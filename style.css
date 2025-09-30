@@ -1,0 +1,129 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+    background-color: #e0f7fa;
+    color: #00695c;
+	font-size: 18px;
+}
+
+/* Elenco allineato a sinistra */
+ul {
+    list-style-position: outside;
+    padding-left: 20px;
+	margin: 10px; 
+}
+
+li {
+    list-style-position: outside;
+    padding-left: 20px;
+	margin: 10px; 
+}
+
+.slide {
+    width: 80%;
+    margin: auto;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border: 2px solid #80cbc4;
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+    background-color: #b2dfdb;
+    text-align: center; /* Mantiene tutto centrato all'interno */
+}
+.image-container img {
+    width: 40%;
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+}
+.nav-buttons button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #26a69a;
+    color: white;
+    transition: background 0.3s;
+}
+.nav-buttons button:hover {
+    background-color: #00897b;
+}
+
+/* Primo box centrato */
+.content-box {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    text-align: center;
+}
+
+/* Secondo box centrato ma più stretto */
+.inner-box {
+    width: 80%; /* Regola questa larghezza per adattarla al contenuto */
+    margin: auto;
+	border-radius: 10px;
+    padding: 15px;
+    text-align: left; /* Mantiene il testo allineato a sinistra */
+	background-color: #ffffff;
+}
+
+/* MENU LATERALE A COMPARSA SOVRAPPOSITIVA */
+
+.menu-toggle {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background-color: #2b4c4b;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+.sidebar {
+    position: fixed;
+    left: -240px;
+    top: 0;
+    width: 220px;
+    height: 100%;
+    background-color: rgba(225, 245, 242, 0.97);  /* leggermente trasparente */
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+    overflow-y: auto;
+    transition: left 0.3s ease;
+    z-index: 999;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+/* Di base nascondi la scrollbar */
+.sidebar {
+    overflow-y: hidden;
+    transition: left 0.3s ease, overflow-y 0s linear 0.3s; /* ritardo per nascondere dopo la chiusura */
+}
+
+/* Quando il menu è aperto rendi visibile la scrollbar */
+.sidebar.open {
+    overflow-y: auto;
+    transition: left 0.3s ease, overflow-y 0s;
+}
+
+.inner-box li > .ok,
+.box li > .ok,
+.inner-box li > .warn,
+.box li > .warn,
+.inner-box li > .note,
+.box li > .note {
+  display: inline-block;
+  margin: .65rem 0 .15rem 0;  /* spazio sopra ben visibile */
+}
+
+
+

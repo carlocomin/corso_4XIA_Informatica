@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – L1.5 · Passare matrici a funzione (C++/C)</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez1_4.html"; }
+    function nextSlide(){ window.location.href = "lez1_6.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 1 — Matrici 2D (4BIA)</h2>
+  <ul>
+    <li><a href="lez1_1.html">L1.1 · Introduzione & obiettivi</a></li>
+    <li><a href="lez1_2.html">L1.2 · Definizioni, indici, row-major</a></li>
+    <li><a href="lez1_3.html">L1.3 · Dichiarazione & attraversamento</a></li>
+    <li><a href="lez1_4.html">L1.4 · I/O & utility</a></li>
+    <li><a href="lez1_5.html">L1.5 · Passare matrici a funzione</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>L1.5 — Passaggio di matrici a funzione: firme corrette (C++ in evidenza, C a fianco)</h1>
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <!-- Perché le firme contano -->
+    <div class="inner-box">
+      <h2>Perché le firme contano (modello mentale)</h2>
+      <ul>
+        <li>In C/C++, un array passato a funzione <strong>decade a puntatore</strong> al suo primo elemento.</li>
+        <li>Per una matrice <code>T a[R][C]</code>, il “primo elemento” è di tipo <code>T[C]</code> (una riga): il tipo diventa <code>T (*)[C]</code>.</li>
+        <li>Il compilatore deve conoscere lo <strong>stride</strong> (cioè <code>C</code>) per calcolare <code>&amp;a[r][c] = base + (r*C + c)*sizeof(T)</code>.</li>
+        <li>Conclusione: nelle firme bisogna fissare almeno la <strong>seconda dimensione</strong> (in C), o usare tecniche tipizzate in C++.</li>
+      </ul>
+    </div>
+
+<div class="inner-box" id="approfondimento-template">
+  <h2>Approfondimento · Perché il <em>template</em> funziona (e quando usarlo)</h2>
+
+  <p>
+    In C++ un array passato a funzione di solito <strong>decade a puntatore</strong>: una matrice <code>int a[R][C]</code>
+    vista dalla funzione diventa <code>int (*)[C]</code> (puntatore a riga). Con i <strong>template</strong> usiamo invece una
+    <strong>referenza ad array</strong> <code>int (&amp;m)[R][C]</code>: le referenze <em>non</em> decadono, quindi il compilatore conosce
+    davvero le dimensioni e può <strong>dedurre</strong> automaticamente i parametri non–tipo <code>R</code> e <code>C</code> a <em>compile time</em>.
+  </p>
+
+  <ul>
+    <li><strong>Firma chiave</strong>: <code>template&lt;std::size_t R, std::size_t C&gt; void f(const int (&amp;m)[R][C]);</code></li>
+    <li><strong>Vantaggi</strong>: sicurezza di tipo (errori a compile time se le dimensioni non corrispondono), nessun overhead,
+        codice generico e leggibile.</li>
+    <li><strong>Limite</strong>: se <code>R</code> e <code>C</code> sono note solo a <em>runtime</em>, i template su array statici non bastano:
+        usa un <em>buffer contiguo</em> (<code>std::vector&lt;T&gt; buf(R*C)</code>) o VLA/pointer-to-array in C.</li>
+  </ul>
+
+<pre><code class="language-cpp">// Deduzione automatica di R e C, zero-cost
+template&lt;std::size_t R, std::size_t C&gt;
+int somma(const int (&amp;m)[R][C]) {
+  int s = 0;
+  for (std::size_t r = 0; r &lt; R; ++r)
+    for (std::size_t c = 0; c &lt; C; ++c)
+      s += m[r][c];
+  return s;
+}
+
+int a[3][5]{{}}; int b[2][2]{{}};
+std::cout &lt;&lt; somma(a) &lt;&lt; "\n";  // R=3, C=5 dedotti
+std::cout &lt;&lt; somma(b) &lt;&lt; "\n";  // R=2, C=2 dedotti
+</code></pre>
+
+  <div class="twocol">
+<pre><code class="language-cpp">// Trasposta: controlla (e scambia) le dimensioni a compile time
+template&lt;std::size_t R, std::size_t C&gt;
+void trasposta(const int (&amp;src)[R][C], int (&amp;dst)[C][R]){
+  for (std::size_t r=0; r&lt;R; ++r)
+    for (std::size_t c=0; c&lt;C; ++c)
+      dst[c][r] = src[r][c];
+}
+</code></pre>
+<pre><code class="language-cpp">// Variante generica anche sul tipo
+template&lt;class T, std::size_t R, std::size_t C&gt;
+T maxElemento(const T (&amp;m)[R][C]) {
+  T mx = m[0][0];
+  for (std::size_t r=0; r&lt;R; ++r)
+    for (std::size_t c=0; c&lt;C; ++c)
+      if (m[r][c] &gt; mx) mx = m[r][c];
+  return mx;
+}
+</code></pre>
+  </div>
+
+</div>
+
+
+
+    <!-- C++: firme consigliate -->
+    <div class="inner-box">
+      <h2>C++ · Firme consigliate (enfasi)</h2>
+      <div class="twocol">
+<pre><code class="language-cpp">// 1) Template generico su R e C (statico, sicuro e flessibile)
+template&lt;std::size_t R, std::size_t C&gt;
+int somma(const int (&m)[R][C]) {
+  int s=0;
+  for (std::size_t r=0; r&lt;R; ++r)
+    for (std::size_t c=0; c&lt;C; ++c)
+      s += m[r][c];
+  return s;
+}
+</code></pre>
+<pre><code class="language-cpp">// 2) Riferimento a array con dimensioni note (es. constexpr R,C)
+constexpr int R=3, C=5;
+int somma(const int (&m)[R][C]) {
+  int s=0;
+  for (int r=0; r&lt;R; ++r)
+    for (int c=0; c&lt;C; ++c)
+      s += m[r][c];
+  return s;
+}
+</code></pre>
+      </div>
+      <div class="twocol">
+<pre><code class="language-cpp">// 3) std::array annidati (contiguo)
+#include &lt;array&gt;
+template&lt;std::size_t R, std::size_t C, class T&gt;
+T somma(const std::array&lt;std::array&lt;T,C&gt;,R&gt;&amp; m){
+  T s{};
+  for (auto const&amp; row : m)
+    for (auto v : row) s += v;
+  return s;
+}
+</code></pre>
+<pre><code class="language-cpp">// 4) Overload read-only vs read-write (const-correctness)
+template&lt;std::size_t R, std::size_t C&gt;
+void stampa(const int (&m)[R][C]);        // read-only
+
+template&lt;std::size_t R, std::size_t C&gt;
+void riempi(int (&m)[R][C], int v);       // modifica
+</code></pre>
+      </div>
+      <p class="note">Il <strong>template</strong> evita di bloccare le dimensioni; il compilatore deduce <code>R</code> e <code>C</code> dall’argomento.</p>
+    </div>
+
+    <!-- C: firme corrette -->
+    <div class="inner-box">
+      <h2>C · Firme corrette</h2>
+      <div class="twocol">
+<pre><code class="language-c">// 1) Seconda dimensione fissa a compile time
+#define C 5
+int somma(int R, const int m[][C]) {
+  int s=0;
+  for (int r=0; r&lt;R; ++r)
+    for (int c=0; c&lt;C; ++c)
+      s += m[r][c];
+  return s;
+}
+</code></pre>
+<pre><code class="language-c">// 2) Puntatore a array di C elementi (equivalente)
+#define C 5
+int somma2(int R, const int (*m)[C]){
+  int s=0;
+  for (int r=0; r&lt;R; ++r)
+    for (int c=0; c&lt;C; ++c)
+      s += m[r][c];
+  return s;
+}
+</code></pre>
+      </div>
+      <div class="twocol">
+<pre><code class="language-c">// 3) C99 VLA (dimensioni a runtime) — ordine parametri!
+int somma_vla(int R, int C, const int m[R][C]) {
+  int s=0;
+  for (int r=0; r&lt;R; ++r)
+    for (int c=0; c&lt;C; ++c)
+      s += m[r][c];
+  return s;
+}
+</code></pre>
+<pre><code class="language-c">// 4) Versioni read-only vs read-write
+void stampa(int R, int C, const int m[R][C]);
+void riempi (int R, int C,       int m[R][C], int v);
+</code></pre>
+      </div>
+      <p class="note"><strong>Attenzione:</strong> i VLA sono C99 e non fanno parte di C++; alcuni compilatori C li estendono ma non è portabile in C++.</p>
+    </div>
+
+    <!-- Casi da evitare -->
+    <div class="inner-box">
+      <h2>❌ Casi da evitare (motivo incluso)</h2>
+      <ul>
+        <li><code>void f(int **m, int R, int C)</code> per un <code>int a[R][C]</code>: <strong>incompatibile</strong>. Un <code>int**</code> non è un <code>int (*)[C]</code>.</li>
+        <li><code>void f(int m[][C])</code> con <code>C</code> non definita (o diversa da quella dell’array chiamante).</li>
+        <li>In C++ fare affidamento su VLA: non standard → comportamento non portabile.</li>
+        <li><code>std::vector&lt;std::vector&lt;T&gt;&gt;</code> credendo sia contiguo: <strong>non lo è</strong>; stride indefinito.</li>
+      </ul>
+    </div>
+
+    <!-- Esempi completi (show/hide) -->
+    <div class="inner-box">
+      <h2>Esempi completi</h2>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-ex1" onclick="toggleBox('btn-ex1','box-ex1')">Mostra C++ (template) ▼</button>
+      </div>
+      <div id="box-ex1" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+template&lt;std::size_t R, std::size_t C&gt;
+int somma(const int (&m)[R][C]){
+  int s=0;
+  for (std::size_t r=0; r&lt;R; ++r)
+    for (std::size_t c=0; c&lt;C; ++c)
+      s += m[r][c];
+  return s;
+}
+template&lt;std::size_t R, std::size_t C&gt;
+void riempi(int (&m)[R][C], int v){
+  for (std::size_t r=0; r&lt;R; ++r)
+    for (std::size_t c=0; c&lt;C; ++c)
+      m[r][c] = v;
+}
+int main(){
+  int a[3][5]{{}};
+  riempi(a, 7);
+  std::cout &lt;&lt; somma(a) &lt;&lt; "\n";
+}
+</code></pre>
+      </div>
+
+      <div class="nav-buttons" style="justify-content:left;margin-top:8px">
+        <button id="btn-ex2" onclick="toggleBox('btn-ex2','box-ex2')">Mostra C (fissa & VLA) ▼</button>
+      </div>
+      <div id="box-ex2" style="display:none;margin-top:8px">
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#define C 5
+int somma(int R, const int m[][C]){
+  int s=0; for(int r=0;r&lt;R;++r) for(int c=0;c&lt;C;++c) s+=m[r][c];
+  return s;
+}
+int somma_vla(int R, int C, const int m[R][C]){
+  int s=0; for(int r=0;r&lt;R;++r) for(int c=0;c&lt;C;++c) s+=m[r][c];
+  return s;
+}
+int main(void){
+  int a[3][5]={{1,2,3,4,5},{6,7,8,9,10},{11,12,13,14,15}};
+  printf("%d\n", somma(3,a));
+  int R=2,Cv=3; int b[2][3]={{1,2,3},{4,5,6}};
+  printf("%d\n", somma_vla(R,Cv,b));
+}
+</code></pre>
+      </div>
+    </div>
+
+    <!-- Mini-task 1 -->
+    <div class="inner-box">
+      <h2>Mini-task 1 · Trasposta (stampa) senza modificare l’originale</h2>
+      <p>Scrivi una funzione che <em>stampi</em> la trasposta <code>Mᵗ</code> di <code>M</code> senza modificarla.</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-t1" onclick="toggleBox('btn-t1','box-t1')">Mostra soluzione ▼</button>
+      </div>
+      <div id="box-t1" style="display:none;margin-top:8px">
+        <div class="twocol">
+<pre><code class="language-cpp">// C++ (template read-only)
+template&lt;std::size_t R, std::size_t C&gt;
+void stampaTrasposta(const int (&m)[R][C]){
+  for (std::size_t c=0; c&lt;C; ++c){
+    for (std::size_t r=0; r&lt;R; ++r)
+      std::cout &lt;&lt; m[r][c] &lt;&lt; ' ';
+    std::cout &lt;&lt; '\n';
+  }
+}
+</code></pre>
+<pre><code class="language-c">// C (VLA)
+void stampa_trasposta(int R, int C, const int m[R][C]){
+  for (int c=0; c&lt;C; ++c){
+    for (int r=0; r&lt;R; ++r)
+      printf("%d ", m[r][c]);
+    printf("\n");
+  }
+}
+</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mini-task 2 -->
+    <div class="inner-box">
+      <h2>Mini-task 2 · Imposta riga e colonna (in-place)</h2>
+      <p>Progetta le <strong>firme</strong> e implementa funzioni che impostano tutti i valori della riga <code>i</code> (o colonna <code>j</code>) a <code>v</code>.</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-t2" onclick="toggleBox('btn-t2','box-t2')">Mostra soluzione ▼</button>
+      </div>
+      <div id="box-t2" style="display:none;margin-top:8px">
+        <div class="twocol">
+<pre><code class="language-cpp">// C++ (template, write)
+template&lt;std::size_t R, std::size_t C&gt;
+void setRiga(int (&m)[R][C], std::size_t i, int v){
+  for (std::size_t c=0; c&lt;C; ++c) m[i][c]=v;
+}
+template&lt;std::size_t R, std::size_t C&gt;
+void setColonna(int (&m)[R][C], std::size_t j, int v){
+  for (std::size_t r=0; r&lt;R; ++r) m[r][j]=v;
+}
+</code></pre>
+<pre><code class="language-c">// C (seconda dimensione fissa)
+#define C 5
+void set_riga (int R,       int m[][C], int i, int v){
+  for (int c=0; c&lt;C; ++c) m[i][c]=v;
+}
+void set_col  (int R,       int m[][C], int j, int v){
+  for (int r=0; r&lt;R; ++r) m[r][j]=v;
+}
+</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Takeaways -->
+    <div class="inner-box">
+      <h2>Da ricordare</h2>
+      <ul>
+        <li>In C serve conoscere la <strong>seconda dimensione</strong> in firma; con C99 VLA puoi passare <strong>anche dimensioni runtime</strong> (ma non in C++).</li>
+        <li>In C++ preferisci <strong>template</strong> o <code>std::array</code> annidati per matrici statiche, con <strong>const-correctness</strong> chiara.</li>
+        <li>Evita <code>int**</code> per matrici statiche: tipo incompatibile.</li>
+        <li>La contiguità è cruciale: nella prossima slide (**L1.6**) vedremo le <strong>rappresentazioni dinamiche</strong> corrette (heap, flatten 1D, <code>std::vector</code>).</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

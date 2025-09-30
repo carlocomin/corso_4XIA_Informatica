@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez3_1 · File: concetti, tipi e modello d’I/O</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "../programma.html"; }
+    function nextSlide(){ window.location.href = "lez3_2.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none':'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+  <style>
+    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
+    .tip  { font-style: italic; opacity:.95 }
+    .spec b { display:inline-block; width:11.5rem }
+    /* forza allineamento a sinistra dei code block */
+    .inner-box pre, .inner-box pre code, .box pre, .box pre code, pre, pre code { text-align: left !important; }
+    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
+    pre code { display:block; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #e5e7eb; padding: .45rem .5rem; vertical-align: top; text-align:left }
+    th { background: #f8fafc; }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+  </style>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 3 — File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">Lez3_1: File: concetti e modelli</a></li>
+    <li><a href="lez3_2.html">Lez3_2: I/O su file testuali (C++)</a></li>
+    <li><a href="lez3_3.html">Lez3_3: I/O su file testuali (C)</a></li>
+    <li><a href="lez3_4.html">Lez3_4: File binari: formati & portabilità</a></li>
+    <li><a href="lez3_5.html">Lez3_5: Binario in C++ (serialize/deserialize)</a></li>
+    <li><a href="lez3_6.html">Lez3_6: Binario in C (serialize/deserialize)</a></li>
+    <li><a href="lez3_7.html">Lez3_7: Prestazioni & buone pratiche</a></li>
+    <li><a href="lez3_8.html">Lez3_8: Laboratorio & esercizi</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Lez3_1 — File: concetti, tipi e modello d’I/O (ripasso esteso)</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box">
+      <h2>Obiettivi</h2>
+      <ul>
+        <li>Capire cos’è un <strong>file</strong> a livello informatico e come lo gestisce il sistema operativo.</li>
+        <li>Distinguere tra <strong>file testuali</strong> e <strong>file binari</strong> (pro/contro, quando usarli).</li>
+        <li>Capire il <strong>modello d’I/O</strong>: aprire, leggere/scrivere, posizionarsi, chiudere; errori tipici.</li>
+        <li>Conoscere i concetti di <strong>percorso</strong> (path), <strong>working directory</strong>, <strong>permessi</strong>, <strong>buffering</strong>.</li>
+      </ul>
+      <p class="note">Le prossime slide mostrano il “come si fa” in C++ e in C. Qui mettiamo le basi per ragionare in modo corretto.</p>
+    </div>
+
+    <div class="box">
+      <h2>Che cos’è un file (3 livelli)</h2>
+      <table>
+        <tr><th>Livello</th><th>Idea</th><th>Esempi/Note</th></tr>
+        <tr>
+          <td><strong>Logico</strong></td>
+          <td>Una <em>sequenza di byte</em> con un significato (testo, dati misure, immagini, codice…)</td>
+          <td>Il significato dipende dal <em>formato</em> deciso dal programmatore/standard</td>
+        </tr>
+        <tr>
+          <td><strong>OS</strong></td>
+          <td>L’OS gestisce i file con <em>percorso</em>, <em>permessi</em>, <em>handle/descrittori</em>, <em>timestamp</em></td>
+          <td>Operazioni: apri/chiudi, leggi/scrivi, crea/cancella, rinomina, sposta</td>
+        </tr>
+        <tr>
+          <td><strong>Fisico</strong></td>
+          <td>I byte sono memorizzati su disco/SSD; il file system organizza blocchi e indici</td>
+          <td>Dettagli fisici <em>astratti</em> dal programmatore</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="box">
+      <h2>File testuali vs file binari</h2>
+      <table>
+        <tr><th>Tipo</th><th>Cos’è</th><th>Pro</th><th>Contro</th><th>Esempi d’uso</th></tr>
+        <tr>
+          <td><strong>Testuale</strong></td>
+          <td>Byte che rappresentano <em>caratteri</em> secondo un’<strong>encoding</strong> (UTF-8, ecc.)</td>
+          <td>Leggibile, diff-friendly, facile da debuggare</td>
+          <td>Più spazio, parsing, attenzione a newline/locale</td>
+          <td>Log, CSV/TSV, JSON, sorgenti</td>
+        </tr>
+        <tr>
+          <td><strong>Binario</strong></td>
+          <td>Byte “grezzi” con struttura fissata dal programma (campi numerici, lunghezze, ecc.)</td>
+          <td>Compatto, veloce da leggere/scrivere, comodo per accesso casuale</td>
+          <td>Non leggibile a occhio, attenzione a <em>endianness</em>, versioni, sicurezza</td>
+          <td>Immagini, audio, archivi dati efficienti</td>
+        </tr>
+      </table>
+      <p class="tip"><strong>Encoding</strong>: in testuale useremo <em>UTF-8</em>. <strong>Newline</strong>: Windows usa CRLF (<span class="mono">\r\n</span>), Linux/macOS LF (<span class="mono">\n</span>).</p>
+    </div>
+
+    <div class="box">
+      <h2>Percorsi, working directory, permessi</h2>
+      <ul>
+        <li><strong>Percorso assoluto</strong>: parte dalla radice del disco. Es. Linux: <span class="kbd">/home/utente/dati/log.txt</span>; Windows: <span class="kbd">C:\Users\Utente\dati\log.txt</span></li>
+        <li><strong>Percorso relativo</strong>: relativo alla <em>working directory</em> del processo. Es.: <span class="kbd">./data/log.txt</span></li>
+        <li><strong>Working directory</strong>: cartella “corrente” da cui il programma risolve i percorsi relativi.</li>
+        <li><strong>Permessi</strong>: lettura/scrittura/esecuzione. Errori tipici: “<em>Permission denied</em>”, “<em>No such file or directory</em>”.</li>
+      </ul>
+      <p class="note">Nelle nostre slide useremo percorsi semplici (file nella cartella del programma) per essere portabili.</p>
+    </div>
+
+    <div class="box">
+      <h2>Modello generale d’I/O (valido sia in C++ che in C)</h2>
+      <ol>
+        <li><strong>Aprire</strong> il file: ottieni un <em>handle</em> (C++: stream; C: <code>FILE*</code>).</li>
+        <li><strong>Leggere/Scrivere</strong>: in <em>testo</em> (linee/parsificato) o in <em>binario</em> (byte/strutture definite).</li>
+        <li><strong>Posizionarsi</strong> (opzionale): spostare il “cursore” interno (seek) per leggere da un punto preciso.</li>
+        <li><strong>Chiudere</strong> il file (o lasciare che la libreria lo chiuda a fine vita dell’oggetto).</li>
+      </ol>
+      <ul>
+        <li><strong>Buffering</strong>: le librerie accumulano dati in memoria per efficienza. <em>Flush</em> = svuotare il buffer su disco.</li>
+        <li><strong>Errori tipici</strong>: file inesistente, permessi, percorso sbagliato, disco pieno, formato inatteso.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>Mini-assaggi di codice (solo per vedere la forma)</h2>
+
+      <div class="box">
+        <h3>1) C++ · <em>lettura</em> file testuale (riga per riga)</h3>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+int main(){
+    std::ifstream in("dati.txt");             // TESTO (r)
+    if (!in) { std::cerr &lt;&lt; "Errore apertura\n"; return 1; }
+    std::string linea;
+    while (std::getline(in, linea)) {
+        std::cout &lt;&lt; "Letta: " &lt;&lt; linea &lt;&lt; "\n";
+    }
+}
+</code></pre>
+      </div>
+
+      <div class="box">
+        <h3>2) C++ · <em>scrittura</em> file testuale</h3>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+
+int main(){
+    std::ofstream out("out.txt");             // TESTO (w, troncante)
+    if (!out){ std::cerr &lt;&lt; "Errore apertura\n"; return 1; }
+    out &lt;&lt; "Prima riga\n";
+    out &lt;&lt; "Seconda riga\n";
+    // RAII: out si chiude da solo a fine blocco
+}
+</code></pre>
+      </div>
+
+      <div class="box">
+        <h3>3) C · <em>lettura</em> file testuale (riga per riga con <code>fgets</code>)</h3>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+static void rstrip_crlf(char* s){
+    size_t n = strlen(s);
+    while (n &gt; 0 &amp;&amp; (s[n-1]=='\n' || s[n-1]=='\r')) s[--n] = '\0';
+}
+
+int main(void){
+    FILE* f = fopen("dati.txt", "r");    // TESTO (r)
+    if (!f) { perror("fopen"); return 1; }
+    char buf[256];
+    while (fgets(buf, sizeof buf, f)){
+        rstrip_crlf(buf);
+        printf("Letta: %s\n", buf);
+    }
+    fclose(f);
+    return 0;
+}
+</code></pre>
+        <p class="tip">Usiamo <code>fgets</code> (riga intera) e togliamo eventuali <code>\r</code>/<code>\n</code> finali (CR/LF).</p>
+      </div>
+
+      <div class="box">
+        <h3>4) C · <em>scrittura</em> file testuale</h3>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(void){
+    FILE* out = fopen("out.txt", "w");   // TESTO (w, troncante)
+    if (!out) { perror("fopen"); return 1; }
+    fprintf(out, "Prima riga\n");
+    fprintf(out, "Seconda riga\n");
+    fclose(out);
+    return 0;
+}
+</code></pre>
+      </div>
+
+      <p class="tip">I dettagli pratici (CSV/TSV robusti, portabilità binario, serializzazione di archivi) sono nelle slide successive.</p>
+    </div>
+
+    <div class="inner-box">
+      <h2>Esercizi di comprensione (con soluzioni a comparsa)</h2>
+      <ol>
+        <li><strong>E1 — Testo o binario?</strong><br/>
+          <span>Hai un archivio di 10.000 studenti con nome, cognome, età e media. Scegli tra <em>testo</em> e <em>binario</em> e motiva pro/contro.</span>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
+          <div id="box-e1" style="display:none;margin-top:8px">
+            <div class="ok">
+              <p><strong>Possibile risposta:</strong> <em>Testo</em> se voglio leggibilità e editing manuale (CSV), facile scambio con fogli di calcolo. <em>Binario</em> se voglio file compatti/veloci (salvataggio frequente, grandi volumi) e controllo totale del formato. Per la classe, testo va benissimo; per un gestionale ad alte prestazioni, binario.</p>
+            </div>
+          </div>
+        </li>
+
+        <li><strong>E2 — Percorsi</strong><br/>
+          <span>Qual è la differenza tra percorso <em>assoluto</em> e <em>relativo</em>? Fai un esempio in Windows e uno in Linux.</span>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
+          <div id="box-e2" style="display:none;margin-top:8px">
+            <div class="ok">
+              <p><strong>Soluzione:</strong> Assoluto: dalla radice (<span class="kbd">C:\</span> o <span class="kbd">/</span>). Es.: <span class="kbd">C:\Users\Mario\log.txt</span>, <span class="kbd">/home/mario/log.txt</span>.
+              Relativo: rispetto alla cartella corrente. Es.: <span class="kbd">.\data\log.txt</span> (Win) o <span class="kbd">./data/log.txt</span> (Linux).</p>
+            </div>
+          </div>
+        </li>
+
+        <li><strong>E3 — Newline & encoding</strong><br/>
+          <span>Perché un file testuale creato su Windows può mostrare “stranezze” se aperto su Linux con editor vecchi?</span>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra ▼</button></div>
+          <div id="box-e3" style="display:none;margin-top:8px">
+            <div class="ok">
+              <p><strong>Soluzione:</strong> Perché Windows usa CRLF (<span class="mono">\r\n</span>) e alcuni editor Linux si aspettano solo LF (<span class="mono">\n</span>). Inoltre l’encoding deve essere noto (meglio <strong>UTF-8</strong>).</p>
+            </div>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="inner-box">
+      <h2>Takeaways</h2>
+      <ul>
+        <li>Un file è <strong>byte + regole</strong> (formato). Il programmatore sceglie regole chiare.</li>
+        <li><strong>Testo</strong> = leggibile ma richiede parsing; <strong>binario</strong> = efficiente ma serve una specifica.</li>
+        <li>Occhio a <strong>path</strong>, <strong>permessi</strong>, <strong>buffering</strong>, <strong>newline</strong>, <strong>encoding</strong>, <strong>endianness</strong> (solo per binario).</li>
+        <li>Da qui in avanti: applicazione pratica in C++ e C, con esempi completi.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lezione 1 · Matrici 2D in C/C++ · Introduzione & Obiettivi</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "../programma.html"; }
+    function nextSlide(){ window.location.href = "lez1_2.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 1 — Matrici 2D (4BIA)</h2>
+  <ul>
+    <li><a href="lez1_1.html">L1.1 · Introduzione & obiettivi</a></li>
+    <!-- Le voci successive verranno aggiunte man mano che creiamo le slide -->
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Lezione 1 — Matrici a due dimensioni in C/C++ <small>(ripasso strutturato)</small></h1>
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box">
+      <h2>Obiettivi della lezione</h2>
+      <ul>
+        <li>Richiamare definizioni e terminologia: <em>righe</em>, <em>colonne</em>, indicizzazione <code>a[r][c]</code>, casi quadrati/rettangolari.</li>
+        <li>Comprendere il <strong>modello di memoria row-major</strong> e le conseguenze su performance e pattern di attraversamento.</li>
+        <li>Ripassare <strong>dichiarazione</strong>, <strong>inizializzazione</strong>, <strong>I/O</strong>, <strong>attraversamento</strong> per riga/colonna.</li>
+        <li>Passare <strong>matrici a funzione</strong> in C e C++ in modo corretto.</li>
+        <li>Introdurre e confrontare le <strong>rappresentazioni dinamiche</strong>:
+          C (<code>malloc/free</code>, VLA C99) e C++ (<code>new/delete</code>, <code>std::vector</code>, flatten 1D, <code>std::vector&lt;std::vector&lt;T&gt;&gt;</code>).</li>
+        <li>Allenarsi su problemi classici (temperature, diagonali, moltiplicazione, pattern di riempimento) e <em>challenge</em> Polibio.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>Roadmap della sequenza (slide di oggi)</h2>
+      <ol>
+        <li><strong>L1.1</strong> (questa): introduzione, obiettivi, convenzioni, prerequisiti.</li>
+        <li><strong>L1.2</strong>: definizioni & indici; modello row-major; errori tipici (<code>&lt;=</code> vs <code>&lt;</code>, indici invertiti).</li>
+        <li><strong>L1.3</strong>: dichiarazione/inizializzazione; attraversamento per riga/colonna; <em>locality</em>.</li>
+        <li><strong>L1.4</strong>: I/O e utility (azzera/mostra/riempi); doppia colonna C/C++ (enfasi C++).</li>
+        <li><strong>L1.5</strong>: passaggio a funzione — firme corrette (C statico, C99 VLA) e C++ (riferimenti a array, <code>std::array</code>).</li>
+        <li><strong>L1.6</strong>: <strong>dinamiche</strong> — C (<code>malloc</code>, <code>int (*a)[C]</code>, flatten 1D) e C++ (<code>new</code>, <code>std::vector</code>, flatten vs <code>vector&lt;vector&gt;</code>).</li>
+        <li><strong>L1.7</strong>: operazioni base (somma per riga/colonna, diagonali, traccia, simmetria).</li>
+        <li><strong>L1.8</strong>: moltiplicazione matrici (ripasso) + ordine dei cicli e inizializzazione di C.</li>
+        <li><strong>L1.9</strong>: esercizio “temperature estive” (7×5) — pseudocodice → C/C++.</li>
+        <li><strong>L1.10</strong>: pattern di riempimento (zig-zag, diagonali, traslata, spirale) con suggerimenti.</li>
+        <li><strong>L1.11</strong>: mini-verifica a risposta rapida + <em>Challenge</em> Polibio (consegna).</li>
+      </ol>
+    </div>
+
+    <div class="inner-box">
+      <h2>Prerequisiti (auto-check)</h2>
+      <p>Spunta mentalmente. Se manca qualcosa, lo riprendiamo al volo durante la pratica.</p>
+      <ul>
+        <li>Array 1D, cicli <code>for</code> annidati, funzioni con parametri per riferimento/valore.</li>
+        <li>I/O di base (C: <code>scanf/printf</code> · C++: <code>cin/cout</code>).</li>
+        <li>Nozioni base di <code>const</code>/<code>constexpr</code>, differenza stack/heap (cenno per le dinamiche).</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>Convenzioni di corso & doppia colonna C/C++</h2>
+      <p>
+        Useremo esempi in <strong>C++ (prevalente)</strong> affiancati dalla versione <strong>C</strong> quando utile.
+        Dove la sintassi diverge sostanzialmente, mostreremo un <em>confronto side-by-side</em>.
+      </p>
+<pre><code class="language-cpp">// C++ (enfasi)
+constexpr int R=3, C=5;
+int a[R][C]{};             // zero-init
+for (int r=0; r&lt;R; ++r)
+  for (int c=0; c&lt;C; ++c)
+    a[r][c] = r*C + c;     // per riga: migliore locality
+</code></pre>
+<pre><code class="language-c">// C (ripasso)
+#define R 3
+#define C 5
+int a[R][C] = {0};
+for (int r=0; r&lt;R; ++r)
+  for (int c=0; c&lt;C; ++c)
+    a[r][c] = r*C + c;
+</code></pre>
+      <p class="note">Nelle slide successive: passaggio a funzione, I/O, e rappresentazioni <strong>dinamiche</strong> (C e C++).</p>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

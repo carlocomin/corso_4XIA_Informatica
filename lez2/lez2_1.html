@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez2.1 · Struct: motivazione, definizione, sintassi base (C++ → C)</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "../programma.html"; }
+    function nextSlide(){ window.location.href = "lez2_2.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+  </script>
+  <style>
+    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
+    /* --- hard-left per code block (evita centrature ereditate) --- */
+    .inner-box pre,
+    .inner-box pre code,
+    .box pre,
+    .box pre code,
+    pre,
+    pre code { text-align: left !important; }
+    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
+    pre code { display:block; }
+  </style>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 2 — Struct (ripasso mirato)</h2>
+  <ul>
+    <li><a href="lez2_1.html">Lez2.1: Motivazione & sintassi base</a></li>
+    <li><a href="lez2_2.html">Lez2.2: Inizializzazioni in C/C++</a></li>
+    <!-- prossime:
+    <li><a href="lez2_3.html">Lez2.3: Passaggio a funzione</a></li>
+    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct & lambda</a></li>
+    -->
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Lez2.1 — <em>Struct</em>: motivazione, definizione e sintassi base</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box">
+      <h2>Perché le <code>struct</code>?</h2>
+      <p>
+        Una <strong>struct</strong> modella un <em>dato composto</em>: un’unica entità che aggrega campi tra loro coerenti.
+        Senza struct, useremmo variabili sciolte non sincronizzate (es. tre array separati per nome, età, media).
+        Con la struct racchiudiamo i campi in un <em>tipo orientato al dominio</em> (es. <code>Studente</code>), rendendo più chiaro cosa
+        rappresenta ogni record, facilitando passaggio a funzione, riuso e test.
+      </p>
+      <ul>
+        <li><strong>Leggibilità & coesione</strong>: i campi stanno insieme e “viaggiano” insieme.</li>
+        <li><strong>Sicurezza dei tipi</strong>: evitiamo parametri sfalsati e mix-up tra campi.</li>
+        <li><strong>Base per collezioni</strong>: vettori/array di struct, ordinamento per chiavi, filtri, ecc.</li>
+      </ul>
+      <p class="note"><strong>Idea chiave:</strong> la struct è un “mini-modello” del mondo reale: definisci il <em>cosa</em> (dati),
+        poi userai funzioni che operano su quel tipo (calcoli, stampa, validazione) nelle prossime slide.</p>
+    </div>
+
+    <!-- C++ PRIMA -->
+    <div class="box">
+      <h2>C++: definizione e uso essenziali</h2>
+      <p>
+        In C++, <code>struct</code> e <code>class</code> differiscono solo per il <strong>default di accesso</strong>:
+        nelle struct è <code>public</code>, nelle class è <code>private</code>. Per dati “plain” e record, la struct è idiomatica.
+      </p>
+<pre><code class="language-cpp">// Definizione di un tipo composto
+struct Studente {
+    std::string nome;
+    std::string cognome;
+    int eta;
+    double media;
+}; // ← il punto e virgola è obbligatorio
+
+// Dichiarazione e accesso ai membri
+int main() {
+    Studente s;                 // oggetto con campi di default-initialization
+    s.nome = "Ada";             // accesso con l'operatore '.'
+    s.cognome = "Lovelace";
+    s.eta = 17;
+    s.media = 9.4;
+}
+</code></pre>
+      <p class="warn"><strong>Attenzione</strong>: le “assegnazioni dopo” sono lecite ma spesso sub-ottimali:
+        nella prossima slide vedremo le <em>inizializzazioni</em> (brace, value, ecc.) più sicure e dichiarative.</p>
+      <p>
+        Con i <strong>puntatori</strong> a struct si usa <code>→</code>:
+        <code>Studente* p = &s;</code> poi <code>p-&gt;eta = 18;</code>. Con un <strong>reference</strong> <code>Studente& r = s;</code> si continua a usare <code>.</code>.
+      </p>
+    </div>
+
+    <!-- POI C -->
+    <div class="box">
+      <h2>C (nota di confronto)</h2>
+      <p>
+        In C “puro”, il nome del tipo include <code>struct</code>, oppure si usa un <code>typedef</code> idiomatico per accorciare:
+      </p>
+<pre><code class="language-c">// C: definizione e typedef
+typedef struct {
+    char nome[32];
+    char cognome[32];
+    int eta;
+    double media;
+} Studente;  // ora Studente è un alias del tipo struct anonimo
+
+// Dichiarazione e uso
+Studente s;
+strcpy(s.nome, "Ada");
+strcpy(s.cognome, "Lovelace");
+s.eta = 17;
+s.media = 9.4;
+</code></pre>
+      <p class="note">
+        In C non esistono <code>std::string</code> né costrutti di alto livello del C++; le stringhe sono array di <code>char</code> terminati da <code>'\0'</code>.
+      </p>
+    </div>
+
+    <div class="inner-box">
+      <h2>Accesso ai membri e semantica dei nomi</h2>
+      <ul>
+        <li><strong>Operatore punto</strong> <code>.</code>: accesso ai campi tramite una <em>istanza</em> (oggetto automatico o riferimento).</li>
+        <li><strong>Operatore freccia</strong> <code>-&gt;</code>: accesso ai campi tramite <em>puntatore</em> (dopo dereferenziamento implicito).</li>
+        <li><strong>Scope & nomi</strong>: la struct definisce un <em>nuovo tipo</em>; firme autoesplicative (es. <code>bool valida(const Studente& s)</code>).</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>Buone pratiche (fin da subito)</h2>
+      <ul>
+        <li><strong>Nomi parlanti</strong> per i campi: meglio <code>dataNascita</code> che <code>d</code>.</li>
+        <li><strong>Tipi corretti</strong>: usa <code>std::string</code> in C++ per testo; buffer “crudi” solo per interoperabilità C.</li>
+        <li><strong>Evita copie inutili</strong>: quando passeremo alle funzioni, preferiremo <code>const Studente&</code> per sola lettura.</li>
+        <li><strong>Punto e virgola</strong> dopo la definizione della struct: è parte della sintassi del linguaggio.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>Mini-quiz (ripasso immediato)</h2>
+      <ol>
+        <li>In C++, qual è la differenza sostanziale tra <code>struct</code> e <code>class</code>?</li>
+        <li>Quando si usa <code>.</code> e quando <code>-&gt;</code> per accedere ai membri?</li>
+        <li>Perché una struct rende il codice più robusto rispetto a gestire più variabili “sciolte”?</li>
+      </ol>
+      <p class="note">Avanti con le <strong>inizializzazioni</strong> (Lez2.2) e poi il <strong>passaggio a funzione</strong>.</p>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

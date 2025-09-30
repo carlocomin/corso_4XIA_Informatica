@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – L1.4 · I/O di matrici & utility (C++/C)</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez1_3.html"; }
+    function nextSlide(){ window.location.href = "lez1_5.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 1 — Matrici 2D (4BIA)</h2>
+  <ul>
+    <li><a href="lez1_1.html">L1.1 · Introduzione & obiettivi</a></li>
+    <li><a href="lez1_2.html">L1.2 · Definizioni, indici, row-major</a></li>
+    <li><a href="lez1_3.html">L1.3 · Dichiarazione & attraversamento</a></li>
+    <li><a href="lez1_4.html">L1.4 · I/O & utility</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>L1.4 — I/O delle matrici & funzioni di utilità (C++ in evidenza, C a fianco)</h1>
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box">
+      <h2>Obiettivo</h2>
+      <ul>
+        <li>Leggere e stampare matrici <strong>in modo chiaro e robusto</strong>.</li>
+        <li>Definire utility riutilizzabili: <code>azzeraMatrice</code>, <code>mostraMatrice</code>, <code>riempiCasuale</code>.</li>
+        <li>Capire le differenze pratiche C++/C (formattazione, robustezza input).</li>
+      </ul>
+    </div>
+
+    <!-- I/O BASE: C++ -->
+    <div class="inner-box">
+      <h2>I/O di base (C++) — versione statica R×C note</h2>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;iomanip&gt;   // setw, setfill
+using namespace std;
+
+constexpr int R=3, C=5;
+
+void leggiMatrice(int (&a)[R][C]){
+  for (int r=0; r&lt;R; ++r)
+    for (int c=0; c&lt;C; ++c){
+      if(!(cin &gt;&gt; a[r][c])){ cerr &lt;&lt; "Errore input\n"; return; }
+    }
+}
+
+// stampa allineata, opzionale intestazioni di riga/colonna
+void mostraMatrice(const int (&a)[R][C], int width=4, bool header=true){
+  if(header){
+    cout &lt;&lt; "    ";
+    for(int c=0;c&lt;C;++c) cout &lt;&lt; setw(width) &lt;&lt; c;
+    cout &lt;&lt; '\n';
+  }
+  for (int r=0; r&lt;R; ++r){
+    if(header) cout &lt;&lt; setw(3) &lt;&lt; r &lt;&lt; ":";
+    for (int c=0; c&lt;C; ++c) cout &lt;&lt; setw(width) &lt;&lt; a[r][c];
+    cout &lt;&lt; '\n';
+  }
+}
+</code></pre>
+      <p class="note">Uso di <code>setw</code> per allineare le colonne; l’argomento <em>width</em> consente di adattare la larghezza alle cifre dei dati.</p>
+    </div>
+
+    <!-- I/O BASE: C -->
+    <div class="inner-box">
+      <h2>I/O di base (C) — versione statica R×C note</h2>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+#define R 3
+#define C 5
+
+void leggiMatrice(int a[R][C]){
+  for(int r=0;r&lt;R;++r)
+    for(int c=0;c&lt;C;++c)
+      if(scanf("%d",&a[r][c])!=1){ fprintf(stderr,"Errore input\n"); return; }
+}
+
+void mostraMatrice(const int a[R][C], int width){
+  printf("    ");
+  for(int c=0;c&lt;C;++c) printf("%*d", width, c);
+  printf("\n");
+  for(int r=0;r&lt;R;++r){
+    printf("%3d:", r);
+    for(int c=0;c&lt;C;++c) printf("%*d", width, a[r][c]);
+    printf("\n");
+  }
+}
+</code></pre>
+      <p class="note">In C si usa la formattazione con <code>%*d</code> per larghezze dinamiche. Validare il valore di ritorno di <code>scanf</code> rende l’input più robusto.</p>
+    </div>
+
+    <!-- UTILITY: AZZERA & CASUALE -->
+    <div class="inner-box">
+      <h2>Utility comuni</h2>
+      <div class="twocol">
+<pre><code class="language-cpp">// C++ — azzera e riempiCasuale (intervallo [lo, hi])
+#include &lt;random&gt;
+void azzeraMatrice(int (&a)[R][C]){
+  for(int r=0;r&lt;R;++r) for(int c=0;c&lt;C;++c) a[r][c]=0;
+}
+void riempiCasuale(int (&a)[R][C], int lo=0, int hi=99){
+  std::mt19937 rng(std::random_device{}());
+  std::uniform_int_distribution&lt;int&gt; dist(lo,hi);
+  for(int r=0;r&lt;R;++r) for(int c=0;c&lt;C;++c) a[r][c]=dist(rng);
+}
+</code></pre>
+<pre><code class="language-c">// C — azzera e riempiCasuale (rand)
+#include &lt;stdlib.h&gt;
+#include &lt;time.h&gt;
+void azzeraMatrice(int a[R][C]){
+  for(int r=0;r&lt;R;++r) for(int c=0;c&lt;C;++c) a[r][c]=0;
+}
+void riempiCasuale(int a[R][C], int lo, int hi){
+  for(int r=0;r&lt;R;++r)
+    for(int c=0;c&lt;C;++c)
+      a[r][c] = lo + rand() % (hi-lo+1);
+}
+</code></pre>
+      </div>
+      <p class="note">C++ usa <code>&lt;random&gt;</code> (migliore qualità statistica); in C ricordarsi <code>srand(time(NULL))</code> in <code>main</code> prima dell’uso.</p>
+    </div>
+
+    <!-- ACCORTEZZE I/O -->
+    <div class="inner-box">
+      <h2>Accortezze pratiche di I/O</h2>
+      <ul>
+        <li><strong>C++:</strong> per input massiccio si può usare <code>ios::sync_with_stdio(false); cin.tie(nullptr);</code>.</li>
+        <li><strong>Spazi & terminatori:</strong> <code>cin &gt;&gt; x</code> salta spazi/newline; <code>scanf</code> richiede formati corretti e controlli sul valore di ritorno.</li>
+        <li><strong>Allineamento output:</strong> usa sempre width coerente con l’ampiezza dei dati per tabelle leggibili.</li>
+      </ul>
+    </div>
+
+    <!-- MINI TASK 1 -->
+    <div class="inner-box">
+      <h2>Mini-task 1 · Stampa con intestazioni e bordo</h2>
+      <p>Estendi <code>mostraMatrice</code> (C++ o C) per disegnare un piccolo bordo “|” tra le celle.</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-t1" onclick="toggleBox('btn-t1','box-t1')">Mostra soluzione ▼</button>
+      </div>
+      <div id="box-t1" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">// C++ (estratto interno al doppio ciclo)
+cout &lt;&lt; '|'
+     &lt;&lt; setw(width) &lt;&lt; a[r][c];
+if(c==C-1) cout &lt;&lt; '|';
+</code></pre>
+<pre><code class="language-c">// C (estratto)
+printf("|%*d", width, a[r][c]);
+if(c==C-1) printf("|");
+</code></pre>
+      </div>
+    </div>
+
+    <!-- MINI TASK 2 -->
+    <div class="inner-box">
+      <h2>Mini-task 2 · Lettura robusta R×C</h2>
+      <p>Scrivi una funzione che legge esattamente <code>R*C</code> interi, ripetendo la richiesta in caso di input non valido.</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-t2" onclick="toggleBox('btn-t2','box-t2')">Mostra soluzione ▼</button>
+      </div>
+      <div id="box-t2" style="display:none;margin-top:8px">
+        <div class="twocol">
+<pre><code class="language-cpp">// C++ (robusto)
+void leggiRobusto(int (&a)[R][C]){
+  for(int r=0;r&lt;R;++r)
+    for(int c=0;c&lt;C;++c){
+      while(!(cin &gt;&gt; a[r][c])){
+        cin.clear();              // reset failbit
+        cin.ignore(1&lt;&lt;20, '\n');  // scarta riga
+        cerr &lt;&lt; "Valore non valido. Riprova: ";
+      }
+    }
+}
+</code></pre>
+<pre><code class="language-c">// C (controllo ritorno scanf)
+void leggiRobusto(int a[R][C]){
+  for(int r=0;r&lt;R;++r)
+    for(int c=0;c&lt;C;++c){
+      while(scanf("%d",&a[r][c])!=1){
+        int ch;
+        fprintf(stderr,"Valore non valido. Riprova: ");
+        while((ch=getchar())!='\n' &amp;&amp; ch!=EOF){} // scarica buffer
+      }
+    }
+}
+</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESEMPIO COMPLETO SHOW/HIDE -->
+    <div class="inner-box">
+      <h2>Programma completo (demo) — C++</h2>
+      <p>Legge, azzera, riempie casuale e stampa una matrice R×C.</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-demo" onclick="toggleBox('btn-demo','box-demo')">Mostra ▼</button>
+      </div>
+      <div id="box-demo" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">int main(){
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  int a[R][C]{};
+  cout &lt;&lt; "Inserisci " &lt;&lt; R*C &lt;&lt; " numeri:\\n";
+  leggiMatrice(a);
+  cout &lt;&lt; "\\nLetta:\\n";  mostraMatrice(a, 4, true);
+  cout &lt;&lt; "\\nAzzero e riempio casualmente:\\n";
+  azzeraMatrice(a);
+  riempiCasuale(a, -9, 9);
+  mostraMatrice(a, 4, true);
+}
+</code></pre>
+      </div>
+    </div>
+
+    <div class="inner-box">
+      <h2>Cosa portarsi a casa</h2>
+      <ul>
+        <li>Stampa **allineata** e leggibile ⇒ debugging più veloce.</li>
+        <li>Input **robusto** ⇒ niente crash/silenzi su errori dell’utente.</li>
+        <li>Utility semplici riusabili ⇒ meno boilerplate nelle prossime esercitazioni.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

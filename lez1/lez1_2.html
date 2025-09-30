@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – L1.2 · Matrici 2D: definizioni, indici, row-major</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez1_1.html"; }
+    function nextSlide(){ window.location.href = "lez1_3.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 1 — Matrici 2D (4BIA)</h2>
+  <ul>
+    <li><a href="lez1_1.html">L1.1 · Introduzione & obiettivi</a></li>
+    <li><a href="lez1_2.html">L1.2 · Definizioni, indici, row-major</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>L1.2 — Matrici 2D: definizioni, indici, modello di memoria</h1>
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <!-- Definizione formale -->
+    <div class="inner-box">
+      <h2>Che cos’è una matrice (ripasso rigoroso)</h2>
+      <ul>
+        <li>Una matrice 2D su tipo <code>T</code> è una funzione discreta
+          <code>M: {0..R−1} × {0..C−1} → T</code>.</li>
+        <li>Convenzionalmente useremo <strong>0-based</strong>: la cella in riga <code>r</code> e colonna <code>c</code> è <code>M[r][c]</code>.</li>
+        <li><strong>R</strong> = numero righe, <strong>C</strong> = numero colonne. Una matrice è
+          <em>quadrata</em> se <code>R = C</code>, altrimenti <em>rettangolare</em>.</li>
+      </ul>
+<pre><code class="language-text">Esempio (R=3, C=5): indici &rarr;  r∈{0,1,2}, c∈{0..4}
+r\c | 0   1   2   3   4
+----+--------------------
+ 0  | a00 a01 a02 a03 a04
+ 1  | a10 a11 a12 a13 a14
+ 2  | a20 a21 a22 a23 a24
+</code></pre>
+    </div>
+
+    <!-- Row-major -->
+    <div class="inner-box">
+      <h2>Modello di memoria (C/C++): <em>row-major</em></h2>
+      <ul>
+        <li>Gli elementi sono disposti in memoria <strong>per riga contigua</strong>.
+            L’indice che varia più velocemente è l’ultimo (<code>c</code>).</li>
+        <li>Indirizzo (idea): <code>&amp;a[r][c] = base + (r*C + c) * sizeof(T)</code>.</li>
+        <li><strong>Prestazioni:</strong> scorrere “per riga” sfrutta la <em>locality</em> della cache;
+            “per colonna” tende a fare più cache-miss.</li>
+      </ul>
+<pre><code class="language-cpp">// C++: scorrimento per riga (consigliato)
+constexpr int R=3, C=5;
+int a[R][C]{};
+for (int r=0; r&lt;R; ++r)
+  for (int c=0; c&lt;C; ++c)
+    a[r][c] = r*C + c;   // a[0][0], a[0][1], ..., a[0][C-1], a[1][0], ...
+</code></pre>
+<pre><code class="language-cpp">// C++: scorrimento per colonna (peggiore per locality, ma talvolta necessario)
+for (int c=0; c&lt;C; ++c)
+  for (int r=0; r&lt;R; ++r)
+    usa(a[r][c]);
+</code></pre>
+      <p class="note">La scelta dell’ordine dei cicli incide molto su prestazioni in presenza di grandi matrici.</p>
+    </div>
+
+    <!-- Errori tipici -->
+    <div class="inner-box">
+      <h2>Errori tipici (da evitare)</h2>
+      <ul>
+        <li><strong>Indici invertiti</strong>: usare <code>a[c][r]</code> invece di <code>a[r][c]</code>.</li>
+        <li><strong>Off-by-one</strong>: limiti errati <code>r &lt;= R</code> o <code>c &lt;= C</code> invece di <code>&lt;</code>.</li>
+        <li><strong>Dimensioni scambiate</strong>: dichiarare <code>int a[R][C]</code> e poi iterare
+            <code>for c in [0..R)</code> / <code>for r in [0..C)</code>.</li>
+        <li><strong>Confusione di layout</strong> con strutture dinamiche C++:
+          <code>std::vector&lt;std::vector&lt;T&gt;&gt;</code> <u>non è contiguo</u>.
+          Per contiguità usare <code>std::vector&lt;T&gt; A(R*C)</code> con indice <code>A[r*C + c]</code>.
+        </li>
+      </ul>
+    </div>
+
+    <!-- Doppia colonna C/C++: dichiarazione minima -->
+    <div class="inner-box">
+      <h2>Dichiarazione minima (statico) — doppia vista</h2>
+      <div class="twocol">
+<pre><code class="language-cpp">// C++ (enfasi)
+constexpr int R=3, C=5;
+int a[R][C]{};            // zero-init
+// accesso
+a[1][2] = 42;
+</code></pre>
+<pre><code class="language-c">// C
+#define R 3
+#define C 5
+int a[R][C] = {0};
+a[1][2] = 42;
+</code></pre>
+      </div>
+      <p class="note">Il passaggio a funzione (firme corrette) lo gestiamo nella slide L1.5; le rappresentazioni dinamiche in L1.6.</p>
+    </div>
+
+    <!-- Mini task 1 -->
+    <div class="inner-box">
+      <h2>Mini-task 1 · Ordine di visita</h2>
+      <p>Con <code>R=3</code>, <code>C=5</code>, elenca le coppie <code>(r,c)</code> visitate da:</p>
+<pre><code class="language-cpp">for (int r=0; r&lt;R; ++r)
+  for (int c=0; c&lt;C; ++c) usa(a[r][c]);   // per riga</code></pre>
+<pre><code class="language-cpp">for (int c=0; c&lt;C; ++c)
+  for (int r=0; r&lt;R; ++r) usa(a[r][c]);   // per colonna</code></pre>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-t1" onclick="toggleBox('btn-t1','box-t1')">Mostra ▼</button>
+      </div>
+      <div id="box-t1" style="display:none;margin-top:8px">
+        <p><strong>Per riga:</strong>
+          (0,0)(0,1)(0,2)(0,3)(0,4) · (1,0)(1,1)(1,2)(1,3)(1,4) · (2,0)(2,1)(2,2)(2,3)(2,4)</p>
+        <p><strong>Per colonna:</strong>
+          (0,0)(1,0)(2,0) · (0,1)(1,1)(2,1) · (0,2)(1,2)(2,2) · (0,3)(1,3)(2,3) · (0,4)(1,4)(2,4)</p>
+        <p class="note">Con layout row-major, il primo ordine è più cache-friendly.</p>
+      </div>
+    </div>
+
+    <!-- Mini task 2 -->
+    <div class="inner-box">
+      <h2>Mini-task 2 · Linearizzazione</h2>
+      <p>Supponi un array contiguo <code>std::vector&lt;int&gt; A(R*C)</code> che rappresenta una matrice <code>R×C</code> in row-major.
+         Qual è l’indice lineare per la cella <code>(r,c)</code>? E quanto vale per <code>R=3</code>, <code>C=5</code>, <code>(r,c)=(2,3)</code>?</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-t2" onclick="toggleBox('btn-t2','box-t2')">Mostra ▼</button>
+      </div>
+      <div id="box-t2" style="display:none;margin-top:8px">
+<pre><code class="language-text">Formula: k = r*C + c
+Per (R,C)=(3,5) e (r,c)=(2,3) &rarr; k = 2*5 + 3 = 13</code></pre>
+        <p class="note">La formula coincide con quella usata nell’indirizzamento: <code>base + k*sizeof(T)</code>.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

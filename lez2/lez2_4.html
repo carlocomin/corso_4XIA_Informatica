@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez2.4 · Collezioni di struct & lambda (sort, find, filter)</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez2_3.html"; }
+    function nextSlide(){ window.location.href = "lez2_5.html"; } // placeholder per eventuale lezione successiva
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra soluzione ▼' : 'Nascondi soluzione ▲';
+    }
+  </script>
+  <style>
+    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
+    .tip { font-style: italic; opacity:.9 }
+    .spec { margin:.25rem 0 .5rem }
+    .spec b { display:inline-block; width:8.6rem }
+    /* --- hard-left per code block (evita centrature ereditate) --- */
+    .inner-box pre,
+    .inner-box pre code,
+    .box pre,
+    .box pre code,
+    pre,
+    pre code { text-align: left !important; }
+    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
+    pre code { display:block; }
+  </style>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 2 — Struct (ripasso mirato)</h2>
+  <ul>
+    <li><a href="lez2_1.html">Lez2.1: Motivazione & sintassi base</a></li>
+    <li><a href="lez2_2.html">Lez2.2: Inizializzazioni in C/C++</a></li>
+    <li><a href="lez2_3.html">Lez2.3: Passaggio a funzione</a></li>
+    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct & lambda</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Lez2.4 — Collezioni di struct & funzioni <em>lambda</em> (C++ → C)</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box">
+      <h2>Obiettivi</h2>
+      <ul>
+        <li>Gestire collezioni di record con <code>std::vector&lt;T&gt;</code> (aggiunta, iterazione, modifica).</li>
+        <li>Usare <strong>lambda</strong> come predicati/comparatori per <code>sort</code>, <code>find_if</code>, <code>count_if</code>, <code>erase_remove_if</code>.</li>
+        <li>Capire bene la <strong>sintassi</strong> delle lambda: catture, parametri, tipo di ritorno.</li>
+        <li>Conoscere l’equivalente in C (array di struct + <code>qsort</code> con funzione di confronto).</li>
+      </ul>
+      <p class="note"><strong>AoS vs SoA (accenno):</strong> lavoriamo con <em>Array of Structs</em> (AoS): un <code>vector&lt;Studente&gt;</code>.
+        Per calcolo numerico intensivo talvolta conviene <em>Struct of Arrays</em> (SoA). Qui l’obiettivo è leggibilità e correttezza con AoS.</p>
+    </div>
+
+    <!-- C++: vector di struct -->
+    <div class="box">
+      <h2>C++ — Collezioni di struct con <code>std::vector</code></h2>
+<pre><code class="language-cpp">#include &lt;string&gt;
+#include &lt;vector&gt;
+
+struct Studente {
+    std::string nome, cognome;
+    int eta = 0;
+    double media = 0.0;
+};
+
+int main() {
+    std::vector&lt;Studente&gt; classe{
+        {"Ada","Lovelace",17,9.4},
+        {"Alan","Turing",18,10.0},
+        {"Edsger","Dijkstra",19,9.1}
+    };
+
+    classe.push_back({"Grace","Hopper",20,8.8});      // aggiunta
+    classe.emplace_back("Barbara","Liskov",20,9.2);   // costruzione in-place
+
+    for (const auto& s : classe) {
+        // lettura senza copie
+    }
+}
+</code></pre>
+      <p class="ok"><strong>Regola pratica:</strong> usa <code>const auto&</code> per leggere, <code>auto&</code> per modificare elementi in-place.</p>
+    </div>
+
+    <!-- Lambda: spiegazione -->
+    <div class="box">
+      <h2>C++ — Cos’è una <em>lambda</em> e come si legge</h2>
+<pre><code class="language-cpp">// Forma generale:
+[capture] (parametri) -&gt; tipo_ritorno {
+    // corpo
+}
+
+// Esempi essenziali
+auto somma = [](int a, int b) -&gt; int { return a + b; };
+auto e_pari = [](int x){ return (x % 2) == 0; }; // tipo di ritorno dedotto
+
+// Catture: prendono dal contesto esterno
+int soglia = 9;
+auto sopra_soglia = [soglia](double m){ return m &gt;= soglia; }; // by value (copia)
+auto inc_soglia   = [&soglia](){ soglia++; };                   // by reference (alias)
+
+// Scorciatoie: [=] cattura TUTTO by value; [&] cattura TUTTO by reference.
+</code></pre>
+      <ul>
+        <li><strong>Capture</strong>: cosa “importa” dal contesto (per default non vede nulla, è chiuso). Usa <code>[x]</code> o <code>[&x]</code> in modo esplicito.</li>
+        <li><strong>Parametri</strong>: come in una funzione normale (<code>(const Studente& a, const Studente& b)</code>...).</li>
+        <li><strong>Ritorno</strong>: di solito <em>dedotto</em>; serve annotarlo (<code>-&gt; bool</code>) quando il corpo non è un singolo <code>return</code> o ci sono rami diversi.</li>
+        <li><strong>Comparatori</strong> (per <code>sort</code>): devono restituire <code>true</code> se <em>a deve venire prima di b</em>.</li>
+        <li>Una lambda <em>senza catture</em> è convertibile a puntatore a funzione; con catture no (usa l’oggetto funzione).</li>
+      </ul>
+      <p class="warn"><strong>Buon stile:</strong> evita <code>[=]</code> o <code>[&]</code> indiscriminati nelle catture. Preferisci catture mirate (<code>[k]</code>, <code>[&k]</code>) per chiarezza.</p>
+    </div>
+
+    <!-- Ordinamenti -->
+    <div class="box">
+      <h2>C++ — Ordinare con <code>std::sort</code> e lambda (chiavi singole e multiple)</h2>
+<pre><code class="language-cpp">#include &lt;algorithm&gt; // sort, stable_sort
+
+// 1) Per cognome crescente
+std::sort(classe.begin(), classe.end(),
+          [](const Studente& a, const Studente& b){
+              return a.cognome &lt; b.cognome;   // confronto lessicografico
+          });
+
+// 2) Cognome poi nome (tie-break)
+std::sort(classe.begin(), classe.end(),
+          [](const Studente& a, const Studente& b){
+              if (a.cognome != b.cognome) return a.cognome &lt; b.cognome;
+              return a.nome &lt; b.nome;
+          });
+
+// 3) Per media decrescente (maggiore prima)
+std::sort(classe.begin(), classe.end(),
+          [](const Studente& a, const Studente& b){
+              return a.media &gt; b.media;
+          });
+
+// 4) Ordinamento stabile (conserva l'ordine relativo dei pari)
+std::stable_sort(classe.begin(), classe.end(),
+                 [](const Studente& a, const Studente& b){
+                     return a.eta &lt; b.eta;
+                 });
+</code></pre>
+      <p class="note"><strong>Comparatori coerenti:</strong> scrivili in modo <em>strict weak ordering</em> (no cicli logici).
+        Un trucco: componi confronti come nell’esempio “cognome poi nome”.</p>
+    </div>
+
+    <!-- Ricerca e filtro -->
+    <div class="box">
+      <h2>C++ — Ricerca e filtro: <code>find_if</code>, <code>count_if</code>, <code>erase_remove_if</code></h2>
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+
+// 1) Trova il primo con media &gt;= soglia
+double soglia = 9.5;
+auto it = std::find_if(classe.begin(), classe.end(),
+                       [soglia](const Studente& s){ return s.media >= soglia; });
+if (it != classe.end()) {
+    // *it è lo Studente trovato
+}
+
+// 2) Conta quanti sono maggiorenni
+int quanti = std::count_if(classe.begin(), classe.end(),
+                           [](const Studente& s){ return s.eta >= 18; });
+
+// 3) Filtro in-place: rimuovi chi ha media &lt; 6 (erase-remove idiom)
+classe.erase(std::remove_if(classe.begin(), classe.end(),
+                            [](const Studente& s){ return s.media < 6.0; }),
+             classe.end());
+</code></pre>
+      <p class="ok"><strong>Erase-remove idiom:</strong> prima “compatta” gli elementi da tenere con <code>remove_if</code>, poi <code>erase</code> taglia la coda.</p>
+    </div>
+
+    <!-- Aggregazioni -->
+    <div class="box">
+      <h2>C++ — Aggregazioni: media, massimo</h2>
+<pre><code class="language-cpp">#include &lt;numeric&gt;   // accumulate
+#include &lt;algorithm&gt; // max_element
+
+// Media delle medie
+double somma = std::accumulate(classe.begin(), classe.end(), 0.0,
+                               [](double acc, const Studente& s){
+                                   return acc + s.media;
+                               });
+double mediaClasse = classe.empty() ? 0.0 : somma / classe.size();
+
+// Miglior studente (per media)
+auto itBest = std::max_element(classe.begin(), classe.end(),
+                               [](const Studente& a, const Studente& b){
+                                   return a.media < b.media; // true se a è "peggio" di b
+                               });
+</code></pre>
+      <p class="note">Le lambda come “pezzi di logica locale” rendono il codice leggibile e vicino all’intento.</p>
+    </div>
+
+    <!-- Parte C -->
+    <div class="box">
+      <h2>C — Array di struct e <code>qsort</code> con funzione di confronto</h2>
+<pre><code class="language-c">#include &lt;stdlib.h&gt;  // qsort
+#include &lt;string.h&gt;  // strcmp
+
+typedef struct {
+    char nome[32], cognome[32];
+    int eta;
+    double media;
+} Studente;
+
+int cmp_cognome_nome(const void* pa, const void* pb) {
+    const Studente* a = (const Studente*)pa;
+    const Studente* b = (const Studente*)pb;
+    int r = strcmp(a-&gt;cognome, b-&gt;cognome);
+    if (r != 0) return r;
+    return strcmp(a-&gt;nome, b-&gt;nome);
+}
+
+int main(void) {
+    Studente v[] = {
+        {"Ada","Lovelace",17,9.4},
+        {"Alan","Turing",18,10.0},
+        {"Edsger","Dijkstra",19,9.1}
+    };
+    size_t n = sizeof v / sizeof *v;
+    qsort(v, n, sizeof *v, cmp_cognome_nome);
+    return 0;
+}
+</code></pre>
+      <p class="note">In C non esistono le lambda: si passa un <strong>puntatore a funzione</strong> come comparatore.</p>
+    </div>
+
+    <!-- Esercizi -->
+    <div class="inner-box">
+      <h2>Esercizi (testi completi + soluzioni a comparsa)</h2>
+      <ol>
+        <li><strong>E1 — Ordinamento multi-chiave</strong>  
+          <div class="spec"><b>Input:</b> <code>std::vector&lt;Studente&gt;</code>.</div>
+          <div class="spec"><b>Richiesta:</b> ordina per <em>cognome crescente</em>, poi <em>nome crescente</em>, poi <em>media decrescente</em>.</div>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra soluzione ▼</button></div>
+          <div id="box-e1" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">std::sort(classe.begin(), classe.end(),
+          [](const Studente& a, const Studente& b){
+              if (a.cognome != b.cognome) return a.cognome &lt; b.cognome;
+              if (a.nome    != b.nome   ) return a.nome    &lt; b.nome;
+              return a.media &gt; b.media; // decrescente
+          });
+</code></pre>
+          </div>
+        </li>
+
+        <li><strong>E2 — Filtra promossi</strong>  
+          <div class="spec"><b>Input:</b> <code>std::vector&lt;Studente&gt;</code>; soglia promozione <code>k</code> (double).</div>
+          <div class="spec"><b>Richiesta:</b> crea un nuovo vettore con chi ha <code>media ≥ k</code> e <code>eta ≥ 14</code>, senza modificare l’originale.</div>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra soluzione ▼</button></div>
+          <div id="box-e2" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">double k = 6.0;
+std::vector&lt;Studente&gt; promossi;
+promossi.reserve(classe.size());
+std::copy_if(classe.begin(), classe.end(), std::back_inserter(promossi),
+             [k](const Studente& s){ return s.media >= k && s.eta >= 14; });
+</code></pre>
+          </div>
+        </li>
+
+        <li><strong>E3 — Trova il primo sotto soglia</strong>  
+          <div class="spec"><b>Input:</b> <code>std::vector&lt;Studente&gt;</code>; soglia <code>t</code>.</div>
+          <div class="spec"><b>Richiesta:</b> usa <code>find_if</code> per ottenere il primo studente con <code>media &lt; t</code>; se non c’è, segnalarlo.</div>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra soluzione ▼</button></div>
+          <div id="box-e3" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">double t = 6.0;
+auto it = std::find_if(classe.begin(), classe.end(),
+                       [t](const Studente& s){ return s.media < t; });
+if (it == classe.end()) {
+    // nessuno sotto soglia
+} else {
+    // *it è il primo sotto soglia
+}
+</code></pre>
+          </div>
+        </li>
+
+        <li><strong>E4 — C: ordina con <code>qsort</code> per media decrescente</strong>  
+          <div class="spec"><b>Input:</b> array C di <code>Studente</code> e lunghezza.</div>
+          <div class="spec"><b>Richiesta:</b> implementa il comparatore per media decrescente e chiama <code>qsort</code>.</div>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e4" onclick="toggleBox('btn-e4','box-e4')">Mostra soluzione ▼</button></div>
+          <div id="box-e4" style="display:none;margin-top:8px">
+<pre><code class="language-c">int cmp_media_desc(const void* pa, const void* pb) {
+    const Studente* a = (const Studente*)pa;
+    const Studente* b = (const Studente*)pb;
+    if (a-&gt;media &lt; b-&gt;media) return 1;   // b prima di a
+    if (a-&gt;media &gt; b-&gt;media) return -1;  // a prima di b
+    return 0;
+}
+// qsort(v, n, sizeof *v, cmp_media_desc);
+</code></pre>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="inner-box">
+      <h2>Takeaways</h2>
+      <ul>
+        <li><code>std::vector&lt;T&gt;</code> è la scelta naturale per collezioni di record in C++ (contiguità, API ricche).</li>
+        <li>Le <strong>lambda</strong> sono “funzioni inline” che catturano variabili: perfette per predicati e comparatori.</li>
+        <li><code>std::sort</code> + lambda per ordinare (chiavi singole e multiple); <code>find_if</code>/<code>count_if</code> per cercare/contare; <code>erase_remove_if</code> per filtrare in-place.</li>
+        <li>In C si usa <code>qsort</code> con un comparatore via <strong>puntatore a funzione</strong> (niente lambda nel C standard).</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

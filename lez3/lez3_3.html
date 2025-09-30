@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez3_3 · File binari (base) in C++ e C</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez3_2.html"; }
+    function nextSlide(){ window.location.href = "lez3_4.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+  </script>
+  <style>
+    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
+    .tip  { font-style: italic; opacity:.95 }
+    /* allinea sempre a sinistra i blocchi di codice */
+    .inner-box pre, .inner-box pre code, .box pre, .box pre code, pre, pre code { text-align: left !important; }
+    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
+    pre code { display:block; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #e5e7eb; padding: .45rem .5rem; vertical-align: top; text-align:left }
+    th { background: #f8fafc; }
+  </style>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 3 — File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">Lez3_1: File: concetti e modelli</a></li>
+    <li><a href="lez3_2.html">Lez3_2: I/O su file testuali (C++)</a></li>
+    <li><a href="lez3_3.html">Lez3_3: File binari (base) in C++ e C</a></li>
+    <li><a href="lez3_4.html">Lez3_4: File binari — formati & pratiche</a></li>
+    <li><a href="lez3_5.html">Lez3_5: Binario in C++ (serialize/deserialize)</a></li>
+    <li><a href="lez3_6.html">Lez3_6: Binario in C (serialize/deserialize)</a></li>
+    <li><a href="lez3_7.html">Lez3_7: Prestazioni & buone pratiche</a></li>
+    <li><a href="lez3_8.html">Lez3_8: Laboratorio & esercizi</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Lez3_3 — File <em>binari</em> (base) in C++ e C</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box">
+      <h2>Obiettivo della lezione (base)</h2>
+      <ul>
+        <li>Aprire file in <strong>modalità binaria</strong> e usare <code>write/read</code> (C++) o <code>fwrite/fread</code> (C).</li>
+        <li>Serializzare e deserializzare:
+          <ul>
+            <li><strong>primitivi</strong> (es. <code>int</code>, <code>double</code>)</li>
+            <li><strong>array 1D</strong> di primitivi</li>
+            <li><strong>matrici 2D</strong> di primitivi (row-major)</li>
+            <li><strong>array di struct</strong> con campi POD (<code>char[]</code>, numeri)</li>
+          </ul>
+        </li>
+      </ul>
+      <p class="note">Questa è la versione <em>base</em> per esercizi sulla stessa macchina: non trattiamo endianness/versioning.</p>
+    </div>
+
+    <div class="box">
+      <h2>Cosa significa “binario” e perché la modalità <code>binary</code>?</h2>
+      <ul>
+        <li><strong>File binario</strong> = scriviamo/leggiamo i <em>byte</em> grezzi degli oggetti in memoria, senza conversioni in caratteri.</li>
+        <li><strong>Modalità binaria</strong>: in C++ usa <code>std::ios::binary</code>; in C usa <code>"rb"</code>/<code>"wb"</code>.
+          Evita conversioni automatiche di newline (CR/LF) e altre “sorprese”.</li>
+        <li><strong><code>write/read</code> e <code>fwrite/fread</code></strong> non aggiungono metadati: devi decidere tu cosa salvare (es. lunghezze).</li>
+      </ul>
+      <p class="tip">Scrittura di collezioni: salva prima la <strong>dimensione</strong> (es. <code>n</code>), poi i <strong>n</strong> elementi contigui.</p>
+    </div>
+
+    <div class="box">
+      <h2>Che cos’è un <em>POD</em> (Plain Old Data) — e perché lo usiamo qui</h2>
+      <ul>
+        <li><strong>Idea pratica</strong>: un tipo è “POD” se ha un <em>layout semplice</em> e i suoi byte possono essere copiati così come sono
+          (con <code>memcpy</code> o scritti su file) senza rompere invarianti interni.</li>
+        <li><strong>Esempi di POD</strong>: tipi primitivi (<code>int</code>, <code>double</code>, …), array di primitivi (<code>int a[10]</code>),
+          <em>struct</em> che contengono solo <code>char[]</code> e numeri.</li>
+        <li><strong>Non sono POD</strong>: <code>std::string</code>, <code>std::vector&lt;T&gt;</code>, classi con costruttori/distruttori non banali,
+          virtual, riferimenti, o puntatori che “posseggono” memoria dinamica.</li>
+      </ul>
+      <p class="ok">Nel nostro corso: quando diciamo “POD” intendiamo “campi banali” (numeri e <code>char[]</code>) che è sicuro scrivere/leggere come blocchi di byte.</p>
+    </div>
+
+    <!-- ===================== C++ ===================== -->
+    <div class="inner-box">
+      <h2>Sezione C++ — modalità binaria & esempi</h2>
+
+      <div class="box">
+        <h3>1) Primitivi (C++)</h3>
+        <p>Scriviamo due valori (<code>int</code> e <code>double</code>) in un file binario, poi li rileggiamo.</p>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+
+int main(){
+    // SCRITTURA
+    {
+        std::ofstream out("prim.bin", std::ios::binary);
+        if(!out){ std::cerr &lt;&lt; "open write\n"; return 1; }
+        int    a = 42;
+        double b = 3.14159;
+        out.write((const char*)&a, sizeof a);
+        out.write((const char*)&b, sizeof b);
+    }
+    // LETTURA
+    {
+        std::ifstream in("prim.bin", std::ios::binary);
+        if(!in){ std::cerr &lt;&lt; "open read\n"; return 1; }
+        int a; double b;
+        in.read((char*)&a, sizeof a);
+        in.read((char*)&b, sizeof b);
+        std::cout &lt;&lt; "a=" &lt;&lt; a &lt;&lt; " b=" &lt;&lt; b &lt;&lt; "\n";
+    }
+}
+</code></pre>
+      </div>
+
+      <div class="box">
+        <h3>2) Array 1D di primitivi (C++)</h3>
+        <p>Salviamo prima la <code>n</code> (numero di elementi), poi il blocco contiguo <code>v.data()</code>.</p>
+<pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;cstdint&gt;
+
+int main(){
+    // SCRITTURA
+    {
+        std::vector&lt;int&gt; v = {1,2,3,4,5};          // storage contiguo
+        std::ofstream out("array.bin", std::ios::binary);
+        if(!out) return 1;
+        std::uint32_t n = (std::uint32_t)v.size(); // salva prima la lunghezza
+        out.write((const char*)&n, sizeof n);
+        out.write((const char*)v.data(), n * sizeof(int));
+    }
+    // LETTURA
+    {
+        std::ifstream in("array.bin", std::ios::binary);
+        if(!in) return 1;
+        std::uint32_t n=0; in.read((char*)&n, sizeof n);
+        std::vector&lt;int&gt; v(n);                     // alloca n elementi
+        in.read((char*)v.data(), n * sizeof(int));  // rilegge il blocco
+        // ... usa v ...
+    }
+}
+</code></pre>
+        <p class="tip"><code>std::vector</code> garantisce memoria <em>contigua</em> per i suoi elementi.</p>
+      </div>
+
+      <div class="box">
+        <h3>3) Matrice 2D di primitivi (C++)</h3>
+        <p>Usiamo layout <strong>row-major</strong>: l’indice di un elemento è <code>r*C + c</code>.</p>
+<pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;cstdint&gt;
+#include &lt;iostream&gt;
+
+int main(){
+    // matrice 2x3 in row-major: m[r*C + c]
+    const std::uint32_t R = 2, C = 3;
+    std::vector&lt;double&gt; m = { 1,2,3, 4,5,6 };
+
+    // SCRITTURA
+    {
+        std::ofstream out("mat.bin", std::ios::binary);
+        if(!out) return 1;
+        out.write((const char*)&R, sizeof R);
+        out.write((const char*)&C, sizeof C);
+        out.write((const char*)m.data(), R*C*sizeof(double));
+    }
+    // LETTURA
+    {
+        std::ifstream in("mat.bin", std::ios::binary);
+        if(!in) return 1;
+        std::uint32_t R2=0,C2=0;
+        in.read((char*)&R2, sizeof R2);
+        in.read((char*)&C2, sizeof C2);
+        std::vector&lt;double&gt; m2(R2*C2);
+        in.read((char*)m2.data(), R2*C2*sizeof(double));
+        std::cout &lt;&lt; "m2[1,2]=" &lt;&lt; m2[1*C2 + 2] &lt;&lt; "\n";
+    }
+}
+</code></pre>
+      </div>
+
+      <div class="box">
+        <h3>4) Array di <em>struct</em> (C++) — solo campi POD</h3>
+        <p>La <em>struct</em> contiene solo campi “banali”: <code>char[]</code>, <code>int</code>, <code>double</code>. Scriviamo/leggiamo il blocco contiguo.</p>
+<pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;cstdint&gt;
+#include &lt;cstring&gt;   // std::strncpy
+
+struct Studente {
+    char   nome[32];
+    char   cognome[32];
+    int    eta;
+    double media;
+};
+
+int main(){
+    // dati di esempio
+    std::vector&lt;Studente&gt; cls(2);
+    std::strncpy(cls[0].nome,"Ada",31); cls[0].nome[31]='\0';
+    std::strncpy(cls[0].cognome,"Lovelace",31); cls[0].cognome[31]='\0';
+    cls[0].eta=17; cls[0].media=9.4;
+
+    std::strncpy(cls[1].nome,"Alan",31); cls[1].nome[31]='\0';
+    std::strncpy(cls[1].cognome,"Turing",31); cls[1].cognome[31]='\0';
+    cls[1].eta=18; cls[1].media=10.0;
+
+    // SCRITTURA: lunghezza + blocco contiguo
+    {
+        std::ofstream out("studenti.bin", std::ios::binary);
+        if(!out) return 1;
+        std::uint32_t n = (std::uint32_t)cls.size();
+        out.write((const char*)&n, sizeof n);
+        out.write((const char*)cls.data(), n*sizeof(Studente));
+    }
+    // LETTURA: lunghezza + blocco contiguo
+    {
+        std::ifstream in("studenti.bin", std::ios::binary);
+        if(!in) return 1;
+        std::uint32_t n=0; in.read((char*)&n, sizeof n);
+        std::vector&lt;Studente&gt; v(n);
+        in.read((char*)v.data(), n*sizeof(Studente));
+        // ... usa v ...
+    }
+}
+</code></pre>
+        <p class="tip">Per semplicità didattica usiamo <code>char[32]</code> al posto di <code>std::string</code>.</p>
+      </div>
+    </div>
+
+    <!-- ===================== C ===================== -->
+    <div class="inner-box">
+      <h2>Sezione C — modalità binaria & esempi</h2>
+
+      <div class="box">
+        <h3>1) Primitivi (C)</h3>
+        <p>Le funzioni <code>fwrite</code>/<code>fread</code> lavorano su blocchi: conta elementi e dimensione di ciascun elemento.</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(void){
+    // SCRITTURA
+    {
+        FILE* f = fopen("prim_c.bin","wb"); if(!f) return 1;
+        int a = 42; double b = 3.14159;
+        fwrite(&a, sizeof a, 1, f);
+        fwrite(&b, sizeof b, 1, f);
+        fclose(f);
+    }
+    // LETTURA
+    {
+        FILE* f = fopen("prim_c.bin","rb"); if(!f) return 1;
+        int a; double b;
+        fread(&a, sizeof a, 1, f);
+        fread(&b, sizeof b, 1, f);
+        printf("a=%d b=%f\n", a, b);
+        fclose(f);
+    }
+    return 0;
+}
+</code></pre>
+      </div>
+
+      <div class="box">
+        <h3>2) Array 1D di primitivi (C)</h3>
+        <p>Come sopra: salviamo prima <code>n</code>, poi il blocco di <code>n</code> elementi.</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void){
+    // SCRITTURA
+    {
+        int v[] = {1,2,3,4,5};
+        uint32_t n = (uint32_t)(sizeof v / sizeof v[0]);
+        FILE* f = fopen("array_c.bin","wb"); if(!f) return 1;
+        fwrite(&n, sizeof n, 1, f);
+        fwrite(v, sizeof(int), n, f);
+        fclose(f);
+    }
+    // LETTURA
+    {
+        FILE* f = fopen("array_c.bin","rb"); if(!f) return 1;
+        uint32_t n=0; fread(&n, sizeof n, 1, f);
+        int* v = (int*)malloc(n * sizeof(int));
+        if(!v){ fclose(f); return 1; }
+        fread(v, sizeof(int), n, f);
+        // ... usa v ...
+        free(v); fclose(f);
+    }
+    return 0;
+}
+</code></pre>
+      </div>
+
+      <div class="box">
+        <h3>3) Matrice 2D di primitivi (C)</h3>
+        <p>Row-major: per accedere a <code>(r,c)</code> usare <code>r*C + c</code>.</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void){
+    // definiamo una matrice 2x3 (row-major)
+    uint32_t R = 2, C = 3;
+    double m[6] = {1,2,3, 4,5,6};
+
+    // SCRITTURA
+    {
+        FILE* f = fopen("mat_c.bin","wb"); if(!f) return 1;
+        fwrite(&R, sizeof R, 1, f);
+        fwrite(&C, sizeof C, 1, f);
+        fwrite(m, sizeof(double), R*C, f);
+        fclose(f);
+    }
+    // LETTURA
+    {
+        FILE* f = fopen("mat_c.bin","rb"); if(!f) return 1;
+        uint32_t R2=0,C2=0;
+        fread(&R2, sizeof R2, 1, f);
+        fread(&C2, sizeof C2, 1, f);
+        double* m2 = (double*)malloc(R2*C2*sizeof(double));
+        if(!m2){ fclose(f); return 1; }
+        fread(m2, sizeof(double), R2*C2, f);
+        // esempio: elemento (1,2)
+        printf("m2[1,2]=%f\n", m2[1*C2 + 2]);
+        free(m2); fclose(f);
+    }
+    return 0;
+}
+</code></pre>
+      </div>
+
+      <div class="box">
+        <h3>4) Array di <em>struct</em> (C) — solo campi POD</h3>
+        <p>Scriviamo e leggiamo un blocco contiguo di <code>Studente</code> (solo <code>char[]</code> e numeri).</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;string.h&gt;
+
+typedef struct {
+    char   nome[32];
+    char   cognome[32];
+    int    eta;
+    double media;
+} Studente;
+
+int main(void){
+    Studente cls[2];
+    memset(&cls, 0, sizeof cls);
+    strncpy(cls[0].nome,"Ada",31); strncpy(cls[0].cognome,"Lovelace",31); cls[0].eta=17; cls[0].media=9.4;
+    strncpy(cls[1].nome,"Alan",31); strncpy(cls[1].cognome,"Turing",31);   cls[1].eta=18; cls[1].media=10.0;
+
+    // SCRITTURA
+    {
+        uint32_t n = 2;
+        FILE* f = fopen("studenti_c.bin","wb"); if(!f) return 1;
+        fwrite(&n, sizeof n, 1, f);
+        fwrite(cls, sizeof(Studente), n, f);  // blocco contiguo
+        fclose(f);
+    }
+    // LETTURA
+    {
+        FILE* f = fopen("studenti_c.bin","rb"); if(!f) return 1;
+        uint32_t n=0; fread(&n, sizeof n, 1, f);
+        Studente v[10]; // per semplicità, supponiamo capienza
+        if(n &gt; 10) n = 10;
+        fread(v, sizeof(Studente), n, f);
+        fclose(f);
+        // ... usa v ...
+    }
+    return 0;
+}
+</code></pre>
+      </div>
+    </div>
+
+    <div class="inner-box">
+      <h2>Pitfall (base) & accortezze</h2>
+      <ul>
+        <li><strong>Dimenticare la modalità binaria</strong> (<code>std::ios::binary</code>, <code>"wb"/"rb"</code>).
+          <span class="ok">Apri sempre i file binari in modalità binaria.</span>
+        </li>
+        <li><strong>Non salvare la lunghezza</strong> prima di array/matrici.
+          <span class="ok">Scrivi prima <code>n</code>; per matrici scrivi <code>R</code> e <code>C</code>, poi <code>R*C</code> valori.</span>
+        </li>
+        <li><strong>Struct con campi non banali</strong> (es. <code>std::string</code> o puntatori).
+          <span class="ok">Per la versione base usa solo campi POD (<code>char[]</code>, numeri).</span>
+        </li>
+        <li><strong>Ignorare i risultati di I/O</strong> (letture parziali).
+          <span class="ok">Controlla sempre l’esito di <code>read/fread</code> e <code>write/fwrite</code>.</span>
+        </li>
+      </ul>
+      <p class="note">Per portabilità tra architetture e formati robusti si veda la prossima lezione.</p>
+    </div>
+
+    <div class="inner-box">
+      <h2>Takeaways</h2>
+      <ul>
+        <li>Binario (base) = scrivere/leggere <strong>byte</strong> di primitivi e POD in blocchi contigui.</li>
+        <li>Per collezioni: salva <strong>prima</strong> le dimensioni, poi i dati.</li>
+        <li>Per matrici: layout semplice (row-major) con indice <code>r*C + c</code>.</li>
+        <li>Questa base è ideale per esercizi su <strong>stessa macchina</strong>; la portabilità si affronta a parte.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

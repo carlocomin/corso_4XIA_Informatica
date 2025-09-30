@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – L1.3 · Dichiarazione/inizializzazione & attraversamento (row vs col)</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez1_2.html"; }
+    function nextSlide(){ window.location.href = "lez1_4.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 1 — Matrici 2D (4BIA)</h2>
+  <ul>
+    <li><a href="lez1_1.html">L1.1 · Introduzione & obiettivi</a></li>
+    <li><a href="lez1_2.html">L1.2 · Definizioni, indici, row-major</a></li>
+    <li><a href="lez1_3.html">L1.3 · Dichiarazione & attraversamento</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>L1.3 — Dichiarazione/inizializzazione & attraversamento per riga/colonna</h1>
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <!-- DICHIARAZIONE & INIZIALIZZAZIONE -->
+    <div class="inner-box">
+      <h2>Dichiarare e inizializzare una matrice (statico, dimensioni note)</h2>
+      <div class="twocol">
+<pre><code class="language-cpp">// C++ (enfasi)
+constexpr int R=3, C=5;
+
+// zero-inizializzazione di tutte le celle
+int a[R][C]{};                    
+
+// inizializzazione esplicita (liste annidate)
+int b[R][C] = {
+  { 1, 2, 3, 4, 5 },
+  { 6, 7, 8, 9,10 },
+  {11,12,13,14,15}
+};
+
+// inizializzazione parziale: celle mancanti valgono 0
+int c[R][C] = { {1,2}, {3}, {4} };
+
+// alternativa moderna (contiguo) con std::array
+#include &lt;array&gt;
+std::array&lt;std::array&lt;int,C&gt;,R&gt; m{{}};  // tutte 0
+</code></pre>
+<pre><code class="language-c">// C
+#define R 3
+#define C 5
+
+int a[R][C] = {0};   // azzera tutte le celle
+
+int b[R][C] = {
+  { 1, 2, 3, 4, 5 },
+  { 6, 7, 8, 9,10 },
+  {11,12,13,14,15}
+};
+
+// C99: inizializzatore designato (facoltativo)
+int c[R][C] = { [1][2] = 42 };  // solo b[1][2]=42, resto 0
+</code></pre>
+      </div>
+      <p class="note">Le dimensioni statiche devono essere note a compile time. Le versioni <em>dinamiche</em> (heap/flatten) arriveranno nella L1.6.</p>
+    </div>
+
+    <!-- ATTRAVERSAMENTO PER RIGA/COLONNA -->
+    <div class="inner-box">
+      <h2>Attraversamento per riga vs per colonna (locality)</h2>
+      <ul>
+        <li><strong>Row-major</strong> (C/C++): gli elementi di una stessa riga sono contigui in memoria.</li>
+        <li>Visita <em>per riga</em> ⇒ stride 1 sull’indice più interno ⇒ alta cache locality.</li>
+        <li>Visita <em>per colonna</em> ⇒ stride pari a <code>C</code> elementi ⇒ più cache miss (più lenta).</li>
+      </ul>
+      <div class="twocol">
+<pre><code class="language-cpp">// C++: per riga (preferibile)
+for (int r=0; r&lt;R; ++r)
+  for (int c=0; c&lt;C; ++c)
+    a[r][c] = r*C + c;
+</code></pre>
+<pre><code class="language-cpp">// C++: per colonna (talvolta necessario)
+for (int c=0; c&lt;C; ++c)
+  for (int r=0; r&lt;R; ++r)
+    usa(a[r][c]);
+</code></pre>
+      </div>
+      <p class="note">Quando l’algoritmo è sensibile alla cache (matrici grandi), l’ordine dei cicli può cambiare sensibilmente i tempi.</p>
+    </div>
+
+    <!-- FUNZIONI DI RIEMPIMENTO RIGA/COLONNA -->
+    <div class="inner-box">
+      <h2>Funzioni di utilità: riempi <em>riga</em> / riempi <em>colonna</em></h2>
+      <div class="twocol">
+<pre><code class="language-cpp">// C++ (statico)
+void riempiRiga(int (&m)[R][C], int r, int v){
+  for (int c=0; c&lt;C; ++c) m[r][c] = v;
+}
+void riempiColonna(int (&m)[R][C], int c, int v){
+  for (int r=0; r&lt;R; ++r) m[r][c] = v;   // locality peggiore
+}
+</code></pre>
+<pre><code class="language-c">// C
+void riempiRiga(int m[][C], int r, int v){
+  for (int c=0; c&lt;C; ++c) m[r][c] = v;
+}
+void riempiColonna(int m[][C], int c, int v){
+  for (int r=0; r&lt;R; ++r) m[r][c] = v;
+}
+</code></pre>
+      </div>
+      <p class="note">Nella L1.5 vedremo le <strong>firme generali</strong> per funzioni che accettano matrici con dimensioni parametriche.</p>
+    </div>
+
+    <!-- ERRORI TIPICI NELLA PRATICA DI ATTRAVERSAMENTO -->
+    <div class="inner-box">
+      <h2>Errori tipici nell’attraversamento</h2>
+      <ul>
+        <li><strong>Limiti errati</strong>: usare <code>&lt;=</code> invece di <code>&lt;</code> causa accessi fuori dai limiti.</li>
+        <li><strong>Indici scambiati</strong>: scrivere <code>a[c][r]</code> al posto di <code>a[r][c]</code>.</li>
+        <li><strong>Inizializzazione mancata</strong>: leggere celle mai assegnate (valori indeterminati).</li>
+        <li><strong>Scrittura non azzerata</strong> (es. moltiplicazione): dimenticare <code>C[r][c]=0</code> prima dell’accumulo.</li>
+      </ul>
+    </div>
+
+    <!-- MINI-TASK 1 -->
+    <div class="inner-box">
+      <h2>Mini-task 1 · Identità su matrice quadrata</h2>
+      <p>Dato <code>n×n</code>, imposta <code>I[i][j]=1</code> se <code>i==j</code>, altrimenti 0. Versione C++ preferibile, C a fianco.</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-id" onclick="toggleBox('btn-id','box-id')">Mostra soluzione ▼</button>
+      </div>
+      <div id="box-id" style="display:none;margin-top:8px">
+        <div class="twocol">
+<pre><code class="language-cpp">// C++ (n noto a compile time)
+constexpr int N=5;
+int I[N][N]{};
+for (int i=0;i&lt;N;++i)
+  for (int j=0;j&lt;N;++j)
+    I[i][j] = (i==j);
+</code></pre>
+<pre><code class="language-c">// C
+#define N 5
+int I[N][N] = {0};
+for (int i=0;i&lt;N;++i)
+  I[i][i] = 1;
+</code></pre>
+        </div>
+        <p class="note">In C si può sfruttare direttamente l’assegnamento sulla diagonale; in C++ l’esempio mostra la struttura completa dei doppi cicli.</p>
+      </div>
+    </div>
+
+    <!-- MINI-TASK 2 -->
+    <div class="inner-box">
+      <h2>Mini-task 2 · Inversione in-place di ogni riga</h2>
+      <p>Scrivi un frammento che inverta l’ordine degli elementi <em>di ciascuna riga</em> (specchio orizzontale).</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-rev" onclick="toggleBox('btn-rev','box-rev')">Mostra soluzione ▼</button>
+      </div>
+      <div id="box-rev" style="display:none;margin-top:8px">
+        <div class="twocol">
+<pre><code class="language-cpp">// C++ (preferibile: per riga = buona locality)
+for (int r=0; r&lt;R; ++r){
+  for (int l=0, h=C-1; l&lt;h; ++l, --h)
+    std::swap(a[r][l], a[r][h]);
+}
+</code></pre>
+<pre><code class="language-c">// C
+for (int r=0; r&lt;R; ++r){
+  int l=0, h=C-1, tmp;
+  while (l&lt;h){
+    tmp = a[r][l]; a[r][l] = a[r][h]; a[r][h] = tmp;
+    ++l; --h;
+  }
+}
+</code></pre>
+        </div>
+        <p class="note">La visita resta per riga, quindi contigua in memoria; complessità O(R·C).</p>
+      </div>
+    </div>
+
+    <!-- APPROFONDIMENTO PRESTAZIONALE -->
+    <div class="inner-box">
+      <h2>Approfondimento · Perché per riga è più veloce?</h2>
+      <ul>
+        <li>In row-major, gli elementi di una riga stanno in sequenza fisica: la CPU carica una <em>cache line</em> (es. 64 byte) contenente più elementi contigui.</li>
+        <li>Scorrere per colonna salta di <code>C</code> elementi: ogni accesso tende a <em>invalidare</em> la cache line precedente e richiedere nuovo fetch dalla RAM.</li>
+        <li>Su matrici grandi, il differenziale può essere anche di un ordine di grandezza.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

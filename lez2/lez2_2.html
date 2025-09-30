@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez2.2 · Inizializzazioni in C/C++ (struct) — C++ → C</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez2_1.html"; }
+    function nextSlide(){ window.location.href = "lez2_3.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+  <style>
+    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
+    .tip { font-style: italic; opacity:.9 }
+    /* --- hard-left per code block --- */
+    .inner-box pre,
+    .inner-box pre code,
+    .box pre,
+    .box pre code,
+    pre,
+    pre code { text-align: left !important; }
+    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
+    pre code { display:block; }
+  </style>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 2 — Struct (ripasso mirato)</h2>
+  <ul>
+    <li><a href="lez2_1.html">Lez2.1: Motivazione & sintassi base</a></li>
+    <li><a href="lez2_2.html">Lez2.2: Inizializzazioni in C/C++</a></li>
+    <!-- prossime:
+    <li><a href="lez2_3.html">Lez2.3: Passaggio a funzione</a></li>
+    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct & lambda</a></li>
+    -->
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Lez2.2 — Inizializzazioni in C/C++ (struct) -</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box">
+      <h2>Perché inizializzare (e non “riempire dopo”)?</h2>
+      <p>
+        L’inizializzazione assegna un <strong>valore sicuro e coerente</strong> ai campi <em>al momento della creazione</em>.
+        Le “assegnazioni dopo” lasciano finestre in cui i fondamentali (<code>int</code>, <code>double</code>) sono <strong>indeterminati</strong>.
+        Inizializzare rende il codice più leggibile, previene bug e comunica l’<em>intento</em>.
+      </p>
+    </div>
+
+    <!-- C++ PRIMA -->
+    <div class="box">
+      <h2>C++ — Forme pratiche di inizializzazione</h2>
+
+      <h3>1) Default-initialization vs Value-initialization</h3>
+<pre><code class="language-cpp">struct Studente {
+    std::string nome, cognome;  // stringhe: “vuote” alla creazione
+    int eta;                     // fondamentale: indeterminato se non inizializzato
+    double media;                // idem
+};
+
+// A) Default-initialization: fondamentali indeterminati
+Studente a;          // a.eta/media INDETERMINATI (rischio uso)
+
+// B) Value-initialization (brace vuote): zero-init + default-init
+Studente b{};        // b.eta=0, b.media=0.0; stringhe vuote
+</code></pre>
+      <p class="ok"><strong>Consiglio:</strong> preferisci <code>Type obj{}</code> per azzerare i fondamentali.</p>
+
+      <h3>2) Aggregate initialization (lista in ordine)</h3>
+<pre><code class="language-cpp">struct Studente {
+    std::string nome, cognome;
+    int eta;
+    double media;
+};
+
+Studente s1{"Ada", "Lovelace", 17, 9.4};   // ordine = ordine dei campi
+</code></pre>
+      <p class="note">Gli <em>aggregate</em> non hanno costruttori personalizzati; la lista segue l’ordine dei membri.</p>
+
+      <h3>3) Inizializzatori in-class (valori di default dei campi)</h3>
+<pre><code class="language-cpp">struct Studente {
+    std::string nome = "Anon";
+    std::string cognome = "N/A";
+    int    eta   = 0;
+    double media = 0.0;
+};
+
+Studente s2;                       // usa i default
+Studente s3{"Ada","Lovelace"};     // eta=0, media=0.0
+</code></pre>
+
+      <h3>4) Campi const e reference</h3>
+<pre><code class="language-cpp">struct Box {
+    const int id;     // deve essere inizializzato subito
+    int& ref;         // idem: deve referenziare qualcosa alla creazione
+    int v;
+};
+
+int x = 10;
+Box b{42, x, 5};      // OK
+// b.id = 7;  // ERRORE: const
+</code></pre>
+      <p class="warn"><strong>Regola</strong>: <code>const</code> e <code>reference</code> <em>non</em> si “sistemano dopo”; vanno inizializzati.</p>
+
+      <h3>5) Struct annidate, array nei campi</h3>
+<pre><code class="language-cpp">struct Punto { int x, y; };
+struct Triangolo { Punto v[3]; };
+Triangolo t{{ {0,0}, {1,0}, {0,1} }};   // brace annidate per l'array
+</code></pre>
+
+      <h3>6) Braces vs parentesi: “narrowing”</h3>
+<pre><code class="language-cpp">struct S { int a; double b; };
+S sA(3.7, 2);   // ammesso (ma 3.7→3 se andasse in int)
+S sB{3.7, 2};   // ERRORE di “narrowing”: le { } proteggono da perdite
+</code></pre>
+      <p class="ok"><strong>Preferisci le {braces}</strong>: evitano conversioni pericolose implicite.</p>
+
+      <h3>7) Oggetti statici/globali</h3>
+<pre><code class="language-cpp">static Studente g;   // storage statico ⇒ zero-initialization garantita
+</code></pre>
+      <p class="tip">Non abusarne; meglio inizializzazioni esplicite e dipendenze chiare.</p>
+    </div>
+
+    <!-- POI C -->
+    <div class="box">
+      <h2>C — Inizializzazione di struct (C99)</h2>
+
+      <h3>1) Lista in ordine</h3>
+<pre><code class="language-c">typedef struct {
+    char nome[32];
+    char cognome[32];
+    int eta;
+    double media;
+} Studente;
+
+Studente s1 = { "Ada", "Lovelace", 17, 9.4 }; // ordine preciso
+</code></pre>
+
+      <h3>2) “Designated initializers” (C)</h3>
+<pre><code class="language-c">Studente s2 = {
+    .cognome = "Lovelace",
+    .nome    = "Ada",
+    .media   = 9.4,
+    .eta     = 17
+};
+</code></pre>
+      <p class="warn"><strong>Nota:</strong> i “designated” sono standard in C; in C++ <em>non sono portabili</em> (dipendono dal compilatore). Per C++ didattico, evitali.</p>
+
+      <h3>3) Array e stringhe</h3>
+<pre><code class="language-c">Studente s3 = { "Alan", "Turing", 18, 10.0 };
+// Le stringhe sono array di char con '\0':

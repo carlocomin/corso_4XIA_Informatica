@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez2.6 · Archivi dati con array / vector di struct</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez2_5.html"; }
+    function nextSlide(){ window.location.href = "lez2_7.html"; } // placeholder prossima
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra soluzione ▼' : 'Nascondi soluzione ▲';
+    }
+  </script>
+  <style>
+    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
+    .spec { margin:.2rem 0 .5rem }
+    .spec b { display:inline-block; width:10.5rem }
+    /* --- hard-left per i code block --- */
+    .inner-box pre,
+    .inner-box pre code,
+    .box pre,
+    .box pre code,
+    pre,
+    pre code { text-align: left !important; }
+    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
+    pre code { display:block; }
+  </style>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 2 — Struct (ripasso mirato)</h2>
+  <ul>
+    <li><a href="lez2_1.html">Lez2.1: Motivazione & sintassi base</a></li>
+    <li><a href="lez2_2.html">Lez2.2: Inizializzazioni in C/C++</a></li>
+    <li><a href="lez2_3.html">Lez2.3: Passaggio a funzione</a></li>
+    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct & lambda</a></li>
+    <li><a href="lez2_5.html">Lez2.5: Layout, sizeof, padding & align</a></li>
+    <li><a href="lez2_6.html">Lez2.6: Archivi con array/vector di struct</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Lez2.6 — Archivi dati con array / <code>std::vector</code> di <code>struct</code></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box">
+      <h2>Obiettivo</h2>
+      <p>
+        Progettare e manipolare un <strong>archivio di record</strong> (es. studenti, libri, prodotti) usando:
+        <strong>array statici</strong> e <strong><code>std::vector</code></strong> di <code>struct</code>.
+        Vediamo operazioni tipiche: inserimento, stampa, ricerca, modifica, ordinamento e rimozione.
+      </p>
+      <p class="note"><strong>Scelte di rappresentazione:</strong> array statico = capacità fissa, gestione manuale dell’“occupato”;
+        <code>std::vector</code> = capacità dinamica, API ricca, gestione automatica della memoria.</p>
+    </div>
+
+    <!-- MODELLO DATI -->
+    <div class="box">
+      <h2>Modello dati (C++)</h2>
+<pre><code class="language-cpp">#include &lt;string&gt;
+
+struct Studente {
+    std::string nome, cognome;
+    int eta = 0;
+    double media = 0.0;
+};
+</code></pre>
+      <p>È un <em>record</em> semplice: useremo questa struct in tutte le operazioni.</p>
+    </div>
+
+    <!-- ARRAY STATICO -->
+    <div class="box">
+      <h2>Archivio con <em>array statico</em> (capacità fissa)</h2>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+constexpr std::size_t MAXN = 100;
+
+struct Studente { std::string nome, cognome; int eta=0; double media=0.0; };
+
+struct ArchivioArray {
+    Studente v[MAXN];
+    std::size_t n = 0; // quanti elementi sono realmente occupati
+
+    bool inserisci(const Studente&amp; s) {
+        if (n == MAXN) return false;
+        v[n++] = s;                 // copia in coda
+        return true;
+    }
+
+    void stampa() const {
+        for (std::size_t i = 0; i &lt; n; ++i) {
+            std::cout &lt;&lt; v[i].cognome &lt;&lt; " " &lt;&lt; v[i].nome
+                      &lt;&lt; " — età: " &lt;&lt; v[i].eta
+                      &lt;&lt; ", media: " &lt;&lt; v[i].media &lt;&lt; "\n";
+        }
+    }
+
+    // ricerca lineare per cognome+nome
+    int trova(const std::string&amp; cogn, const std::string&amp; nome) const {
+        for (std::size_t i = 0; i &lt; n; ++i)
+            if (v[i].cognome == cogn &amp;&amp; v[i].nome == nome)
+                return static_cast&lt;int&gt;(i);
+        return -1;
+    }
+
+    // rimozione "compatta": shift a sinistra
+    bool rimuoviIndice(std::size_t idx) {
+        if (idx &gt;= n) return false;
+        for (std::size_t i = idx+1; i &lt; n; ++i) v[i-1] = std::move(v[i]);
+        --n;
+        return true;
+    }
+};
+</code></pre>
+      <p class="warn"><strong>Limite:</strong> capacità fissa <code>MAXN</code>, inserimenti/remozioni centrali costano <code>O(n)</code> per lo shift.</p>
+    </div>
+
+    <!-- VECTOR -->
+    <div class="box">
+      <h2>Archivio con <code>std::vector&lt;Studente&gt;</code> (dinamico)</h2>
+<pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;algorithm&gt; // sort, remove_if, find_if
+#include &lt;iostream&gt;
+
+struct ArchivioVector {
+    std::vector&lt;Studente&gt; v;
+
+    void inserisci(const Studente&amp; s) {
+        v.push_back(s); // o v.emplace_back("Ada","Lovelace",17,9.4);
+    }
+
+    void stampa() const {
+        for (const auto&amp; s : v)
+            std::cout &lt;&lt; s.cognome &lt;&lt; " " &lt;&lt; s.nome
+                      &lt;&lt; " — età: " &lt;&lt; s.eta
+                      &lt;&lt; ", media: " &lt;&lt; s.media &lt;&lt; "\n";
+    }
+
+    // ricerca lineare: predicato con lambda
+    int trova(const std::string&amp; cogn, const std::string&amp; nome) const {
+        auto it = std::find_if(v.begin(), v.end(),
+            [&](const Studente&amp; s){ return s.cognome==cogn &amp;&amp; s.nome==nome; });
+        return (it==v.end()) ? -1 : static_cast&lt;int&gt;(it - v.begin());
+    }
+
+    // ordinamento: cognome, poi nome (chiavi multiple)
+    void ordina() {
+        std::sort(v.begin(), v.end(),
+            [](const Studente&amp; a, const Studente&amp; b){
+                if (a.cognome != b.cognome) return a.cognome &lt; b.cognome;
+                return a.nome &lt; b.nome;
+            });
+    }
+
+    // rimozione con erase-remove idiom (per condizione)
+    void rimuoviMediaSotto(double k) {
+        v.erase(std::remove_if(v.begin(), v.end(),
+            [k](const Studente&amp; s){ return s.media &lt; k; }),
+            v.end());
+    }
+};
+</code></pre>
+      <ul>
+        <li><strong>Capacità</strong>: <code>vector</code> cresce automaticamente; usa <code>reserve()</code> se conosci N per ridurre riallocazioni.</li>
+        <li><strong>Invalidazione</strong>: le riallocazioni possono invalidare puntatori/iteratori/riferimenti esistenti.</li>
+        <li><strong>Rimozione</strong>: preferisci <code>erase-remove</code> per cancellazioni condizionali in massa.</li>
+      </ul>
+    </div>
+
+    <!-- ORDINAMENTO E RICERCA BINARIA -->
+    <div class="box">
+      <h2>Archivio ordinato: ricerca binaria</h2>
+<pre><code class="language-cpp">#include &lt;algorithm&gt; // sort, lower_bound
+
+// Supponiamo archivio.v ordinato per (cognome, nome)
+int trovaBinaria(const std::vector&lt;Studente&gt;& v,
+                 const std::string&amp; cogn, const std::string&amp; nome)
+{
+    auto key = [&](const Studente&amp; s){ return std::pair{s.cognome, s.nome}; };
+    auto target = std::pair{cogn, nome};
+
+    auto it = std::lower_bound(v.begin(), v.end(), target,
+        [&](const Studente&amp; s, const std::pair&lt;std::string,std::string&gt;& t){
+            return key(s) &lt; t;
+        });
+
+    if (it != v.end() &amp;&amp; it-&gt;cognome==cogn &amp;&amp; it-&gt;nome==nome)
+        return static_cast&lt;int&gt;(it - v.begin());
+    return -1;
+}
+</code></pre>
+      <p class="ok"><strong>Vantaggio:</strong> su archivio ordinato la ricerca passa da <code>O(n)</code> (lineare) a <code>O(log n)</code> (binaria).</p>
+    </div>
+
+    <!-- PARTE C -->
+    <div class="box">
+      <h2>C — Archivio con array di struct</h2>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+#define MAXN 100
+
+typedef struct { char nome[32], cognome[32]; int eta; double media; } Studente;
+
+typedef struct {
+    Studente v[MAXN];
+    size_t n;
+} Archivio;
+
+int inserisci(Archivio* A, Studente s){
+    if (A-&gt;n == MAXN) return 0;
+    A-&gt;v[A-&gt;n++] = s;
+    return 1;
+}
+
+int trova(const Archivio* A, const char* cogn, const char* nome){
+    for (size_t i=0; i&lt;A-&gt;n; ++i)
+        if (strcmp(A-&gt;v[i].cognome,cogn)==0 &amp;&amp; strcmp(A-&gt;v[i].nome,nome)==0)
+            return (int)i;
+    return -1;
+}
+
+int rimuoviIndice(Archivio* A, size_t idx){
+    if (idx &gt;= A-&gt;n) return 0;
+    for (size_t i=idx+1; i&lt;A-&gt;n; ++i) A-&gt;v[i-1] = A-&gt;v[i];
+    --A-&gt;n;
+    return 1;
+}
+</code></pre>
+      <p class="note">Stessa logica dell’array statico in C++: si mantiene un contatore <code>n</code> degli elementi validi.</p>
+    </div>
+
+    <!-- ESERCIZI -->
+    <div class="inner-box">
+      <h2>Esercizi (testi completi + soluzioni a comparsa)</h2>
+      <ol>
+        <li><strong>E1 — Archivio studenti (C++)</strong><br/>
+          <div class="spec"><b>Richiesta:</b> implementa una funzione <code>aggiungiSeNuovo(ArchivioVector&amp;, const Studente&amp;)</code>
+            che inserisce uno studente solo se non esiste già la coppia (cognome,nome). Usa <code>find_if</code>.</div>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra soluzione ▼</button></div>
+          <div id="box-e1" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">void aggiungiSeNuovo(ArchivioVector&amp; A, const Studente&amp; s) {
+    auto it = std::find_if(A.v.begin(), A.v.end(),
+        [&](const Studente&amp; x){ return x.cognome==s.cognome &amp;&amp; x.nome==s.nome; });
+    if (it == A.v.end()) A.v.push_back(s);
+}
+</code></pre>
+          </div>
+        </li>
+
+        <li><strong>E2 — Promossi (C++)</strong><br/>
+          <div class="spec"><b>Richiesta:</b> data una soglia <code>k</code>, restituisci un nuovo <code>std::vector&lt;Studente&gt;</code>
+            con chi ha <code>media ≥ k</code> e <code>eta ≥ 14</code>, senza modificare l’archivio originale.</div>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra soluzione ▼</button></div>
+          <div id="box-e2" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">std::vector&lt;Studente&gt; promossi(const ArchivioVector&amp; A, double k){
+    std::vector&lt;Studente&gt; out;
+    out.reserve(A.v.size());
+    std::copy_if(A.v.begin(), A.v.end(), std::back_inserter(out),
+                 [k](const Studente&amp; s){ return s.media >= k &amp;&amp; s.eta >= 14; });
+    return out;
+}
+</code></pre>
+          </div>
+        </li>
+
+        <li><strong>E3 — Ricerca binaria (C++)</strong><br/>
+          <div class="spec"><b>Richiesta:</b> mantieni l’archivio <em>sempre ordinato</em> per (cognome, nome). Implementa
+            <code>inserisciOrdinato(ArchivioVector&amp;, const Studente&amp;)</code> usando <code>lower_bound</code> per inserire nel punto giusto (senza duplicati).</div>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra soluzione ▼</button></div>
+          <div id="box-e3" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">void inserisciOrdinato(ArchivioVector&amp; A, const Studente&amp; s){
+    auto key = [](const Studente&amp; t){ return std::pair{t.cognome, t.nome}; };
+    auto it = std::lower_bound(A.v.begin(), A.v.end(), key(s),
+        [&](const Studente&amp; x, const std::pair&lt;std::string,std::string&gt;&amp; k){
+            return key(x) &lt; k;
+        });
+    if (it == A.v.end() || key(*it) != key(s)) A.v.insert(it, s);
+}
+</code></pre>
+          </div>
+        </li>
+
+        <li><strong>E4 — C: rimozione per condizione</strong><br/>
+          <div class="spec"><b>Richiesta:</b> in C, scrivi <code>rimuovi_media_sotto(Archivio*, double k)</code> che rimuove <em>in place</em> tutti gli studenti con media &lt; k (compattando con shift).</div>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e4" onclick="toggleBox('btn-e4','box-e4')">Mostra soluzione ▼</button></div>
+          <div id="box-e4" style="display:none;margin-top:8px">
+<pre><code class="language-c">void rimuovi_media_sotto(Archivio* A, double k){
+    size_t write = 0;
+    for (size_t read=0; read&lt;A-&gt;n; ++read){
+        if (A-&gt;v[read].media &gt;= k) {
+            if (write != read) A-&gt;v[write] = A-&gt;v[read];
+            ++write;
+        }
+    }
+    A-&gt;n = write; // compattato
+}
+</code></pre>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="inner-box">
+      <h2>Takeaways</h2>
+      <ul>
+        <li><strong>Array statico</strong>: semplice e veloce, ma capacità fissa e gestione manuale di inserimenti/rimozioni.</li>
+        <li><strong><code>std::vector</code></strong>: dinamico, API ricche (<code>sort</code>, <code>find_if</code>, <code>erase-remove</code>), attenzione all’invalidazione su riallocazioni.</li>
+        <li>Mantenere l’archivio <strong>ordinato</strong> consente <strong>ricerca binaria</strong> (<code>O(log n)</code>) e inserimenti con <code>lower_bound</code>.</li>
+        <li>Definisci sempre <strong>chiave di confronto</strong> chiara (es. <code>(cognome, nome)</code>) e gestisci i <strong>duplicati</strong> secondo la policy.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>
