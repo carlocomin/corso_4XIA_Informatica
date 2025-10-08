@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez3_7 · Indici per file binari (indice primario ordinato)</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez3_6.html"; }
+    function nextSlide(){ window.location.href = "programma.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+  </script>
+  <style>
+    /* assicurati che testi/liste/codice siano a sinistra nelle inner-box */
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li, .inner-box pre, .inner-box code {
+      text-align: left !important;
+    }
+    .inner-box ul, .inner-box ol { margin: .5rem 0 .75rem 1rem; padding-left: 1.25rem; list-style-position: outside; }
+    .inner-box li { margin: .25rem 0; }
+    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
+    .ascii { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background:#f8fafc; border:1px solid #e5e7eb; border-radius:8px; padding:.6rem .8rem; }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; display:inline-block; margin-top:.25rem }
+    .mini { font-size:.95rem; }
+  </style>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 3 — File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">Lez3_1: Concetti di file</a></li>
+    <li><a href="lez3_2.html">Lez3_2: File testuali (C++)</a></li>
+    <li><a href="lez3_3.html">Lez3_3: File binari (base)</a></li>
+    <li><a href="lez3_4.html">Lez3_4: Binari portabili (formati)</a></li>
+    <li><a href="lez3_5.html">Lez3_5: fseek/ftell &amp; seekg/tellg</a></li>
+    <li><a href="lez3_6.html">Lez3_6: Binario in C (esercizi)</a></li>
+    <li><a href="lez3_7.html" class="active">Lez3_7: Indici per file binari</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Lez3_7 — Indici per file binari (indice primario ordinato)</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box">
+      <h2>Perché un indice</h2>
+      <p class="note"><strong>Problema:</strong> cercare un record per chiave scorrendo tutto <code>data.bin</code> costa <strong>O(n)</strong> per ogni query.</p>
+      <p class="ok"><strong>Idea:</strong> mantieni un <em>indice primario ordinato</em> di coppie <code>{chiave, offset}</code> → ricerca con <strong>binary search</strong> in <strong>O(log n)</strong>, poi <code>seek</code> diretto nel file dati.</p>
+    </div>
+
+    <div class="inner-box">
+      <h2>Layout dei file (semplice &amp; robusto)</h2>
+      <div class="ascii mini">
+data.bin   : [HEADER][RECORD][RECORD]...[RECORD] <br/>
+index.bin  : [HEADER][ (key:u32, offset:u64) ordinati per key ]
+      </div>
+      <ul class="mini">
+        <li><strong>Header</strong>: magic, version, endianness, <code>record_size</code> (se fisso), <code>n_records</code>.</li>
+        <li><strong>Tipi fissi</strong>: <code>uint32_t</code> per chiave (esempio), <code>uint64_t</code> per offset (file &gt; 2GB).</li>
+        <li><strong>Endianness</strong> di formato definita (consigliato LE). I/O in <em>modalità binaria</em>.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>Operazioni essenziali</h2>
+      <ul>
+        <li><strong>Build iniziale</strong>: scorri <code>data.bin</code>, raccogli <code>{key, offset}</code>, ordina, scrivi <code>index.bin</code>.</li>
+        <li><strong>Search</strong> (puntuale): binary search su <code>index.bin</code> → ottieni <code>offset</code> → <code>seek</code> in <code>data.bin</code>.</li>
+        <li><strong>Insert</strong> (record fisso): append in <code>data.bin</code>, poi aggiorna l’indice (in RAM) e riscrivi <code>index.bin</code> (per molte insert: <em>batch</em> o <em>rebuild</em>).</li>
+        <li><strong>Update in-place</strong> (campo non-chiave): sovrascrivi a <code>offset</code>. Se cambia la chiave → rimuovi/riinserisci nell’indice.</li>
+        <li><strong>Delete</strong>: cancellazione logica (tombstone/flag); compattazione periodica e rebuild dell’indice.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>Pseudocodice — ricerca con indice ordinato</h2>
+<pre><code>// INPUT: key cercata    OUTPUT: record logico o "non trovato"
+idx = apri("index.bin", binario)   // carica in RAM o mappa l'array {key,offset}
+(lo, hi) = (0, idx.n - 1)
+while lo ≤ hi do
+    mid = (lo + hi) // 2
+    if key == idx[mid].key then
+        off = idx[mid].offset
+        dati = apri("data.bin", binario)
+        seek(dati, off)          // posizionamento O(1)
+        rec = leggi_record(dati)
+        return rec
+    else if key &lt; idx[mid].key then
+        hi = mid - 1
+    else
+        lo = mid + 1
+fine while
+return "non trovato"
+</code></pre>
+      <p class="ok mini">Memoria indice ≈ <code>n * (sizeof(key) + sizeof(offset))</code> → ~12 B/record con <code>u32 + u64</code>.</p>
+    </div>
+
+    <div class="inner-box">
+      <h2>Portabilità minima (da rispettare)</h2>
+      <ul class="mini">
+        <li><strong>Tipi a larghezza fissa</strong> (no <code>long/size_t</code> “raw” sul disco).</li>
+        <li><strong>Endianness</strong> di formato costante e documentata.</li>
+        <li><strong>Niente puntatori/bit-field</strong> nel file: solo dati logici.</li>
+        <li><strong>Update atomico dell’indice</strong>: scrivi <code>index.tmp</code> → fsync → rename.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>Complexity snapshot</h2>
+      <ul class="mini">
+        <li><strong>Ricerca</strong>: O(log n) su <code>index.bin</code> + O(1) per <code>seek</code>.</li>
+        <li><strong>Insert singola</strong>: O(n) su array ordinato (riscrittura). Per molte insert → <em>batch</em> o <em>rebuild</em>.</li>
+        <li><strong>Pratica didattica</strong>: inizia con record a lunghezza fissa; poi passa ai variabili (length-prefix) aggiornando l’offset.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

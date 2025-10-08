@@ -14,15 +14,22 @@
     function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
   </script>
   <style>
+    /* stile box base + colorate (come nel tuo file) */
     .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
-    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
-    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; }
     .tip  { font-style: italic; opacity:.95 }
-    /* allinea sempre a sinistra i blocchi di codice */
-    .inner-box pre, .inner-box pre code, .box pre, .box pre code, pre, pre code { text-align: left !important; }
+
+    /* allineamento SEMPRE a sinistra per testo/liste/codice nelle inner-box */
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li, .inner-box pre, .inner-box code { text-align: left !important; }
+    .inner-box ul, .inner-box ol { margin: .5rem 0 .75rem 1rem; padding-left: 1.25rem; list-style-position: outside; }
+    .inner-box li { margin: .25rem 0; }
+
+    /* codice ben leggibile */
     pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
-    pre code { display:block; }
+    pre code { display:block; text-align:left !important; }
+
     table { width:100%; border-collapse: collapse; }
     th, td { border-bottom: 1px solid #e5e7eb; padding: .45rem .5rem; vertical-align: top; text-align:left }
     th { background: #f8fafc; }
@@ -36,7 +43,7 @@
   <ul>
     <li><a href="lez3_1.html">Lez3_1: File: concetti e modelli</a></li>
     <li><a href="lez3_2.html">Lez3_2: I/O su file testuali (C++)</a></li>
-    <li><a href="lez3_3.html">Lez3_3: File binari (base) in C++ e C</a></li>
+    <li><a href="lez3_3.html" class="active">Lez3_3: File binari (base) in C++ e C</a></li>
     <li><a href="lez3_4.html">Lez3_4: File binari — formati & pratiche</a></li>
     <li><a href="lez3_5.html">Lez3_5: Binario in C++ (serialize/deserialize)</a></li>
     <li><a href="lez3_6.html">Lez3_6: Binario in C (serialize/deserialize)</a></li>
@@ -72,7 +79,7 @@
       <p class="note">Questa è la versione <em>base</em> per esercizi sulla stessa macchina: non trattiamo endianness/versioning.</p>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>Cosa significa “binario” e perché la modalità <code>binary</code>?</h2>
       <ul>
         <li><strong>File binario</strong> = scriviamo/leggiamo i <em>byte</em> grezzi degli oggetti in memoria, senza conversioni in caratteri.</li>
@@ -83,7 +90,7 @@
       <p class="tip">Scrittura di collezioni: salva prima la <strong>dimensione</strong> (es. <code>n</code>), poi i <strong>n</strong> elementi contigui.</p>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>Che cos’è un <em>POD</em> (Plain Old Data) — e perché lo usiamo qui</h2>
       <ul>
         <li><strong>Idea pratica</strong>: un tipo è “POD” se ha un <em>layout semplice</em> e i suoi byte possono essere copiati così come sono
@@ -100,7 +107,7 @@
     <div class="inner-box">
       <h2>Sezione C++ — modalità binaria & esempi</h2>
 
-      <div class="box">
+      <div class="inner-box box">
         <h3>1) Primitivi (C++)</h3>
         <p>Scriviamo due valori (<code>int</code> e <code>double</code>) in un file binario, poi li rileggiamo.</p>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
@@ -129,7 +136,7 @@ int main(){
 </code></pre>
       </div>
 
-      <div class="box">
+      <div class="inner-box box">
         <h3>2) Array 1D di primitivi (C++)</h3>
         <p>Salviamo prima la <code>n</code> (numero di elementi), poi il blocco contiguo <code>v.data()</code>.</p>
 <pre><code class="language-cpp">#include &lt;vector&gt;
@@ -159,7 +166,7 @@ int main(){
         <p class="tip"><code>std::vector</code> garantisce memoria <em>contigua</em> per i suoi elementi.</p>
       </div>
 
-      <div class="box">
+      <div class="inner-box box">
         <h3>3) Matrice 2D di primitivi (C++)</h3>
         <p>Usiamo layout <strong>row-major</strong>: l’indice di un elemento è <code>r*C + c</code>.</p>
 <pre><code class="language-cpp">#include &lt;vector&gt;
@@ -194,7 +201,7 @@ int main(){
 </code></pre>
       </div>
 
-      <div class="box">
+      <div class="inner-box box">
         <h3>4) Array di <em>struct</em> (C++) — solo campi POD</h3>
         <p>La <em>struct</em> contiene solo campi “banali”: <code>char[]</code>, <code>int</code>, <code>double</code>. Scriviamo/leggiamo il blocco contiguo.</p>
 <pre><code class="language-cpp">#include &lt;vector&gt;
@@ -246,7 +253,7 @@ int main(){
     <div class="inner-box">
       <h2>Sezione C — modalità binaria & esempi</h2>
 
-      <div class="box">
+      <div class="inner-box box">
         <h3>1) Primitivi (C)</h3>
         <p>Le funzioni <code>fwrite</code>/<code>fread</code> lavorano su blocchi: conta elementi e dimensione di ciascun elemento.</p>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
@@ -274,7 +281,7 @@ int main(void){
 </code></pre>
       </div>
 
-      <div class="box">
+      <div class="inner-box box">
         <h3>2) Array 1D di primitivi (C)</h3>
         <p>Come sopra: salviamo prima <code>n</code>, poi il blocco di <code>n</code> elementi.</p>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
@@ -306,7 +313,7 @@ int main(void){
 </code></pre>
       </div>
 
-      <div class="box">
+      <div class="inner-box box">
         <h3>3) Matrice 2D di primitivi (C)</h3>
         <p>Row-major: per accedere a <code>(r,c)</code> usare <code>r*C + c</code>.</p>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
@@ -344,7 +351,7 @@ int main(void){
 </code></pre>
       </div>
 
-      <div class="box">
+      <div class="inner-box box">
         <h3>4) Array di <em>struct</em> (C) — solo campi POD</h3>
         <p>Scriviamo e leggiamo un blocco contiguo di <code>Studente</code> (solo <code>char[]</code> e numeri).</p>
 <pre><code class="language-c">#include &lt;stdio.h&gt;

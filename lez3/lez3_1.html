@@ -20,21 +20,30 @@
     }
   </script>
   <style>
+    /* Box base + colorate (come nel tuo file) */
     .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
-    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
-    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
     .tip  { font-style: italic; opacity:.95 }
     .spec b { display:inline-block; width:11.5rem }
-    /* forza allineamento a sinistra dei code block */
-    .inner-box pre, .inner-box pre code, .box pre, .box pre code, pre, pre code { text-align: left !important; }
+
+    /* Allineamento SEMPRE a sinistra per contenuti nelle inner-box */
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li, .inner-box pre, .inner-box code { text-align: left !important; }
+    .inner-box ul, .inner-box ol { margin: .5rem 0 .75rem 1rem; padding-left: 1.25rem; list-style-position: outside; }
+    .inner-box li { margin: .25rem 0; }
+
+    /* Code block leggibili */
     pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
-    pre code { display:block; }
+    pre code { display:block; text-align:left !important; }
+
+    /* Tabelle */
     table { width:100%; border-collapse: collapse; }
     th, td { border-bottom: 1px solid #e5e7eb; padding: .45rem .5rem; vertical-align: top; text-align:left }
     th { background: #f8fafc; }
-    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+
+    .kbd, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    .kbd { background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
   </style>
 </head>
 <body>
@@ -43,14 +52,14 @@
 <div class="sidebar" id="menu">
   <h2>Lezione 3 — File I/O</h2>
   <ul>
-    <li><a href="lez3_1.html">Lez3_1: File: concetti e modelli</a></li>
+    <li><a href="lez3_1.html" class="active">Lez3_1: File: concetti e modelli</a></li>
     <li><a href="lez3_2.html">Lez3_2: I/O su file testuali (C++)</a></li>
     <li><a href="lez3_3.html">Lez3_3: I/O su file testuali (C)</a></li>
-    <li><a href="lez3_4.html">Lez3_4: File binari: formati & portabilità</a></li>
+    <li><a href="lez3_4.html">Lez3_4: File binari: formati &amp; portabilità</a></li>
     <li><a href="lez3_5.html">Lez3_5: Binario in C++ (serialize/deserialize)</a></li>
     <li><a href="lez3_6.html">Lez3_6: Binario in C (serialize/deserialize)</a></li>
-    <li><a href="lez3_7.html">Lez3_7: Prestazioni & buone pratiche</a></li>
-    <li><a href="lez3_8.html">Lez3_8: Laboratorio & esercizi</a></li>
+    <li><a href="lez3_7.html">Lez3_7: Prestazioni &amp; buone pratiche</a></li>
+    <li><a href="lez3_8.html">Lez3_8: Laboratorio &amp; esercizi</a></li>
   </ul>
 </div>
 <!-- END MENU -->
@@ -76,7 +85,7 @@
       <p class="note">Le prossime slide mostrano il “come si fa” in C++ e in C. Qui mettiamo le basi per ragionare in modo corretto.</p>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>Che cos’è un file (3 livelli)</h2>
       <table>
         <tr><th>Livello</th><th>Idea</th><th>Esempi/Note</th></tr>
@@ -98,7 +107,7 @@
       </table>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>File testuali vs file binari</h2>
       <table>
         <tr><th>Tipo</th><th>Cos’è</th><th>Pro</th><th>Contro</th><th>Esempi d’uso</th></tr>
@@ -120,7 +129,7 @@
       <p class="tip"><strong>Encoding</strong>: in testuale useremo <em>UTF-8</em>. <strong>Newline</strong>: Windows usa CRLF (<span class="mono">\r\n</span>), Linux/macOS LF (<span class="mono">\n</span>).</p>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>Percorsi, working directory, permessi</h2>
       <ul>
         <li><strong>Percorso assoluto</strong>: parte dalla radice del disco. Es. Linux: <span class="kbd">/home/utente/dati/log.txt</span>; Windows: <span class="kbd">C:\Users\Utente\dati\log.txt</span></li>
@@ -131,7 +140,7 @@
       <p class="note">Nelle nostre slide useremo percorsi semplici (file nella cartella del programma) per essere portabili.</p>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>Modello generale d’I/O (valido sia in C++ che in C)</h2>
       <ol>
         <li><strong>Aprire</strong> il file: ottieni un <em>handle</em> (C++: stream; C: <code>FILE*</code>).</li>
@@ -148,7 +157,7 @@
     <div class="inner-box">
       <h2>Mini-assaggi di codice (solo per vedere la forma)</h2>
 
-      <div class="box">
+      <div class="inner-box box">
         <h3>1) C++ · <em>lettura</em> file testuale (riga per riga)</h3>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;iostream&gt;
@@ -165,7 +174,7 @@ int main(){
 </code></pre>
       </div>
 
-      <div class="box">
+      <div class="inner-box box">
         <h3>2) C++ · <em>scrittura</em> file testuale</h3>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;iostream&gt;
@@ -180,7 +189,7 @@ int main(){
 </code></pre>
       </div>
 
-      <div class="box">
+      <div class="inner-box box">
         <h3>3) C · <em>lettura</em> file testuale (riga per riga con <code>fgets</code>)</h3>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;string.h&gt;
@@ -205,7 +214,7 @@ int main(void){
         <p class="tip">Usiamo <code>fgets</code> (riga intera) e togliamo eventuali <code>\r</code>/<code>\n</code> finali (CR/LF).</p>
       </div>
 
-      <div class="box">
+      <div class="inner-box box">
         <h3>4) C · <em>scrittura</em> file testuale</h3>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
 
@@ -247,7 +256,7 @@ int main(void){
           </div>
         </li>
 
-        <li><strong>E3 — Newline & encoding</strong><br/>
+        <li><strong>E3 — Newline &amp; encoding</strong><br/>
           <span>Perché un file testuale creato su Windows può mostrare “stranezze” se aperto su Linux con editor vecchi?</span>
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra ▼</button></div>
           <div id="box-e3" style="display:none;margin-top:8px">

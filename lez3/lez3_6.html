@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez3_6 · fseek/ftell (text) e seekg/tellg: portabilità reale</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez3_5.html"; }
+    function nextSlide(){ window.location.href = "lez3_7.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+  </script>
+  <!-- patch allineamento + box colorate -->
+  <style>
+    /* Testo/liste/codice SEMPRE a sinistra nelle inner-box */
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li, .inner-box pre, .inner-box code {
+      text-align: left !important;
+    }
+    .inner-box ul, .inner-box ol {
+      margin: .5rem 0 .75rem 1rem;
+      padding-left: 1.25rem;
+      list-style-position: outside;
+    }
+    .inner-box li { margin: .25rem 0; }
+    pre, pre code { text-align: left !important; white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
+    .content-box { text-align: left !important; }
+    .center { text-align: center; }
+    /* Box colorate */
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; display:inline-block; margin:.35rem 0; }
+    .tip  { font-style: italic; opacity:.95; }
+    /* Lista compatta opzionale */
+    .tight li { margin:.25rem 0; }
+  </style>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 3 — File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">Lez3_1: Concetti di file</a></li>
+    <li><a href="lez3_2.html">Lez3_2: File testuali (C++)</a></li>
+    <li><a href="lez3_3.html">Lez3_3: File binari (base)</a></li>
+    <li><a href="lez3_4.html">Lez3_4: Binari portabili (formati)</a></li>
+    <li><a href="lez3_5.html">Lez3_5: fseek/ftell &amp; seekg/tellg</a></li>
+    <li><a href="lez3_6.html" class="active">Lez3_6: fseek/ftell &amp; seekg/tellg (text mode)</a></li>
+    <li><a href="lez3_7.html">Lez3_7: Indici per file binari</a></li>
+    <li><a href="lez3_seek.html">Extra: Cursore &amp; posizionamento</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>fseek/ftell (C) e seekg/tellg (C++): cosa è davvero portabile in <em>text mode</em></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box">
+      <h2>TL;DR (In breve)</h2>
+      <ul>
+        <li><strong>Sì</strong>: in <em>text mode</em> puoi <em>sempre</em> tornare all’inizio (<code>fseek(fp, 0, SEEK_SET)</code>) <strong>oppure</strong> a una posizione <em>prima ottenuta</em> con <code>ftell</code>/<code>fgetpos</code> (C) o <code>tellg</code> (C++). Queste sono le <em>forme portabili</em>.</li>
+        <li><strong>No</strong> a seek “a mano” (es. <code>SEEK_CUR</code> con <code>+N</code> o <code>SEEK_END</code> con offset ≠ 0) in text mode: non sono portabili a causa di traduzioni newline e stati multibyte.</li>
+        <li>Su POSIX la <code>b</code> è ignorata (text≈binary), quindi <em>sembra</em> funzionare, ma <strong>non</strong> è portabile su Windows.</li>
+        <li><strong>Prestazioni</strong>: il seek è O(1) rispetto alla dimensione del file (si lavora su <em>byte</em>), ma il “carattere k-esimo” in UTF-8 non è raggiungibile in O(1).</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>Perché i seek arbitrari in text mode non sono portabili</h2>
+      <p>
+        In <em>text mode</em> la libreria può tradurre i newline (<code>\n</code> ↔ <code>\r\n</code>) e mantenere stato per codifiche multibyte.
+        Quindi “N byte avanti” non corrisponde stabilmente a “N caratteri”, e la posizione logica può dipendere dall’implementazione.
+        Per questo gli <strong>unici</strong> salti portabili sono:
+      </p>
+      <ul class="tight">
+        <li>all’inizio (<code>SEEK_SET, 0</code>);</li>
+        <li>ad una posizione “opaca” <em>prodotta</em> dallo stesso stream (C: <code>ftell</code> / <code>fgetpos</code> → <code>fseek</code> / <code>fsetpos</code>; C++: <code>tellg</code> → <code>seekg</code>).</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>C (stdio): cosa garantisce lo standard</h2>
+      <ul>
+        <li><strong>Regola portabile (text stream)</strong>: offset validi sono <code>0</code> (qualunque origine) o un valore <em>precedentemente</em> ritornato da <code>ftell</code> (usabile con <code>SEEK_SET</code>).</li>
+        <li><strong>POSIX</strong>: su sistemi POSIX la lettera <code>b</code> in <code>fopen</code> è ignorata (text≈binary), ma le regole di portabilità C restano valide a livello generale.</li>
+        <li><strong>Linee guida</strong>: trattare il valore di <code>ftell</code> in text mode come <em>token</em> opaco (non farci aritmetica, non stimare la “dimensione” del file di testo).</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>C++ (iostream): implicazioni</h2>
+      <ul>
+        <li><code>tellg()</code>/<code>tellp()</code> restituiscono <code>std::streampos</code> (basato su <code>std::fpos&lt;mbstate_t&gt;</code>): non è “un numero di byte puro”. Serve a <em>tornare</em> con <code>seekg(pos)</code>/<code>seekp(pos)</code>, non a fare aritmetica di offset.</li>
+        <li><code>streampos</code>/<code>streamoff</code> sono <em>implementation-defined</em>: evita cast “creativi”; usa le API di posizionamento.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>Ricette sicure (portabili)</h2>
+      <ol>
+        <li><strong>Marca e torna</strong>:<br/><br/>
+          <span class="ok">
+            C: <code>long p = ftell(fp);</code> … <code>fseek(fp, p, SEEK_SET);</code><br/>
+            C++: <code>auto p = ifs.tellg();</code> … <code>ifs.seekg(p);</code>
+          </span>
+        </li>
+        <li><strong>Random access a byte precisi?</strong><br/><br/>
+          <span class="ok">Apri in <code>binary mode</code> e gestisci tu le newline/encoding.</span>
+        </li>
+        <li><strong>File grandi</strong> (≥2–4 GiB):<br/><br/>
+          <span class="ok">C su POSIX: <code>fseeko/ftello</code>; C su MSVC: <code>_fseeki64/_ftelli64</code>.</span>
+        </li>
+        <li><strong>Non usare <code>ftell</code> per dimensioni</strong> in text mode:<br/><br/>
+          <span class="ok">È un token opaco; per la size usa metodi adatti (stat/fstat, o apri in binario e misura con <code>seek end</code> → <code>tell</code>).</span>
+        </li>
+      </ol>
+    </div>
+
+    <div class="inner-box">
+      <h2>Esempi minimi (didattici)</h2>
+
+      <div class="inner-box">
+        <h3>C — “marca e torna” in <em>text mode</em></h3>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+int main(void){
+    FILE *fp = fopen("poesia.txt", "r");   // text mode
+    if(!fp) return 1;
+
+    // leggo fino all'inizio della 3a riga
+    int riga = 1, ch;
+    long mark = 0;
+    while ((ch = fgetc(fp)) != EOF) {
+        if (riga == 3) { mark = ftell(fp); break; }
+        if (ch == '\n') riga++;
+    }
+    // ... più tardi torno esattamente lì:
+    if (mark != -1L) fseek(fp, mark, SEEK_SET);
+    // ora leggo la 3a riga per intero
+    int c; while ((c = fgetc(fp)) != EOF && c != '\n') putchar(c);
+    putchar('\n');
+    fclose(fp);
+    return 0;
+}
+</code></pre>
+        <p class="note">Portabile perché si torna ad una posizione <em>ottenuta</em> da <code>ftell</code> sullo <em>stesso</em> stream.</p>
+      </div>
+
+      <div class="inner-box">
+        <h3>C++ — “marca e torna” in <em>text mode</em></h3>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+int main(){
+    std::ifstream ifs("poesia.txt"); // text mode
+    if(!ifs) return 1;
+
+    // memorizzo la posizione corrente
+    auto pos = ifs.tellg();
+
+    // leggo una riga
+    std::string riga1;
+    std::getline(ifs, riga1);
+
+    // ... poi torno alla posizione salvata
+    ifs.clear();       // se ho toccato EOF o errori
+    ifs.seekg(pos);    // portabile
+
+    std::string riga1_bis;
+    std::getline(ifs, riga1_bis);
+    std::cout &lt;&lt; riga1_bis &lt;&lt; "\n";
+}
+</code></pre>
+        <p class="ok">In C++ <code>pos</code> è un <code>std::streampos</code> opaco: garantito per <em>seekg(pos)</em>, non per aritmetica.</p>
+      </div>
+    </div>
+
+    <div class="inner-box">
+      <h2>Pitfall comuni (e rimedi pratici)</h2>
+      <ul>
+        <li><strong>Usare offset “a mano” in text mode</strong> (es. <code>SEEK_CUR,+N</code>) → comportamento non portabile.<br/><br/>
+          <span class="ok">Torna sempre a posizioni ottenute con <code>ftell</code>/<code>tellg</code>, oppure apri in binario.</span>
+        </li>
+        <li><strong>Stimare dimensioni con <code>ftell</code> in text mode</strong> → valori non significativi.<br/><br/>
+          <span class="ok">Usa <code>stat/fstat</code> o apri in binario e misura con <code>seek end</code> → <code>tell</code>.</span>
+        </li>
+        <li><strong>Differenze di piattaforma</strong> (POSIX vs Windows) nascoste in laboratorio → codice fragile in produzione.<br/><br/>
+          <span class="ok">Se devi essere cross-platform, rispetta le regole standard; non affidarti al “qui funziona”.</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>Riferimenti essenziali</h2>
+      <ul>
+        <li>cppreference — <a href="https://en.cppreference.com/w/c/io/fseek" target="_blank" rel="noopener">fseek (C)</a>, note sui text stream e offset validi.</li>
+        <li>cppreference — <a href="https://en.cppreference.com/w/cpp/io/basic_istream/seekg" target="_blank" rel="noopener">seekg/tellg (C++)</a>; <a href="https://en.cppreference.com/w/cpp/io/fpos" target="_blank" rel="noopener">std::fpos/streampos</a>.</li>
+        <li>man7 — <a href="https://man7.org/linux/man-pages/man3/fopen.3.html" target="_blank" rel="noopener">fopen(3)</a> (POSIX: la <code>b</code> è ignorata).</li>
+        <li>CERT C — <a href="https://wiki.sei.cmu.edu/confluence/display/c/FIO14-C.+Understand+the+difference+between+text+mode+and+binary+mode+with+file+streams" target="_blank" rel="noopener">FIO14-C</a>, <a href="https://wiki.sei.cmu.edu/confluence/x/o9YxBQ" target="_blank" rel="noopener">FIO19-C</a>.</li>
+        <li>Microsoft — <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/fseek-fseeki64" target="_blank" rel="noopener">fseek/_fseeki64</a>, <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/ftell-ftelli64" target="_blank" rel="noopener">ftell/_ftelli64</a>.</li>
+      </ul>
+      <p class="tip">Per accesso casuale “vero” a byte esatti, lavora in <strong>binario</strong> e usa <code>seekg/seekp</code> / <code>fseek</code> con offset precisi.</p>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

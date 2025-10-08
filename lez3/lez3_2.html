@@ -20,18 +20,23 @@
       if(btn) btn.textContent = open ? 'Mostra soluzione ▼' : 'Nascondi soluzione ▲';
     }
   </script>
+  <!-- patch allineamento + box colorate -->
   <style>
-    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
-    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
-    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
-    .tip  { font-style: italic; opacity:.95 }
-    .spec { margin:.2rem 0 .5rem }
-    .spec b { display:inline-block; width:11.5rem }
-    /* codice allineato a sinistra */
-    .inner-box pre, .inner-box pre code, .box pre, .box pre code, pre, pre code { text-align: left !important; }
-    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
-    pre code { display:block; }
+    /* Testo/liste/codice SEMPRE a sinistra nelle inner-box */
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li, .inner-box pre, .inner-box code {
+      text-align: left !important;
+    }
+    .inner-box ul, .inner-box ol { margin: .5rem 0 .75rem 1rem; padding-left: 1.25rem; list-style-position: outside; }
+    .inner-box li { margin: .25rem 0; }
+    pre, pre code { text-align: left !important; white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
+
+    /* Box base + colorate */
+    .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; display:inline-block; }
+    .tip  { font-style: italic; opacity:.95; }
+
     table { width:100%; border-collapse: collapse; }
     th, td { border-bottom: 1px solid #e5e7eb; padding: .45rem .5rem; vertical-align: top; text-align:left }
     th { background: #f8fafc; }
@@ -45,13 +50,13 @@
   <h2>Lezione 3 — File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">Lez3_1: File: concetti e modelli</a></li>
-    <li><a href="lez3_2.html">Lez3_2: I/O su file testuali (C++)</a></li>
+    <li><a href="lez3_2.html" class="active">Lez3_2: I/O su file testuali (C++)</a></li>
     <li><a href="lez3_3.html">Lez3_3: I/O su file testuali (C)</a></li>
-    <li><a href="lez3_4.html">Lez3_4: File binari: formati & portabilità</a></li>
+    <li><a href="lez3_4.html">Lez3_4: File binari: formati &amp; portabilità</a></li>
     <li><a href="lez3_5.html">Lez3_5: Binario in C++ (serialize/deserialize)</a></li>
     <li><a href="lez3_6.html">Lez3_6: Binario in C (serialize/deserialize)</a></li>
-    <li><a href="lez3_7.html">Lez3_7: Prestazioni & buone pratiche</a></li>
-    <li><a href="lez3_8.html">Lez3_8: Laboratorio & esercizi</a></li>
+    <li><a href="lez3_7.html">Lez3_7: Prestazioni &amp; buone pratiche</a></li>
+    <li><a href="lez3_8.html">Lez3_8: Laboratorio &amp; esercizi</a></li>
   </ul>
 </div>
 <!-- END MENU -->
@@ -77,7 +82,7 @@
       <p class="note">Scelte del corso: <strong>UTF-8</strong>, separatore CSV predefinito <strong>;</strong>, lettura con <code>getline</code> + parser.</p>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>CSV e TSV: due esempi</h2>
       <div style="font-family:ui-monospace,monospace;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:.6rem .8rem;overflow:auto">
         CSV (sep <code>;</code>)<br/>
@@ -93,7 +98,7 @@
       </div>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>Struttura dati</h2>
 <pre><code class="language-cpp">#include &lt;string&gt;
 #include &lt;vector&gt;
@@ -106,7 +111,7 @@ struct Studente {
 </code></pre>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>Aprire file e gestire errori</h2>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;iostream&gt;
@@ -124,7 +129,7 @@ int main(){
       <p class="tip"><code>exceptions(failbit|badbit)</code> + <code>try/catch</code> è una variante comoda per gestire gli errori.</p>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2><code>getline</code> vs <code>&gt;&gt;</code> (perché scegliere <code>getline</code>)</h2>
       <ul>
         <li><code>&gt;&gt;</code> su <code>std::string</code> si ferma a spazi/tab.</li>
@@ -136,7 +141,7 @@ std::cin &gt;&gt; nome;     // "Mario Rossi" → legge solo "Mario"
 </code></pre>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>Scrivere CSV (escape corretto)</h2>
 <pre><code class="language-cpp">static std::string csv_escape(const std::string&amp; s, char sep) {
     bool need_quotes = s.find_first_of(std::string() + sep + "\"\n\r") != std::string::npos;
@@ -164,7 +169,7 @@ void save_students_csv(const std::vector&lt;Studente&gt;& v,
       <p class="ok">File aperti correttamente da Excel/LibreOffice grazie al quoting standard.</p>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>Leggere CSV (parser semplice e robusto)</h2>
 <pre><code class="language-cpp">static std::vector&lt;std::string&gt; split_csv_line(const std::string&amp; line, char sep){
     std::vector&lt;std::string&gt; out; std::string cur; cur.reserve(line.size());
@@ -206,7 +211,7 @@ std::vector&lt;Studente&gt; load_students_csv(const std::string&amp; path, char 
       <p class="warn">CR/LF: su Windows, le righe terminano con <code>\r\n</code>. Il <code>\r</code> va tolto dall’ultimo campo (vedi parser).</p>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>TSV (Tab-Separated Values)</h2>
 <pre><code class="language-cpp">void save_students_tsv(const std::vector&lt;Studente&gt;& v, const std::string&amp; path){
     std::ofstream f(path);
@@ -221,7 +226,7 @@ std::vector&lt;Studente&gt; load_students_csv(const std::string&amp; path, char 
       <p class="note">TSV riduce le virgolette ma non elimina tutti i casi-limite.</p>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>Locale numerica &amp; precisione</h2>
 <pre><code class="language-cpp">#include &lt;iomanip&gt;
 #include &lt;locale&gt;
@@ -242,7 +247,7 @@ void save_students_csv_prec(const std::vector&lt;Studente&gt;& v, const std::str
       <p class="ok">Fissare la <strong>locale</strong> evita ambiguità tra punto e virgola nei decimali.</p>
     </div>
 
-    <div class="box">
+    <div class="inner-box box">
       <h2>Esempio completo (round-trip)</h2>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
