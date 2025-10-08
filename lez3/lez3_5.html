@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez3_raw · Perché NON serializzare una struct “a crudo”</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez3_4.html"; }
+    function nextSlide(){ window.location.href = "../lez4/lez4_1.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+  </script>
+  <style>
+    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
+    .tip  { font-style: italic; opacity:.95 }
+    /* codice allineato a sinistra (mai centrato) */
+    .inner-box pre, .inner-box pre code, .box pre, .box pre code, pre, pre code { text-align:left !important; }
+    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
+    ul.checklist li { margin: .35rem 0; }
+  </style>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 3 — File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">Lez3_1: Concetti di file</a></li>
+    <li><a href="lez3_2.html">Lez3_2: File testuali (C++)</a></li>
+    <li><a href="lez3_3.html">Lez3_3: File binari (base)</a></li>
+    <li><a href="lez3_seek.html">Lez3_seek: Cursore &amp; posizionamento</a></li>
+    <li><a href="lez3_raw_struct.html" class="active">Lez3_raw: Perché NON scrivere struct “raw”</a></li>
+    <li><a href="lez3_4.html">Lez3_4: Binari portabili (formati)</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Perché <em>non conviene</em> scrivere/leggere una <code>struct</code> “a crudo”</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box">
+      <h2>Idea</h2>
+      <p class="note">
+        Fare <code>fwrite(&amp;s, sizeof s, 1, f)</code> / <code>read(fd, &amp;s, sizeof s)</code> salva su disco dettagli <em>accidentali</em> (padding, endianness, dimensioni/ABI, layout).
+        È fragile, non portabile, rischioso. Meglio un formato esplicito: tipi a larghezza fissa, endianness definita, header/versione.
+      </p>
+    </div>
+
+    <div class="box">
+      <h2>1) Padding &amp; allineamento (dipendono da compilatore/ABI)</h2>
+      <p>I compilatori inseriscono <strong>byte di riempimento</strong> tra i campi per rispettare l’allineamento.</p>
+<pre><code class="language-cpp">struct A { char c; int x; };
+// Spesso: sizeof(A) == 8 (non 5) a causa del padding
+</code></pre>
+      <ul>
+        <li>La quantità/posizione del padding può cambiare con: compilatore, versione, opzioni (<code>#pragma pack</code>), piattaforma (LP64 vs LLP64), perfino tra build diverse.</li>
+        <li>Questi byte finiscono nel file → layout su disco <strong>non stabile</strong>.</li>
+      </ul>
+      <p class="warn"><strong>Effetto pratico:</strong> un file scritto oggi potrebbe non essere leggibile domani da una build diversa della stessa app.</p>
+    </div>
+
+    <div class="box">
+      <h2>2) Padding non inizializzato → leak e incoerenze</h2>
+      <ul>
+        <li>Il padding può contenere <em>spazzatura</em> (byte indeterminati) → possibili <strong>leak</strong> di memoria/sicurezza.</li>
+        <li>Due struct con stessi campi logici possono differire byte-a-byte per via del padding → confronti binari inaffidabili.</li>
+      </ul>
+    </div>
+
+    <div class="box">
+      <h2>3) Endianness &amp; rappresentazione dei tipi</h2>
+      <ul>
+        <li>Gli interi multi-byte seguono l’endianness dell’host (LE/BE). Su un’altra macchina leggerai byte “invertiti”.</li>
+        <li><code>float/double</code> in genere sono IEEE-754, ma resta l’endianness dei byte (e dettagli come i NaN).</li>
+      </ul>
+      <p class="ok"><strong>Esempio:</strong> <code>uint16_t v=0x1234;</code> → su little-endian: <code>34 12</code>; su big-endian: <code>12 34</code>.</p>
+    </div>
+
+    <div class="box">
+      <h2>4) Dimensioni dei campi non uniformi</h2>
+      <p>Tipi come <code>long</code>, <code>size_t</code>, <code>ptrdiff_t</code>, <code>wchar_t</code>, <code>bool</code>, <code>enum</code>… cambiano dimensione tra piattaforme.</p>
+      <p class="warn">LLP64 (Windows 64-bit): <code>long</code> è 32 bit — LP64 (Linux/macOS 64-bit): <code>long</code> è 64 bit.</p>
+    </div>
+
+    <div class="box">
+      <h2>5) Bit-field: ordine e packing <em>implementation-defined</em></h2>
+      <p>Stessa dichiarazione ⇢ byte su disco diversi a seconda del compilatore/ABI.</p>
+    </div>
+
+    <div class="box">
+      <h2>6) (C++) Oggetti non banali, vtable, puntatori</h2>
+      <ul>
+        <li><strong>Mai</strong> serializzare “raw” classi con virtual (vtable), ereditarietà multipla.</li>
+        <li>Evita membri non <em>trivially copyable</em> (<code>std::string</code>, <code>std::vector&lt;T&gt;</code>, smart pointer…): il dump salva puntatori, non i dati.</li>
+      </ul>
+      <p class="warn">Anche per tipi banali: cambiare ordine/numero campi rompe la compatibilità binaria.</p>
+    </div>
+
+    <div class="box">
+      <h2>7) Sicurezza &amp; manutenzione</h2>
+      <ul>
+        <li>Rischio leak (puntatori, stack bytes nel padding).</li>
+        <li>Qualsiasi refactoring o ricompilazione può cambiare il layout ⇒ formato rotto senza accorgersene.</li>
+      </ul>
+    </div>
+
+    <div class="box">
+      <h2>8) “<code>#pragma pack</code>” non risolve davvero</h2>
+      <ul>
+        <li>Riduce il padding ma è <strong>non portabile</strong> (diverso tra compilatori).</li>
+        <li>Non tocca endianness/bit-field.</li>
+        <li>Può causare accessi disallineati (UB/performance pessime su alcune architetture).</li>
+      </ul>
+      <p class="tip">Usalo solo per strutture “di trasporto” trattate come <em>blob</em> di byte; non dereferenziare direttamente.</p>
+    </div>
+
+    <div class="inner-box">
+      <h2>Quando è (quasi) accettabile</h2>
+      <p>Solo per <strong>cache effimere locali</strong>, lette/scritte dalla stessa identica build sulla <em>stessa macchina</em>/<em>architettura</em>. Anche lì:</p>
+      <ul>
+        <li>Metti un header: magic, versione, <code>sizeof(T)</code>, checksum.</li>
+        <li><code>static_assert(std::is_trivially_copyable_v&lt;T&gt;)</code>.</li>
+        <li>Evita padding indeterminato: azzera la struct prima di riempirla o usa (indicativamente) <code>std::has_unique_object_representations_v&lt;T&gt;</code>.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>Cosa fare invece (approccio robusto)</h2>
+
+      <div class="box">
+        <h3>1) Formato esplicito campo-per-campo</h3>
+        <ul>
+          <li>Scrivi i campi in un <strong>ordine documentato</strong>.</li>
+          <li>Usa <strong>tipi a larghezza fissa</strong>: <code>std::uint32_t</code>, <code>std::int16_t</code>, …</li>
+          <li>Scegli un’<strong>endianness di formato</strong> (spesso big-endian “network order”) e <strong>convertila</strong> in scrittura/lettura.</li>
+        </ul>
+<pre><code class="language-c">// C portabile — u32 big-endian
+#include &lt;stdint.h&gt;
+#include &lt;stdio.h&gt;
+
+static inline uint32_t to_be32(uint32_t x) {
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    return __builtin_bswap32(x);
+#else
+    return x;
+#endif
+}
+
+void write_u32_be(FILE* f, uint32_t v) {
+    uint32_t be = to_be32(v);
+    fwrite(&be, 1, 4, f);
+}
+
+uint32_t read_u32_be(FILE* f) {
+    uint32_t be;
+    fread(&be, 1, 4, f);
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    return __builtin_bswap32(be);
+#else
+    return be;
+#endif
+}
+</code></pre>
+
+<pre><code class="language-cpp">// C++23 comodo — conversione endianness generica
+#include &lt;bit&gt;
+#include &lt;cstdint&gt;
+#include &lt;concepts&gt;
+
+template &lt;std::unsigned_integral T&gt;
+T to_be(T x) {
+    if constexpr (std::endian::native == std::endian::little)
+        return std::byteswap(x);
+    else
+        return x;
+}
+</code></pre>
+        <p class="note">Su Windows in modalità testo <code>'\n'</code> diventa <code>"\r\n"</code>: apri i file in <strong>modalità binaria</strong> (<code>"wb"</code>, <code>"rb"</code>) per evitare traduzioni (non è endianness, ma è una trappola comune).</p>
+      </div>
+
+      <div class="box">
+        <h3>2) Evita puntatori nel formato</h3>
+        <p>Non scrivere indirizzi: serializza il contenuto (es. <em>length-prefixed</em> per stringhe) o usa ID.</p>
+      </div>
+
+      <div class="box">
+        <h3>3) Float espliciti</h3>
+        <ul>
+          <li>Dichiara che salvi IEEE-754 nell’endianness di formato.</li>
+          <li>Valuta una <em>quantizzazione intera</em> o un checksum se i dati sono critici.</li>
+        </ul>
+      </div>
+
+      <div class="box">
+        <h3>4) Header minimale</h3>
+        <p>Magic (es. <code>"MY1\0"</code>), versione, conteggi record, flags, eventualmente un CRC.</p>
+      </div>
+
+      <div class="box">
+        <h3>5) Versionamento &amp; compatibilità</h3>
+        <p>Prevedi una <strong>versione</strong> e, se possibile, campi a <strong>lunghezza esplicita</strong> (stile TLV: Type-Length-Value) per evolvere senza rompere i reader.</p>
+      </div>
+
+      <div class="box">
+        <h3>6) Valuta formati/librerie esistenti</h3>
+        <ul>
+          <li>Protobuf, FlatBuffers, Cap’n Proto → schema, versioni, (de)serializzazione veloce.</li>
+          <li>CBOR/MessagePack → binari semplici, ottimi per prototipi/strumenti.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="inner-box">
+      <h2>Esempio breve “prima/dopo”</h2>
+      <div class="box">
+        <h3>❌ Sconsigliato</h3>
+<pre><code class="language-cpp">struct Rec { char tag; int value; };
+fwrite(&rec, sizeof rec, 1, f);   // padding, endianness, dimensioni non portabili
+</code></pre>
+      </div>
+      <div class="box">
+        <h3>✅ Consigliato</h3>
+<pre><code class="language-c">// Formato: tag (1 byte), value (u32 big-endian)
+fputc(rec.tag, f);
+write_u32_be(f, (uint32_t)rec.value);
+
+// Lettura
+rec.tag   = fgetc(f);
+rec.value = (int)read_u32_be(f);
+</code></pre>
+      </div>
+    </div>
+
+    <div class="inner-box">
+      <h2>Checklist rapida</h2>
+      <ul class="checklist">
+        <li>[ ] Tipi a larghezza fissa (<code>uint32_t</code>, …)</li>
+        <li>[ ] Endianness di formato definita (spesso big-endian)</li>
+        <li>[ ] Niente puntatori/bit-field nel wire format</li>
+        <li>[ ] Niente <code>long</code>/<code>size_t</code>/<code>bool</code> “raw” nel file</li>
+        <li>[ ] Header con magic + versione (+ checksum se serve)</li>
+        <li>[ ] Versionamento pensato per estensioni future</li>
+        <li>[ ] File aperti in modalità <strong>binaria</strong></li>
+        <li>[ ] In C++: serializza <em>i membri logici</em>, non l’oggetto intero</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>
