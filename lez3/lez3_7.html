@@ -12,19 +12,34 @@
     function prevSlide(){ window.location.href = "lez3_6.html"; }
     function nextSlide(){ window.location.href = "programma.html"; }
     function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none':'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
   </script>
   <style>
-    /* assicurati che testi/liste/codice siano a sinistra nelle inner-box */
+    /* allineamento a sinistra nelle inner-box */
     .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li, .inner-box pre, .inner-box code {
       text-align: left !important;
     }
     .inner-box ul, .inner-box ol { margin: .5rem 0 .75rem 1rem; padding-left: 1.25rem; list-style-position: outside; }
     .inner-box li { margin: .25rem 0; }
     pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
-    .ascii { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background:#f8fafc; border:1px solid #e5e7eb; border-radius:8px; padding:.6rem .8rem; }
+
+    /* box colorate */
     .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
     .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; display:inline-block; margin-top:.25rem }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
+
+    /* ascii panel */
+    .ascii { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background:#f8fafc; border:1px solid #e5e7eb; border-radius:8px; padding:.6rem .8rem; }
     .mini { font-size:.95rem; }
+
+    table { width:100%; border-collapse: collapse; }
+    th, td { border-bottom:1px solid #e5e7eb; padding:.45rem .5rem; vertical-align:top; text-align:left }
+    th { background:#f8fafc }
   </style>
 </head>
 <body>
@@ -107,13 +122,112 @@ return "non trovato"
       <p class="ok mini">Memoria indice ≈ <code>n * (sizeof(key) + sizeof(offset))</code> → ~12 B/record con <code>u32 + u64</code>.</p>
     </div>
 
+    <!-- NEW: esempio numerico end-to-end -->
+    <div class="inner-box">
+      <h2>Esempio numerico end-to-end</h2>
+      <p>Sia <code>index.bin</code> con 6 coppie ordinate per chiave:</p>
+      <table class="mini">
+        <tr><th>i</th><th>key</th><th>offset</th></tr>
+        <tr><td>0</td><td>10</td><td>128</td></tr>
+        <tr><td>1</td><td>14</td><td>256</td></tr>
+        <tr><td>2</td><td>21</td><td>384</td></tr>
+        <tr><td>3</td><td>37</td><td>512</td></tr>
+        <tr><td>4</td><td>40</td><td>640</td></tr>
+        <tr><td>5</td><td>55</td><td>768</td></tr>
+      </table>
+      <div class="ascii mini" style="margin-top:.5rem">
+Ricerca di key=37:<br/>
+lo=0, hi=5 → mid=2 (key=21)  → 37 &gt; 21 → lo=3<br/>
+lo=3, hi=5 → mid=4 (key=40)  → 37 &lt; 40 → hi=3<br/>
+lo=3, hi=3 → mid=3 (key=37)  → trovato! offset=512 → seek(data.bin, 512)
+      </div>
+      <p class="ok mini">Salto diretto nel file dati: lettura del record senza scorrere tutto il file.</p>
+    </div>
+
+    <!-- NEW: C++ mini-esempi build & lookup -->
+    <div class="inner-box">
+      <h2>Mini-esempi C++: build e lookup</h2>
+      <div class="note mini">Formato didattico: little-endian, tipi fissi; header <code>"IDX\0"</code>, ver=1, n.</div>
+
+      <h3>Build dell’indice (da <code>data.bin</code> a record fissi)</h3>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;cstdint&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+
+struct Pair { uint32_t key; uint64_t off; };
+
+uint32_t read_key_from_record(std::ifstream&amp; data){
+    // supponiamo che la chiave sia nei primi 4 byte del record
+    uint32_t k=0; data.read((char*)&k, 4); return k;
+}
+
+void build_index(const char* dataPath, const char* idxPath, uint64_t record_size){
+    std::ifstream data(dataPath, std::ios::binary);
+    if(!data) throw std::runtime_error("open data");
+    std::vector&lt;Pair&gt; idx;
+    uint64_t off=0;
+    while (true){
+        data.seekg(off);
+        uint32_t k=0;
+        data.read((char*)&k, 4);
+        if(!data) break;               // fine file
+        idx.push_back({k, off});
+        off += record_size;            // record fisso
+    }
+    std::sort(idx.begin(), idx.end(), [](auto&amp; a, auto&amp; b){ return a.key &lt; b.key; });
+
+    std::ofstream out(idxPath, std::ios::binary);
+    const char magic[4]={'I','D','X','\0'};
+    uint32_t ver=1, n=(uint32_t)idx.size();
+    out.write(magic,4); out.write((char*)&ver,4); out.write((char*)&n,4);
+    out.write((char*)idx.data(), idx.size()*sizeof(Pair));
+}
+</code></pre>
+
+      <h3>Lookup (ricerca binaria in RAM + seek nel file dati)</h3>
+<pre><code class="language-cpp">#include &lt;optional&gt;
+
+std::optional&lt;uint64_t&gt; load_and_find(const char* idxPath, uint32_t key){
+    std::ifstream in(idxPath, std::ios::binary);
+    if(!in) return std::nullopt;
+    char magic[4]; uint32_t ver=0,n=0;
+    in.read(magic,4); in.read((char*)&ver,4); in.read((char*)&n,4);
+    if(std::string(magic,4)!="IDX\0" || ver!=1) return std::nullopt;
+    std::vector&lt;Pair&gt; v(n);
+    in.read((char*)v.data(), n*sizeof(Pair));
+    // binary search
+    int lo=0, hi=(int)v.size()-1;
+    while(lo&lt;=hi){
+        int mid=(lo+hi)/2;
+        if      (key==v[mid].key) return v[mid].off;
+        else if (key&lt; v[mid].key) hi=mid-1;
+        else                      lo=mid+1;
+    }
+    return std::nullopt;
+}
+
+// Uso finale:
+void retrieve_record(const char* dataPath, const char* idxPath, uint32_t key, uint64_t rec_size){
+    auto off = load_and_find(idxPath, key);
+    if(!off){ std::cout &lt;&lt; "non trovato\n"; return; }
+    std::ifstream data(dataPath, std::ios::binary);
+    data.seekg(*off);
+    std::vector&lt;char&gt; rec(rec_size);
+    data.read(rec.data(), rec_size);
+    // ... decodifica campi del record ...
+}
+</code></pre>
+      <p class="tip mini">Per indici grandi usa memory-mapping o ricerca binaria “on-disk” leggendo blocchi con <code>seekg</code> “a metà”.</p>
+    </div>
+
     <div class="inner-box">
       <h2>Portabilità minima (da rispettare)</h2>
       <ul class="mini">
         <li><strong>Tipi a larghezza fissa</strong> (no <code>long/size_t</code> “raw” sul disco).</li>
         <li><strong>Endianness</strong> di formato costante e documentata.</li>
         <li><strong>Niente puntatori/bit-field</strong> nel file: solo dati logici.</li>
-        <li><strong>Update atomico dell’indice</strong>: scrivi <code>index.tmp</code> → fsync → rename.</li>
+        <li><strong>Aggiornamenti atomici</strong> dell’indice: scrivi <code>index.tmp</code> → flush/fsync → rename.</li>
       </ul>
     </div>
 
@@ -122,8 +236,22 @@ return "non trovato"
       <ul class="mini">
         <li><strong>Ricerca</strong>: O(log n) su <code>index.bin</code> + O(1) per <code>seek</code>.</li>
         <li><strong>Insert singola</strong>: O(n) su array ordinato (riscrittura). Per molte insert → <em>batch</em> o <em>rebuild</em>.</li>
-        <li><strong>Pratica didattica</strong>: inizia con record a lunghezza fissa; poi passa ai variabili (length-prefix) aggiornando l’offset.</li>
+        <li><strong>Didattica</strong>: inizia con record a lunghezza fissa; poi passa ai variabili (length-prefix) aggiornando gli offset.</li>
       </ul>
+    </div>
+
+    <!-- NEW: esercizio a comparsa -->
+    <div class="inner-box">
+      <h2>Esercizio (con soluzione a comparsa)</h2>
+      <p><strong>E1 — Costruisci e usa un indice primario:</strong> dato <code>data.bin</code> con record fissi di 64 byte, chiave <code>u32</code> al byte 0, <br/>1) genera <code>index.bin</code> ordinando per chiave; 2) implementa una funzione che dato <code>key</code> stampa il record.</p>
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
+      <div id="box-e1" style="display:none;margin-top:8px">
+        <div class="ok mini">
+          <p><strong>Soluzione (idea):</strong><br/>
+          <em>Build:</em> scorri <code>data.bin</code> a passi di 64, leggi i 4 byte iniziali → vettore <code>{key, offset}</code> → ordina → scrivi header + vettore.<br/>
+          <em>Lookup:</em> carica header e vettore → binary search → <code>seekg(offset)</code> in <code>data.bin</code> → leggi 64 byte → stampa campi.</p>
+        </div>
+      </div>
     </div>
 
   </div>
