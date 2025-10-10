@@ -20,15 +20,14 @@
     }
   </script>
   <style>
-    /* Box base + colorate (come nel tuo file) */
+    /* Box base + colorate */
     .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
     .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
     .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; display:inline-block }
     .tip  { font-style: italic; opacity:.95 }
-    .spec b { display:inline-block; width:11.5rem }
 
-    /* Allineamento SEMPRE a sinistra per contenuti nelle inner-box */
+    /* Allineamento SEMPRE a sinistra nelle inner-box */
     .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li, .inner-box pre, .inner-box code { text-align: left !important; }
     .inner-box ul, .inner-box ol { margin: .5rem 0 .75rem 1rem; padding-left: 1.25rem; list-style-position: outside; }
     .inner-box li { margin: .25rem 0; }
@@ -54,12 +53,11 @@
   <ul>
     <li><a href="lez3_1.html" class="active">Lez3_1: File: concetti e modelli</a></li>
     <li><a href="lez3_2.html">Lez3_2: I/O su file testuali (C++)</a></li>
-    <li><a href="lez3_3.html">Lez3_3: I/O su file testuali (C)</a></li>
-    <li><a href="lez3_4.html">Lez3_4: File binari: formati &amp; portabilità</a></li>
-    <li><a href="lez3_5.html">Lez3_5: Binario in C++ (serialize/deserialize)</a></li>
-    <li><a href="lez3_6.html">Lez3_6: Binario in C (serialize/deserialize)</a></li>
-    <li><a href="lez3_7.html">Lez3_7: Prestazioni &amp; buone pratiche</a></li>
-    <li><a href="lez3_8.html">Lez3_8: Laboratorio &amp; esercizi</a></li>
+    <li><a href="lez3_3.html">Lez3_3: File binari (base) in C++ e C</a></li>
+    <li><a href="lez3_4.html">Lez3_4: Binari portabili (formati)</a></li>
+    <li><a href="lez3_5.html">Lez3_5: Perché non scrivere struct “raw”</a></li>
+    <li><a href="lez3_6.html">Lez3_6: fseek/ftell &amp; seekg/tellg (text mode)</a></li>
+    <li><a href="lez3_7.html">Lez3_7: Indici per file binari</a></li>
   </ul>
 </div>
 <!-- END MENU -->
@@ -77,12 +75,11 @@
     <div class="inner-box">
       <h2>Obiettivi</h2>
       <ul>
-        <li>Capire cos’è un <strong>file</strong> a livello informatico e come lo gestisce il sistema operativo.</li>
+        <li>Capire cos’è un <strong>file</strong> e come lo gestisce l’OS (path, handle, permessi, buffering).</li>
         <li>Distinguere tra <strong>file testuali</strong> e <strong>file binari</strong> (pro/contro, quando usarli).</li>
-        <li>Capire il <strong>modello d’I/O</strong>: aprire, leggere/scrivere, posizionarsi, chiudere; errori tipici.</li>
-        <li>Conoscere i concetti di <strong>percorso</strong> (path), <strong>working directory</strong>, <strong>permessi</strong>, <strong>buffering</strong>.</li>
+        <li>Conoscere il <strong>modello d’I/O</strong>: apri → leggi/scrivi → (seek) → chiudi; gestire errori tipici.</li>
       </ul>
-      <p class="note">Le prossime slide mostrano il “come si fa” in C++ e in C. Qui mettiamo le basi per ragionare in modo corretto.</p>
+      <p class="note">Le lezioni successive mostrano il “come si fa” (C++ e C). Qui fissiamo le basi concettuali.</p>
     </div>
 
     <div class="inner-box box">
@@ -91,18 +88,18 @@
         <tr><th>Livello</th><th>Idea</th><th>Esempi/Note</th></tr>
         <tr>
           <td><strong>Logico</strong></td>
-          <td>Una <em>sequenza di byte</em> con un significato (testo, dati misure, immagini, codice…)</td>
-          <td>Il significato dipende dal <em>formato</em> deciso dal programmatore/standard</td>
+          <td>Una <em>sequenza di byte</em> che segue un <strong>formato</strong> (testo, immagine, archivio dati…)</td>
+          <td>Il significato è dato dalle <em>regole del formato</em> (scelte dal programmatore o da uno standard)</td>
         </tr>
         <tr>
           <td><strong>OS</strong></td>
-          <td>L’OS gestisce i file con <em>percorso</em>, <em>permessi</em>, <em>handle/descrittori</em>, <em>timestamp</em></td>
+          <td>L’OS gestisce path, permessi, handle/descrittori, timestamp; espone chiamate per I/O</td>
           <td>Operazioni: apri/chiudi, leggi/scrivi, crea/cancella, rinomina, sposta</td>
         </tr>
         <tr>
           <td><strong>Fisico</strong></td>
-          <td>I byte sono memorizzati su disco/SSD; il file system organizza blocchi e indici</td>
-          <td>Dettagli fisici <em>astratti</em> dal programmatore</td>
+          <td>I byte vivono su disco/SSD; il file system organizza blocchi e indici</td>
+          <td>I dettagli fisici sono <em>astratti</em> dai livelli superiori</td>
         </tr>
       </table>
     </div>
@@ -114,15 +111,15 @@
         <tr>
           <td><strong>Testuale</strong></td>
           <td>Byte che rappresentano <em>caratteri</em> secondo un’<strong>encoding</strong> (UTF-8, ecc.)</td>
-          <td>Leggibile, diff-friendly, facile da debuggare</td>
+          <td>Leggibile, diff-friendly, debug semplice</td>
           <td>Più spazio, parsing, attenzione a newline/locale</td>
           <td>Log, CSV/TSV, JSON, sorgenti</td>
         </tr>
         <tr>
           <td><strong>Binario</strong></td>
-          <td>Byte “grezzi” con struttura fissata dal programma (campi numerici, lunghezze, ecc.)</td>
-          <td>Compatto, veloce da leggere/scrivere, comodo per accesso casuale</td>
-          <td>Non leggibile a occhio, attenzione a <em>endianness</em>, versioni, sicurezza</td>
+          <td>Byte “grezzi” con struttura decisa dal programma</td>
+          <td>Compatto, veloce, ottimo per accesso casuale</td>
+          <td>Non leggibile a occhio; servono specifiche (endianness/versioni)</td>
           <td>Immagini, audio, archivi dati efficienti</td>
         </tr>
       </table>
@@ -132,39 +129,123 @@
     <div class="inner-box box">
       <h2>Percorsi, working directory, permessi</h2>
       <ul>
-        <li><strong>Percorso assoluto</strong>: parte dalla radice del disco. Es. Linux: <span class="kbd">/home/utente/dati/log.txt</span>; Windows: <span class="kbd">C:\Users\Utente\dati\log.txt</span></li>
-        <li><strong>Percorso relativo</strong>: relativo alla <em>working directory</em> del processo. Es.: <span class="kbd">./data/log.txt</span></li>
-        <li><strong>Working directory</strong>: cartella “corrente” da cui il programma risolve i percorsi relativi.</li>
-        <li><strong>Permessi</strong>: lettura/scrittura/esecuzione. Errori tipici: “<em>Permission denied</em>”, “<em>No such file or directory</em>”.</li>
+        <li><strong>Assoluto</strong>: dalla radice. Linux: <span class="kbd">/home/utente/dati/log.txt</span> — Windows: <span class="kbd">C:\Users\Utente\dati\log.txt</span></li>
+        <li><strong>Relativo</strong>: dalla <em>working directory</em> del processo. Es.: <span class="kbd">./data/log.txt</span></li>
+        <li><strong>Permessi</strong>: lettura/scrittura/esecuzione. Errori tipici: “<em>No such file or directory</em>”, “<em>Permission denied</em>”.</li>
       </ul>
-      <p class="note">Nelle nostre slide useremo percorsi semplici (file nella cartella del programma) per essere portabili.</p>
+      <p class="note">Nelle esercitazioni useremo percorsi semplici (file nella cartella del programma) per massima portabilità.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>Modello generale d’I/O (valido sia in C++ che in C)</h2>
+      <h2>Modello generale d’I/O</h2>
       <ol>
-        <li><strong>Aprire</strong> il file: ottieni un <em>handle</em> (C++: stream; C: <code>FILE*</code>).</li>
-        <li><strong>Leggere/Scrivere</strong>: in <em>testo</em> (linee/parsificato) o in <em>binario</em> (byte/strutture definite).</li>
-        <li><strong>Posizionarsi</strong> (opzionale): spostare il “cursore” interno (seek) per leggere da un punto preciso.</li>
-        <li><strong>Chiudere</strong> il file (o lasciare che la libreria lo chiuda a fine vita dell’oggetto).</li>
+        <li><strong>Apri</strong> il file → ottieni uno <em>stream</em> (C++: `ifstream/ofstream/fstream`) o un <code>FILE*</code> (C).</li>
+        <li><strong>Leggi/Scrivi</strong> → in <em>testo</em> (linee/parsificato) o in <em>binario</em> (byte secondo il tuo formato).</li>
+        <li><strong>(Seek)</strong> posiziona il cursore se serve accesso casuale.</li>
+        <li><strong>Chiudi</strong> (in C++ spesso RAII chiude in automatico).</li>
       </ol>
       <ul>
-        <li><strong>Buffering</strong>: le librerie accumulano dati in memoria per efficienza. <em>Flush</em> = svuotare il buffer su disco.</li>
-        <li><strong>Errori tipici</strong>: file inesistente, permessi, percorso sbagliato, disco pieno, formato inatteso.</li>
+        <li><strong>Buffering</strong>: i dati passano da/verso un buffer; <em>flush</em> = scrittura forzata su disco.</li>
+        <li><strong>Errori tipici</strong>: percorso errato, permessi, file occupato, disco pieno, formato inatteso.</li>
       </ul>
     </div>
 
+    <!-- NEW: tabella decisionale testo vs binario -->
+    <div class="inner-box box">
+      <h2>Come scegliere: Testo o Binario? (tabella decisionale)</h2>
+      <table>
+        <tr><th>Criterio</th><th>Scegli TESTO</th><th>Scegli BINARIO</th></tr>
+        <tr>
+          <td>Leggibilità umana</td>
+          <td class="ok">Sì: debug/edito con editor, versionamento (diff)</td>
+          <td>No interesse alla lettura diretta</td>
+        </tr>
+        <tr>
+          <td>Dimensioni/velocità</td>
+          <td>Dati piccoli, frequenza bassa</td>
+          <td class="ok">Dati voluminosi, I/O intensivo</td>
+        </tr>
+        <tr>
+          <td>Interoperabilità</td>
+          <td class="ok">Scambio con tool “office” (CSV/TSV)</td>
+          <td>Pipeline proprietarie, protocolli compatti</td>
+        </tr>
+        <tr>
+          <td>Accesso casuale</td>
+          <td>Non necessario</td>
+          <td class="ok">Sì: salto al record k, update in-place</td>
+        </tr>
+        <tr>
+          <td>Controllo del formato</td>
+          <td>Parsing semplice (CSV/JSON)</td>
+          <td class="ok">Header/versione/endianness, layout preciso</td>
+        </tr>
+      </table>
+      <p class="tip">Nel corso: testo per CSV/TSV e scambio; binario per efficienza e indici.</p>
+    </div>
+
+    <!-- NEW: cheat-sheet modalità apertura -->
+    <div class="inner-box box">
+      <h2>Cheat-sheet: modalità di apertura (C++ e C)</h2>
+      <table>
+        <tr><th>Operazione</th><th>C++ (iostream)</th><th>C (stdio)</th><th>Note</th></tr>
+        <tr>
+          <td>Leggi testo</td>
+          <td><span class="mono">std::ifstream f("a.txt");</span></td>
+          <td><span class="mono">fopen("a.txt","r")</span></td>
+          <td>Su Windows la modalità testo traduce newline</td>
+        </tr>
+        <tr>
+          <td>Scrivi testo (troncante)</td>
+          <td><span class="mono">std::ofstream f("a.txt");</span></td>
+          <td><span class="mono">fopen("a.txt","w")</span></td>
+          <td>Tronca se esiste</td>
+        </tr>
+        <tr>
+          <td>Append testo</td>
+          <td><span class="mono">std::ofstream f("a.txt", std::ios::app);</span></td>
+          <td><span class="mono">fopen("a.txt","a")</span></td>
+          <td>Aggiunge in fondo</td>
+        </tr>
+        <tr>
+          <td>Leggi binario</td>
+          <td><span class="mono">std::ifstream f("d.bin", std::ios::binary);</span></td>
+          <td><span class="mono">fopen("d.bin","rb")</span></td>
+          <td class="ok">Nessuna traduzione newline</td>
+        </tr>
+        <tr>
+          <td>Scrivi binario (troncante)</td>
+          <td><span class="mono">std::ofstream f("d.bin", std::ios::binary);</span></td>
+          <td><span class="mono">fopen("d.bin","wb")</span></td>
+          <td>Tronca se esiste</td>
+        </tr>
+        <tr>
+          <td>Append binario</td>
+          <td><span class="mono">std::ofstream f("d.bin", std::ios::app|std::ios::binary);</span></td>
+          <td><span class="mono">fopen("d.bin","ab")</span></td>
+          <td>Aggiunge in fondo</td>
+        </tr>
+        <tr>
+          <td>Lettura+scrittura</td>
+          <td><span class="mono">std::fstream f("a.txt", std::ios::in|std::ios::out);</span></td>
+          <td><span class="mono">fopen("a.txt","r+")</span></td>
+          <td>Con binario: aggiungi <span class="mono">std::ios::binary</span> / <span class="mono">"b"</span></td>
+        </tr>
+      </table>
+      <p class="note">C++: flag utili <span class="mono">std::ios::in|out|app|trunc|binary</span>. C: combinazioni <span class="mono">r/w/a</span> con <span class="mono">b</span> per binario.</p>
+    </div>
+
     <div class="inner-box">
-      <h2>Mini-assaggi di codice (solo per vedere la forma)</h2>
+      <h2>Mini-assaggi di codice (forma generale)</h2>
 
       <div class="inner-box box">
-        <h3>1) C++ · <em>lettura</em> file testuale (riga per riga)</h3>
+        <h3>1) C++ · <em>lettura</em> testo (riga per riga)</h3>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;iostream&gt;
 #include &lt;string&gt;
 
 int main(){
-    std::ifstream in("dati.txt");             // TESTO (r)
+    std::ifstream in("dati.txt");      // TESTO (r)
     if (!in) { std::cerr &lt;&lt; "Errore apertura\n"; return 1; }
     std::string linea;
     while (std::getline(in, linea)) {
@@ -175,22 +256,21 @@ int main(){
       </div>
 
       <div class="inner-box box">
-        <h3>2) C++ · <em>scrittura</em> file testuale</h3>
+        <h3>2) C++ · <em>scrittura</em> testo</h3>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;iostream&gt;
 
 int main(){
-    std::ofstream out("out.txt");             // TESTO (w, troncante)
+    std::ofstream out("out.txt");      // TESTO (w, troncante)
     if (!out){ std::cerr &lt;&lt; "Errore apertura\n"; return 1; }
     out &lt;&lt; "Prima riga\n";
     out &lt;&lt; "Seconda riga\n";
-    // RAII: out si chiude da solo a fine blocco
 }
 </code></pre>
       </div>
 
       <div class="inner-box box">
-        <h3>3) C · <em>lettura</em> file testuale (riga per riga con <code>fgets</code>)</h3>
+        <h3>3) C · <em>lettura</em> testo (<code>fgets</code>)</h3>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;string.h&gt;
 
@@ -200,7 +280,7 @@ static void rstrip_crlf(char* s){
 }
 
 int main(void){
-    FILE* f = fopen("dati.txt", "r");    // TESTO (r)
+    FILE* f = fopen("dati.txt", "r");  // TESTO (r)
     if (!f) { perror("fopen"); return 1; }
     char buf[256];
     while (fgets(buf, sizeof buf, f)){
@@ -211,15 +291,14 @@ int main(void){
     return 0;
 }
 </code></pre>
-        <p class="tip">Usiamo <code>fgets</code> (riga intera) e togliamo eventuali <code>\r</code>/<code>\n</code> finali (CR/LF).</p>
       </div>
 
       <div class="inner-box box">
-        <h3>4) C · <em>scrittura</em> file testuale</h3>
+        <h3>4) C · <em>scrittura</em> testo</h3>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
 
 int main(void){
-    FILE* out = fopen("out.txt", "w");   // TESTO (w, troncante)
+    FILE* out = fopen("out.txt", "w"); // TESTO (w, troncante)
     if (!out) { perror("fopen"); return 1; }
     fprintf(out, "Prima riga\n");
     fprintf(out, "Seconda riga\n");
@@ -229,7 +308,7 @@ int main(void){
 </code></pre>
       </div>
 
-      <p class="tip">I dettagli pratici (CSV/TSV robusti, portabilità binario, serializzazione di archivi) sono nelle slide successive.</p>
+      <p class="tip">I dettagli pratici (CSV/TSV robusti, binario base/portabile, seek, indici) arrivano nelle prossime lezioni.</p>
     </div>
 
     <div class="inner-box">
@@ -240,7 +319,7 @@ int main(void){
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
           <div id="box-e1" style="display:none;margin-top:8px">
             <div class="ok">
-              <p><strong>Possibile risposta:</strong> <em>Testo</em> se voglio leggibilità e editing manuale (CSV), facile scambio con fogli di calcolo. <em>Binario</em> se voglio file compatti/veloci (salvataggio frequente, grandi volumi) e controllo totale del formato. Per la classe, testo va benissimo; per un gestionale ad alte prestazioni, binario.</p>
+              <p><strong>Possibile risposta:</strong> <em>Testo</em> se voglio leggibilità e editing manuale (CSV), facile scambio con fogli di calcolo. <em>Binario</em> se voglio file compatti/veloci (salvataggio frequente, grandi volumi) e controllo del layout. Per la classe, testo va benissimo; per un gestionale ad alte prestazioni, binario.</p>
             </div>
           </div>
         </li>
@@ -271,10 +350,9 @@ int main(void){
     <div class="inner-box">
       <h2>Takeaways</h2>
       <ul>
-        <li>Un file è <strong>byte + regole</strong> (formato). Il programmatore sceglie regole chiare.</li>
+        <li>Un file è <strong>byte + regole</strong> (formato). Scegli regole chiare e documentate.</li>
         <li><strong>Testo</strong> = leggibile ma richiede parsing; <strong>binario</strong> = efficiente ma serve una specifica.</li>
-        <li>Occhio a <strong>path</strong>, <strong>permessi</strong>, <strong>buffering</strong>, <strong>newline</strong>, <strong>encoding</strong>, <strong>endianness</strong> (solo per binario).</li>
-        <li>Da qui in avanti: applicazione pratica in C++ e C, con esempi completi.</li>
+        <li>Attenzione a <strong>path</strong>, <strong>permessi</strong>, <strong>buffering</strong>, <strong>newline</strong>, <strong>encoding</strong> (testo) ed <strong>endianness/versioni</strong> (binario).</li>
       </ul>
     </div>
 
