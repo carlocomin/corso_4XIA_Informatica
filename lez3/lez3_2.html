@@ -295,7 +295,7 @@ std::vector&lt;Studente&gt; load_students_csv(const std::string&amp; path, char 
             s.media   = std::stod(cols[3]);             // converte stringa -> double
         }
         catch(...) { continue; }                         // conversione fallita: scarta
-        v.push_back(std::move(s));
+        v.push_back(s);
     }
     return v;
 }
@@ -451,7 +451,7 @@ void stats_csv(const std::string&amp; path){
         Studente s;
         try{ s.nome=cols[0]; s.cognome=cols[1]; s.eta=std::stoi(cols[2]); s.media=std::stod(cols[3]); }
         catch(...){ ++err; std::cerr &lt;&lt; "Conversione fallita a linea " &lt;&lt; lineNo &lt;&lt; "\n"; continue; }
-        v.push_back(std::move(s));
+        v.push_back(s);
     }
     if(err) std::cerr &lt;&lt; "Righe scartate: " &lt;&lt; err &lt;&lt; "\n";
     return v;
