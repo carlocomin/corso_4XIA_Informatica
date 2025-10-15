@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA – Lez3_2 · I/O su file testuali (C++) — versione semplificata</title>
+  <title>4BIA – Lez3_2 · I/O su file testuali (C++) — versione spiegata</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -22,25 +22,22 @@
   </script>
   <!-- patch allineamento + box colorate -->
   <style>
-    /* Testo/liste/codice SEMPRE a sinistra nelle inner-box */
     .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li, .inner-box pre, .inner-box code {
       text-align: left !important;
     }
     .inner-box ul, .inner-box ol { margin: .5rem 0 .75rem 1rem; padding-left: 1.25rem; list-style-position: outside; }
     .inner-box li { margin: .25rem 0; }
     pre, pre code { text-align: left !important; white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
-
-    /* Box base + colorate */
     .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
     .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; }
     .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; }
     .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; display:inline-block; }
     .tip  { font-style: italic; opacity:.95; }
-
     table { width:100%; border-collapse: collapse; }
     th, td { border-bottom: 1px solid #e5e7eb; padding: .45rem .5rem; vertical-align: top; text-align:left }
     th { background: #f8fafc; }
     .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
+    .mini { font-size: .95rem; }
   </style>
 </head>
 <body>
@@ -51,11 +48,11 @@
   <ul>
     <li><a href="lez3_1.html">Lez3_1: File: concetti e modelli</a></li>
     <li><a href="lez3_2.html" class="active">Lez3_2: I/O su file testuali (C++)</a></li>
-    <li><a href="lez3_3.html">Lez3_3: I/O su file testuali (C)</a></li>
-    <li><a href="lez3_4.html">Lez3_4: File binari: formati &amp; portabilità</a></li>
-    <li><a href="lez3_5.html">Lez3_5: Binario in C++ (serialize/deserialize)</a></li>
-    <li><a href="lez3_6.html">Lez3_6: Binario in C (serialize/deserialize)</a></li>
-    <li><a href="lez3_7.html">Lez3_7: Prestazioni &amp; buone pratiche</a></li>
+    <li><a href="lez3_3.html">Lez3_3: File binari (base) in C++ e C</a></li>
+    <li><a href="lez3_4.html">Lez3_4: Binari portabili (formati)</a></li>
+    <li><a href="lez3_5.html">Lez3_5: Perché non scrivere struct “raw”</a></li>
+    <li><a href="lez3_6.html">Lez3_6: fseek/ftell &amp; seekg/tellg (text mode)</a></li>
+    <li><a href="lez3_7.html">Lez3_7: Indici per file binari</a></li>
     <li><a href="lez3_8.html">Lez3_8: Laboratorio &amp; esercizi</a></li>
   </ul>
 </div>
@@ -126,39 +123,69 @@ int main(){
     // ... usa in/out ...
 }
 </code></pre>
-      <p class="tip"><code>exceptions(failbit|badbit)</code> + <code>try/catch</code> è una variante comoda per gestire gli errori.</p>
+      <div class="mini">
+        <p><strong>Cosa fanno le chiamate usate</strong>:</p>
+        <ul>
+          <li><code>std::ifstream/ std::ofstream</code>: aprono uno stream di <em>input/output</em> su file.</li>
+          <li><code>if(!in)</code> / <code>if(!out)</code>: controllano se l’apertura è fallita (percorso/permessi inesatti, ecc.).</li>
+          <li><code>std::cerr</code>: canale standard degli errori (stampa messaggi diagnostici).</li>
+        </ul>
+      </div>
     </div>
 
-    <div class="inner-box box">
-      <h2><code>getline</code> vs <code>&gt;&gt;</code> (perché scegliere <code>getline</code>)</h2>
-      <ul>
-        <li><code>&gt;&gt;</code> su <code>std::string</code> si ferma a spazi/tab.</li>
-        <li><code>getline</code> legge l’intera riga; poi facciamo noi il parsing.</li>
-      </ul>
-<pre><code class="language-cpp">// Esempio
-std::string nome;
-std::cin &gt;&gt; nome;     // "Mario Rossi" → legge solo "Mario"
-</code></pre>
-    </div>
-
+    <!-- ============ SEZIONE 1: SCRIVERE CSV (SPIEGAZIONE ESTESA) ============ -->
     <div class="inner-box box">
       <h2>Scrivere CSV (escape corretto)</h2>
+      <p><strong>Obiettivo:</strong> produrre un file CSV che ogni programma (Excel/LibreOffice/reader) legga senza ambiguità.</p>
+      <p><strong>Problema:</strong> se un campo contiene <em>separatore</em> (<code>;</code>), <em>virgolette</em> (<code>"</code>) o <em>newline</em>, non possiamo stamparlo “così com’è”, altrimenti il lettore lo spezzerebbe in colonne sbagliate.</p>
+      <p><strong>Regola CSV standard:</strong> racchiudi il campo tra <code>" ... "</code> e <em>raddoppia</em> ogni <code>"</code> interno (<code>"</code> → <code>""</code>).</p>
+
+      <h3>Algoritmo (a parole)</h3>
+      <ol>
+        <li>Controlla se il campo contiene uno tra: <code>sep</code>, <code>"</code>, <code>\n</code> o <code>\r</code>.</li>
+        <li>Se <em>no</em>, restituisci il campo invariato (nessuna citazione necessaria).</li>
+        <li>Se <em>sì</em>:
+          <ul>
+            <li>crea una nuova stringa, aprila con <code>"</code>;</li>
+            <li>scorri ogni carattere del campo:
+              <ul>
+                <li>se è <code>"</code>, aggiungi <code>""</code> (raddoppio);</li>
+                <li>altrimenti aggiungi il carattere com’è;</li>
+              </ul>
+            </li>
+            <li>chiudi con <code>"</code> e restituisci.</li>
+          </ul>
+        </li>
+      </ol>
+      <p class="ok">Così qualunque parser CSV potrà riconoscere correttamente i campi.</p>
+
 <pre><code class="language-cpp">static std::string csv_escape(const std::string&amp; s, char sep) {
+    // 1) Decido se servono le virgolette (campo 'sensibile')
     bool need_quotes = s.find_first_of(std::string() + sep + "\"\n\r") != std::string::npos;
-    if (!need_quotes) return s;
+
+    if (!need_quotes) return s;  // 2) Nessun carattere speciale: restituisco s
+
+    // 3) Creo l'output quotato e con virgolette raddoppiate
     std::string out; out.reserve(s.size()+2);
-    out.push_back('"');
-    for (char c : s) out += (c=='"') ? "\"\"" : std::string(1,c);
-    out.push_back('"');
+    out.push_back('"');          // apre il campo con "
+    for (char c : s) {
+        if (c == '"') out += "\"\"";   // raddoppia le "
+        else          out.push_back(c);
+    }
+    out.push_back('"');          // chiude il campo con "
     return out;
 }
 
 void save_students_csv(const std::vector&lt;Studente&gt;& v,
                        const std::string&amp; path, char sep = ';')
 {
-    std::ofstream f(path);
+    std::ofstream f(path);                  // apre il file in testo
     if (!f) throw std::runtime_error("open write");
+
+    // Header (nomi di colonna). Operatore &lt;&lt; stampa testo su file.
     f &lt;&lt; "nome" &lt;&lt; sep &lt;&lt; "cognome" &lt;&lt; sep &lt;&lt; "eta" &lt;&lt; sep &lt;&lt; "media" &lt;&lt; "\n";
+
+    // Riga dati: ogni campo viene 'escapato' con la funzione sopra.
     for (const auto&amp; s : v) {
         f &lt;&lt; csv_escape(s.nome, sep) &lt;&lt; sep
           &lt;&lt; csv_escape(s.cognome, sep) &lt;&lt; sep
@@ -166,49 +193,123 @@ void save_students_csv(const std::vector&lt;Studente&gt;& v,
     }
 }
 </code></pre>
-      <p class="ok">File aperti correttamente da Excel/LibreOffice grazie al quoting standard.</p>
+
+      <div class="mini">
+        <p><strong>Cosa fanno le chiamate usate</strong>:</p>
+        <ul>
+          <li><code>std::string::find_first_of</code>: cerca il primo carattere tra quelli indicati; se non trova, restituisce <em>npos</em>.</li>
+          <li><code>std::ofstream</code>: flusso di output su file di testo.</li>
+          <li><code>operator&lt;&lt;</code> (<code>f &lt;&lt; ...</code>): scrive testo/valori formattati nello stream.</li>
+          <li><code>throw std::runtime_error</code>: segnala errore d’apertura (gestibile con <code>try/catch</code> a livello superiore).</li>
+        </ul>
+      </div>
     </div>
 
+    <!-- ============ SEZIONE 2: LEGGERE CSV (SPIEGAZIONE ESTESA) ============ -->
     <div class="inner-box box">
       <h2>Leggere CSV (parser semplice e robusto)</h2>
+      <p><strong>Obiettivo:</strong> trasformare una riga di testo CSV in un vettore di campi <code>std::vector&lt;std::string&gt;</code>.</p>
+      <p><strong>Idea chiave:</strong> implementiamo un piccolo <em>automa a stati</em> con una variabile booleana <code>inq</code> che dice se stiamo leggendo <em>dentro</em> campi tra virgolette.</p>
+
+      <h3>Algoritmo (a parole)</h3>
+      <ol>
+        <li>Imposta <code>inq=false</code> e una stringa vuota <code>cur</code> per accumulare il campo corrente.</li>
+        <li>Scorri la riga carattere per carattere:
+          <ul>
+            <li>Se <code>inq==true</code> (siamo dentro <code>"..."</code>):
+              <ul>
+                <li>se trovi <code>"</code>:
+                  <ul>
+                    <li>se il prossimo carattere è ancora <code>"</code>, aggiungi <code>"</code> a <code>cur</code> e <em>salta</em> il prossimo (raddoppio → una sola <code>"</code> nel risultato);</li>
+                    <li>altrimenti, chiudi il campo quotato: <code>inq=false</code>;</li>
+                  </ul>
+                </li>
+                <li>se non è <code>"</code>, copia il carattere in <code>cur</code>;</li>
+              </ul>
+            </li>
+            <li>Se <code>inq==false</code> (fuori dalle virgolette):
+              <ul>
+                <li>se trovi <code>"</code>, inizia un campo quotato: <code>inq=true</code>;</li>
+                <li>se trovi il separatore <code>sep</code>, chiudi il campo corrente e aggiungilo al vettore;</li>
+                <li>altrimenti, copia il carattere in <code>cur</code>;</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>Alla fine, aggiungi l’ultimo campo (<code>cur</code>) al vettore risultati.</li>
+        <li>Se l’ultimo carattere del campo finale è <code>\r</code> (Windows: CRLF), toglilo.</li>
+      </ol>
+      <p class="ok">Questo riconosce correttamente separatori, virgolette raddoppiate e newline quotati.</p>
+
 <pre><code class="language-cpp">static std::vector&lt;std::string&gt; split_csv_line(const std::string&amp; line, char sep){
     std::vector&lt;std::string&gt; out; std::string cur; cur.reserve(line.size());
-    bool inq=false;
+    bool inq=false;                         // siamo dentro "..." ?
     for(size_t i=0;i&lt;line.size();++i){
         char c=line[i];
         if(inq){
-            if(c=='"'){ if(i+1&lt;line.size() &amp;&amp; line[i+1]=='"'){ cur.push_back('"'); ++i; } else inq=false; }
-            else cur.push_back(c);
-        }else{
-            if(c=='"') inq=true;
-            else if(c==sep){ out.push_back(cur); cur.clear(); }
-            else cur.push_back(c);
+            if(c=='"'){                    // possibile fine campo quotato o "" raddoppiate
+                if(i+1&lt;line.size() &amp;&amp; line[i+1]=='"'){
+                    cur.push_back('"');    // "" -> una " nel risultato
+                    ++i;                   // salta la seconda "
+                } else {
+                    inq=false;             // chiudi le virgolette
+                }
+            } else {
+                cur.push_back(c);          // carattere qualunque dentro "..."
+            }
+        } else {                            // fuori da "..."
+            if(c=='"') inq=true;           // inizia un campo quotato
+            else if(c==sep){               // fine campo non quotato
+                out.push_back(cur); cur.clear();
+            } else {
+                cur.push_back(c);          // carattere normale
+            }
         }
     }
-    out.push_back(cur);
-    if(!out.empty() &amp;&amp; !out.back().empty() &amp;&amp; out.back().back()=='\r') out.back().pop_back(); // CR Windows
+    out.push_back(cur);                     // aggiungi l'ultimo campo
+
+    // Se l'ultimo campo finisce con CR (Windows), rimuovilo.
+    if(!out.empty() &amp;&amp; !out.back().empty() &amp;&amp; out.back().back()=='\r')
+        out.back().pop_back();
+
     return out;
 }
 
 std::vector&lt;Studente&gt; load_students_csv(const std::string&amp; path, char sep=';'){
-    std::ifstream f(path);
+    std::ifstream f(path);                  // apre file in testo
     if(!f) throw std::runtime_error("open read");
+
     std::vector&lt;Studente&gt; v; std::string line;
 
-    if(!std::getline(f,line)) return v; // header
-    while(std::getline(f,line)){
-        if(line.empty() || line[0]=='#') continue;
-        auto cols = split_csv_line(line, sep);
-        if(cols.size() &lt; 4) continue;
+    if(!std::getline(f,line)) return v;     // salta l'header; getline legge una riga di testo
+
+    while(std::getline(f,line)){            // leggi ogni riga finché c'è
+        if(line.empty() || line[0]=='#') continue;       // ignora vuote e commenti
+        auto cols = split_csv_line(line, sep);           // parsifica la riga in colonne
+        if(cols.size() &lt; 4) continue;                    // riga malformata: troppo corta
         Studente s;
-        try { s.nome=cols[0]; s.cognome=cols[1]; s.eta=std::stoi(cols[2]); s.media=std::stod(cols[3]); }
-        catch(...) { continue; }
+        try {
+            s.nome    = cols[0];
+            s.cognome = cols[1];
+            s.eta     = std::stoi(cols[2]);             // converte stringa -> int
+            s.media   = std::stod(cols[3]);             // converte stringa -> double
+        }
+        catch(...) { continue; }                         // conversione fallita: scarta
         v.push_back(std::move(s));
     }
     return v;
 }
 </code></pre>
-      <p class="warn">CR/LF: su Windows, le righe terminano con <code>\r\n</code>. Il <code>\r</code> va tolto dall’ultimo campo (vedi parser).</p>
+
+      <div class="mini">
+        <p><strong>Cosa fanno le chiamate usate</strong>:</p>
+        <ul>
+          <li><code>std::getline(f, line)</code>: legge dal file una riga fino a <code>\n</code> (su Windows la riga termina <code>\r\n</code>, <code>\r</code> resta nell’ultimo campo, e lo togliamo).</li>
+          <li><code>split_csv_line</code>: nostra funzione che implementa il parser CSV (state machine con <code>inq</code>).</li>
+          <li><code>std::stoi / std::stod</code>: convertono testo in numero; sollevano eccezione se il testo non è un numero valido.</li>
+          <li><code>std::vector::push_back</code>: aggiunge un elemento in coda al vettore (cresce automaticamente).</li>
+        </ul>
+      </div>
     </div>
 
     <div class="inner-box box">
@@ -223,20 +324,31 @@ std::vector&lt;Studente&gt; load_students_csv(const std::string&amp; path, char 
     }
 }
 </code></pre>
-      <p class="note">TSV riduce le virgolette ma non elimina tutti i casi-limite.</p>
+      <p class="note">TSV riduce l’uso di virgolette, ma non elimina tutti i casi-limite (per es. tab o newline nei dati).</p>
     </div>
 
+    <!-- ============ SEZIONE 3: LOCALE NUMERICA & PRECISIONE (SPIEGAZIONE ESTESA) ============ -->
     <div class="inner-box box">
       <h2>Locale numerica &amp; precisione</h2>
-<pre><code class="language-cpp">#include &lt;iomanip&gt;
-#include &lt;locale&gt;
+      <p><strong>Cos’è la “locale”:</strong> è l’insieme di regole dipendenti da lingua/Paese che governano formattazione di numeri (punto o virgola), date, ordinamenti lessicografici, ecc. In C++ ogni stream eredita una locale; se non la impostiamo, può dipendere dall’ambiente del sistema.</p>
+      <p><strong>Perché impostarla qui:</strong> nei CSV vogliamo sempre il <em>punto</em> come separatore decimale (stile inglese), altrimenti su sistemi con locale italiana (<code>it_IT</code>) potremmo scrivere <code>9,40</code> e poi il parser (che si aspetta <code>.</code>) fallisce.</p>
+
+<pre><code class="language-cpp">#include &lt;iomanip&gt;   // std::setprecision, std::fixed
+#include &lt;locale&gt;    // std::locale
 
 void save_students_csv_prec(const std::vector&lt;Studente&gt;& v, const std::string&amp; path){
-    std::locale::global(std::locale::classic());  // punto come separatore decimale
+    // 1) Forzo la locale "classica" C: separatore decimale = '.'
+    std::locale::global(std::locale::classic());
+
     std::ofstream f(path);
     if(!f) throw std::runtime_error("open write");
     f &lt;&lt; "nome;cognome;eta;media\n";
-    f.setf(std::ios::fixed); f &lt;&lt; std::setprecision(2);
+
+    // 2) Imposto formato e precisione: numeri in notazione fissa con 2 decimali
+    f.setf(std::ios::fixed);
+    f &lt;&lt; std::setprecision(2);
+
+    // 3) Scrivo i record con escape CSV dove serve (vedi funzione csv_escape)
     for(const auto&amp; s : v){
         f &lt;&lt; csv_escape(s.nome,';') &lt;&lt; ';'
           &lt;&lt; csv_escape(s.cognome,';') &lt;&lt; ';'
@@ -244,7 +356,19 @@ void save_students_csv_prec(const std::vector&lt;Studente&gt;& v, const std::str
     }
 }
 </code></pre>
-      <p class="ok">Fissare la <strong>locale</strong> evita ambiguità tra punto e virgola nei decimali.</p>
+
+      <div class="mini">
+        <p><strong>Cosa fanno le chiamate usate</strong>:</p>
+        <ul>
+          <li><code>std::locale::classic()</code>: locale “C”/neutra (decimale = <code>.</code>), indipendente dalla lingua del sistema.</li>
+          <li><code>std::locale::global(...)</code>: imposta la locale globale del processo; gli stream creati dopo la chiamata ne ereditano le regole.</li>
+          <li><code>std::ios::fixed</code>: stampa i floating-point in notazione fissa (non scientifica).</li>
+          <li><code>std::setprecision(2)</code>: fissa il numero di cifre dopo la virgola in modalità <em>fixed</em>.</li>
+        </ul>
+      </div>
+
+      <p class="ok">Risultato: valori come <code>9.40</code>, <code>7.75</code> sono scritti in modo coerente e facilmente rileggibili ovunque.</p>
+      <p class="warn">Se leggi con <code>std::stod</code> ma la tua locale usa la virgola, <code>"3.14"</code> può fallire. Forzare la locale a “C” prima di leggere/scrivere evita questo problema.</p>
     </div>
 
     <div class="inner-box box">
@@ -257,22 +381,22 @@ int main(){
         {"Alan","Turing",18,10.00},
         {"Edsger","Dijkstra",19,9.10}
     };
-    save_students_csv_prec(classe, "classe.csv");
-    auto r = load_students_csv("classe.csv");
+    save_students_csv_prec(classe, "classe.csv");  // scrivo CSV robusto
+    auto r = load_students_csv("classe.csv");      // rileggo lo stesso file
     std::cout &lt;&lt; "Caricati " &lt;&lt; r.size() &lt;&lt; " record\n";
 }
 </code></pre>
-      <p class="ok"><strong>Round-trip</strong> = scrivo → rileggo → confronto: verifica rapida del formato.</p>
+      <p class="ok"><strong>Round-trip</strong> = scrivo → rileggo → confronto: verifica rapida che il formato sia coerente.</p>
     </div>
 
     <div class="inner-box">
       <h2>Pitfall comuni (e rimedi pratici)</h2>
       <ul>
-        <li><strong>Usare <code>&gt;&gt;</code> invece di <code>getline</code></strong> → tronca ai primi spazi. <span class="ok">Per righe usa sempre <code>getline</code>.</span></li>
-        <li><strong>Non gestire virgolette/sep</strong> → parsing fallisce. <span class="ok">Escapa in scrittura e usa un parser con virgolette.</span></li>
-        <li><strong>CR finale</strong> su Windows → ultimo campo con <code>\r</code>. <span class="ok">Togli il <code>\r</code> come mostrato.</span></li>
-        <li><strong>Locale diversa</strong> (virgola decimale) → <code>stod("3.14")</code> fallisce. <span class="ok">Usa <code>std::locale::classic()</code> o normalizza.</span></li>
-        <li><strong>Righe malformate</strong> → crash/dati sporchi. <span class="ok">Controlla <code>cols.size()</code>, usa <code>try/catch</code>, logga e salta.</span></li>
+        <li><strong>Usare <code>&gt;&gt;</code> invece di <code>getline</code></strong> → tronca ai primi spazi. <br/><br/><span class="ok">Per righe usa sempre <code>getline</code>.</span></li>
+        <li><strong>Non gestire virgolette/sep</strong> → parsing fallisce. <br/><br/><span class="ok">Escapa in scrittura e usa un parser con virgolette.</span></li>
+        <li><strong>CR finale</strong> su Windows → ultimo campo con <code>\r</code>. <br/><br/><span class="ok">Togli il <code>\r</code> come mostrato.</span></li>
+        <li><strong>Locale diversa</strong> (virgola decimale) → <code>stod("3.14")</code> fallisce. <br/><br/><span class="ok">Forza <code>std::locale::classic()</code> o normalizza.</span></li>
+        <li><strong>Righe malformate</strong> → crash/dati sporchi. <br/><br/><span class="ok">Controlla <code>cols.size()</code>, usa <code>try/catch</code>, logga e salta.</span></li>
       </ul>
     </div>
 
@@ -323,10 +447,10 @@ void stats_csv(const std::string&amp; path){
     while(std::getline(f,line)){
         ++lineNo; if(line.empty() || line[0]=='#') continue;
         auto cols = split_csv_line(line,sep);
-        if(cols.size() &lt; 4){ ++err; std::cerr &lt;&lt; "Linea " &lt;&lt; lineNo &lt;&lt; ": colonne insufficienti\n"; continue; }
+        if(cols.size() &lt; 4){ ++err; std::cerr &lt;&lt; "Colonne insufficienti a linea " &lt;&lt; lineNo &lt;&lt; "\n"; continue; }
         Studente s;
         try{ s.nome=cols[0]; s.cognome=cols[1]; s.eta=std::stoi(cols[2]); s.media=std::stod(cols[3]); }
-        catch(...){ ++err; std::cerr &lt;&lt; "Linea " &lt;&lt; lineNo &lt;&lt; ": conversione fallita\n"; continue; }
+        catch(...){ ++err; std::cerr &lt;&lt; "Conversione fallita a linea " &lt;&lt; lineNo &lt;&lt; "\n"; continue; }
         v.push_back(std::move(s));
     }
     if(err) std::cerr &lt;&lt; "Righe scartate: " &lt;&lt; err &lt;&lt; "\n";
@@ -343,7 +467,7 @@ void stats_csv(const std::string&amp; path){
       <ul>
         <li><strong><code>getline</code> + parser</strong> per il testo; evita <code>&gt;&gt;</code> per campi con spazi.</li>
         <li>Gestisci <strong>virgolette/separatori</strong> (escape) e <strong>CR/LF</strong> su Windows.</li>
-        <li>Fissa la <strong>locale</strong> per i decimali o normalizza i separatori.</li>
+        <li>Fissa la <strong>locale</strong> (punto decimale) e la <strong>precisione</strong> per numeri coerenti.</li>
         <li>Valida righe e conversioni; in caso di errore, logga e salta.</li>
       </ul>
     </div>
