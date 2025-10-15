@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA – Lez3_seek · Spostamento del cursore nei file binari (C++ → C)</title>
+  <title>4BIA – Lez3_4 · Spostamento del cursore nei file binari (C++ → C)</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <!-- evidenziazione sintassi: stesso path delle altre lezioni -->
@@ -13,21 +13,31 @@
     function prevSlide(){ window.location.href = "lez3_3.html"; }
     function nextSlide(){ window.location.href = "lez3_5.html"; }
     function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none':'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
   </script>
   <style>
     .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
     .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
     .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; display:inline-block }
     .tip  { font-style: italic; opacity:.95 }
-    /* codice allineato a sinistra, niente doppie colonne */
-    .inner-box pre, .inner-box pre code, .box pre, .box pre code, pre, pre code { text-align: left !important; }
+    /* allineamento a sinistra, niente doppie colonne */
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li, .inner-box pre, .inner-box code { text-align: left !important; }
+    .inner-box ul, .inner-box ol { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li { margin:.25rem 0 }
     pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
+    pre code { display:block; text-align:left !important; }
     table { width:100%; border-collapse: collapse; }
     th, td { border-bottom: 1px solid #e5e7eb; padding: .45rem .5rem; vertical-align: top; text-align:left }
     th { background: #f8fafc; }
     code { white-space: pre; }
     .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
+    .mini { font-size:.95rem }
   </style>
 </head>
 <body>
@@ -39,10 +49,10 @@
     <li><a href="lez3_1.html">Lez3_1: Concetti di file</a></li>
     <li><a href="lez3_2.html">Lez3_2: File testuali (C++)</a></li>
     <li><a href="lez3_3.html">Lez3_3: File binari (base)</a></li>
-    <li><a href="lez3_4.html">Lez3_4: Binari portabili (formati)</a></li>
-    <li><a href="lez3_5.html">Lez3_5: Binario in C++ (esercizi)</a></li>
-    <li><a href="lez3_6.html">Lez3_6: Binario in C (esercizi)</a></li>
-    <li><a href="lez3_seek.html">Lez3_seek: Cursore &amp; posizionamento</a></li>
+    <li><a href="lez3_4.html" class="active">Lez3_4: Cursore &amp; posizionamento</a></li>
+    <li><a href="lez3_5.html">Lez3_5: Binari portabili (formati)</a></li>
+    <li><a href="lez3_6.html">Lez3_6: fseek/ftell &amp; seekg/tellg (text mode)</a></li>
+    <li><a href="lez3_7.html">Lez3_7: Indici per file binari</a></li>
   </ul>
 </div>
 <!-- END MENU -->
@@ -76,17 +86,18 @@
       <h2>Parte I — C++: <code>seekg/seekp</code> e <code>tellg/tellp</code></h2>
 
       <div class="box">
-        <h3>1) Direzioni & tipi di posizione</h3>
+        <h3>1) Direzioni &amp; tipi di posizione</h3>
         <ul>
           <li><strong>Direzioni</strong>: <code>std::ios::beg</code> (dall’inizio), <code>std::ios::cur</code> (dalla posizione corrente), <code>std::ios::end</code> (dalla fine).</li>
-          <li><strong>Posizioni</strong>: <code>tellg/tellp</code> restituiscono un <code>pos_type</code> (tipicamente <code>std::streampos</code>), convertibile a intero/offset se serve.</li>
+          <li><strong>Posizioni</strong>: <code>tellg/tellp</code> restituiscono un <code>pos_type</code> (tipicamente <code>std::streampos</code>): è una “posizione” opaca, ma puoi memorizzarla e tornarci con <code>seek*</code>.</li>
           <li><strong>Stream</strong>: per aggiornare <em>in-place</em> usa <code>std::fstream</code> con <code>std::ios::in|std::ios::out|std::ios::binary</code>.</li>
         </ul>
-        <p class="warn"><b>Regola d’oro:</b> se alterni <em>lettura</em> e <em>scrittura</em> sullo stesso <code>fstream</code>, inserisci un posizionamento (<code>seekg/seekp</code>) o un <code>flush</code> tra le due.</p>
+        <p class="warn"><b>Regola d’alternanza:</b> se alterni <em>lettura</em> e <em>scrittura</em> sullo stesso <code>fstream</code>, inserisci un posizionamento (<code>seekg/seekp</code>) o un <code>flush</code> tra le due.</p>
       </div>
 
       <div class="box">
         <h3>2) Dimensione del file (pattern standard)</h3>
+        <p class="mini"><strong>Algoritmo (a parole)</strong>: porta il cursore in fondo (<code>seekg(end)</code>) → chiedi la posizione (<code>tellg()</code>) → quello è il numero di byte → torna all’inizio se devi leggere.</p>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;iostream&gt;
 
@@ -94,20 +105,28 @@ int main(){
     std::ifstream f("data.bin", std::ios::binary);
     if(!f){ std::cerr &lt;&lt; "open read\n"; return 1; }
 
-    f.seekg(0, std::ios::end);
-    std::streampos end = f.tellg();         // fine file
+    f.seekg(0, std::ios::end);             // sposta alla fine
+    std::streampos end = f.tellg();        // posizione = dimensione in byte
     if(end == std::streampos(-1)){ std::cerr &lt;&lt; "tellg fallito\n"; return 1; }
     std::size_t size = static_cast&lt;std::size_t&gt;(end);
 
-    f.seekg(0, std::ios::beg);              // torna all'inizio se devi leggere
+    f.seekg(0, std::ios::beg);             // torna all'inizio se devi leggere
     std::cout &lt;&lt; "size=" &lt;&lt; size &lt;&lt; " B\n";
 }
 </code></pre>
-        <p class="tip">Se hai toccato EOF, chiama <code>f.clear()</code> prima di <code>seekg</code>.</p>
+        <div class="mini">
+          <p><strong>Cosa fanno le chiamate</strong>:</p>
+          <ul>
+            <li><code>seekg(off, dir)</code>: posiziona il puntatore di lettura a <em>off</em> byte da <em>dir</em> (<code>beg/cur/end</code>).</li>
+            <li><code>tellg()</code>: restituisce la posizione corrente (numero di byte dall’inizio).</li>
+            <li>Se hai toccato EOF, fai <code>f.clear()</code> prima di un <code>seekg</code>.</li>
+          </ul>
+        </div>
       </div>
 
       <div class="box">
         <h3>3) Lettura del record <em>k</em>-esimo (record fisso)</h3>
+        <p class="mini"><strong>Algoritmo</strong>: calcola <code>off = k * sizeof(Rec)</code> → <code>seekg(off,beg)</code> → <code>read</code> di <code>sizeof(Rec)</code> byte dentro la struct.</p>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;cstdint&gt;
 #include &lt;iostream&gt;
@@ -124,11 +143,12 @@ bool read_k(const char* path, std::uint32_t k, Rec&amp; out){
     return (bool)f;
 }
 </code></pre>
-        <p class="ok">Offset assoluto dal principio: <code>off = k * sizeof(Rec)</code>.</p>
+        <p class="mini"><strong>Cosa fanno le chiamate</strong>: <code>read(ptr,n)</code> copia <em>n</em> byte dal file in memoria a partire da <code>ptr</code>; il valore di ritorno si controlla con <code>!f.fail()</code> o testando il cast a <code>bool</code>.</p>
       </div>
 
       <div class="box">
         <h3>4) Aggiornare <em>in-place</em> il record <em>k</em>-esimo</h3>
+        <p class="mini"><strong>Algoritmo</strong>: apri in R/W → vai all’offset del record → <code>write</code> il nuovo contenuto.</p>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;cstdint&gt;
 
@@ -138,17 +158,18 @@ bool write_k(const char* path, std::uint32_t k, const Rec&amp; rec){
     std::fstream f(path, std::ios::binary | std::ios::in | std::ios::out);
     if(!f) return false;
     std::streamoff off = static_cast&lt;std::streamoff&gt;(k) * static_cast&lt;std::streamoff&gt;(sizeof(Rec));
-    f.seekp(off, std::ios::beg);            // posizioniamo il "put pointer"
+    f.seekp(off, std::ios::beg);            // posiziona il "put pointer"
     if(!f) return false;
     f.write((const char*)&rec, sizeof rec); // scrittura in-place
     return (bool)f;
 }
 </code></pre>
-        <p class="note">Ricorda la “regola di alternanza” I/O sullo stesso stream: posizionati o fai <code>flush()</code> tra read e write.</p>
+        <p class="mini"><strong>Cosa fanno le chiamate</strong>: <code>seekp</code> posiziona il puntatore di scrittura; <code>write</code> copia i byte da memoria a file. Tra una read e una write sullo stesso stream, fai un <code>seek*</code> o <code>flush</code>.</p>
       </div>
 
       <div class="box">
         <h3>5) Scansione + sovrascrittura per chiave (uso di <code>tellg</code>)</h3>
+        <p class="mini"><strong>Algoritmo</strong>: leggi sequenzialmente record → quando trovi la chiave, calcola l’inizio record come <code>tellg()-sizeof(Rec)</code> → torna lì con <code>seekp</code> e sovrascrivi.</p>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 
 struct Rec { int id; double val; char name[16]; };
@@ -170,19 +191,19 @@ bool inc_val_by_id(const char* path, int target){
     return false; // non trovato
 }
 </code></pre>
-        <p class="ok">Pattern tipico: <em>read</em> → calcola l’inizio record con <code>tellg - sizeof(Rec)</code> → <code>seekp</code> → <em>write</em>.</p>
+        <p class="mini"><strong>Cosa fanno le chiamate</strong>: <code>tellg()</code> restituisce “dove sei” dopo la read; sottraendo <code>sizeof(Rec)</code> torni all’inizio di quel record.</p>
       </div>
 
       <div class="box">
         <h3>6) Salvare e ripristinare una posizione</h3>
+        <p class="mini"><strong>Idea</strong>: memorizzi l’attuale <code>tellg/tellp</code>, salti a leggere/scrivere altrove (es. header/indice), poi torni dove eri.</p>
 <pre><code class="language-cpp">std::fstream f("data.bin", std::ios::binary | std::ios::in | std::ios::out);
 std::streampos pos_g = f.tellg();
 std::streampos pos_p = f.tellp();
-/* ... salta per leggere un indice o un header ... */
+/* ... leggi/scrivi altrove ... */
 if(pos_g != std::streampos(-1)) f.seekg(pos_g);
 if(pos_p != std::streampos(-1)) f.seekp(pos_p);
 </code></pre>
-        <p class="tip">Utile per “bookmark” temporanei durante elaborazioni complesse.</p>
       </div>
 
       <div class="inner-box">
@@ -201,16 +222,17 @@ if(pos_p != std::streampos(-1)) f.seekp(pos_p);
       <h2>Parte II — C: <code>fseek</code> e <code>ftell</code></h2>
 
       <div class="box">
-        <h3>1) Direzioni & apertura</h3>
+        <h3>1) Direzioni, apertura &amp; semantica</h3>
         <ul>
-          <li><code>fseek(f, offset, origin)</code> con <code>origin ∈ {SEEK_SET, SEEK_CUR, SEEK_END}</code>.</li>
-          <li><code>ftell(f)</code> restituisce la posizione corrente (byte dall’inizio).</li>
-          <li>Aperture utili: <code>"rb"</code>, <code>"wb"</code>, <code>"rb+"</code>/<code>"wb+"</code> per R/W senza troncare (attenzione alle differenze di piattaforma).</li>
+          <li><code>fseek(f, offset, origin)</code> con <code>origin ∈ {SEEK_SET, SEEK_CUR, SEEK_END}</code>: posiziona il cursore del file.</li>
+          <li><code>ftell(f)</code> restituisce la posizione corrente (byte dall’inizio) oppure <code>-1L</code> in caso di errore.</li>
+          <li>Apertura per aggiornare: <code>"rb+"</code>/<code>"wb+"</code> (R/W senza troncare). <span class="note">Su Windows “b” evita traduzioni di newline.</span></li>
         </ul>
       </div>
 
       <div class="box">
         <h3>2) Dimensione file (pattern standard)</h3>
+        <p class="mini"><strong>Algoritmo</strong>: <code>fseek(..., SEEK_END)</code> → <code>ftell()</code> → <code>fseek(..., SEEK_SET)</code> se poi devi leggere dall’inizio.</p>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
 
 long file_size(const char* path){
@@ -224,11 +246,12 @@ long file_size(const char* path){
     return size;
 }
 </code></pre>
-        <p class="tip">Per file &gt;2GB, preferisci <code>fseeko/ftello</code> (o varianti 64-bit della piattaforma).</p>
+        <p class="mini"><strong>Nota 64-bit</strong>: per file molto grandi preferisci <code>fseeko/ftello</code> (POSIX) o varianti 64-bit su Windows (<code>_fseeki64/_ftelli64</code>).</p>
       </div>
 
       <div class="box">
         <h3>3) Leggere/scrivere il record <em>k</em>-esimo (record fisso)</h3>
+        <p class="mini"><strong>Algoritmo</strong>: <code>off = k * sizeof(Rec)</code> → <code>fseek(SEEK_SET)</code> → <code>fread/fwrite</code> di un record.</p>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;stdint.h&gt;
 
@@ -250,49 +273,71 @@ int write_k(const char* path, uint32_t k, const Rec* rec){
     long off = (long)(k * (uint32_t)sizeof(Rec));
     if(fseek(f, off, SEEK_SET) != 0){ fclose(f); return 0; }
     size_t n = fwrite(rec, sizeof *rec, 1, f);
-    fflush(f);
+    fflush(f);                      // forza il flush su disco
     fclose(f);
     return n == 1;
 }
 </code></pre>
-        <p class="ok">Offset assoluto dal principio: <code>SEEK_SET</code>. <code>"rb+"</code> abilita R/W “in-place”.</p>
+        <div class="mini">
+          <p><strong>Cosa fanno le chiamate</strong>:</p>
+          <ul>
+            <li><code>fseek</code>: sposta il cursore del file (offset da origine).</li>
+            <li><code>fread/fwrite</code>: trasferiscono blocchi di <em>count</em> oggetti, ciascuno di <em>size</em> byte; ritornano quanti oggetti sono stati effettivamente trasferiti.</li>
+            <li><code>fflush</code>: chiede di scrivere immediatamente il buffer su disco.</li>
+          </ul>
+        </div>
       </div>
 
       <div class="box">
         <h3>4) Salvare e ripristinare la posizione</h3>
+        <p class="mini"><strong>Idea</strong>: metti un “segnalibro” con <code>ftell</code>, fai un salto per consultare qualcosa (es. header), poi torna con <code>fseek(pos,SEEK_SET)</code>.</p>
 <pre><code class="language-c">long pos = ftell(f);
 /* ... leggi/scrivi altrove ... */
 fseek(f, pos, SEEK_SET);  // ritorna dove eri
 </code></pre>
-        <p class="note">Comodissimo per consultare header/indici e poi proseguire da dove avevi interrotto.</p>
       </div>
 
       <div class="inner-box">
         <h3>Pitfall comuni (C)</h3>
         <ul>
           <li><strong>Apertura sbagliata</strong> (es. <code>"wb"</code> tronca). <span class="ok">Per aggiornare usa <code>"rb+"</code>/<code>"wb+"</code> secondo necessità.</span></li>
-          <li><strong>Controlli mancanti</strong> sui ritorni di <code>fseek/fread/fwrite</code>. <span class="ok">Verifica sempre le funzioni.</span></li>
+          <li><strong>Controlli mancanti</strong> su ritorni <code>fseek/fread/fwrite</code>. <span class="ok">Verifica sempre i risultati.</span></li>
           <li><strong>Overflow di <code>long</code></strong> su file grandi. <span class="ok">Usa <code>fseeko/ftello</code> o API 64-bit.</span></li>
         </ul>
       </div>
     </div>
 
-    <div class="inner-box">
-      <h2>Strategie & buone pratiche</h2>
+    <div class="inner-box box">
+      <h2>Strategie &amp; buone pratiche</h2>
       <ul>
         <li><strong>Record fissi ⇒ accesso O(1)</strong>: <code>offset = k * sizeof(Rec)</code>.</li>
-        <li><strong>Indice</strong> per record variabili: salva array di offset e usa <code>seek</code>.</li>
+        <li><strong>Record variabili</strong>: mantieni un indice degli offset; poi <code>seek</code> al punto giusto.</li>
         <li><strong>Header</strong> con magic/versione: lo leggi una volta, poi lavori solo sui dati usando posizionamenti mirati.</li>
         <li><strong>Sempre controlli</strong> su esito di <code>seek/tell/read/write</code>; in C++ chiama <code>clear()</code> se tocchi EOF.</li>
       </ul>
     </div>
 
     <div class="inner-box">
-      <h2>Esercizi</h2>
+      <h2>Esercizi (con soluzioni a comparsa)</h2>
       <ol>
-        <li><b>File size tool</b>: stampa byte, KiB, MiB usando <code>seek/tell</code> (C++ e C).</li>
-        <li><b>Update in-place</b>: cerca per <code>id</code> e incrementa <code>val</code> di 0.5 usando posizionamento.</li>
-        <li><b>Salti regolari</b>: leggi solo i record con indice pari usando <code>ios::cur</code>/<code>SEEK_CUR</code>.</li>
+        <li><b>File size tool</b>: stampa byte, KiB, MiB usando <code>seek/tell</code> (C++ e C).<br/>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
+          <div id="box-e1" style="display:none;margin-top:8px">
+            <div class="ok mini">Idea: portati a <code>end</code> (o <code>SEEK_END</code>), leggi la posizione, dividi per 1024 per KiB/MiB, poi <code>seek</code> a <code>beg</code>.</div>
+          </div>
+        </li>
+        <li><b>Update in-place</b>: cerca per <code>id</code> e incrementa <code>val</code> di 0.5 usando posizionamento.<br/>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
+          <div id="box-e2" style="display:none;margin-top:8px">
+            <div class="ok mini">Idea: scan record → quando trovi l’<code>id</code>, calcola <code>start = tellg() - sizeof(Rec)</code> → <code>seekp(start)</code> → sovrascrivi.</div>
+          </div>
+        </li>
+        <li><b>Salti regolari</b>: leggi solo i record con indice pari usando <code>ios::cur</code>/<code>SEEK_CUR</code>.<br/>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra ▼</button></div>
+          <div id="box-e3" style="display:none;margin-top:8px">
+            <div class="ok mini">Idea: leggi un record, poi <code>seek</code> avanti di <code>sizeof(Rec)</code> per saltarne uno (pari/dispari).</div>
+          </div>
+        </li>
       </ol>
     </div>
 
