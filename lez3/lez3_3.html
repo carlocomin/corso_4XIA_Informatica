@@ -12,6 +12,12 @@
     function prevSlide(){ window.location.href = "lez3_2.html"; }
     function nextSlide(){ window.location.href = "lez3_4.html"; }
     function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none':'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
   </script>
   <style>
     /* stile box + colorate */
@@ -33,6 +39,7 @@
     table { width:100%; border-collapse: collapse; }
     th, td { border-bottom:1px solid #e5e7eb; padding:.45rem .5rem; vertical-align:top; text-align:left }
     th { background:#f8fafc }
+    .mini { font-size:.95rem }
   </style>
 </head>
 <body>
@@ -79,39 +86,39 @@
     </div>
 
     <div class="inner-box box">
-      <h2>Cosa significa “binario” e perché usare la modalità <code>binary</code>?</h2>
+      <h2>Cosa significa “binario” e perché <code>binary</code>?</h2>
       <ul>
-        <li><strong>File binario</strong> = scriviamo/leggiamo i <em>byte</em> degli oggetti in memoria, senza conversioni verso testo.</li>
-        <li>In C++ aggiungi <code>std::ios::binary</code>; in C usa <code>"rb"</code>/<code>"wb"</code> → niente traduzione di newline.</li>
-        <li><code>write/read</code> e <code>fwrite/fread</code> non aggiungono metadati: il <strong>formato</strong> lo decidi tu.</li>
+        <li><strong>File binario</strong>: leggi/scrivi direttamente i <em>byte</em> degli oggetti, senza conversione in testo.</li>
+        <li>C++: aggiungi <code>std::ios::binary</code>. C: usa <code>"rb"</code>/<code>"wb"</code>. <span class="ok">Eviti traduzioni di newline.</span></li>
+        <li><strong>Formato</strong>: non c’è “magia” — decidi tu l’ordine dei dati nel file; per questo è utile un <em>header</em>.</li>
       </ul>
-      <p class="tip">Collezioni: salva prima la <strong>dimensione</strong> (es. <code>n</code>), poi i <strong>n</strong> elementi contigui.</p>
+      <p class="tip">Per collezioni salva sempre prima la <strong>dimensione</strong> (es. <code>n</code>), poi i <strong>n</strong> elementi contigui.</p>
     </div>
 
     <!-- NEW: Contratto di formato minimale -->
     <div class="inner-box box">
       <h2>Contratto di formato <em>minimale</em> (consigliato anche nel “base”)</h2>
       <ul>
-        <li><strong>Magic</strong> (es. 3 byte + <code>\0</code>): identifica il tuo formato, es. <code>"B1\0"</code>.</li>
-        <li><strong>Versione</strong> (es. <code>uint32_t</code> con valore 1): permette evoluzioni future.</li>
-        <li><strong>Dimensioni</strong> (es. <code>n</code> elementi, oppure <code>R</code>, <code>C</code> per matrici).</li>
+        <li><strong>Magic</strong> (es. 3 byte + <code>\0</code>) per riconoscere il file, es. <code>"B1\0"</code>.</li>
+        <li><strong>Versione</strong> (<code>uint32_t</code>) per evoluzioni future.</li>
+        <li><strong>Dimensioni</strong> (<code>n</code> elementi / <code>R</code>,<code>C</code> per matrici).</li>
       </ul>
-      <p class="ok">Anche se lavori “sulla stessa macchina”, questa piccola intestazione ti evita molti problemi e ti prepara alla Lez3_4.</p>
+      <p class="ok">Anche su “stessa macchina”, questa intestazione ti evita inconsistenti e facilita debug.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>Che cos’è un <em>POD</em> (Plain Old Data) — perché lo usiamo qui</h2>
+      <h2>Cos’è un <em>POD</em> (Plain Old Data) — perché lo usiamo qui</h2>
       <ul>
-        <li><strong>POD (pragmatico)</strong>: tipo con layout semplice, copiabile byte-a-byte senza invarianti nascosti.</li>
-        <li><strong>Esempi</strong>: primitivi (<code>int</code>, <code>double</code>), array di primitivi (<code>int a[10]</code>), struct con <code>char[]</code> e numeri.</li>
+        <li><strong>POD</strong>: tipo con layout semplice e copiabile byte-a-byte, senza puntatori nascosti o invarianti.</li>
+        <li><strong>Esempi</strong>: primitivi (<code>int</code>, <code>double</code>), array di primitivi, struct di soli <code>char[]</code> e numeri.</li>
       </ul>
-      <h3>Controesempi (non-POD) & come fare</h3>
+      <h3>Controesempi (non-POD) & come serializzarli</h3>
       <ul>
-        <li><strong><code>std::string</code></strong> → contiene puntatori/capacità interne. <span class="ok">Serializza come: <code>uint32_t len</code> + <code>len</code> byte del contenuto.</span></li>
-        <li><strong><code>std::vector&lt;T&gt;</code></strong> → solo il buffer è contiguo, l’oggetto ha metadati. <span class="ok">Salva: <code>n</code> + blocco <code>data()</code> (se T è POD).</span></li>
-        <li><strong>Puntatori</strong> → un indirizzo di memoria non ha senso su disco. <span class="ok">Salva il contenuto referenziato o un ID.</span></li>
+        <li><code>std::string</code> → contiene puntatori. <span class="ok">Salva come <code>uint32_t len</code> + <em>len</em> byte UTF-8.</span></li>
+        <li><code>std::vector&lt;T&gt;</code> → l’oggetto non è un blob contiguo. <span class="ok">Salva <code>n</code> + buffer <code>data()</code> (se <code>T</code> è POD).</span></li>
+        <li><strong>Puntatori</strong> → un indirizzo non ha senso su disco. <span class="ok">Salva il contenuto o un ID.</span></li>
       </ul>
-      <p class="warn">Evitare bit-field, <code>bool</code> con size implementation-defined, e layout “raw” non documentati.</p>
+      <p class="warn">Evita bit-field e <code>bool</code> “raw” (size implementation-defined) nei file base.</p>
     </div>
 
     <!-- ===================== C++ ===================== -->
@@ -120,6 +127,10 @@
 
       <div class="inner-box box">
         <h3>1) Primitivi (con header minimale)</h3>
+        <p class="mini"><strong>Algoritmo in parole</strong> — Scrittura: apri file in binario → scrivi <em>magic</em>, <em>versione</em>, <em>count</em> → scrivi i due valori (<code>int</code>, <code>double</code>) usando <code>write</code> che prende un puntatore ai byte e la dimensione. Lettura: apri in binario → leggi header → leggi i due valori con <code>read</code> negli indirizzi delle variabili.</p>
+        <p class="mini"><strong>Cosa fanno le chiamate</strong> — <code>out.write((const char*)&x, sizeof x)</code> copia su file i <em>sizeof(x)</em> byte attualmente in memoria per <code>x</code>. <code>in.read((char*)&x, sizeof x)</code> fa l’inverso. 
+		<br/><br/>
+		<span class="warn">Portabilità:</span> così scrivi il layout “nativo” (endianness, padding): bene per “stessa macchina”, non cross-platform (vedi Lez3_4).</p>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;cstdint&gt;
 #include &lt;iostream&gt;
@@ -129,7 +140,6 @@ int main(){
     {
         std::ofstream out("prim.bin", std::ios::binary);
         if(!out){ std::cerr &lt;&lt; "open write\n"; return 1; }
-        // Header: magic + version + count
         const char magic[3] = {'B','1','\0'};
         std::uint32_t ver = 1, count = 2;
         out.write((const char*)magic, sizeof magic);
@@ -161,6 +171,8 @@ int main(){
 
       <div class="inner-box box">
         <h3>2) Array 1D di primitivi</h3>
+        <p class="mini"><strong>Algoritmo</strong> — Scrivi: header, poi <code>n=vector.size()</code>, poi i <em>n</em> elementi contigui dal buffer <code>v.data()</code>. Leggi: header → <code>n</code> → ridimensiona <code>vector</code> → leggi in blocco nel suo buffer.</p>
+        <p class="mini"><strong>Perché funziona</strong> — <code>std::vector</code> garantisce che gli elementi siano contigui in memoria; <code>data()</code> restituisce un puntatore al primo elemento, utilizzabile da <code>read/write</code>.</p>
 <pre><code class="language-cpp">#include &lt;vector&gt;
 #include &lt;cstdint&gt;
 #include &lt;fstream&gt;
@@ -190,11 +202,12 @@ int main(){
     }
 }
 </code></pre>
-        <p class="tip"><code>std::vector</code> garantisce memoria contigua per i suoi elementi.</p>
       </div>
 
       <div class="inner-box box">
         <h3>3) Matrice 2D di primitivi (row-major)</h3>
+        <p class="mini"><strong>Algoritmo</strong> — Rappresentiamo la matrice come unico vettore di lunghezza <code>R*C</code> in <em>row-major</em> (prima riga, poi la seconda, ...). Scriviamo header + <code>R</code>, <code>C</code> + blocco <code>R*C</code> elementi. In lettura, ricostruiamo un vettore di pari dimensione e usiamo l’indice <code>r*C + c</code>.</p>
+        <p class="mini"><strong>Perché</strong> — Usare un buffer lineare evita complicazioni con array di puntatori e rende la scrittura/lettura un’unica operazione di blocco.</p>
 <pre><code class="language-cpp">#include &lt;vector&gt;
 #include &lt;cstdint&gt;
 #include &lt;fstream&gt;
@@ -231,6 +244,8 @@ int main(){
 
       <div class="inner-box box">
         <h3>4) Array di <em>struct</em> (solo campi POD)</h3>
+        <p class="mini"><strong>Algoritmo</strong> — Dichiarare una struct “POD-style” (solo <code>char[]</code>, numeri). Scrivere: header + <code>n</code> + blocco <code>n*sizeof(Studente)</code> prelevato dal buffer contiguo del <code>vector</code>. Leggere: header + <code>n</code> → ridimensiona → <code>read</code> in blocco.</p>
+        <p class="mini"><strong>Perché <code>char[32]</code> e non <code>std::string</code></strong> — <code>std::string</code> ha puntatori/capacità interni: il dump “grezzo” non rappresenta il testo. Con <code>char[]</code> i byte del nome sono <em>davvero</em> nel record.</p>
 <pre><code class="language-cpp">#include &lt;vector&gt;
 #include &lt;cstdint&gt;
 #include &lt;cstring&gt;
@@ -275,7 +290,6 @@ int main(){
     }
 }
 </code></pre>
-        <p class="tip">Per semplicità didattica usiamo <code>char[32]</code> invece di <code>std::string</code> (non-POD).</p>
       </div>
     </div>
 
@@ -285,6 +299,7 @@ int main(){
 
       <div class="inner-box box">
         <h3>1) Primitivi (con header minimale)</h3>
+        <p class="mini"><strong>Algoritmo</strong> — Scrivi: header + valori con <code>fwrite</code>. Leggi: header + valori con <code>fread</code>. <strong>Semantica</strong>: <code>fwrite(ptr, size, count, f)</code> prova a scrivere <em>count</em> oggetti da <em>size</em> byte presi da <em>ptr</em>; restituisce quanti ne ha scritti. <code>fread</code> fa l’opposto. Nel codice didattico omettiamo i check sul valore di ritorno, ma in produzione vanno controllati.</p>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;stdint.h&gt;
 
@@ -319,6 +334,7 @@ int main(void){
 
       <div class="inner-box box">
         <h3>2) Array 1D di primitivi</h3>
+        <p class="mini"><strong>Algoritmo</strong> — Scrivi: header + <code>n</code> + blocco <code>n</code> interi con un’unica <code>fwrite</code>. Leggi: header → <code>n</code> → <code>malloc</code> di <code>n*sizeof(int)</code> → <code>fread</code> del blocco.</p>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;stdint.h&gt;
 #include &lt;stdlib.h&gt;
@@ -350,6 +366,7 @@ int main(void){
 
       <div class="inner-box box">
         <h3>3) Matrice 2D di primitivi (row-major)</h3>
+        <p class="mini"><strong>Algoritmo</strong> — Scrivi: header + <code>R</code>, <code>C</code> + blocco lineare di <code>R*C</code> double. Leggi: header → <code>R</code>, <code>C</code> → <code>malloc</code> di <code>R*C</code> elementi → <code>fread</code> del blocco. Accedi con <code>m[r*C + c]</code>.</p>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;stdint.h&gt;
 #include &lt;stdlib.h&gt;
@@ -384,6 +401,7 @@ int main(void){
 
       <div class="inner-box box">
         <h3>4) Array di <em>struct</em> (C) — solo campi POD</h3>
+        <p class="mini"><strong>Algoritmo</strong> — Scrivi: header + <code>n</code> + blocco <code>n*sizeof(Studente)</code>. Leggi: header → <code>n</code> → buffer statico o dinamico → <code>fread</code> del blocco.</p>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;stdint.h&gt;
 #include &lt;string.h&gt;
@@ -425,10 +443,10 @@ int main(void){
     <div class="inner-box">
       <h2>Pitfall (base) & accortezze</h2>
       <ul>
-        <li><strong>Dimenticare la modalità binaria</strong> (<code>std::ios::binary</code>, <code>"wb"/"rb"</code>). <span class="ok">Apri sempre i file binari in modalità binaria.</span></li>
-        <li><strong>Non salvare le dimensioni</strong> prima di array/matrici. <span class="ok">Scrivi prima <code>n</code> (o <code>R</code>, <code>C</code>), poi i dati.</span></li>
-        <li><strong>Struct con campi non banali</strong> (<code>std::string</code>, puntatori). <span class="ok">Usa solo campi POD nel “base”, o serializza i contenuti (len+bytes).</span></li>
-        <li><strong>Ignorare i risultati I/O</strong> (letture parziali). <span class="ok">Controlla gli esiti di <code>read/fread</code> e <code>write/fwrite</code>.</span></li>
+        <li><strong>Dimenticare la modalità binaria</strong> (<code>std::ios::binary</code>, <code>"wb"/"rb"</code>). <br/><br/><span class="ok">Apri sempre i file binari in modalità binaria.</span></li>
+        <li><strong>Non salvare le dimensioni</strong> prima di array/matrici. <br/><br/><span class="ok">Scrivi prima <code>n</code> (o <code>R</code>, <code>C</code>), poi i dati.</span></li>
+        <li><strong>Struct con campi non banali</strong> (<code>std::string</code>, puntatori). <br/><br/><span class="ok">Nel “base” usa solo campi POD, oppure serializza i contenuti (len+bytes).</span></li>
+        <li><strong>Ignorare i risultati I/O</strong> (letture parziali). <br/><br/><span class="ok">In C verifica il valore di ritorno di <code>fread/fwrite</code>; in C++ verifica <code>!stream.fail()</code> o <code>gcount()</code> se leggi parziale.</span></li>
       </ul>
       <p class="note">Per formati portabili (endianness/versioni) → Lez3_4; per “perché non raw struct” → Lez3_5.</p>
     </div>
@@ -438,8 +456,8 @@ int main(void){
       <ul>
         <li>Binario (base) = scrivere/leggere <strong>byte</strong> di primitivi e POD in blocchi contigui.</li>
         <li>Inserisci un <strong>header minimale</strong> (magic+versione+dimensioni) anche negli esempi base.</li>
-        <li>Per matrici: layout row-major, indice <code>r*C + c</code>.</li>
-        <li>La portabilità è nella prossima lezione; qui consolidiamo la tecnica sulla stessa macchina.</li>
+        <li>Per matrici: layout row-major e indice <code>r*C + c</code>.</li>
+        <li>La portabilità generale è nella prossima lezione; qui consolidiamo le tecniche fondamentali.</li>
       </ul>
     </div>
 
