@@ -21,21 +21,16 @@
     }
   </script>
   <style>
-    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
     .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
     .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
-    .spec { margin:.25rem 0 .5rem }
-    .spec b { display:inline-block; width:8.2rem }
-    /* --- hard-left per code block --- */
-    .inner-box pre,
-    .inner-box pre code,
-    .box pre,
-    .box pre code,
-    pre,
-    pre code { text-align: left !important; }
-    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
-    pre code { display:block; }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; display:inline-block }
+    .tip  { font-style: italic; opacity:.95 }
+    /* hard-left per testo, elenchi e codice */
+    .inner-box, .inner-box p, .inner-box ul, .inner-box li, .inner-box h3, .box p, .box ul, .box li { text-align:left !important; }
+    .inner-box ul, .box ul { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li, .box li { margin:.25rem 0 }
+    pre, pre code { text-align:left !important; white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; }
   </style>
 </head>
 <body>
@@ -44,10 +39,10 @@
 <div class="sidebar" id="menu">
   <h2>Lezione 2 — Struct (ripasso mirato)</h2>
   <ul>
-    <li><a href="lez2_1.html">Lez2.1: Motivazione & sintassi base</a></li>
+    <li><a href="lez2_1.html">Lez2.1: Motivazione &amp; sintassi base</a></li>
     <li><a href="lez2_2.html">Lez2.2: Inizializzazioni in C/C++</a></li>
-    <li><a href="lez2_3.html">Lez2.3: Passaggio a funzione</a></li>
-    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct & lambda</a></li>
+    <li><a href="lez2_3.html" class="active">Lez2.3: Passaggio a funzione</a></li>
+    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct &amp; lambda</a></li>
   </ul>
 </div>
 <!-- END MENU -->
@@ -63,24 +58,18 @@
   <div class="content-box">
 
     <div class="inner-box">
-      <h2>Perché il “modo di passare” conta</h2>
-      <p>
-        Con una <strong>struct</strong> possiamo passare i dati alle funzioni in vari modi. La scelta impatta:
-        <strong>costo</strong> (copie o no), <strong>correttezza</strong> (mutazioni intenzionali o accidentali), e
-        <strong>chiarezza semantica</strong> (sta leggendo o modificando?).
-      </p>
+      <h2>Obiettivi</h2>
       <ul>
-        <li><strong>by value</strong>: si passa una <em>copia</em> (la funzione non tocca l’originale).</li>
-        <li><strong>by reference</strong> (<code>T&</code>): si passa un <em>alias</em> (la funzione può modificare l’originale).</li>
-        <li><strong>by const reference</strong> (<code>const T&</code>): alias <em>sola lettura</em> (zero copie, nessuna mutazione).</li>
-        <li><strong>by pointer</strong> (<code>T*</code>): stile C; simile al reference, ma con sintassi e gestione null esplicite.</li>
+        <li>Capire le <b>quattro modalità</b> principali: <em>by value</em>, <em>by reference</em>, <em>by const reference</em>, <em>by pointer</em>.</li>
+        <li>Interpretare l’<b>intento</b> dell’API: funzione “legge” oppure “modifica” l’oggetto?</li>
+        <li>Valutare <b>costi</b>, <b>sicurezza</b>, <b>portabilità C/C++</b> e <b>casi d’uso</b> didattici.</li>
       </ul>
-      <p class="note"><strong>Regola pratica C++:</strong> per parametri “solo lettura” di tipo non triviale usa <code>const T&</code>.
-        Per modifiche intenzionali usa <code>T&</code>. Copia (<code>T</code>) solo se vuoi davvero una copia o il tipo è leggero.</p>
+      <p class="note"><b>Regola pratica C++</b>: per parametri “solo lettura” usa <code>const T&amp;</code>; per modifiche intenzionali <code>T&amp;</code>; copia (<code>T</code>) solo se vuoi davvero duplicare o il tipo è leggero.</p>
     </div>
 
+    <!-- C++: ESEMPIO GUIDA COMPLETO -->
     <div class="box">
-      <h2>C++ — Esempio guida</h2>
+      <h2>C++ — Esempio guida (value vs &amp; vs const&amp; vs *)</h2>
 <pre><code class="language-cpp">#include &lt;string&gt;
 #include &lt;vector&gt;
 #include &lt;iostream&gt;
@@ -88,21 +77,21 @@
 struct Studente {
     std::string nome;
     std::string cognome;
-    int eta = 0;
+    int    eta   = 0;
     double media = 0.0;
 };
 
 // 1) by value: COPIA (non modifica l'originale)
 void aggiornaMedia_value(Studente s, double nuova) {
-    s.media = nuova;            // modifica la COPIA
+    s.media = nuova;   // modifica la COPIA
 }
 
 // 2) by reference: ALIAS (modifica l'originale)
 void aggiornaMedia_ref(Studente& s, double nuova) {
-    s.media = nuova;            // modifica l'oggetto chiamante
+    s.media = nuova;   // modifica l'oggetto chiamante
 }
 
-// 3) by const reference: sola lettura, zero copia
+// 3) by const reference: sola lettura (zero copie)
 void stampaStudente(const Studente& s) {
     std::cout &lt;&lt; s.cognome &lt;&lt; " " &lt;&lt; s.nome
               &lt;&lt; " — età: " &lt;&lt; s.eta
@@ -128,95 +117,121 @@ int main() {
     stampaStudente(a);
 }
 </code></pre>
-      <p class="ok"><strong>Lettura senza copia:</strong> <code>const T&</code> è idiomatico e performante.
-        <br><strong>Modifica esplicita:</strong> <code>T&</code> rende chiara l’intenzione di mutare.</p>
+      <p><b>Lettura senza copia</b>: <code>const T&amp;</code> evita duplicazioni e rende l’intento chiaro (<em>solo lettura</em>).
+      <br><b>Modifica esplicita</b>: <code>T&amp;</code> comunica che la funzione cambierà il chiamante.
+      <br><b>Pointer</b>: utile quando il parametro è <em>opzionale</em> (può essere <code>nullptr</code>) o per interoperare con C.</p>
     </div>
 
+    <!-- C++: COLLEZIONI E COMPLESSITÀ -->
     <div class="box">
-      <h2>C++ — Collezioni di struct (vettori) e passaggio</h2>
+      <h2>C++ — Collezioni di struct e costi</h2>
 <pre><code class="language-cpp">double mediaClasse(const std::vector&lt;Studente&gt;& s) { // const&: sola lettura
     if (s.empty()) return 0.0;
     double somma = 0.0;
-    for (const auto& st : s) somma += st.media;      // evita copie
+    for (const auto& st : s) somma += st.media;      // evita copie di Studente
     return somma / s.size();
 }
 
-void curvaVoti(std::vector&lt;Studente&gt;& s, double delta) { // & : modifica
+void curvaVoti(std::vector&lt;Studente&gt;& s, double delta) { // &: modifica
     for (auto& st : s) st.media += delta;
 }
 </code></pre>
-      <p class="note">Sulle collezioni grandi, <code>const std::vector&lt;T&gt;&</code> evita copie costose.
-        Per modificare in-place usa <code>std::vector&lt;T&gt;&</code>.</p>
+      <ul>
+        <li><b>by value</b> di un <code>std::vector&lt;T&gt;</code> copierebbe <em>tutti</em> gli elementi → costoso.</li>
+        <li><b>const&amp;</b> su collezioni grandi è lo <em>standard</em> per sola lettura.</li>
+        <li><b>&amp;</b> per modifiche in-place (chiaro e senza copie).</li>
+      </ul>
     </div>
 
+    <!-- C: CONFRONTO -->
     <div class="box">
-      <h2>C — Passaggio per puntatore (confronto)</h2>
+      <h2>C — Confronto: passaggio tramite puntatore</h2>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
 
 typedef struct {
-    char nome[32];
-    char cognome[32];
-    int eta;
+    char   nome[32];
+    char   cognome[32];
+    int    eta;
     double media;
 } Studente;
 
-void aggiorna_media(Studente* s, double nuova) { // puntatore: può modificare
+void aggiorna_media(Studente* s, double nuova) { // può modificare
     if (!s) return;
     s-&gt;media = nuova;
 }
 
-void stampa(const Studente* s) { // const puntatore: sola lettura
+void stampa(const Studente* s) { // sola lettura
     if (!s) return;
     printf("%s %s — età: %d, media: %.1f\n",
            s-&gt;cognome, s-&gt;nome, s-&gt;eta, s-&gt;media);
 }
-
-int main(void) {
-    Studente a = {"Ada","Lovelace",17,9.4};
-    stampa(&a);
-    aggiorna_media(&a, 10.0);
-    stampa(&a);
-    return 0;
-}
 </code></pre>
-      <p class="note">In C il “by reference” si esprime con un <strong>puntatore</strong>. In C++ si preferiscono i <strong>reference</strong> per chiarezza.</p>
+      <p class="note">In C non esistono i <em>reference</em>. Il “by reference” si ottiene con un <b>puntatore</b> (passi l’indirizzo di memoria).
+        <br/>Costruisci API chiare: <code>const Studente*</code> per sola lettura; <code>Studente*</code> per modifica.</p>
     </div>
 
-    <div class="inner-box">
-      <h2>Costi e semantica: quando scegliere cosa</h2>
+    <!-- INTENTO API, CONST-CORRECTNESS, OPTIONALITÀ -->
+    <div class="inner-box box">
+      <h2>Intento dell’API &amp; const-correctness</h2>
       <ul>
-        <li><strong>by value</strong> (<code>T</code>): comodo se il tipo è <em>leggero</em> o se desideri una copia intenzionale (es. filtrare e restituire).</li>
-        <li><strong>by const&</strong>: default per parametri di sola lettura su tipi “pesanti” (stringhe, vettori, struct con stringhe).</li>
-        <li><strong>by &</strong>: quando la funzione deve <em>modificare</em> il chiamante (API esplicita).</li>
-        <li><strong>by pointer</strong>: utile per interoperabilità C, gestione opzionale/null, o array C-style.</li>
+        <li><b>Solo lettura</b> (parametro pesante) ⇒ <code>const T&amp;</code> (C++) / <code>const T*</code> (C).</li>
+        <li><b>Modifica intenzionale</b> ⇒ <code>T&amp;</code> (C++) / <code>T*</code> (C).</li>
+        <li><b>Parametro opzionale</b> ⇒ in C++ usa un <code>T*</code> che può essere <code>nullptr</code> (o un “out parameter”); il reference non può essere nullo.</li>
+        <li><b>Copia voluta</b> ⇒ <code>T</code> by value. Utile quando vuoi isolare la funzione da effetti collaterali.</li>
       </ul>
-      <p class="warn"><strong>Attenzione lifetime:</strong> non restituire <em>reference</em> a oggetti locali (dangling). Se devi restituire un oggetto costruito dentro la funzione, restituisci <em>by value</em> (C++ fa copy/move elision).</p>
+      <p class="ok"><b>Buona pratica</b>: i nomi delle funzioni dovrebbero riflettere l’intento: <code>calcola...</code> (non muta) vs <code>aggiorna...</code> (muta).</p>
     </div>
 
-    <div class="inner-box">
-      <h2>Restituire struct da funzione</h2>
-<pre><code class="language-cpp">Studente creaStudente(std::string nome, std::string cognome, int eta, double media) {
-    return Studente{std::move(nome), std::move(cognome), eta, media}; // RVO/move elision
+    <!-- LIFETIME E RITORNI -->
+    <div class="inner-box box">
+      <h2>Lifetime: cosa puoi restituire?</h2>
+<pre><code class="language-cpp">// ✔️ Ritorno by value: sicuro (RVO/move elision)
+Studente crea(std::string nome, std::string cognome, int eta, double media) {
+    return Studente{std::move(nome), std::move(cognome), eta, media};
+}
+
+// ❌ Vietato: reference a locale (oggetto distrutto a fine funzione)
+const Studente& creaBad() {
+    Studente tmp{"X","Y",18,8.5};
+    return tmp; // DANGEROUS: dangling reference
+}
+
+// ✔️ Reference a elemento che vive fuori (attenzione alla validità del container)
+Studente& scegliPrimo(std::vector&lt;Studente&gt;& v) {
+    return v.at(0); // ok se v non è vuoto e resta valido
 }
 </code></pre>
-      <p class="note">C++ elide la copia in molti casi (RVO): il valore viene costruito direttamente nel chiamante.</p>
+      <p class="warn"><b>Regola d’oro</b>: non restituire reference/puntatori ad <em>oggetti locali</em>. Se devi costruire un valore in funzione, <b>restituisci per valore</b>.</p>
     </div>
 
+    <!-- POINTER CONSTNESS (C E C++) -->
+    <div class="inner-box box">
+      <h2>Puntatori: leggere la “costanza” (C e C++)</h2>
+      <ul>
+        <li><code>T* p</code> — posso modificare <code>*p</code>.</li>
+        <li><code>const T* p</code> — <em>non</em> posso modificare <code>*p</code> (sola lettura), ma posso cambiare quale indirizzo contiene <code>p</code>.</li>
+        <li><code>T* const p</code> — <code>p</code> punta sempre allo stesso oggetto, ma <code>*p</code> è modificabile.</li>
+        <li><code>const T* const p</code> — né cambio <code>p</code>, né modifico <code>*p</code>.</li>
+      </ul>
+      <p class="tip">In C++ preferisci <code>const T&amp;</code> per sola lettura; usa <code>const T*</code> quando ha senso gestire il caso “nessun oggetto”.</p>
+    </div>
+
+    <!-- ESERCIZI -->
     <div class="inner-box">
-      <h2>Esercizi (show/hide soluzioni)</h2>
+      <h2>Esercizi (con soluzioni a comparsa)</h2>
       <ol>
-        <li><strong>E1 — Validazione</strong>: scrivi in C++ <code>bool valida(const Studente& s)</code> che ritorna vero se <code>0 ≤ s.media ≤ 10</code> e <code>14 ≤ s.eta ≤ 100</code>.
+        <li><b>E1 — Validazione (C++)</b>: <code>bool valida(const Studente&amp; s)</code> restituisce vero se <code>0 ≤ s.media ≤ 10</code> e <code>14 ≤ s.eta ≤ 100</code>.
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
           <div id="box-e1" style="display:none;margin-top:8px">
 <pre><code class="language-cpp">bool valida(const Studente& s) {
     return (s.media >= 0.0 && s.media <= 10.0) && (s.eta >= 14 && s.eta <= 100);
 }
 </code></pre>
+            <p>Parametri “solo lettura” ⇒ <code>const&amp;</code>. La funzione è pura: non modifica <code>s</code>.</p>
           </div>
         </li>
 
-        <li><strong>E2 — Normalizzazione</strong>: scrivi <code>void normalizza(Studente& s)</code> che “clampa” <code>s.media</code> nell’intervallo <code>[0,10]</code>.
+        <li><b>E2 — Normalizzazione (C++)</b>: <code>void normalizza(Studente&amp; s)</code> “clampa” <code>s.media</code> nell’intervallo <code>[0,10]</code>.
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
           <div id="box-e2" style="display:none;margin-top:8px">
 <pre><code class="language-cpp">void normalizza(Studente& s) {
@@ -224,10 +239,11 @@ int main(void) {
     else if (s.media > 10) s.media = 10;
 }
 </code></pre>
+            <p>Qui l’intento è la modifica in-place ⇒ <code>&amp;</code>.</p>
           </div>
         </li>
 
-        <li><strong>E3 — Media della classe</strong>: scrivi <code>double mediaClasse(const std::vector&lt;Studente&gt;& s)</code>.
+        <li><b>E3 — Media della classe (C++)</b>: <code>double mediaClasse(const std::vector&lt;Studente&gt;&amp; s)</code>.
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra ▼</button></div>
           <div id="box-e3" style="display:none;margin-top:8px">
 <pre><code class="language-cpp">double mediaClasse(const std::vector<Studente>& s) {
@@ -237,10 +253,11 @@ int main(void) {
     return sum / s.size();
 }
 </code></pre>
+            <p>Collezione potenzialmente grande ⇒ <code>const&amp;</code> evita copie.</p>
           </div>
         </li>
 
-        <li><strong>E4 (C) — Aggiornamento via puntatore</strong>: in C, scrivi <code>void incrementa_eta(Studente* s)</code> che aumenta di 1 l’età se il puntatore è non nullo.
+        <li><b>E4 — Aggiornamento via puntatore (C)</b>: <code>void incrementa_eta(Studente* s)</code> aumenta di 1 l’età se il puntatore è non nullo.
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e4" onclick="toggleBox('btn-e4','box-e4')">Mostra ▼</button></div>
           <div id="box-e4" style="display:none;margin-top:8px">
 <pre><code class="language-c">void incrementa_eta(Studente* s) {
@@ -248,18 +265,32 @@ int main(void) {
     s-&gt;eta += 1;
 }
 </code></pre>
+            <p>Pattern tipico C: controlla <code>NULL</code>, poi modifica l’oggetto referenziato.</p>
           </div>
         </li>
       </ol>
     </div>
 
+    <!-- PITFALL -->
     <div class="inner-box">
-      <h2>Checklist</h2>
+      <h2>Pitfall comuni (e rimedi)</h2>
       <ul>
-        <li>Se la funzione <em>legge soltanto</em> un parametro pesante ⇒ <strong><code>const T&</code></strong>.</li>
-        <li>Se deve <em>modificare</em> ⇒ <strong><code>T&</code></strong> (o <code>T*</code> se vuoi gestire “nessun oggetto” con <code>null</code>).</li>
-        <li>Se ti serve una <em>copia</em> indipendente ⇒ <strong>by value</strong>.</li>
-        <li>Attento a lifetime e dangling reference; per i ritorni preferisci <strong>by value</strong> (RVO).</li>
+        <li><b>Restituire reference/puntatore a locale</b>. <br/><br/><span class="ok">Ritorna per <b>valore</b> (RVO) oppure referenzia solo oggetti che vivono oltre la funzione.</span></li>
+        <li><b>Copia involontaria di oggetti pesanti</b> (passaggio by value di <code>std::vector</code> o struct con stringhe). <br/><br/><span class="ok">Usa <b>const&amp;</b> per sola lettura.</span></li>
+        <li><b>Reference usato come “opzionale”</b> (non può essere nullo). <br/><br/><span class="ok">Se il parametro è davvero opzionale, usa un <b>puntatore</b> e documenta il caso <code>nullptr</code>.</span></li>
+        <li><b>Const mancante</b> su parametri di lettura. <br/><br/><span class="ok">Metti <b>const</b> dove puoi: documenta l’intento e previeni errori.</span></li>
+      </ul>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="inner-box box">
+      <h2>Checklist rapida</h2>
+      <ul>
+        <li>Leggo e basta? ⇒ <b>const T&amp;</b> (C++) / <b>const T*</b> (C).</li>
+        <li>Devo modificare? ⇒ <b>T&amp;</b> (C++) / <b>T*</b> (C).</li>
+        <li>Parametro opzionale? ⇒ <b>T*</b> con gestione esplicita di <code>nullptr</code>.</li>
+        <li>Voglio una copia indipendente? ⇒ <b>by value</b>.</li>
+        <li>Nei ritorni evita dangling: se crei dentro la funzione, <b>ritorna per valore</b>.</li>
       </ul>
     </div>
 
