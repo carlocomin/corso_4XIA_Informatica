@@ -10,7 +10,7 @@
   <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
     function prevSlide(){ window.location.href = "lez2_5.html"; }
-    function nextSlide(){ window.location.href = "../lez3/lez3_1.html"; } // placeholder prossima
+    function nextSlide(){ window.location.href = "../lez3/lez3_1.html"; } // prossima unità
     function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
     function toggleBox(btnId, boxId){
       const box = document.getElementById(boxId);
@@ -21,20 +21,24 @@
     }
   </script>
   <style>
-    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
     .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
     .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; display:inline-block }
+    .tip  { font-style: italic; opacity:.9 }
     .spec { margin:.2rem 0 .5rem }
     .spec b { display:inline-block; width:10.5rem }
-    /* --- hard-left per i code block --- */
+    /* allineamento forte a sinistra per testi, elenchi e codice */
+    .inner-box, .inner-box p, .inner-box ul, .inner-box li, .inner-box h2, .inner-box h3 { text-align:left !important; }
+    .inner-box ul { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li { margin:.25rem 0 }
     .inner-box pre,
     .inner-box pre code,
     .box pre,
     .box pre code,
     pre,
-    pre code { text-align: left !important; }
-    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
+    pre code { text-align:left !important; }
+    pre { white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; }
     pre code { display:block; }
   </style>
 </head>
@@ -44,12 +48,12 @@
 <div class="sidebar" id="menu">
   <h2>Lezione 2 — Struct (ripasso mirato)</h2>
   <ul>
-    <li><a href="lez2_1.html">Lez2.1: Motivazione & sintassi base</a></li>
+    <li><a href="lez2_1.html">Lez2.1: Motivazione &amp; sintassi base</a></li>
     <li><a href="lez2_2.html">Lez2.2: Inizializzazioni in C/C++</a></li>
     <li><a href="lez2_3.html">Lez2.3: Passaggio a funzione</a></li>
-    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct & lambda</a></li>
-    <li><a href="lez2_5.html">Lez2.5: Layout, sizeof, padding & align</a></li>
-    <li><a href="lez2_6.html">Lez2.6: Archivi con array/vector di struct</a></li>
+    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct &amp; lambda</a></li>
+    <li><a href="lez2_5.html">Lez2.5: Layout, sizeof, padding &amp; align</a></li>
+    <li><a href="lez2_6.html" class="active">Lez2.6: Archivi con array/vector di struct</a></li>
   </ul>
 </div>
 <!-- END MENU -->
@@ -65,14 +69,24 @@
   <div class="content-box">
 
     <div class="inner-box">
-      <h2>Obiettivo</h2>
+      <h2>Obiettivi e contesto</h2>
       <p>
         Progettare e manipolare un <strong>archivio di record</strong> (es. studenti, libri, prodotti) usando:
-        <strong>array statici</strong> e <strong><code>std::vector</code></strong> di <code>struct</code>.
-        Vediamo operazioni tipiche: inserimento, stampa, ricerca, modifica, ordinamento e rimozione.
+        <strong>array statici</strong> e <strong><code>std::vector</code></strong> di <code>struct</code>. Operazioni tipiche:
+        <em>inserimento</em>, <em>stampa</em>, <em>ricerca</em>, <em>modifica</em>, <em>ordinamento</em>, <em>rimozione</em>.
       </p>
-      <p class="note"><strong>Scelte di rappresentazione:</strong> array statico = capacità fissa, gestione manuale dell’“occupato”;
-        <code>std::vector</code> = capacità dinamica, API ricca, gestione automatica della memoria.</p>
+      <p class="note"><b>Scelta di rappresentazione</b>: array statico ⇒ capacità fissa, gestione manuale dell’“occupato”; 
+        <code>std::vector</code> ⇒ capacità dinamica, algoritmi STL, gestione memoria automatica.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Invarianti e chiavi (mettiamoci d’accordo prima!)</h2>
+      <ul>
+        <li><b>Record</b>: <code>Studente{nome,cognome,eta,media}</code>.</li>
+        <li><b>Chiave logica</b>: <code>(cognome, nome)</code> (esempio). Decidi se ammetti <b>duplicati</b> o se l’inserimento deve rifiutarli.</li>
+        <li><b>Archivio ordinato?</b> Se lo mantieni ordinato per la chiave, puoi usare <b>ricerca binaria</b> (<code>O(log n)</code>) e inserimenti “al posto giusto”.</li>
+        <li><b>Consistenza</b>: definisci e rispetta queste regole in TUTTE le funzioni (niente sorprese a metà corso).</li>
+      </ul>
     </div>
 
     <!-- MODELLO DATI -->
@@ -86,7 +100,7 @@ struct Studente {
     double media = 0.0;
 };
 </code></pre>
-      <p>È un <em>record</em> semplice: useremo questa struct in tutte le operazioni.</p>
+      <p>È il nostro <em>record</em> base. Usiamo le <code>std::string</code> per gestire stringhe in modo sicuro.</p>
     </div>
 
     <!-- ARRAY STATICO -->
@@ -134,14 +148,18 @@ struct ArchivioArray {
     }
 };
 </code></pre>
-      <p class="warn"><strong>Limite:</strong> capacità fissa <code>MAXN</code>, inserimenti/remozioni centrali costano <code>O(n)</code> per lo shift.</p>
+      <p>
+        <b>Spiegazione.</b> Manteniamo un contatore <code>n</code> di elementi validi. Inserire in coda è <code>O(1)</code> (se c’è spazio);
+        cercare e rimuovere richiede <code>O(n)</code> (ricerca lineare e shift).
+      </p>
+      <p class="warn"><b>Limite:</b> capacità fissa <code>MAXN</code>. Se devi crescere dinamicamente, passa a <code>std::vector</code>.</p>
     </div>
 
     <!-- VECTOR -->
     <div class="box">
       <h2>Archivio con <code>std::vector&lt;Studente&gt;</code> (dinamico)</h2>
 <pre><code class="language-cpp">#include &lt;vector&gt;
-#include &lt;algorithm&gt; // sort, remove_if, find_if
+#include &lt;algorithm&gt; // sort, remove_if, find_if, lower_bound
 #include &lt;iostream&gt;
 
 struct ArchivioVector {
@@ -182,10 +200,109 @@ struct ArchivioVector {
     }
 };
 </code></pre>
+      <p>
+        <b>Note operative.</b> <code>push_back</code> è <em>amortized</em> <code>O(1)</code>. 
+        <code>erase</code>/<code>remove_if</code> è <code>O(n)</code>. 
+        Le <em>riallocazioni</em> possono <b>invalidare</b> puntatori/riferimenti/iteratori: se puoi, chiama <code>reserve(N)</code>.
+      </p>
+    </div>
+
+    <!-- LAMBDA APPENDIX -->
+    <div class="inner-box box">
+      <h2>Appendice — Funzioni <em>lambda</em> (C++): guida pratica</h2>
+
+      <h3>1) Cos’è una lambda (come si legge)</h3>
+<pre><code class="language-cpp">[catture] (parametri) -&gt; tipo_ritorno {
+    // corpo: restituisce un valore (o void)
+}</code></pre>
       <ul>
-        <li><strong>Capacità</strong>: <code>vector</code> cresce automaticamente; usa <code>reserve()</code> se conosci N per ridurre riallocazioni.</li>
-        <li><strong>Invalidazione</strong>: le riallocazioni possono invalidare puntatori/iteratori/riferimenti esistenti.</li>
-        <li><strong>Rimozione</strong>: preferisci <code>erase-remove</code> per cancellazioni condizionali in massa.</li>
+        <li><b>Catture</b>: cosa “importo” dal contesto esterno (per valore <code>[x]</code> o per riferimento <code>[&amp;x]</code>).</li>
+        <li><b>Parametri</b>: come una funzione normale (<code>(const Studente&amp; s)</code>, …).</li>
+        <li><b>Ritorno</b>: di solito dedotto; se ci sono rami multipli, puoi esplicitare <code>-&gt; bool</code>, <code>-&gt; int</code>, ecc.</li>
+      </ul>
+      <p class="ok"><b>Intuizione:</b> una lambda è una “mini-funzione” definita sul posto, ideale per passare <em>comportamenti</em> ad algoritmi STL (sort, find_if, …).</p>
+
+      <h3>2) Le lambda che usiamo (e perché)</h3>
+      <ul>
+        <li><b>Predicato di ricerca</b> per <code>std::find_if</code>:
+<pre><code class="language-cpp">auto it = std::find_if(v.begin(), v.end(),
+    [&](const Studente&amp; s){ return s.cognome==cogn &amp;&amp; s.nome==nome; });</code></pre>
+          Dice se l’elemento corrente soddisfa la condizione. Catturiamo <code>cogn</code>/<code>nome</code> (per riferimento o per valore se piccoli).</li>
+
+        <li><b>Filtro</b> per <code>remove_if</code> (con <code>erase</code>):
+<pre><code class="language-cpp">v.erase(std::remove_if(v.begin(), v.end(),
+    [k](const Studente&amp; s){ return s.media &lt; k; }),
+    v.end());</code></pre>
+          Il predicato restituisce <code>true</code> per gli elementi da rimuovere.</li>
+
+        <li><b>Comparatore</b> per <code>std::sort</code>:
+<pre><code class="language-cpp">std::sort(v.begin(), v.end(),
+    [](const Studente&amp; a, const Studente&amp; b){
+        if (a.cognome != b.cognome) return a.cognome &lt; b.cognome;
+        return a.nome &lt; b.nome;
+    });</code></pre>
+          Deve definire un <b>ordine coerente</b> (ordinamento debole stretto).</li>
+
+        <li><b>Comparatore eterogeneo</b> per <code>std::lower_bound</code>:
+<pre><code class="language-cpp">auto key = [&](const Studente&amp; s){ return std::pair{s.cognome, s.nome}; };
+auto it  = std::lower_bound(v.begin(), v.end(), std::pair{cogn, nome},
+    [&](const Studente&amp; s, const std::pair&lt;std::string,std::string&gt;&amp; t){
+        return key(s) &lt; t;
+    });</code></pre>
+          Confronta un <code>Studente</code> con una <code>pair&lt;string,string&gt;</code> senza oggetti temporanei superflui.</li>
+      </ul>
+
+      <h3>3) Equivalenti senza lambda (per capire cosa succede “dietro”)</h3>
+      <div class="note"><b>Predicato di ricerca</b> (find_if):</div>
+<pre><code class="language-cpp">struct PredRicerca {
+    const std::string&amp; cogn; const std::string&amp; nome;
+    bool operator()(const Studente&amp; s) const {
+        return s.cognome==cogn &amp;&amp; s.nome==nome;
+    }
+};
+// std::find_if(v.begin(), v.end(), PredRicerca{cogn, nome});</code></pre>
+
+      <div class="note"><b>Comparatore sort</b> (cognome, poi nome):</div>
+<pre><code class="language-cpp">struct CmpCognomeNome {
+    bool operator()(const Studente&amp; a, const Studente&amp; b) const {
+        if (a.cognome != b.cognome) return a.cognome &lt; b.cognome;
+        return a.nome &lt; b.nome;
+    }
+};
+// std::sort(v.begin(), v.end(), CmpCognomeNome{});</code></pre>
+
+      <div class="note"><b>Comparatore lower_bound</b> (Studente vs pair):</div>
+<pre><code class="language-cpp">struct Key { std::string cogn, nome; };
+struct CmpStudenteVsKey {
+    bool operator()(const Studente&amp; s, const Key&amp; k) const {
+        if (s.cognome != k.cogn) return s.cognome &lt; k.cogn;
+        return s.nome &lt; k.nome;
+    }
+};
+// std::lower_bound(v.begin(), v.end(), Key{cogn, nome}, CmpStudenteVsKey{});</code></pre>
+
+      <h3>4) Catture: cosa scegliere e quando</h3>
+      <ul>
+        <li><code>[x]</code>: copia <code>x</code> (sicuro, ma copia dati). Bene per <em>piccoli</em> fondamentali.</li>
+        <li><code>[&amp;x]</code>: riferimento a <code>x</code> (niente copia). Attento alla <b>vita</b> di <code>x</code>: deve restare valida.</li>
+        <li><code>[=]</code>/<code>[&amp;]</code>: catture “tutto” — <b>sconsigliate</b> didatticamente: poco esplicite.</li>
+        <li><code>[k = expr]</code>: inizializzazione esplicita della cattura (utile per trasformazioni).</li>
+      </ul>
+      <p class="warn"><b>Regola di sicurezza:</b> niente riferimenti pendenti (dangling). Se non sei sicuro, cattura per <b>valore</b>.</p>
+
+      <h3>5) Comparatori corretti (per <code>sort</code> e <code>lower_bound</code>)</h3>
+      <ul>
+        <li>Devono implementare un <b>ordinamento debole stretto</b>: transitivo, antisimmetrico, consistente.</li>
+        <li>Usa <code>&lt;</code> (non <code>&lt;=</code>) e tie-break chiari (cognome→nome, ecc.).</li>
+        <li>Niente effetti collaterali: non modificare gli oggetti dentro il comparatore.</li>
+      </ul>
+
+      <h3>6) Checklist rapida</h3>
+      <ul>
+        <li>Predicati (<code>find_if</code>, <code>remove_if</code>): <code>bool(const T&amp;)</code>, nessun effetto collaterale.</li>
+        <li>Comparatori (<code>sort</code>): <code>bool(const T&amp;, const T&amp;)</code>, coerenti; per <code>lower_bound</code> anche forme eterogenee.</li>
+        <li>Catture specifiche (<code>[k]</code>, <code>[&amp;k]</code>), evita <code>[=]</code>/<code>[&amp;]</code>.</li>
+        <li>Attento alla <b>vita</b> delle variabili catturate; se in dubbio, cattura per valore.</li>
       </ul>
     </div>
 
@@ -211,7 +328,49 @@ int trovaBinaria(const std::vector&lt;Studente&gt;& v,
     return -1;
 }
 </code></pre>
-      <p class="ok"><strong>Vantaggio:</strong> su archivio ordinato la ricerca passa da <code>O(n)</code> (lineare) a <code>O(log n)</code> (binaria).</p>
+      <p class="ok"><b>Vantaggio:</b> su archivio ordinato la ricerca passa da <code>O(n)</code> (lineare) a <code>O(log n)</code> (binaria). Inserimenti “al posto giusto” con <code>lower_bound</code>.</p>
+    </div>
+
+    <!-- APPENDICE CAST -->
+    <div class="inner-box box">
+      <h2>Appendice — <code>static_cast</code> vs cast in stile C (C++)</h2>
+      <p>
+        In C++ esistono i <b>cast espliciti “sicuri”</b> (come <code>static_cast</code>) e il <b>cast tradizionale</b> “in stile C”
+        <code>(Tipo)espr</code>. Sembrano equivalenti ma NON lo sono: il C-cast è più permissivo, meno leggibile e può nascondere
+        conversioni rischiose.
+      </p>
+      <h3>1) Perché preferire <code>static_cast</code></h3>
+      <ul>
+        <li><b>Intenzionalità</b>: si legge “qui voglio una conversione statica a quel tipo”.</li>
+        <li><b>Controllo del compilatore</b>: permette solo conversioni <em>consentite</em> a compile-time; non rimuove <code>const</code>, non fa reinterpretazioni selvagge.</li>
+        <li><b>Diagnostica migliore</b>: in caso di errore, messaggi più chiari.</li>
+      </ul>
+
+      <h3>2) Esempi pratici (dal nostro codice)</h3>
+<pre><code class="language-cpp">// differenza tra iteratori (ptrdiff_t / signed size) -> int
+// ✔️ meglio esplicitarlo con static_cast
+int idx = static_cast&lt;int&gt;(it - v.begin());
+
+// ❌ stile C: compila ma è meno chiaro e può "nascondere" warning
+int idx2 = (int)(it - v.begin());
+</code></pre>
+      <p class="note">La conversione resta a carico tuo: se l’indice non entra in <code>int</code> potresti perdere informazioni.
+        Il <code>static_cast</code> non “magicamente” rende sicuro: rende solo <em>esplicito</em> l’intento e lascia al compilatore fare più controlli.</p>
+
+      <h3>3) Confronto sintetico</h3>
+      <ul>
+        <li><code>(T)expr</code> (C-cast) ⇢ può comportarsi come <code>static_cast</code>, <code>const_cast</code> o <code>reinterpret_cast</code> a seconda dei casi:
+            <b>troppo potente</b>, meno leggibile, rischioso.</li>
+        <li><code>static_cast&lt;T&gt;(expr)</code> ⇢ solo conversioni “di tipo” ammesse a compile-time (numeriche, up/downcast senza virtual,
+            puntatore base⇄derivata con responsabilità tua, ecc.); <b>non</b> rimuove <code>const</code>, <b>non</b> reinterpretazioni di bit.</li>
+      </ul>
+
+      <h3>4) Linee guida didattiche</h3>
+      <ul>
+        <li>In C++ usa <b><code>static_cast</code></b> per conversioni numeriche o tra tipi correlati (iterator diff → int, double → int consapevole, ecc.).</li>
+        <li>Evita il C-cast: può nascondere operazioni “forti” non ovvie a chi legge.</li>
+      </ul>
+      <p class="ok"><b>TL;DR</b>: in C++ <em>quasi sempre</em> meglio <code>static_cast</code> del C-cast: è più leggibile, limitato, controllabile.</p>
     </div>
 
     <!-- PARTE C -->
@@ -249,7 +408,29 @@ int rimuoviIndice(Archivio* A, size_t idx){
     return 1;
 }
 </code></pre>
-      <p class="note">Stessa logica dell’array statico in C++: si mantiene un contatore <code>n</code> degli elementi validi.</p>
+      <p><b>Spiegazione.</b> Stessa logica dell’array statico in C++: contatore <code>n</code>, ricerca lineare, rimozione con compattazione.</p>
+    </div>
+
+    <!-- COMPLESSITÀ -->
+    <div class="inner-box box">
+      <h2>Complessità (riassunto)</h2>
+      <ul>
+        <li><b>Inserisci in coda</b>: <code>O(1)</code> (array se c’è spazio) / <em>amortized</em> <code>O(1)</code> (<code>vector</code>).</li>
+        <li><b>Ricerca lineare</b>: <code>O(n)</code>; <b>ricerca binaria</b> su archivio ordinato: <code>O(log n)</code>.</li>
+        <li><b>Rimozione per indice</b>: <code>O(n)</code> (shift).</li>
+        <li><b>Ordinamento</b>: <code>O(n log n)</code> con <code>std::sort</code>.</li>
+      </ul>
+    </div>
+
+    <!-- PITFALL -->
+    <div class="inner-box">
+      <h2>Pitfall comuni (e rimedi)</h2>
+      <ul>
+        <li><b>Duplicati non gestiti</b>. <br/><br/><span class="ok">Stabilisci una <b>policy</b>: vietati (rifiuta inserimento) o consentiti (consapevole).</span></li>
+        <li><b>Vector: invalidazione</b> di iteratori/riferimenti dopo <code>push_back</code>/<code>erase</code>. <br/><br/><span class="ok">Usa indici o <code>reserve()</code> e ricrea gli iteratori dopo le operazioni.</span></li>
+        <li><b>Comparatori incoerenti</b> in sort. <br/><br/><span class="ok">Definisci un ordine chiaro (chiavi in cascata) e usa <code>&lt;</code>, non <code>&lt;=</code>.</span></li>
+        <li><b>Uso di <code>strcmp</code> senza controllo</b> (C). <br/><br/><span class="ok">Assicurati che le stringhe siano terminate da <code>'\0'</code> e che i campi abbiano capienza.</span></li>
+      </ul>
     </div>
 
     <!-- ESERCIZI -->
@@ -257,8 +438,7 @@ int rimuoviIndice(Archivio* A, size_t idx){
       <h2>Esercizi (testi completi + soluzioni a comparsa)</h2>
       <ol>
         <li><strong>E1 — Archivio studenti (C++)</strong><br/>
-          <div class="spec"><b>Richiesta:</b> implementa una funzione <code>aggiungiSeNuovo(ArchivioVector&amp;, const Studente&amp;)</code>
-            che inserisce uno studente solo se non esiste già la coppia (cognome,nome). Usa <code>find_if</code>.</div>
+          <div class="spec"><b>Richiesta:</b> implementa <code>aggiungiSeNuovo(ArchivioVector&amp;, const Studente&amp;)</code> che inserisce solo se la chiave (cognome,nome) non esiste già.</div>
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra soluzione ▼</button></div>
           <div id="box-e1" style="display:none;margin-top:8px">
 <pre><code class="language-cpp">void aggiungiSeNuovo(ArchivioVector&amp; A, const Studente&amp; s) {
@@ -271,8 +451,7 @@ int rimuoviIndice(Archivio* A, size_t idx){
         </li>
 
         <li><strong>E2 — Promossi (C++)</strong><br/>
-          <div class="spec"><b>Richiesta:</b> data una soglia <code>k</code>, restituisci un nuovo <code>std::vector&lt;Studente&gt;</code>
-            con chi ha <code>media ≥ k</code> e <code>eta ≥ 14</code>, senza modificare l’archivio originale.</div>
+          <div class="spec"><b>Richiesta:</b> data una soglia <code>k</code>, restituisci un nuovo <code>std::vector&lt;Studente&gt;</code> con chi ha <code>media ≥ k</code> e <code>eta ≥ 14</code>, senza modificare l’archivio originale.</div>
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra soluzione ▼</button></div>
           <div id="box-e2" style="display:none;margin-top:8px">
 <pre><code class="language-cpp">std::vector&lt;Studente&gt; promossi(const ArchivioVector&amp; A, double k){
@@ -286,9 +465,8 @@ int rimuoviIndice(Archivio* A, size_t idx){
           </div>
         </li>
 
-        <li><strong>E3 — Ricerca binaria (C++)</strong><br/>
-          <div class="spec"><b>Richiesta:</b> mantieni l’archivio <em>sempre ordinato</em> per (cognome, nome). Implementa
-            <code>inserisciOrdinato(ArchivioVector&amp;, const Studente&amp;)</code> usando <code>lower_bound</code> per inserire nel punto giusto (senza duplicati).</div>
+        <li><strong>E3 — Inserimento ordinato (C++)</strong><br/>
+          <div class="spec"><b>Richiesta:</b> mantieni l’archivio sempre ordinato per (cognome, nome). Implementa <code>inserisciOrdinato(ArchivioVector&amp;, const Studente&amp;)</code> con <code>lower_bound</code> (no duplicati).</div>
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra soluzione ▼</button></div>
           <div id="box-e3" style="display:none;margin-top:8px">
 <pre><code class="language-cpp">void inserisciOrdinato(ArchivioVector&amp; A, const Studente&amp; s){
@@ -323,13 +501,14 @@ int rimuoviIndice(Archivio* A, size_t idx){
       </ol>
     </div>
 
-    <div class="inner-box">
+    <div class="inner-box box">
       <h2>Takeaways</h2>
       <ul>
-        <li><strong>Array statico</strong>: semplice e veloce, ma capacità fissa e gestione manuale di inserimenti/rimozioni.</li>
-        <li><strong><code>std::vector</code></strong>: dinamico, API ricche (<code>sort</code>, <code>find_if</code>, <code>erase-remove</code>), attenzione all’invalidazione su riallocazioni.</li>
-        <li>Mantenere l’archivio <strong>ordinato</strong> consente <strong>ricerca binaria</strong> (<code>O(log n)</code>) e inserimenti con <code>lower_bound</code>.</li>
-        <li>Definisci sempre <strong>chiave di confronto</strong> chiara (es. <code>(cognome, nome)</code>) e gestisci i <strong>duplicati</strong> secondo la policy.</li>
+        <li><b>Array statico</b>: semplice e veloce, ma capacità fissa e rimozioni con shift (<code>O(n)</code>).</li>
+        <li><b><code>std::vector</code></b>: dinamico, algoritmi STL (<code>sort</code>, <code>find_if</code>, <code>erase-remove</code>); attenzione all’invalidazione su riallocazioni.</li>
+        <li><b>Archivio ordinato</b> ⇒ <b>ricerca binaria</b> (<code>O(log n)</code>) e inserimenti con <code>lower_bound</code>.</li>
+        <li><b>Definisci la chiave</b> e la <b>policy sui duplicati</b> prima di scrivere codice; poi rispettala ovunque.</li>
+        <li><b>Casting</b> in C++: preferisci <code>static_cast</code> al C-cast; più leggibilità e controlli.</li>
       </ul>
     </div>
 
