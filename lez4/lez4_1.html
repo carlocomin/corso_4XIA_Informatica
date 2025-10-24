@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA – Lez4_1 · Perché OOP? Concetti di base</title>
+  <title>4BIA – Lez4_1 · Perché OOP? Concetti di base (C++)</title>
 
-  <!-- Template base -->
+  <!-- Template coerente con il corso -->
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -16,38 +16,37 @@
     function nextSlide(){ window.location.href = "lez4_2.html"; }
     function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
     function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
       box.style.display = open ? 'none' : 'block';
       if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
     }
   </script>
 
   <style>
-    /* Forza allineamento a sinistra in ogni inner-box */
+    /* Allineamento forte a sinistra per elenchi e codice */
     .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
     .inner-box pre, .inner-box code, .inner-box h2, .inner-box h3 { text-align:left !important; }
-    .inner-box ul, .inner-box ol { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
-    .inner-box li { margin:.25rem 0 }
-    pre, pre code { white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; }
-    code { white-space:pre-wrap; }
+    .inner-box ul, .inner-box ol { margin:.5rem 0 .9rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li { margin:.28rem 0 }
+    pre, pre code { white-space:pre; tab-size:4; margin:.35rem 0 1rem 0; padding:.55rem .8rem; }
 
-    /* Box colorati per enfasi */
+    /* Box tematici */
     .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
-    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; display:inline-block }
-    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.4rem 0 }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.4rem 0; display:inline-block }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.4rem 0 }
+    .bad  { background:#ffefef; border-left:4px solid #ef4444; padding:.6rem .8rem; border-radius:8px; margin:.4rem 0 }
     .kbd  { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
 
     table { width:100%; border-collapse:collapse }
-    th, td { border-bottom:1px solid #e5e7eb; padding:.45rem .5rem; text-align:left; vertical-align:top }
+    th, td { border-bottom:1px solid #e5e7eb; padding:.5rem .55rem; text-align:left; vertical-align:top }
     th { background:#f8fafc }
   </style>
 </head>
 <body>
 
-<!-- MENU -->
+<!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
   <h2>Lezione 4 — OOP in C++ (introduzione)</h2>
@@ -60,9 +59,10 @@
     <li><a href="lez4_6.html">Lez4_6: Header/Sorgenti, include-guard, build</a></li>
   </ul>
 </div>
+<!-- END MENU -->
 
 <div class="slide">
-  <h1>Perché OOP? Concetti di base (C++)</h1>
+  <h1>Perché OOP? Concetti di base (in C++)</h1>
 
   <div class="nav-buttons" style="margin-bottom:10px">
     <button onclick="prevSlide()">&#8592; Indietro</button>
@@ -74,150 +74,215 @@
     <div class="inner-box box">
       <h2>Obiettivi della lezione</h2>
       <ul>
-        <li>Capire il <strong>perché</strong> della programmazione a oggetti (OOP) rispetto allo stile procedurale.</li>
-        <li>Imparare il vocabolario minimo: <strong>classe</strong>, <strong>oggetto</strong>, <strong>stato</strong>, <strong>comportamento</strong>, <strong>interfaccia</strong>, <strong>invarianti</strong>.</li>
-        <li>Vedere esempi semplici e <strong>pattern</strong> di progettazione base (incapsulamento).</li>
+        <li>Capire quali problemi pratici affronta l’OOP rispetto allo stile procedurale.</li>
+        <li>Conoscere il vocabolario: <b>classe</b>, <b>oggetto</b>, <b>stato</b>, <b>metodi</b>, <b>interfaccia</b>, <b>implementazione</b>.</li>
+        <li>Comprendere a fondo <b>astrazione</b> e <b>incapsulamento</b> e il loro rapporto.</li>
+        <li>Vedere esempi C++ idiomatici e linea storica essenziale dell’OOP fino al C++ moderno.</li>
       </ul>
-      <p class="ok"><b>Idea chiave:</b> l’OOP aiuta a gestire la complessità raggruppando dati e operazioni coerenti nello stesso modulo: <em>l’oggetto</em>.</p>
+      <p class="ok"><b>Idea chiave:</b> l’OOP organizza il software attorno a <em>entità</em> con <b>stato</b> e <b>comportamenti</b>, separando <em>cosa</em> si può fare (interfaccia) da <em>come</em> viene realizzato (implementazione).</p>
     </div>
 
     <div class="inner-box box">
-      <h2>Motivazioni: perché OOP?</h2>
+      <h2>Timeline storica (argomentata) dell’OOP → C++</h2>
       <ul>
-        <li><b>Incapsulamento</b>: nasconde i dettagli interni, espone solo l’API necessaria.</li>
-        <li><b>Astrazione</b>: modelli il “tipo” che ti serve (es. <code>Punto</code>, <code>Orario</code>, <code>Conto</code>), non i soli tipi primitivi.</li>
-        <li><b>Coesione alta &amp; accoppiamento basso</b>: ogni classe ha una responsabilità chiara; le dipendenze tra moduli restano semplici.</li>
-        <li><b>Riuso controllato</b>: istanzi diversi oggetti, componi classi, riusi codice senza copia/incolla.</li>
-        <li><b>Testabilità</b>: API piccole e stabili ⇒ più facile scrivere test unitari e fare refactor.</li>
+        <li><b>Anni ’60 – Simula 67</b> (Nygaard &amp; Dahl): introduce <em>classi</em>, <em>oggetti</em>, <em>ereditarietà</em> in un linguaggio per simulazione. L’idea: modellare “attori” del dominio con stato e comportamento.</li>
+        <li><b>Anni ’70 – Smalltalk</b> (Xerox PARC): OOP “pura”, tutto è oggetto, messaggi, ambiente interattivo. Spinge il paradigma come <em>metodo di progettazione</em> oltre che linguaggio.</li>
+        <li><b>1979–1985 – C with Classes → C++</b> (Bjarne Stroustrup): porta classi e astrazione di tipo nel mondo C, mantenendo efficienza e controllo “vicino all’hardware”. Nasce l’idea di linguaggio <b>multi-paradigma</b>: OO, generico, procedurale.</li>
+        <li><b>’90 – Standardizzazione</b>: C++ si diffonde in sistemi “real-world” (OS, embedded, finanza) grazie a prestazioni e controllo. Pattern e librerie (STL) solidificano pratiche OOP.</li>
+        <li><b>2011→oggi – C++11/14/17/20/23</b>: move semantics, <code>auto</code>, <code>unique_ptr</code>/<code>shared_ptr</code>, <code>constexpr</code>, <code>concepts</code>, che rendono l’OOP più <em>sicura</em> (RAII, smart pointer) e integrata con gli altri paradigmi.</li>
       </ul>
-      <p class="note">L’OOP non è una panacea: è uno strumento. Lo useremo con buon senso, partendo da casi semplici e concreti.</p>
+      <p class="note"><b>Sintesi:</b> C++ nasce per <em>unire</em> astrazione e prestazioni. L’OOP è uno strumento tra altri: si usa quando porta chiarezza, non “sempre e comunque”.</p>
     </div>
 
     <div class="inner-box box">
       <h2>Vocabolario minimo</h2>
-      <ul>
-        <li><b>Classe</b>: progetto/tipo astratto (dichiara <em>stato</em> e <em>metodi</em>).</li>
-        <li><b>Oggetto</b>: istanza concreta della classe (vive in memoria; ha <em>identità</em>).</li>
-        <li><b>Stato</b>: insieme di campi (dati) che descrivono l’oggetto in un certo momento.</li>
-        <li><b>Comportamento</b>: metodi/operazioni che l’oggetto sa eseguire.</li>
-        <li><b>Interfaccia</b>: la parte <code>public</code> che un utente può chiamare; il contratto d’uso.</li>
-        <li><b>Invariante</b>: proprietà che deve rimanere vera per ogni istanza valida (es. saldo ≥ 0).</li>
-      </ul>
-      <p class="ok"><b>Focus:</b> a parità di funzionalità, preferisci un’API più semplice e con regole chiare (contratto esplicito).</p>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Procedurale vs OOP (confronto pratico)</h2>
       <table>
-        <thead><tr><th>Procedurale</th><th>OOP</th></tr></thead>
+        <thead><tr><th>Termine</th><th>Significato</th><th>Esempio C++</th></tr></thead>
         <tbody>
           <tr>
-            <td>Strutture dati “passive” + funzioni libere.</td>
-            <td>Dati + metodi nello stesso involucro (<b>classe</b>).</td>
+            <td><b>Classe</b></td>
+            <td>Schema/tipo che definisce <em>stato</em> (campi) e <em>operazioni</em> (metodi).</td>
+            <td><code>class Punto { double x_, y_; void sposta(...); };</code></td>
           </tr>
           <tr>
-            <td>Validazioni disperse in molte funzioni.</td>
-            <td>Validazioni centralizzate nell’API (<b>incapsulamento</b>).</td>
+            <td><b>Oggetto (istanza)</b></td>
+            <td>Esemplare concreto della classe, con il <em>proprio</em> stato.</td>
+            <td><code>Punto p;</code> – <code>Punto q{1.0,2.0};</code></td>
           </tr>
           <tr>
-            <td>Più facile “rompere” lo stato per errore.</td>
-            <td>Invarianti difese dai metodi pubblici.</td>
+            <td><b>Stato</b></td>
+            <td>Valori dei campi a un dato istante.</td>
+            <td><code>x_, y_</code> dentro <code>Punto</code></td>
           </tr>
           <tr>
-            <td>Accoppiamento spesso alto tra moduli.</td>
-            <td>Accoppiamento più basso grazie a interfacce chiare.</td>
+            <td><b>Interfaccia</b></td>
+            <td>Metodi pubblici: <em>cosa</em> posso fare con l’oggetto.</td>
+            <td>Sezione <code>public:</code></td>
+          </tr>
+          <tr>
+            <td><b>Implementazione</b></td>
+            <td>Dettagli interni: <em>come</em> realizzo l’interfaccia.</td>
+            <td>Sezione <code>private:</code>, .cpp</td>
           </tr>
         </tbody>
       </table>
-      <p class="note">Entrambi gli stili sono utili. In questa unità useremo C++ per vedere come tradurre i concetti OOP in codice.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>Esempio didattico: il tipo <code>Punto</code> (stato + operazioni)</h2>
-<pre><code class="language-cpp">#include &lt;cmath&gt;
-#include &lt;string&gt;
-#include &lt;sstream&gt;
+      <h2>Principio di <u>astrazione</u></h2>
+      <p><b>Astrare</b> significa esporre solo gli aspetti <em>essenziali</em> e stabilire un <b>contratto</b> d’uso, rinviando o nascondendo i dettagli. In OOP, l’astrazione prende forma in:</p>
+      <ul>
+        <li><b>Interfacce chiare</b>: nomi significativi, parametri minimali, pre/postcondizioni.</li>
+        <li><b>Separazione “che cosa / come”</b>: il <em>cliente</em> usa l’oggetto secondo il “cosa”; il “come” può evolvere senza rompere l’uso.</li>
+        <li><b>Modello del dominio</b>: la classe rispecchia concetti reali (es. <code>Orario</code>), non dettagli di rappresentazione.</li>
+      </ul>
+<pre><code class="language-cpp">class Stack {
+public:
+    bool empty() const;
+    void push(int v);
+    bool pop();           // rimuove top se esiste, false altrimenti
+    int  top() const;     // pre: !empty()
+private:
+    // implementazione nascosta: vector, lista, array a capacità fissa...
+};</code></pre>
+      <p class="ok"><b>Effetto:</b> chi usa <code>Stack</code> ragiona in termini di “pila”: non importa <em>come</em> sia realizzata. Il contratto guida l’uso corretto.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Principio di <u>incapsulamento</u></h2>
+      <p><b>Incapsulare</b> significa <em>racchiudere</em> dati e operazioni in un’unità con confini netti, controllando gli accessi tramite l’interfaccia. In C++:</p>
+      <ul>
+        <li><b>Accesso</b> con <code>public</code>/<code>private</code>/<code>protected</code>.</li>
+        <li><b>Invarianti</b> difesi da costruttori e metodi (validazioni centralizzate).</li>
+        <li><b>RAII</b> per risorse: vita dell’oggetto = vita della risorsa (file, socket, memoria).</li>
+      </ul>
+<pre><code class="language-cpp">class Conto {
+private:
+    double saldo_{0.0};                       // invariante: saldo_ ≥ 0
+public:
+    Conto() = default;
+    Conto(double s) : saldo_{ (s &gt;= 0) ? s : 0.0 } {}
+    bool versa(double v){ if(v &lt; 0) return false; saldo_ += v; return true; }
+    bool preleva(double v){ if(v &lt; 0 || v &gt; saldo_) return false; saldo_ -= v; return true; }
+    double saldo() const { return saldo_; }   // osservatore const (solo lettura)
+};</code></pre>
+      <p class="note"><b>Perché serve:</b> impedisce che codice esterno metta l’oggetto in stati impossibili (saldo negativo), rende localizzate le regole, semplifica test e manutenzione.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Astrazione <i>vs</i> Incapsulamento</h2>
+      <p><b>Astrazione</b> è un <em>principio</em> di progettazione: definire <em>che cosa</em> un tipo offre, con un linguaggio vicino al dominio, e quali garanzie dà (contratti). <b>Incapsulamento</b> è un <em>meccanismo</em> del linguaggio e della struttura del codice che fa rispettare i confini tra interfaccia e dettagli (accesso controllato, dati privati, RAII).</p>
+      <p>Si rafforzano a vicenda: l’astrazione dà forma all’interfaccia; l’incapsulamento assicura che l’interfaccia resti l’unico punto di contatto, proteggendo l’invariante. Può esistere astrazione senza forte incapsulamento (es. API in C con documentazione ma campi pubblici), ma è fragile; e incapsulamento senza una buona astrazione produce “scatole chiuse” difficili da usare. <b>Obiettivo</b>: interfacce astratte <em>chiare</em> + incapsulamento <em>rigoroso</em>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2><code>struct</code> vs <code>class</code> in C++ (confronto)</h2>
+      <table>
+        <thead><tr><th>Aspetto</th><th><code>struct</code></th><th><code>class</code></th><th>Commento/uso pratico</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Accesso di default</b></td>
+            <td><code>public</code></td>
+            <td><code>private</code></td>
+            <td>È la differenza principale.</td>
+          </tr>
+          <tr>
+            <td><b>Ereditarietà di default</b></td>
+            <td><code>public</code></td>
+            <td><code>private</code></td>
+            <td>Coerente col default d’accesso.</td>
+          </tr>
+          <tr>
+            <td><b>Capacità</b></td>
+            <td colspan="2">Uguali: metodi, costruttori, operatori, template, ecc.</td>
+            <td>Non esiste “potenza” diversa: cambia lo <em>stile</em>.</td>
+          </tr>
+          <tr>
+            <td><b>Stile d’uso</b></td>
+            <td>“Value type” / record dati, API banali.</td>
+            <td>Oggetti con invarianti e logica.</td>
+            <td>Linea guida, non regola assoluta.</td>
+          </tr>
+          <tr>
+            <td><b>Aggregati</b></td>
+            <td>Spesso più “comodi” per init <code>{...}</code> se tutti i membri sono pubblici.</td>
+            <td>Di solito non aggregato (membri privati).</td>
+            <td>Per DTO semplici, <code>struct</code> rende chiara l’intenzione.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="ok"><b>Regola pratica:</b> per <em>contenitori di dati</em> semplici e pubblici usa <code>struct</code>; per tipi con invarianti/metodi e stato da proteggere usa <code>class</code>. In entrambi i casi, sii coerente: o tutto pubblico (record) o incapsulamento serio (private + metodi).</p>
+<pre><code class="language-cpp">// Esempio "record dati"
+struct RGB {
+    unsigned r{0}, g{0}, b{0}; // tutti pubblici, uso diretto
+};
+
+// Esempio "classe con invariante"
+class Rettangolo {
+    double b_{1.0}, h_{1.0};    // privati, > 0
+public:
+    Rettangolo() = default;
+    Rettangolo(double b,double h) : b_{ (b&gt;0?b:1.0) }, h_{ (h&gt;0?h:1.0) } {}
+    double base() const { return b_; }
+    double altezza() const { return h_; }
+    double area() const { return b_ * h_; }
+};</code></pre>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio introduttivo: una classe minimale <code>Punto</code></h2>
+      <p>Osservatori <code>const</code> per leggere lo stato; mutatori separati. Stile coerente e “const-correct”.</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cmath&gt;
 
 class Punto {
 private:
-    double x_{0.0}, y_{0.0};   // STATO: coordinate
-    static bool finito(double v){ return std::isfinite(v); } // utility di classe
+    double x_{0}, y_{0};
 public:
-    // COSTRUZIONE: oggetti sempre validi
-    Punto() = default;
-    Punto(double x, double y) : x_{x}, y_{y} {}
-
-    // OPERAZIONI: mutatori + osservatori (const)
-    bool set(double nx, double ny){
-        if(!finito(nx) || !finito(ny)) return false;
-        x_ = nx; y_ = ny; return true;
-    }
-    void sposta_rel(double dx, double dy){ x_ += dx; y_ += dy; }
+    // Osservatori: lettura dello stato senza modificarlo (const-correct)
     double x() const { return x_; }
     double y() const { return y_; }
-    double norm() const { return std::sqrt(x_*x_ + y_*y_); }
 
-    // RAPPRESENTAZIONE TESTUALE
-    std::string to_string() const {
-        std::ostringstream os; os &lt;&lt; "(" &lt;&lt; x_ &lt;&lt; "," &lt;&lt; y_ &lt;&lt; ")";
-        return os.str();
-    }
-};</code></pre>
-      <ul>
-        <li><b>Incapsulamento</b>: i campi sono privati; l’esterno usa metodi controllati.</li>
-        <li><b>Osservatori const</b>: <code>x()</code>, <code>y()</code>, <code>norm()</code> non modificano lo stato.</li>
-        <li><b>Invariante implicita</b>: coordinate finite (controllata in <code>set</code>).</li>
-      </ul>
-      <div class="nav-buttons" style="justify-content:left">
-        <button id="btn-demo" onclick="toggleBox('btn-demo','box-demo')">Mostra ▼</button>
-      </div>
-      <div id="box-demo" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">#include &lt;iostream&gt;
+    // Mutatore d’esempio (approfondiremo)
+    void sposta(double dx, double dy){ x_ += dx; y_ += dy; }
+};
+
+double norma(const Punto&amp; p) {
+    return std::sqrt(p.x()*p.x() + p.y()*p.y());
+}
 
 int main(){
-    Punto p;                       // (0,0)
-    p.sposta_rel(3,4);
-    std::cout &lt;&lt; p.to_string() &lt;&lt; " norm=" &lt;&lt; p.norm() &lt;&lt; "\n";
+    Punto p;                   // (0,0)
+    std::cout &lt;&lt; "p: (" &lt;&lt; p.x() &lt;&lt; "," &lt;&lt; p.y() &lt;&lt; ")\n";
 
-    const Punto q{1,2};           // oggetto const
-    std::cout &lt;&lt; "q.x=" &lt;&lt; q.x() &lt;&lt; " q.y=" &lt;&lt; q.y() &lt;&lt; "\n"; // ok: metodi const
+    const Punto cp;            // oggetto const
+    std::cout &lt;&lt; "cp: (" &lt;&lt; cp.x() &lt;&lt; "," &lt;&lt; cp.y() &lt;&lt; ") norm=" &lt;&lt; norma(cp) &lt;&lt; "\n";
 }</code></pre>
-      </div>
+      <p class="note"><b>Stile API:</b> per accessi di sola lettura preferire <code>x()</code>/<code>y()</code> a <code>getX()</code>/<code>getY()</code>; riservare nomi verbosi (<code>compute…</code>, <code>load…</code>) a operazioni non banali.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>API e contratto d’uso</h2>
+      <h2>Interfaccia vs implementazione (perché ci interessa)</h2>
       <ul>
-        <li><b>Interfaccia minima</b>: esponi solo ciò che serve a chi usa la classe.</li>
-        <li><b>Precondizioni/Postcondizioni</b>: documenta requisiti degli argomenti e risultati garantiti.</li>
-        <li><b>Nome dei metodi</b>: osservatori “banali” ⇒ nomi brevi (<code>x()</code>); operazioni costose/che possono fallire ⇒ verbi espliciti (<code>compute…</code>, <code>load…</code>).</li>
+        <li><b>Interfaccia stabile</b>: i client dipendono da nomi e contratti, non dai dettagli.</li>
+        <li><b>Implementazione evolvibile</b>: posso cambiare strutture dati senza rompere chi usa la classe.</li>
+        <li><b>Testabilità</b>: i test si agganciano all’interfaccia; i dettagli interni possono cambiare.</li>
       </ul>
-      <p class="ok">Un’API chiara riduce i bug e rende più facile cambiare l’implementazione senza toccare il codice client.</p>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Come “scomporre” un problema in classi</h2>
-      <ol>
-        <li><b>Individua gli oggetti</b> del dominio (nouns: Punto, Segmento, Rettangolo, Orario, Conto…).</li>
-        <li><b>Definisci lo stato</b> necessario e gli <b>invarianti</b> (proprietà sempre vere).</li>
-        <li><b>Progetta l’interfaccia</b> (metodi pubblici): cosa deve poter fare l’oggetto?</li>
-        <li><b>Nascondi i dettagli</b> d’implementazione (<code>private</code>): lascia libertà di refactoring.</li>
-      </ol>
-      <p class="note">Parti semplice; refactora via via che emergono nuove esigenze. Evita “classi Dio” che fanno tutto.</p>
+      <p class="ok">Base per librerie riusabili e codice manutenibile. In <b>Lez4_6</b> vedremo header/sorgenti e include-guard.</p>
     </div>
 
     <div class="inner-box box">
       <h2>Pitfall comuni (e rimedi pratici)</h2>
       <ul>
-        <li><strong>Campi pubblici</strong> “per comodità” → invarianti violabili. <br/><br/><span class="ok">Rendi i campi <code>private</code> e valida nei metodi.</span></li>
-        <li><strong>API enorme</strong> con metodi superflui. <br/><br/><span class="ok">Inizia con un set minimo; aggiungi solo quando serve davvero.</span></li>
-        <li><strong>Mescolare logica e I/O</strong> nella stessa classe. <br/><br/><span class="ok">Separa responsabilità (SRP): calcolo da una parte, formattazione/stampa dall’altra.</span></li>
-        <li><strong>Dimenticare gli osservatori <code>const</code></strong>. <br/><br/><span class="ok">Segna <code>const</code> i metodi che non mutano lo stato.</span></li>
+        <li><strong>Campi pubblici “per comodità”</strong> → stato violabile ovunque. <br/><br/><span class="ok">Rendi i campi <code>private</code> e offri metodi controllati.</span></li>
+        <li><strong>Mescolare interfaccia e dettagli</strong> (tutto in un file) → dipendenze fragili. <br/><br/><span class="ok">Dichiara la classe “pulita”, definizioni fuori (o in .cpp).</span></li>
+        <li><strong>Dimenticare i metodi <code>const</code></strong> per la sola lettura. <br/><br/><span class="ok">Segna <code>const</code> gli osservatori.</span></li>
+        <li><strong>API ridondanti</strong> (<code>x()</code> e <code>getX()</code> identici). <br/><br/><span class="ok">Scegli uno stile coerente (preferenza: <code>x()</code>/<code>y()</code>).</span></li>
       </ul>
     </div>
 
     <div class="inner-box note">
-      <b>Prossimo:</b> in <strong>Lez4_2</strong> vediamo la <strong>sintassi minima</strong> per dichiarare una classe, l’uso di <code>public</code>/<code>private</code> e i primi metodi.
+      <b>Prossimi passi.</b> In <strong>Lez4_2</strong> scriveremo la <b>sintassi minima</b> di una classe, definendo metodi dentro/fuori la classe e introducendo nel dettaglio i metodi <code>const</code>.
     </div>
 
   </div>
@@ -229,7 +294,7 @@ int main(){
 </div>
 
 <script>
-  function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
 </script>
 </body>
 </html>
