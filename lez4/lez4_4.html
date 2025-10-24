@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez4_4 · Incapsulamento, metodi const, overload</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "../programma.html"; }
+    function nextSlide(){ window.location.href = "lez4_2.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+
+  <style>
+    /* Allineamento forte a sinistra e stile coerente */
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
+    .inner-box pre, .inner-box code, .inner-box h2, .inner-box h3 { text-align:left !important; }
+    .inner-box ul, .inner-box ol { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li { margin:.25rem 0 }
+    pre, pre code { white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; }
+    code { white-space:pre-wrap; }
+
+    .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; display:inline-block }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
+    .kbd  { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
+
+    table { width:100%; border-collapse:collapse }
+    th, td { border-bottom:1px solid #e5e7eb; padding:.45rem .5rem; text-align:left; vertical-align:top }
+    th { background:#f8fafc }
+  </style>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 4 — OOP in C++ (introduzione)</h2>
+  <ul>
+    <li><a href="lez4_1.html">Lez4_1: Perché OOP? Concetti di base</a></li>
+    <li><a href="lez4_2.html">Lez4_2: Definire una classe (sintassi minima)</a></li>
+    <li><a href="lez4_3.html">Lez4_3: Costruttori, distruttore, lista d’iniz.</a></li>
+    <li><a class="active" href="lez4_4.html">Lez4_4: Incapsulamento, metodi const, overload</a></li>
+    <li><a href="lez4_5.html">Lez4_5: to_string(), stampa, pre/postcondiz.</a></li>
+    <li><a href="lez4_6.html">Lez4_6: Header/Sorgenti, include-guard, build</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Incapsulamento forte, metodi <code>const</code>, overload (C++)</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi</h2>
+      <ul>
+        <li>Progettare classi con <strong>incapsulamento forte</strong> e <strong>invarianti</strong> difesi dall’interfaccia.</li>
+        <li>Usare correttamente i <strong>metodi <code>const</code></strong> (osservatori) per distinguere lettura da modifica.</li>
+        <li>Definire <strong>overload</strong> di metodi in modo chiaro, evitando ambiguità.</li>
+      </ul>
+      <p class="ok"><b>Idea chiave:</b> dati <code>private</code>, interfaccia <code>public</code> minima e chiara; osservatori <code>const</code> per leggere lo stato; overload solo quando aggiunge espressività.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Incapsulamento &amp; invarianti (ripasso)</h2>
+<pre><code class="language-cpp">class Conto {
+private:
+    double saldo_{0.0};                 // invariante: saldo_ ≥ 0
+public:
+    Conto() = default;
+    Conto(double s) : saldo_{ (s &gt;= 0) ? s : 0.0 } {}
+    bool versa(double v){ if(v &lt; 0) return false; saldo_ += v; return true; }
+    bool preleva(double v){ if(v &lt; 0 || v &gt; saldo_) return false; saldo_ -= v; return true; }
+    double saldo() const { return saldo_; }      // osservatore const
+};</code></pre>
+      <p class="note">Stato sempre valido: l’esterno non può violare l’invariante senza passare dai controlli dell’interfaccia.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Metodi <code>const</code>: significato e benefici</h2>
+      <ul>
+        <li>Un metodo marcato <code>const</code> <b>non modifica</b> lo stato osservabile dell’oggetto.</li>
+        <li>È chiamabile su oggetti <code>const</code> e su referenze <code>const</code> (tipico nelle funzioni che “leggono” soltanto).</li>
+        <li>Rende l’API <b>auto-documentante</b> e abilita ottime verifiche a compile-time.</li>
+      </ul>
+<pre><code class="language-cpp">class Punto {
+private:
+    double x_{0}, y_{0};
+public:
+    void sposta(double dx, double dy){ x_ += dx; y_ += dy; }   // mutatore
+    double x() const { return x_; }                            // osservatore
+    double y() const { return y_; }
+};</code></pre>
+      <p class="warn"><b>Errore tipico:</b> dimenticare <code>const</code> sugli osservatori ⇒ impossibile richiamarli su oggetti passati per <code>const&amp;</code>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Getter tradizionale <code>getX()</code> vs osservatore <code>X()</code></h2>
+      <p><b>Non esiste differenza semantica per il compilatore</b>: è <em>stile di API</em>. In C++ idiomatico si preferisce spesso il nome del campo come <b>osservatore</b> (es. <code>x()</code>), breve e naturale, per accessi in sola lettura e a costo “banale”. Lo stile <code>getX()</code> nasce dalla tradizione Java/Beans: può essere usato in C++ ma va motivato.</p>
+      <ul>
+        <li><b>Usa <code>x()</code></b> quando l’accesso è <em>semplice</em>, <em>sempre valido</em> e <em>O(1)</em> (restituisce il valore o un riferimento costante): è un <b>vero osservatore</b>.</li>
+        <li><b>Usa <code>getX()</code></b> se l’operazione <em>non è un mero accesso</em> (può fallire, è costosa, fa caching, alloca, può lanciare). Il prefisso “get” segnala che <em>sta facendo qualcosa in più</em> del leggere un campo.</li>
+        <li><b>Evita di avere entrambi</b> <code>x()</code> e <code>getX()</code> per lo stesso scopo: duplichi l’API e confondi l’utente.</li>
+      </ul>
+<pre><code class="language-cpp">#include <iostream>
+#include <vector>
+#include <cmath>
+
+// Osservatori "economici" e const-correct
+class Punto {
+private:
+    double x_{0}, y_{0};
+
+public:
+    // Osservatori: lettura dello stato senza modificarlo
+    double x() const { return x_; }
+    double y() const { return y_; }
+
+    // (Sconsigliato duplicare con getX()/getY() se è solo un accesso banale)
+    // double getX() const { return x_; } // duplicato inutile
+    // double getY() const { return y_; }
+};
+
+// Esempio di "getter" non banale: può fare lavoro (calcolo/caching/allocazioni)
+class Mesh {
+public:
+    // Nome verboso che esplicita l'azione (meglio di un generico getX)
+    std::vector<double> computeNormals() const;  // può costare tempo/memoria
+};
+
+// Funzione libera che usa gli osservatori (accetta una ref const)
+double norma(const Punto& p) {
+    return std::sqrt(p.x() * p.x() + p.y() * p.y());
+}
+
+void stampa(const Punto& p) {
+    std::cout << "Punto(" << p.x() << ", " << p.y()
+              << ") norm=" << norma(p) << "\n";
+}
+
+int main() {
+    Punto p;              // (0,0) per default
+    stampa(p);            // invoca x()/y() su oggetto non-const
+
+    const Punto cp;       // oggetto const
+    std::cout << "cp: x=" << cp.x() << " y=" << cp.y() << "\n";
+
+    const Punto& r = p;   // reference const a oggetto non-const
+    std::cout << "r: x=" << r.x() << " y=" << r.y() << "\n";
+
+    return 0;
+}</code></pre>
+      <p class="ok"><b>Regola pratica:</b> per campi logici “di sola lettura”, preferisci <code>x() const</code>. Usa nomi con verbi (<code>compute…</code>, <code>load…</code>, <code>fetch…</code>) quando l’operazione ha <em>costo</em> o <em>semantica</em> diversa dal mero accesso.</p>
+      <p class="note"><b>Ritorno per valore o per riferimento?</b> Se il tipo è piccolo (es. <code>double</code>, <code>int</code>), restituisci per valore. Per oggetti pesanti valuta <code>const&amp;</code> ma fai attenzione a <em>aliasing</em> e durata di vita: l’esterno non deve poter invalidare l’invariante.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Overload di metodi (quando e come)</h2>
+      <ul>
+        <li>Stesso nome, firme diverse (numero/tipo/ordine parametri o qualificatore <code>const</code>).</li>
+        <li>Non si overloadda <em>solo</em> il tipo di ritorno.</li>
+        <li>Evita combinazioni ambigue con parametri di default.</li>
+      </ul>
+<pre><code class="language-cpp">class Punto {
+private:
+    double x_{0}, y_{0};
+public:
+    void set(double nx, double ny){ x_ = nx; y_ = ny; }      // assoluto
+    void sposta_rel(double dx, double dy){ x_ += dx; y_ += dy; } // relativo
+    double distanza(const Punto&amp; p) const;    // overload per oggetto
+    double distanza(double px, double py) const; // overload per coordinate
+};</code></pre>
+      <p class="note">Overload se le varianti sono davvero due modi naturali della stessa operazione. Altrimenti nomi diversi.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Overload <code>const</code>/<code>non-const</code> (pattern utile)</h2>
+<pre><code class="language-cpp">#include &lt;vector&gt;
+class IntBag {
+private:
+    std::vector&lt;int&gt; v_;
+public:
+    int&amp; at(std::size_t i)             { return v_.at(i); }   // mutabile
+    const int&amp; at(std::size_t i) const { return v_.at(i); }   // sola lettura
+};</code></pre>
+      <p class="ok">Consente lettura su oggetti <code>const</code> e modifica su oggetti non-<code>const</code>, con la stessa interfaccia.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Pitfall comuni (e rimedi rapidi)</h2>
+      <ul>
+        <li><strong>Campi pubblici</strong> → invarianti violabili. <br/><br/><span class="ok">Rendi i campi <code>private</code> e valida nei metodi.</span></li>
+        <li><strong>Dimenticare <code>const</code></strong> sugli osservatori. <br/><br/><span class="ok">Segna <code>const</code> tutti i metodi di sola lettura.</span></li>
+        <li><strong>Overload confusi</strong> con default. <br/><br/><span class="ok">Evita firme che si sovrappongono; preferisci nomi espliciti.</span></li>
+        <li><strong>Doppio stile</strong> <code>x()</code>/<code>getX()</code> per la stessa cosa. <br/><br/><span class="ok">Scegli uno stile coerente (preferenza: osservatori <code>x()</code> per accessi banali).</span></li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esercizi guidati (solution reveal)</h2>
+      <ol>
+        <li><b>E1 — <code>Orario</code> con overload</b><br/>
+          <em>Testo:</em> Aggiungi due <code>aggiungi</code>: uno che somma <code>h,m,s</code>, uno che somma solo <code>secondi</code>. Rinormalizza in 0≤hh&lt;24, 0≤mm,ss&lt;60. Fornisci <code>to_string() const</code>.
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
+          <div id="box-e1" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">class Orario {
+    int hh_{0}, mm_{0}, ss_{0};
+    static void norm(int&amp; h,int&amp; m,int&amp; s){
+        int tot = h*3600 + m*60 + s;
+        tot = ((tot % 86400) + 86400) % 86400;
+        h =  tot/3600; m = (tot%3600)/60; s = tot%60;
+    }
+public:
+    Orario() = default;
+    Orario(int h,int m,int s){ norm(h,m,s); hh_=h; mm_=m; ss_=s; }
+    void aggiungi(int h,int m,int s){ int H=hh_+h, M=mm_+m, S=ss_+s; norm(H,M,S); hh_=H; mm_=M; ss_=S; }
+    void aggiungi(int sec){ int H=hh_, M=mm_, S=ss_+sec; norm(H,M,S); hh_=H; mm_=M; ss_=S; }
+};</code></pre>
+          </div>
+        </li>
+
+        <li><b>E2 — <code>IntBag</code> const/non-const overload</b><br/>
+          <em>Testo:</em> Implementa i due overload di <code>at()</code> e mostra un uso con oggetto <code>const</code> e non-<code>const</code>.
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
+          <div id="box-e2" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">class IntBag {
+    std::vector&lt;int&gt; v_;
+public:
+    int&amp; at(std::size_t i)             { return v_.at(i); }
+    const int&amp; at(std::size_t i) const { return v_.at(i); }
+};</code></pre>
+          </div>
+        </li>
+
+        <li><b>E3 — API coerente per <code>Punto</code></b><br/>
+          <em>Testo:</em> Scegli uno stile (osservatori <code>x()</code>/<code>y()</code> oppure <code>getX()</code>/<code>getY()</code>) e rimuovi i duplicati. Motiva la scelta.
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra ▼</button></div>
+          <div id="box-e3" style="display:none;margin-top:8px">
+            <p class="ok"><b>Soluzione possibile:</b> preferire <code>x()</code>/<code>y()</code> come osservatori const “banali”. Riservare nomi verbosi (<code>compute…</code>, <code>fetch…</code>) per operazioni costose o che possono fallire.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="inner-box note">
+      <b>Prossimi passi.</b> Nella <strong>Lez4_5</strong> vedremo come progettare la <strong>stampa</strong> degli oggetti: <code>to_string()</code>, quando introdurre <code>operator&lt;&lt;</code>, e come comunicare pre/postcondizioni con messaggi chiari.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

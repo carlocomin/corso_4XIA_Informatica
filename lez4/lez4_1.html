@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>4BIA – Lez4_1 · Perché OOP? Concetti di base</title>
 
+  <!-- Template base -->
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -15,15 +16,16 @@
     function nextSlide(){ window.location.href = "lez4_2.html"; }
     function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
     function toggleBox(btnId, boxId){
-      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
-      const open = box.style.display==='block';
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
       box.style.display = open ? 'none' : 'block';
       if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
     }
   </script>
 
   <style>
-    /* Allineamento forte a sinistra e stile coerente */
+    /* Forza allineamento a sinistra in ogni inner-box */
     .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
     .inner-box pre, .inner-box code, .inner-box h2, .inner-box h3 { text-align:left !important; }
     .inner-box ul, .inner-box ol { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
@@ -31,6 +33,7 @@
     pre, pre code { white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; }
     code { white-space:pre-wrap; }
 
+    /* Box colorati per enfasi */
     .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
     .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
     .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; display:inline-block }
@@ -44,7 +47,7 @@
 </head>
 <body>
 
-<!-- BEGIN MENU -->
+<!-- MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
   <h2>Lezione 4 — OOP in C++ (introduzione)</h2>
@@ -57,10 +60,9 @@
     <li><a href="lez4_6.html">Lez4_6: Header/Sorgenti, include-guard, build</a></li>
   </ul>
 </div>
-<!-- END MENU -->
 
 <div class="slide">
-  <h1>Perché OOP? Concetti di base (classe, oggetto, stato, comportamento)</h1>
+  <h1>Perché OOP? Concetti di base (C++)</h1>
 
   <div class="nav-buttons" style="margin-bottom:10px">
     <button onclick="prevSlide()">&#8592; Indietro</button>
@@ -70,186 +72,152 @@
   <div class="content-box">
 
     <div class="inner-box box">
-      <h2>Obiettivi</h2>
+      <h2>Obiettivi della lezione</h2>
       <ul>
-        <li>Comprendere i concetti fondamentali: <strong>classe</strong>, <strong>oggetto</strong>, <strong>stato</strong>, <strong>comportamento</strong>.</li>
-        <li>Capire <strong>incapsulamento</strong> e <strong>interfaccia vs implementazione</strong>.</li>
-        <li>Confrontare approccio <strong>procedurale</strong> (struct + funzioni) con <strong>OOP</strong> (dati + operazioni insieme).</li>
+        <li>Capire il <strong>perché</strong> della programmazione a oggetti (OOP) rispetto allo stile procedurale.</li>
+        <li>Imparare il vocabolario minimo: <strong>classe</strong>, <strong>oggetto</strong>, <strong>stato</strong>, <strong>comportamento</strong>, <strong>interfaccia</strong>, <strong>invarianti</strong>.</li>
+        <li>Vedere esempi semplici e <strong>pattern</strong> di progettazione base (incapsulamento).</li>
       </ul>
-      <p class="ok"><b>Idea chiave:</b> la classe descrive un <em>tipo</em> (modello); l’oggetto è un’<em>istanza</em> concreta con valori di stato propri.</p>
+      <p class="ok"><b>Idea chiave:</b> l’OOP aiuta a gestire la complessità raggruppando dati e operazioni coerenti nello stesso modulo: <em>l’oggetto</em>.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>Procedurale vs OOP (motivazione)</h2>
+      <h2>Motivazioni: perché OOP?</h2>
       <ul>
-        <li><b>Procedurale</b>: i dati stanno in <code>struct</code>, le funzioni li manipolano dall’esterno. Rischio: accessi incontrollati e invarianti fragili.</li>
-        <li><b>OOP</b>: raggruppa <b>dati</b> (stato) e <b>operazioni</b> (metodi) in un unico costrutto (<b>classe</b>), offrendo un’<b>interfaccia</b> pubblica sicura.</li>
-        <li><b>Vantaggi pratici</b>: incapsulamento, località delle modifiche, progettazione per responsabilità, facilità di test.</li>
+        <li><b>Incapsulamento</b>: nasconde i dettagli interni, espone solo l’API necessaria.</li>
+        <li><b>Astrazione</b>: modelli il “tipo” che ti serve (es. <code>Punto</code>, <code>Orario</code>, <code>Conto</code>), non i soli tipi primitivi.</li>
+        <li><b>Coesione alta &amp; accoppiamento basso</b>: ogni classe ha una responsabilità chiara; le dipendenze tra moduli restano semplici.</li>
+        <li><b>Riuso controllato</b>: istanzi diversi oggetti, componi classi, riusi codice senza copia/incolla.</li>
+        <li><b>Testabilità</b>: API piccole e stabili ⇒ più facile scrivere test unitari e fare refactor.</li>
       </ul>
-      <p class="note">Quando ha senso OOP? Oggetti con stato non banale e regole d’uso (es. <em>Conto</em> con saldo ≥ 0, <em>Rettangolo</em> con base/altezza positive).</p>
+      <p class="note">L’OOP non è una panacea: è uno strumento. Lo useremo con buon senso, partendo da casi semplici e concreti.</p>
     </div>
 
     <div class="inner-box box">
-      <h2><code>struct</code> vs <code>class</code> in C++</h2>
+      <h2>Vocabolario minimo</h2>
       <ul>
-        <li>In C++ <code>struct</code> e <code>class</code> sono quasi equivalenti: <b>default access</b> è <code>public</code> per <code>struct</code>, <code>private</code> per <code>class</code>.</li>
-        <li>Uso tipico: <code>struct</code> per <em>aggregati</em> semplici (tutti campi pubblici), <code>class</code> quando servono invarianti/metodi e stato privato.</li>
-        <li>Obiettivo: <b>esporre solo l’interfaccia</b> necessaria, nascondendo i dettagli d’implementazione.</li>
+        <li><b>Classe</b>: progetto/tipo astratto (dichiara <em>stato</em> e <em>metodi</em>).</li>
+        <li><b>Oggetto</b>: istanza concreta della classe (vive in memoria; ha <em>identità</em>).</li>
+        <li><b>Stato</b>: insieme di campi (dati) che descrivono l’oggetto in un certo momento.</li>
+        <li><b>Comportamento</b>: metodi/operazioni che l’oggetto sa eseguire.</li>
+        <li><b>Interfaccia</b>: la parte <code>public</code> che un utente può chiamare; il contratto d’uso.</li>
+        <li><b>Invariante</b>: proprietà che deve rimanere vera per ogni istanza valida (es. saldo ≥ 0).</li>
       </ul>
-<pre><code class="language-cpp">struct PuntoS {
-    double x;  // public di default
-    double y;
-};
-
-class PuntoC {
-private:
-    double x_, y_;       // stato nascosto
-public:
-    void sposta(double dx, double dy){ x_ += dx; y_ += dy; }
-    double x() const { return x_; }  // "getter" di sola lettura
-    double y() const { return y_; }
-};</code></pre>
-      <p class="warn"><b>Perché privato?</b> Se lasciassi <code>x</code>/<code>y</code> pubblici, qualsiasi parte del programma potrebbe modificarli liberamente, violando invarianti e rendendo i bug difficili da trovare.</p>
+      <p class="ok"><b>Focus:</b> a parità di funzionalità, preferisci un’API più semplice e con regole chiare (contratto esplicito).</p>
     </div>
 
     <div class="inner-box box">
-      <h2>Classe, oggetto, stato, comportamento</h2>
-      <ul>
-        <li><b>Classe</b>: definisce i campi (stato) e i metodi (comportamento) validi per tutte le istanze.</li>
-        <li><b>Oggetto</b>: istanza della classe con <em>proprio</em> stato (i valori dei campi).</li>
-        <li><b>Stato</b>: insieme dei valori dei campi in un certo istante; cambia tramite <b>metodi</b> (operazioni dell’interfaccia).</li>
-      </ul>
-<pre><code class="language-cpp">class Conto {
-private:
-    double saldo_{0.0};          // invariante: saldo_ &gt;= 0
-public:
-    bool versa(double importo){
-        if(importo &lt; 0) return false;
-        saldo_ += importo;
-        return true;
-    }
-    bool preleva(double importo){
-        if(importo &lt; 0 || importo &gt; saldo_) return false; // rispetto invariante
-        saldo_ -= importo;
-        return true;
-    }
-    double saldo() const { return saldo_; } // metodo "osservatore" (const)
-};
-
-int main(){
-    Conto c;                // oggetto
-    c.versa(100);
-    c.preleva(30);
-    // c.saldo_ = -100;     // ERRORE: saldo_ è privato
-}</code></pre>
-      <p class="ok"><b>Invariante di classe:</b> condizione che deve restare vera per tutti gli oggetti corretti (qui: <code>saldo_ ≥ 0</code>). Si difende nell’interfaccia pubblica.</p>
+      <h2>Procedurale vs OOP (confronto pratico)</h2>
+      <table>
+        <thead><tr><th>Procedurale</th><th>OOP</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Strutture dati “passive” + funzioni libere.</td>
+            <td>Dati + metodi nello stesso involucro (<b>classe</b>).</td>
+          </tr>
+          <tr>
+            <td>Validazioni disperse in molte funzioni.</td>
+            <td>Validazioni centralizzate nell’API (<b>incapsulamento</b>).</td>
+          </tr>
+          <tr>
+            <td>Più facile “rompere” lo stato per errore.</td>
+            <td>Invarianti difese dai metodi pubblici.</td>
+          </tr>
+          <tr>
+            <td>Accoppiamento spesso alto tra moduli.</td>
+            <td>Accoppiamento più basso grazie a interfacce chiare.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">Entrambi gli stili sono utili. In questa unità useremo C++ per vedere come tradurre i concetti OOP in codice.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>Interfaccia vs implementazione</h2>
-      <ul>
-        <li><b>Interfaccia</b>: l’insieme dei membri <code>public</code> (cosa posso fare con l’oggetto).</li>
-        <li><b>Implementazione</b>: dettagli <code>private</code> (come lo fa). Può cambiare senza rompere il codice cliente.</li>
-        <li>Più avanti: separeremo in <code>.hpp</code> (interfaccia) e <code>.cpp</code> (implementazione) e vedremo la build multi-file.</li>
-      </ul>
-      <p class="note"><b>Progettazione per responsabilità:</b> ogni classe ha un compito chiaro e un’interfaccia piccola ma completa per quel compito.</p>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Esempio guidato: <code>Punto</code> 2D minimale</h2>
+      <h2>Esempio didattico: il tipo <code>Punto</code> (stato + operazioni)</h2>
 <pre><code class="language-cpp">#include &lt;cmath&gt;
 #include &lt;string&gt;
-#include &lt;iostream&gt;
+#include &lt;sstream&gt;
 
 class Punto {
 private:
-    double x_{0.0}, y_{0.0};
+    double x_{0.0}, y_{0.0};   // STATO: coordinate
+    static bool finito(double v){ return std::isfinite(v); } // utility di classe
 public:
-    Punto() = default;                // costr. di default (0,0)
-    Punto(double x, double y) : x_{x}, y_{y} {}   // lista d'inizializzazione
+    // COSTRUZIONE: oggetti sempre validi
+    Punto() = default;
+    Punto(double x, double y) : x_{x}, y_{y} {}
 
-    void sposta(double dx, double dy){ x_ += dx; y_ += dy; }
+    // OPERAZIONI: mutatori + osservatori (const)
+    bool set(double nx, double ny){
+        if(!finito(nx) || !finito(ny)) return false;
+        x_ = nx; y_ = ny; return true;
+    }
+    void sposta_rel(double dx, double dy){ x_ += dx; y_ += dy; }
     double x() const { return x_; }
     double y() const { return y_; }
     double norm() const { return std::sqrt(x_*x_ + y_*y_); }
 
+    // RAPPRESENTAZIONE TESTUALE
     std::string to_string() const {
-        return "(" + std::to_string(x_) + ", " + std::to_string(y_) + ")";
+        std::ostringstream os; os &lt;&lt; "(" &lt;&lt; x_ &lt;&lt; "," &lt;&lt; y_ &lt;&lt; ")";
+        return os.str();
     }
-};
+};</code></pre>
+      <ul>
+        <li><b>Incapsulamento</b>: i campi sono privati; l’esterno usa metodi controllati.</li>
+        <li><b>Osservatori const</b>: <code>x()</code>, <code>y()</code>, <code>norm()</code> non modificano lo stato.</li>
+        <li><b>Invariante implicita</b>: coordinate finite (controllata in <code>set</code>).</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-demo" onclick="toggleBox('btn-demo','box-demo')">Mostra ▼</button>
+      </div>
+      <div id="box-demo" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
 
 int main(){
-    Punto p(3,4);
+    Punto p;                       // (0,0)
+    p.sposta_rel(3,4);
     std::cout &lt;&lt; p.to_string() &lt;&lt; " norm=" &lt;&lt; p.norm() &lt;&lt; "\n";
+
+    const Punto q{1,2};           // oggetto const
+    std::cout &lt;&lt; "q.x=" &lt;&lt; q.x() &lt;&lt; " q.y=" &lt;&lt; q.y() &lt;&lt; "\n"; // ok: metodi const
 }</code></pre>
-      <p class="ok">Qui vedi: stato privato, metodi pubblici (mutatori/osservatori), costruttori, e un metodo di utilità <code>to_string()</code>.</p>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Mini-esercizio 1 — <code>Timer</code> (stato &amp; operazioni)</h2>
-      <p><b>Testo.</b> Progetta una classe <code>Timer</code> con operazioni <code>start()</code>, <code>stop()</code>, <code>reset()</code>, <code>elapsed()</code> (secondi). Garantisci che <code>elapsed()</code> funzioni sia a timer fermo sia mentre sta “correndo”.</p>
-      <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
-      <div id="box-e1" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">#include &lt;chrono&gt;
-class Timer {
-private:
-    using clock = std::chrono::steady_clock;
-    bool running_{false};
-    clock::time_point t0_{};
-    double acc_{0.0}; // secondi accumulati
-public:
-    void start(){
-        if(!running_){ running_ = true; t0_ = clock::now(); }
-    }
-    void stop(){
-        if(running_){
-            acc_ += std::chrono::duration&lt;double&gt;(clock::now() - t0_).count();
-            running_ = false;
-        }
-    }
-    void reset(){ running_ = false; acc_ = 0.0; }
-    double elapsed() const {
-        if(running_){
-            return acc_ + std::chrono::duration&lt;double&gt;(clock::now() - t0_).count();
-        }
-        return acc_;
-    }
-};</code></pre>
-        <p class="note">Invarianti: <code>acc_ ≥ 0</code>. L’interfaccia impedisce usi illeciti (es. <em>start</em> ripetuti non accumulano doppio).</p>
       </div>
     </div>
 
     <div class="inner-box box">
-      <h2>Mini-esercizio 2 — <code>Conto</code> (interfaccia “sicura”)</h2>
-      <p><b>Testo.</b> Disegna l’interfaccia di <code>Conto</code> che impedisca saldi negativi e prelievi superiori al saldo. Scegli tu se il prelievo restituisce <code>bool</code> o solleva un’eccezione (per ora preferiamo <code>bool</code>).</p>
-      <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
-      <div id="box-e2" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">class Conto {
-private:
-    double saldo_{0.0};
-public:
-    Conto() = default;
-    explicit Conto(double s_iniz){ if(s_iniz &gt;= 0) saldo_ = s_iniz; }
-    bool versa(double v){ if(v &lt; 0) return false; saldo_ += v; return true; }
-    bool preleva(double v){ if(v &lt; 0 || v &gt; saldo_) return false; saldo_ -= v; return true; }
-    double saldo() const { return saldo_; }
-};</code></pre>
-        <p class="ok">Interfaccia minima, invariante semplice, comportamento prevedibile.</p>
-      </div>
+      <h2>API e contratto d’uso</h2>
+      <ul>
+        <li><b>Interfaccia minima</b>: esponi solo ciò che serve a chi usa la classe.</li>
+        <li><b>Precondizioni/Postcondizioni</b>: documenta requisiti degli argomenti e risultati garantiti.</li>
+        <li><b>Nome dei metodi</b>: osservatori “banali” ⇒ nomi brevi (<code>x()</code>); operazioni costose/che possono fallire ⇒ verbi espliciti (<code>compute…</code>, <code>load…</code>).</li>
+      </ul>
+      <p class="ok">Un’API chiara riduce i bug e rende più facile cambiare l’implementazione senza toccare il codice client.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Come “scomporre” un problema in classi</h2>
+      <ol>
+        <li><b>Individua gli oggetti</b> del dominio (nouns: Punto, Segmento, Rettangolo, Orario, Conto…).</li>
+        <li><b>Definisci lo stato</b> necessario e gli <b>invarianti</b> (proprietà sempre vere).</li>
+        <li><b>Progetta l’interfaccia</b> (metodi pubblici): cosa deve poter fare l’oggetto?</li>
+        <li><b>Nascondi i dettagli</b> d’implementazione (<code>private</code>): lascia libertà di refactoring.</li>
+      </ol>
+      <p class="note">Parti semplice; refactora via via che emergono nuove esigenze. Evita “classi Dio” che fanno tutto.</p>
     </div>
 
     <div class="inner-box box">
       <h2>Pitfall comuni (e rimedi pratici)</h2>
       <ul>
-        <li><b>Campi pubblici</b> per comodità → invarianti violabili. <br/><br/><span class="ok">Rendi i campi <code>private</code>, espone metodi che controllano gli input.</span></li>
-        <li><b>Getter/Setter automatici</b> senza design → interfacce rumorose. <br/><br/><span class="ok">Esporre solo ciò che serve; preferire metodi di alto livello.</span></li>
-        <li><b>Mescolare responsabilità</b> in una classe. <br/><br/><span class="ok">Un oggetto = una responsabilità chiara.</span></li>
-        <li><b>Dipendenze forti</b> tra classi. <br/><br/><span class="ok">Riduci accoppiamento: passa valori semplici, usa forward-declaration dove possibile.</span></li>
+        <li><strong>Campi pubblici</strong> “per comodità” → invarianti violabili. <br/><br/><span class="ok">Rendi i campi <code>private</code> e valida nei metodi.</span></li>
+        <li><strong>API enorme</strong> con metodi superflui. <br/><br/><span class="ok">Inizia con un set minimo; aggiungi solo quando serve davvero.</span></li>
+        <li><strong>Mescolare logica e I/O</strong> nella stessa classe. <br/><br/><span class="ok">Separa responsabilità (SRP): calcolo da una parte, formattazione/stampa dall’altra.</span></li>
+        <li><strong>Dimenticare gli osservatori <code>const</code></strong>. <br/><br/><span class="ok">Segna <code>const</code> i metodi che non mutano lo stato.</span></li>
       </ul>
     </div>
 
     <div class="inner-box note">
-      <b>Prossimi passi.</b> Nella prossima slide definiremo la <strong>sintassi minima</strong> di una classe (metodi dentro/fuori dalla classe, <code>public/private</code>, <code>const</code>) e inizieremo a costruire una piccola libreria di classi didattiche.
+      <b>Prossimo:</b> in <strong>Lez4_2</strong> vediamo la <strong>sintassi minima</strong> per dichiarare una classe, l’uso di <code>public</code>/<code>private</code> e i primi metodi.
     </div>
 
   </div>
@@ -261,7 +229,7 @@ public:
 </div>
 
 <script>
-function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+  function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
 </script>
 </body>
 </html>
