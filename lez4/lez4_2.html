@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez4_2 · Definire una classe (sintassi minima)</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez4_1.html"; }
+    function nextSlide(){ window.location.href = "lez4_3.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+
+  <style>
+    /* Allineamento forte a sinistra e stile coerente */
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
+    .inner-box pre, .inner-box code, .inner-box h2, .inner-box h3 { text-align:left !important; }
+    .inner-box ul, .inner-box ol { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li { margin:.25rem 0 }
+    pre, pre code { white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; }
+    code { white-space:pre-wrap; }
+
+    .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; display:inline-block }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
+    .kbd  { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
+
+    table { width:100%; border-collapse:collapse }
+    th, td { border-bottom:1px solid #e5e7eb; padding:.45rem .5rem; text-align:left; vertical-align:top }
+    th { background:#f8fafc }
+  </style>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 4 — OOP in C++ (introduzione)</h2>
+  <ul>
+    <li><a href="lez4_1.html">Lez4_1: Perché OOP? Concetti di base</a></li>
+    <li><a class="active" href="lez4_2.html">Lez4_2: Definire una classe (sintassi minima)</a></li>
+    <li><a href="lez4_3.html">Lez4_3: Costruttori, distruttore, lista d’iniz.</a></li>
+    <li><a href="lez4_4.html">Lez4_4: Incapsulamento, metodi const, overload</a></li>
+    <li><a href="lez4_5.html">Lez4_5: to_string(), stampa, pre/postcondiz.</a></li>
+    <li><a href="lez4_6.html">Lez4_6: Header/Sorgenti, include-guard, build</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Definire una classe: sintassi minima, accessi, metodi (C++)</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi</h2>
+      <ul>
+        <li>Scrivere la <strong>dichiarazione</strong> di una classe con membri <code>private</code>/<code>public</code>.</li>
+        <li>Definire <strong>metodi</strong> dentro e fuori dalla classe; capire l’uso implicito di <code>this</code>.</li>
+        <li>Usare metodi <strong><code>const</code></strong> per le operazioni “osservatrici”.</li>
+        <li>Applicare buone pratiche di <strong>incapsulamento</strong> ed <strong>API minima</strong>.</li>
+      </ul>
+      <p class="ok"><b>Idea chiave:</b> stato <code>private</code>, interfaccia <code>public</code> piccola ma completa, metodi <code>const</code> quando non mutano lo stato.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Scheletro minimo di classe</h2>
+<pre><code class="language-cpp">class Punto {
+private:          // stato interno nascosto
+    double x_, y_;
+
+public:           // interfaccia pubblica
+    void sposta(double dx, double dy);  // dichiarazione metodo
+    double x() const;                   // osservatore "const"
+    double y() const;
+};</code></pre>
+      <ul>
+        <li><b>Default access</b>: <code>class</code> ⇒ <code>private</code>; <code>struct</code> ⇒ <code>public</code>.</li>
+        <li>I metodi possono essere <em>dichiarati</em> nella classe e <em>definiti</em> fuori con l’operatore di risoluzione <code>::</code>.</li>
+        <li><code>const</code> dopo la firma indica che il metodo <em>non modifica</em> lo stato osservabile dell’oggetto.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Definizioni dei metodi (fuori dalla classe) &amp; <code>this</code></h2>
+<pre><code class="language-cpp">#include &lt;cmath&gt;
+
+void Punto::sposta(double dx, double dy) {
+    // equivale a: this-&gt;x_ += dx; this-&gt;y_ += dy;
+    x_ += dx;
+    y_ += dy;
+}
+
+double Punto::x() const { return x_; }
+double Punto::y() const { return y_; }</code></pre>
+      <ul>
+        <li><b><code>this</code></b> è un puntatore all’oggetto corrente; è implicito e raramente serve scriverlo esplicitamente.</li>
+        <li>Definire i metodi <em>fuori</em> dalla classe aiuta a separare interfaccia vs implementazione (vedi Lez4_6).</li>
+        <li>Metodi brevi si possono definire <em>dentro</em> la classe: diventano candidati a essere <em>inline</em> (accenno).</li>
+      </ul>
+      <p class="note">Nel <code>main()</code> userai l’operatore <code>.</code> per invocare i metodi: <code>p.sposta(1,2);</code></p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Metodi <code>const</code>: perché e come usarli</h2>
+      <ul>
+        <li>Un metodo <code>const</code> promette di <strong>non mutare lo stato</strong> dell’oggetto (può solo leggere i campi).</li>
+        <li>Consente di chiamare il metodo su oggetti costanti o referenze costanti: <code>double d = dist(const Punto&amp; p);</code>.</li>
+        <li>Migliora leggibilità e sicurezza: il compilatore impedisce modifiche accidentali.</li>
+      </ul>
+<pre><code class="language-cpp">double Punto::x() const { return x_; }  // ok
+// double Punto::x() const { x_ += 1; return x_; } // ERRORE: modifica stato in metodo const</code></pre>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio completo: uso della classe</h2>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cmath&gt;
+
+class Punto {
+private:
+    double x_{0.0}, y_{0.0}; // inizializzazione di membro (default)
+public:
+    void sposta(double dx, double dy);
+    double x() const;
+    double y() const;
+    double norm() const { return std::sqrt(x_*x_ + y_*y_); } // definizione "inline"
+};
+
+void Punto::sposta(double dx, double dy){ x_ += dx; y_ += dy; }
+double Punto::x() const { return x_; }
+double Punto::y() const { return y_; }
+
+int main(){
+    Punto p;                // (0,0)
+    p.sposta(3,4);
+    std::cout &lt;&lt; p.x() &lt;&lt; "," &lt;&lt; p.y() &lt;&lt; " norm=" &lt;&lt; p.norm() &lt;&lt; "\n";
+}</code></pre>
+      <p class="ok">Pattern consigliato: stato privato, metodi pubblici essenziali, osservatori <code>const</code>, funzioni di utilità corte definite inline.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Access specifier: <code>public</code>, <code>private</code>, <code>protected</code> (accenno)</h2>
+      <ul>
+        <li><b>public</b>: visibile e accessibile dall’esterno (interfaccia).</li>
+        <li><b>private</b>: accessibile solo dall’interno della classe (incapsulamento forte).</li>
+        <li><b>protected</b>: accessibile anche dalle classi derivate (lo useremo quando tratteremo l’ereditarietà).</li>
+      </ul>
+      <p class="warn"><b>Errore comune:</b> lasciare i campi <code>public</code> “per comodità”. Così si rompono invarianti senza controllo.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>API minima: getter/setter quando servono (non “sempre”)</h2>
+      <ul>
+        <li>I <b>getter</b> hanno senso per leggere lo stato in modo <code>const</code>.</li>
+        <li>I <b>setter</b> vanno offerti solo se la modifica è <b>lecita</b> e <b>controllabile</b> (con validazioni).</li>
+        <li>Spesso è meglio esporre <b>metodi di alto livello</b> (es. <code>sposta()</code>) invece di manipolazioni a campo.</li>
+      </ul>
+<pre><code class="language-cpp">class Punto {
+private:
+    double x_{0}, y_{0};
+public:
+    bool setX(double nx){ x_ = nx; return true; } // qui "sempre lecito"
+    bool setY(double ny){ y_ = ny; return true; }
+    // oppure solo sposta(dx, dy) se cambiare liberamente non ha senso nel modello
+};</code></pre>
+      <p class="note">Nella prossima lezione vedremo come <b>inizializzare</b> correttamente (costruttori, lista di inizializzazione, <code>= default</code>/<code>= delete</code>).</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Mini-esercizio — Validazione nei setter</h2>
+      <p><b>Testo.</b> Aggiungi a <code>Punto</code> dei setter che <em>rifiutino</em> valori <em>NaN</em> o infiniti (usa <code>std::isfinite</code>). Restituisci <code>bool</code> per segnalare l’esito.</p>
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
+      <div id="box-e1" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">#include &lt;cmath&gt;
+
+class Punto {
+private:
+    double x_{0}, y_{0};
+public:
+    bool setX(double nx){
+        if(!std::isfinite(nx)) return false;
+        x_ = nx; return true;
+    }
+    bool setY(double ny){
+        if(!std::isfinite(ny)) return false;
+        y_ = ny; return true;
+    }
+};</code></pre>
+        <p class="ok">L’invariante “coordinate finite” è ora protetto dall’interfaccia.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Pitfall comuni (e rimedi pratici)</h2>
+      <ul>
+        <li><strong>Dimenticare <code>const</code></strong> sugli osservatori. <br/><br/><span class="ok">Metti <code>const</code> ai metodi che non mutano lo stato: ti permette di usarli su oggetti costanti e previene errori.</span></li>
+        <li><strong>Mescolare interfaccia e dettagli inutili</strong>. <br/><br/><span class="ok">Esporre solo ciò che serve; rinvia dettagli all’implementazione.</span></li>
+        <li><strong>Campi pubblici</strong> e assenza di validazioni. <br/><br/><span class="ok">Rendi i campi privati e valida all’ingresso nei metodi.</span></li>
+        <li><strong>Metodi troppo lunghi</strong> nella classe. <br/><br/><span class="ok">Definisci fuori dalla classe, mantieni la dichiarazione pulita.</span></li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esercizi lampo (con soluzione a comparsa)</h2>
+      <ol>
+        <li><b>E1 — Procedurale → OOP</b><br/>
+          <em>Testo:</em> Trasforma una <code>struct</code> con <code>double base, altezza</code> e funzioni libere <code>area</code>, <code>scala(k)</code> in una classe <code>Rettangolo</code> con metodi.
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-ea" onclick="toggleBox('btn-ea','box-ea')">Mostra ▼</button></div>
+          <div id="box-ea" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">class Rettangolo {
+private:
+    double b_, h_;
+public:
+    Rettangolo(double b, double h): b_{b}, h_{h} {}
+    double area() const { return b_ * h_; }
+    bool scala(double k){
+        if(!(k &gt; 0)) return false;
+        b_ *= k; h_ *= k; return true;
+    }
+};</code></pre>
+          </div>
+        </li>
+
+        <li><b>E2 — <code>this</code> e method chaining</b><br/>
+          <em>Testo:</em> Aggiungi a <code>Punto</code> metodi che restituiscano <code>*this</code> per concatenare chiamate: <code>p.sposta(1,0).sposta(0,2);</code>
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-eb" onclick="toggleBox('btn-eb','box-eb')">Mostra ▼</button></div>
+          <div id="box-eb" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">class Punto {
+    double x_{0}, y_{0};
+public:
+    Punto&amp; sposta(double dx, double dy){ x_+=dx; y_+=dy; return *this; }
+};</code></pre>
+          </div>
+        </li>
+
+        <li><b>E3 — Osservatori <code>const</code></b><br/>
+          <em>Testo:</em> Perché <code>double norm() const;</code> è meglio di <code>double norm();</code>?
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-ec" onclick="toggleBox('btn-ec','box-ec')">Mostra ▼</button></div>
+          <div id="box-ec" style="display:none;margin-top:8px">
+            <p class="note"><b>Soluzione:</b> garantisce che la funzione non cambia lo stato, abilita l’uso su oggetti <code>const</code> e fa controllare al compilatore eventuali modifiche accidentali.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="inner-box note">
+      <b>Prossimi passi.</b> Nella <strong>Lez4_3</strong> vedremo <strong>costruttori</strong>, <strong>distruttore</strong>, e la <strong>lista di inizializzazione</strong>: fondamentali per creare oggetti sempre in uno stato valido.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>
