@@ -107,7 +107,7 @@
           </tr>
         </tbody>
       </table>
-      <p class="note">Per ora useremo <b>default</b> e <b>parametrico</b>. Copia/move arriveranno più avanti (regola dello 0/5).</p>
+      <p class="note">Per ora useremo <b>default</b> e <b>parametrico</b>. Copia/move arriveranno più avanti.</p>
     </div>
 
     <div class="inner-box box">
@@ -142,6 +142,13 @@ public:
     bool preleva(double v){ if(v &lt; 0 || v &gt; saldo_) return false; saldo_ -= v; return true; }
     double saldo() const { return saldo_; }
 };</code></pre>
+      <p class="note"><b>Cosa significa <code>= default</code> qui?</b> Si chiede al compilatore di <em>generare</em> il costruttore di default con la sua semantica naturale (quella che avrebbe se non dichiarassimo alcun costruttore). È utile perché:
+        <ul>
+          <li><b>Documenta l’intento</b> (esiste un default “voluto”).</li>
+          <li><b>Riattiva</b> il costruttore di default anche se hai definito altri costruttori.</li>
+          <li>Mantiene, quando possibile, proprietà come “trivialità” e <code>noexcept</code>; se qualche membro non è costruibile di default, la <em>defaultizzazione fallisce a compile-time</em>.</li>
+        </ul>
+      </p>
       <p class="ok">L’invariante “<code>saldo ≥ 0</code>” viene garantita <em>subito</em> dal costruttore: nessun oggetto può nascere in stato illegale.</p>
     </div>
 
@@ -172,7 +179,7 @@ public:
 class LogFile {
     std::ofstream out_;
 public:
-    LogFile(const std::string&amp; path) : out_{path} {} // niente explicit qui
+    LogFile(const std::string&amp; path) : out_{path} {}
     ~LogFile(){ /* out_ chiude il file nel suo distruttore */ }
     void write(const std::string&amp; s){ out_ &lt;&lt; s &lt;&lt; '\n'; }
 };</code></pre>
@@ -189,7 +196,7 @@ public:
     int id_;
 public:
     SoloConId() = delete;               // vietato senza id
-    SoloConId(int id) : id_{id} {}      // niente explicit in questa lezione
+    SoloConId(int id) : id_{id} {}
     ~SoloConId() = default;             // distruttore di default
 };</code></pre>
       <p class="ok">Queste forme rendono le intenzioni <b>esplicite</b> e fanno fallire a compile-time gli usi non voluti.</p>
@@ -252,8 +259,8 @@ public:
     }
     std::string to_string() const {
         std::ostringstream os;
-        os &lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; hh_ &lt;&lt; ":"
-           &lt;&lt; std::setw(2) &lt;&lt; mm_ &lt;&lt; ":" &lt;&lt; std::setw(2) &lt;&lt; ss_;
+        os << std::setfill('0') << std::setw(2) << hh_ << ":"
+           << std::setw(2) << mm_ << ":" << std::setw(2) << ss_;
         return os.str();
     }
 };
@@ -292,59 +299,6 @@ public:
         <li><strong>Ordine sbagliato</strong> tra membri e lista. <br/><br/><span class="ok">La costruzione segue l’ordine di <em>dichiarazione</em>; riordina i membri.</span></li>
         <li><strong>Confusione sui metodi <code>static</code></strong>. <br/><br/><span class="ok">Ricorda: niente <code>this</code>, niente accesso a campi non-static; usali per controlli/utility “di classe”.</span></li>
       </ul>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Esercizi (con soluzione a comparsa)</h2>
-      <ol>
-        <li><b>E1 — <code>Rettangolo</code> robusto</b><br/>
-          <em>Testo:</em> Scrivi costruttore default (1x1) e parametrico che rifiuta lati ≤ 0; aggiungi <code>area()</code>.
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
-          <div id="box-e1" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">class Rettangolo {
-    double b_{1.0};
-    double h_{1.0};
-public:
-    Rettangolo() = default;
-    Rettangolo(double b,double h) : b_{ (b&gt;0?b:1.0) }, h_{ (h&gt;0?h:1.0) } {}
-    double area() const { return b_ * h_; }
-};</code></pre>
-          </div>
-        </li>
-
-        <li><b>E2 — <code>Libro</code> con membro <code>const</code></b><br/>
-          <em>Testo:</em> Crea una classe con <code>const int isbn_;</code> che deve essere impostato nel costruttore.
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
-          <div id="box-e2" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">class Libro {
-    const int isbn_;
-    std::string titolo_;
-public:
-    Libro(int isbn, std::string t) : isbn_{isbn}, titolo_{std::move(t)} {}
-    int isbn() const { return isbn_; }
-};</code></pre>
-          </div>
-        </li>
-
-        <li><b>E3 — Ordine di inizializzazione</b><br/>
-          <em>Testo:</em> Correggi la classe seguente affinché <code>a_</code> sia inizializzato usando il valore di <code>b_</code> in modo definito.
-<pre><code class="language-cpp">class Demo {
-    int a_;
-    int b_;
-public:
-    Demo(int x) : b_{x}, a_{b_} {}
-};</code></pre>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra ▼</button></div>
-          <div id="box-e3" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">class Demo {
-    int b_;
-    int a_;
-public:
-    Demo(int x) : b_{x}, a_{b_} {}   // ora l'ordine delle dichiarazioni rende definito l'uso
-};</code></pre>
-          </div>
-        </li>
-      </ol>
     </div>
 
     <div class="inner-box note">
