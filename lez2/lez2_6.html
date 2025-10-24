@@ -3,63 +3,59 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA – Lez2.6 · Archivi dati con array / vector di struct</title>
+  <title>4BIA – Lez3_5 · Perché NON serializzare una struct “a crudo”</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez2_5.html"; }
-    function nextSlide(){ window.location.href = "../lez3/lez3_1.html"; } // prossima unità
+    function prevSlide(){ window.location.href = "lez3_4.html"; }
+    function nextSlide(){ window.location.href = "lez3_6.html"; }
     function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
     function toggleBox(btnId, boxId){
       const box = document.getElementById(boxId);
       const btn = document.getElementById(btnId);
       const open = box.style.display === 'block';
       box.style.display = open ? 'none' : 'block';
-      if(btn) btn.textContent = open ? 'Mostra soluzione ▼' : 'Nascondi soluzione ▲';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
     }
   </script>
+  <!-- allineamento forte a sinistra + box evidenziati -->
   <style>
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
+    .inner-box pre, .inner-box code, .content-box { text-align:left !important; }
+    .inner-box ul, .inner-box ol { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside; }
+    .inner-box li { margin:.25rem 0; }
+    pre, pre code { text-align:left !important; white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; }
+
     .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
-    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
-    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; display:inline-block }
-    .tip  { font-style: italic; opacity:.9 }
-    .spec { margin:.2rem 0 .5rem }
-    .spec b { display:inline-block; width:10.5rem }
-    /* allineamento forte a sinistra per testi, elenchi e codice */
-    .inner-box, .inner-box p, .inner-box ul, .inner-box li, .inner-box h2, .inner-box h3 { text-align:left !important; }
-    .inner-box ul { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
-    .inner-box li { margin:.25rem 0 }
-    .inner-box pre,
-    .inner-box pre code,
-    .box pre,
-    .box pre code,
-    pre,
-    pre code { text-align:left !important; }
-    pre { white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; }
-    pre code { display:block; }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; display:inline-block; }
+    .tip  { font-style:italic; opacity:.95 }
+    ul.checklist li { margin:.35rem 0; }
   </style>
 </head>
 <body>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 2 — Struct (ripasso mirato)</h2>
+  <h2>Lezione 3 — File I/O</h2>
   <ul>
-    <li><a href="lez2_1.html">Lez2.1: Motivazione &amp; sintassi base</a></li>
-    <li><a href="lez2_2.html">Lez2.2: Inizializzazioni in C/C++</a></li>
-    <li><a href="lez2_3.html">Lez2.3: Passaggio a funzione</a></li>
-    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct &amp; lambda</a></li>
-    <li><a href="lez2_5.html">Lez2.5: Layout, sizeof, padding &amp; align</a></li>
-    <li><a href="lez2_6.html" class="active">Lez2.6: Archivi con array/vector di struct</a></li>
+    <li><a href="lez3_1.html">Lez3_1: Concetti di file</a></li>
+    <li><a href="lez3_2.html">Lez3_2: File testuali (C++)</a></li>
+    <li><a href="lez3_3.html">Lez3_3: File binari (base)</a></li>
+    <li><a href="lez3_4.html">Lez3_4: Binari portabili (formati)</a></li>
+    <li><a href="lez3_5.html" class="active">Lez3_5: Perché NON scrivere struct “raw”</a></li>
+    <li><a href="lez3_6.html">Lez3_6: Binario in C (esercizi)</a></li>
+    <li><a href="lez3_7.html">Lez3_7: Indici per file binari</a></li>
+    <li><a href="lez3_seek.html">Extra: Cursore &amp; posizionamento</a></li>
   </ul>
 </div>
 <!-- END MENU -->
 
 <div class="slide">
-  <h1>Lez2.6 — Archivi dati con array / <code>std::vector</code> di <code>struct</code></h1>
+  <h1>Perché <em>non conviene</em> scrivere/leggere una <code>struct</code> “a crudo”</h1>
 
   <div class="nav-buttons" style="margin-bottom:10px">
     <button onclick="prevSlide()">&#8592; Indietro</button>
@@ -68,448 +64,219 @@
 
   <div class="content-box">
 
-    <div class="inner-box">
-      <h2>Obiettivi e contesto</h2>
+    <div class="inner-box box">
+      <h2>Obiettivo della lezione</h2>
       <p>
-        Progettare e manipolare un <strong>archivio di record</strong> (es. studenti, libri, prodotti) usando:
-        <strong>array statici</strong> e <strong><code>std::vector</code></strong> di <code>struct</code>. Operazioni tipiche:
-        <em>inserimento</em>, <em>stampa</em>, <em>ricerca</em>, <em>modifica</em>, <em>ordinamento</em>, <em>rimozione</em>.
+        A volte si pensa: “Ho una <code>struct</code>. La salvo su file con un colpo solo usando
+        <code>fwrite(&amp;s, sizeof s, 1, f)</code> e poi la rileggo uguale”. <b>Sembra comodo</b>, ma è
+        <b>fragile e non portabile</b>. In questa lezione capiamo <em>perché</em> e <em>come</em> farlo nel modo giusto.
       </p>
-      <p class="note"><b>Scelta di rappresentazione</b>: array statico ⇒ capacità fissa, gestione manuale dell’“occupato”; 
-        <code>std::vector</code> ⇒ capacità dinamica, algoritmi STL, gestione memoria automatica.</p>
+      <p class="ok"><b>Idea chiave:</b> su disco vogliamo un <strong>formato stabile</strong> (uguale su PC diversi e in anni diversi). Per ottenerlo, scriviamo i <em>campi</em> uno alla volta con regole precise.</p>
     </div>
 
-    <div class="inner-box box">
-      <h2>Invarianti e chiavi (mettiamoci d’accordo prima!)</h2>
+    <div class="inner-box">
+      <h2>Glossario</h2>
       <ul>
-        <li><b>Record</b>: <code>Studente{nome,cognome,eta,media}</code>.</li>
-        <li><b>Chiave logica</b>: <code>(cognome, nome)</code> (esempio). Decidi se ammetti <b>duplicati</b> o se l’inserimento deve rifiutarli.</li>
-        <li><b>Archivio ordinato?</b> Se lo mantieni ordinato per la chiave, puoi usare <b>ricerca binaria</b> (<code>O(log n)</code>) e inserimenti “al posto giusto”.</li>
-        <li><b>Consistenza</b>: definisci e rispetta queste regole in TUTTE le funzioni (niente sorprese a metà corso).</li>
+        <li><b>Allineamento</b>: alcuni tipi (es. <code>int</code>, <code>double</code>) vogliono partire a indirizzi multipli di 2/4/8 byte. È una regola della CPU/ABI.</li>
+        <li><b>Padding</b>: byte “di riempimento” inseriti dal compilatore per rispettare l’allineamento.</li>
+        <li><b>Endianness</b>: ordine dei byte di un numero (little-endian ↔ big-endian). Computer diversi possono usare ordini diversi.</li>
+        <li><b>ABI</b>: insieme di regole della piattaforma (dimensione dei tipi, allineamenti, convenzioni...). Cambiando ABI, può cambiare il layout in memoria.</li>
       </ul>
     </div>
 
-    <!-- MODELLO DATI -->
-    <div class="box">
-      <h2>Modello dati (C++)</h2>
-<pre><code class="language-cpp">#include &lt;string&gt;
-
-struct Studente {
-    std::string nome, cognome;
-    int eta = 0;
-    double media = 0.0;
-};
-</code></pre>
-      <p>È il nostro <em>record</em> base. Usiamo le <code>std::string</code> per gestire stringhe in modo sicuro.</p>
-    </div>
-
-    <!-- ARRAY STATICO -->
-    <div class="box">
-      <h2>Archivio con <em>array statico</em> (capacità fissa)</h2>
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-#include &lt;string&gt;
-
-constexpr std::size_t MAXN = 100;
-
-struct Studente { std::string nome, cognome; int eta=0; double media=0.0; };
-
-struct ArchivioArray {
-    Studente v[MAXN];
-    std::size_t n = 0; // quanti elementi sono realmente occupati
-
-    bool inserisci(const Studente&amp; s) {
-        if (n == MAXN) return false;
-        v[n++] = s;                 // copia in coda
-        return true;
-    }
-
-    void stampa() const {
-        for (std::size_t i = 0; i &lt; n; ++i) {
-            std::cout &lt;&lt; v[i].cognome &lt;&lt; " " &lt;&lt; v[i].nome
-                      &lt;&lt; " — età: " &lt;&lt; v[i].eta
-                      &lt;&lt; ", media: " &lt;&lt; v[i].media &lt;&lt; "\n";
-        }
-    }
-
-    // ricerca lineare per cognome+nome
-    int trova(const std::string&amp; cogn, const std::string&amp; nome) const {
-        for (std::size_t i = 0; i &lt; n; ++i)
-            if (v[i].cognome == cogn &amp;&amp; v[i].nome == nome)
-                return static_cast&lt;int&gt;(i);
-        return -1;
-    }
-
-    // rimozione "compatta": shift a sinistra
-    bool rimuoviIndice(std::size_t idx) {
-        if (idx &gt;= n) return false;
-        for (std::size_t i = idx+1; i &lt; n; ++i) v[i-1] = std::move(v[i]);
-        --n;
-        return true;
-    }
-};
-</code></pre>
-      <p>
-        <b>Spiegazione.</b> Manteniamo un contatore <code>n</code> di elementi validi. Inserire in coda è <code>O(1)</code> (se c’è spazio);
-        cercare e rimuovere richiede <code>O(n)</code> (ricerca lineare e shift).
-      </p>
-      <p class="warn"><b>Limite:</b> capacità fissa <code>MAXN</code>. Se devi crescere dinamicamente, passa a <code>std::vector</code>.</p>
-    </div>
-
-    <!-- VECTOR -->
-    <div class="box">
-      <h2>Archivio con <code>std::vector&lt;Studente&gt;</code> (dinamico)</h2>
-<pre><code class="language-cpp">#include &lt;vector&gt;
-#include &lt;algorithm&gt; // sort, remove_if, find_if, lower_bound
-#include &lt;iostream&gt;
-
-struct ArchivioVector {
-    std::vector&lt;Studente&gt; v;
-
-    void inserisci(const Studente&amp; s) {
-        v.push_back(s); // o v.emplace_back("Ada","Lovelace",17,9.4);
-    }
-
-    void stampa() const {
-        for (const auto&amp; s : v)
-            std::cout &lt;&lt; s.cognome &lt;&lt; " " &lt;&lt; s.nome
-                      &lt;&lt; " — età: " &lt;&lt; s.eta
-                      &lt;&lt; ", media: " &lt;&lt; s.media &lt;&lt; "\n";
-    }
-
-    // ricerca lineare: predicato con lambda
-    int trova(const std::string&amp; cogn, const std::string&amp; nome) const {
-        auto it = std::find_if(v.begin(), v.end(),
-            [&](const Studente&amp; s){ return s.cognome==cogn &amp;&amp; s.nome==nome; });
-        return (it==v.end()) ? -1 : static_cast&lt;int&gt;(it - v.begin());
-    }
-
-    // ordinamento: cognome, poi nome (chiavi multiple)
-    void ordina() {
-        std::sort(v.begin(), v.end(),
-            [](const Studente&amp; a, const Studente&amp; b){
-                if (a.cognome != b.cognome) return a.cognome &lt; b.cognome;
-                return a.nome &lt; b.nome;
-            });
-    }
-
-    // rimozione con erase-remove idiom (per condizione)
-    void rimuoviMediaSotto(double k) {
-        v.erase(std::remove_if(v.begin(), v.end(),
-            [k](const Studente&amp; s){ return s.media &lt; k; }),
-            v.end());
-    }
-};
-</code></pre>
-      <p>
-        <b>Note operative.</b> <code>push_back</code> è <em>amortized</em> <code>O(1)</code>. 
-        <code>erase</code>/<code>remove_if</code> è <code>O(n)</code>. 
-        Le <em>riallocazioni</em> possono <b>invalidare</b> puntatori/riferimenti/iteratori: se puoi, chiama <code>reserve(N)</code>.
-      </p>
-    </div>
-
-    <!-- LAMBDA APPENDIX -->
     <div class="inner-box box">
-      <h2>Appendice — Funzioni <em>lambda</em> (C++): guida pratica</h2>
+      <h2>1) Padding &amp; allineamento: perché sono un problema</h2>
+      <p>Il compilatore può inserire byte “cuscinetto” tra i campi. Quei byte finiscono <b>nel file</b> se salvi la struct a blocchi.</p>
+<pre><code class="language-cpp">struct A { char c; int x; };
+// Spesso: sizeof(A) == 8 (non 5) a causa del padding</code></pre>
+      <ul>
+        <li>La quantità e la posizione del padding dipendono da compilatore/ABI/opzioni e possono cambiare nel tempo.</li>
+        <li>Il file scritto oggi potrebbe non essere leggibile domani da una build diversa.</li>
+      </ul>
+      <p class="warn"><b>Conclusione:</b> il layout “in memoria” non è un buon formato “su disco”.</p>
+    </div>
 
-      <h3>1) Cos’è una lambda (come si legge)</h3>
-<pre><code class="language-cpp">[catture] (parametri) -&gt; tipo_ritorno {
-    // corpo: restituisce un valore (o void)
+    <div class="inner-box box">
+      <h2>2) Padding non inizializzato: rischi pratici</h2>
+      <ul>
+        <li>Il padding può contenere <em>spazzatura</em> (byte casuali) → rischi di <b>leak</b> di informazioni.</li>
+        <li>Due struct “uguali” per campi possono essere diverse byte-a-byte → <code>memcmp</code> inaffidabile.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>3) Endianness &amp; rappresentazione dei tipi</h2>
+      <ul>
+        <li>Gli interi multi-byte dipendono dall’endian del PC: i byte possono risultare invertiti su un’altra macchina.</li>
+        <li>I <code>float/double</code> di solito sono IEEE-754, ma l’ordine dei byte può comunque cambiare.</li>
+      </ul>
+      <p class="ok"><b>Esempio:</b> <code>uint16_t v = 0x1234;</code> → su little-endian il file contiene <code>34 12</code>, su big-endian <code>12 34</code>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>4) Dimensioni dei tipi non uniformi</h2>
+      <p>Tipi come <code>long</code>, <code>size_t</code>, <code>wchar_t</code>, <code>enum</code>… non hanno la stessa dimensione ovunque.</p>
+      <p class="warn"><b>Esempio reale:</b> su Windows 64-bit (<em>LLP64</em>) <code>long</code> è 32 bit; su Linux/macOS 64-bit (<em>LP64</em>) <code>long</code> è 64 bit.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>5) Bit-field: il packing è “a scelta” dell’implementazione</h2>
+      <p>Stesse dichiarazioni possono diventare byte su disco diversi a seconda del compilatore/ABI. Evita di salvarli “raw”.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>6) (C++) Oggetti “non banali”</h2>
+      <ul>
+        <li>Classi con <em>virtual</em> (vtable) o ereditarietà: <b>no</b> alla scrittura “raw”.</li>
+        <li>Membri non trivially copyable (<code>std::string</code>, <code>std::vector</code>…): salveresti puntatori interni, non i dati veri.</li>
+      </ul>
+      <p class="warn">Anche per tipi banali: cambiare l’ordine/numero dei campi rompe la compatibilità binaria.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>7) Sicurezza &amp; manutenzione</h2>
+      <ul>
+        <li>Possibile esposizione involontaria di byte di memoria (padding, puntatori).</li>
+        <li>Basta una ricompilazione con altre opzioni per <b>rompere</b> il formato “raw”.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>8) “<code>#pragma pack</code>” non è la soluzione</h2>
+      <ul>
+        <li>Riduce il padding ma è <b>non portabile</b> (diverso tra compilatori) e non risolve l’endianness.</li>
+        <li>Può causare accessi disallineati (lenti o addirittura non validi su alcune CPU).</li>
+      </ul>
+      <p class="tip">Usalo solo quando devi rispettare un layout “imposto” e tratta quei record come <em>blob</em> di byte, non come oggetti da dereferenziare.</p>
+    </div>
+
+    <div class="inner-box">
+      <h2><em>Mai</em> scrivere “raw”?</h2>
+      <p>Solo per cache temporanee locali, lette e scritte dalla <b>stessa build</b> sulla <b>stessa macchina</b>. Anche lì:</p>
+      <ul>
+        <li>Metti un header con <b>magic</b>, <b>versione</b>, <b>sizeof(T)</b>, checksum.</li>
+        <li>Limita i tipi a quelli <em>banali</em> (<code>std::is_trivially_copyable_v&lt;T&gt;</code> in C++).</li>
+        <li>Azzera la struct prima di riempirla (per non scrivere padding “sporco”).</li>
+      </ul>
+    </div>
+
+    <div class="inner-box">
+      <h2>La strada giusta: <em>formato esplicito</em> campo-per-campo</h2>
+
+      <div class="box">
+        <h3>Regole semplici (portabili)</h3>
+        <ul>
+          <li>Scrivi i campi in un <b>ordine documentato</b> e sempre uguale.</li>
+          <li>Usa <b>tipi a larghezza fissa</b> (<code>uint32_t</code>, <code>int16_t</code>, …).</li>
+          <li>Scegli un’<b>endianness di formato</b> (spesso big-endian “network order”) e converti in scrittura/lettura.</li>
+          <li>Apri i file in <b>modalità binaria</b> (<code>"wb"</code>, <code>"rb"</code>) per evitare la traduzione delle newline su Windows.</li>
+        </ul>
+      </div>
+
+      <div class="box">
+        <h3>C (funzioni d’aiuto per interi a 32 bit big-endian)</h3>
+<pre><code class="language-c">#include &lt;stdint.h&gt;
+#include &lt;stdio.h&gt;
+
+static inline uint32_t to_be32(uint32_t x) {
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    return __builtin_bswap32(x);
+#else
+    return x;
+#endif
+}
+
+void write_u32_be(FILE* f, uint32_t v) {
+    uint32_t be = to_be32(v);
+    fwrite(&be, 1, 4, f);
+}
+
+uint32_t read_u32_be(FILE* f) {
+    uint32_t be;
+    fread(&be, 1, 4, f);
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    return __builtin_bswap32(be);
+#else
+    return be;
+#endif
 }</code></pre>
-      <ul>
-        <li><b>Catture</b>: cosa “importo” dal contesto esterno (per valore <code>[x]</code> o per riferimento <code>[&amp;x]</code>).</li>
-        <li><b>Parametri</b>: come una funzione normale (<code>(const Studente&amp; s)</code>, …).</li>
-        <li><b>Ritorno</b>: di solito dedotto; se ci sono rami multipli, puoi esplicitare <code>-&gt; bool</code>, <code>-&gt; int</code>, ecc.</li>
-      </ul>
-      <p class="ok"><b>Intuizione:</b> una lambda è una “mini-funzione” definita sul posto, ideale per passare <em>comportamenti</em> ad algoritmi STL (sort, find_if, …).</p>
+      </div>
 
-      <h3>2) Le lambda che usiamo (e perché)</h3>
-      <ul>
-        <li><b>Predicato di ricerca</b> per <code>std::find_if</code>:
-<pre><code class="language-cpp">auto it = std::find_if(v.begin(), v.end(),
-    [&](const Studente&amp; s){ return s.cognome==cogn &amp;&amp; s.nome==nome; });</code></pre>
-          Dice se l’elemento corrente soddisfa la condizione. Catturiamo <code>cogn</code>/<code>nome</code> (per riferimento o per valore se piccoli).</li>
+      <div class="box">
+        <h3>C++23 (conversione endianness generica)</h3>
+<pre><code class="language-cpp">#include &lt;bit&gt;
+#include &lt;cstdint&gt;
+#include &lt;concepts&gt;
 
-        <li><b>Filtro</b> per <code>remove_if</code> (con <code>erase</code>):
-<pre><code class="language-cpp">v.erase(std::remove_if(v.begin(), v.end(),
-    [k](const Studente&amp; s){ return s.media &lt; k; }),
-    v.end());</code></pre>
-          Il predicato restituisce <code>true</code> per gli elementi da rimuovere.</li>
+template &lt;std::unsigned_integral T&gt;
+T to_be(T x) {
+    if constexpr (std::endian::native == std::endian::little)
+        return std::byteswap(x);
+    else
+        return x;
+}</code></pre>
+        <p class="note"><b>Se non hai C++23</b>, usa routine come in C (bswap) o librerie/utility equivalenti.</p>
+      </div>
 
-        <li><b>Comparatore</b> per <code>std::sort</code>:
-<pre><code class="language-cpp">std::sort(v.begin(), v.end(),
-    [](const Studente&amp; a, const Studente&amp; b){
-        if (a.cognome != b.cognome) return a.cognome &lt; b.cognome;
-        return a.nome &lt; b.nome;
-    });</code></pre>
-          Deve definire un <b>ordine coerente</b> (ordinamento debole stretto).</li>
-
-        <li><b>Comparatore eterogeneo</b> per <code>std::lower_bound</code>:
-<pre><code class="language-cpp">auto key = [&](const Studente&amp; s){ return std::pair{s.cognome, s.nome}; };
-auto it  = std::lower_bound(v.begin(), v.end(), std::pair{cogn, nome},
-    [&](const Studente&amp; s, const std::pair&lt;std::string,std::string&gt;&amp; t){
-        return key(s) &lt; t;
-    });</code></pre>
-          Confronta un <code>Studente</code> con una <code>pair&lt;string,string&gt;</code> senza oggetti temporanei superflui.</li>
-      </ul>
-
-      <h3>3) Equivalenti senza lambda (per capire cosa succede “dietro”)</h3>
-      <div class="note"><b>Predicato di ricerca</b> (find_if):</div>
-<pre><code class="language-cpp">struct PredRicerca {
-    const std::string&amp; cogn; const std::string&amp; nome;
-    bool operator()(const Studente&amp; s) const {
-        return s.cognome==cogn &amp;&amp; s.nome==nome;
-    }
-};
-// std::find_if(v.begin(), v.end(), PredRicerca{cogn, nome});</code></pre>
-
-      <div class="note"><b>Comparatore sort</b> (cognome, poi nome):</div>
-<pre><code class="language-cpp">struct CmpCognomeNome {
-    bool operator()(const Studente&amp; a, const Studente&amp; b) const {
-        if (a.cognome != b.cognome) return a.cognome &lt; b.cognome;
-        return a.nome &lt; b.nome;
-    }
-};
-// std::sort(v.begin(), v.end(), CmpCognomeNome{});</code></pre>
-
-      <div class="note"><b>Comparatore lower_bound</b> (Studente vs pair):</div>
-<pre><code class="language-cpp">struct Key { std::string cogn, nome; };
-struct CmpStudenteVsKey {
-    bool operator()(const Studente&amp; s, const Key&amp; k) const {
-        if (s.cognome != k.cogn) return s.cognome &lt; k.cogn;
-        return s.nome &lt; k.nome;
-    }
-};
-// std::lower_bound(v.begin(), v.end(), Key{cogn, nome}, CmpStudenteVsKey{});</code></pre>
-
-      <h3>4) Catture: cosa scegliere e quando</h3>
-      <ul>
-        <li><code>[x]</code>: copia <code>x</code> (sicuro, ma copia dati). Bene per <em>piccoli</em> fondamentali.</li>
-        <li><code>[&amp;x]</code>: riferimento a <code>x</code> (niente copia). Attento alla <b>vita</b> di <code>x</code>: deve restare valida.</li>
-        <li><code>[=]</code>/<code>[&amp;]</code>: catture “tutto” — <b>sconsigliate</b> didatticamente: poco esplicite.</li>
-        <li><code>[k = expr]</code>: inizializzazione esplicita della cattura (utile per trasformazioni).</li>
-      </ul>
-      <p class="warn"><b>Regola di sicurezza:</b> niente riferimenti pendenti (dangling). Se non sei sicuro, cattura per <b>valore</b>.</p>
-
-      <h3>5) Comparatori corretti (per <code>sort</code> e <code>lower_bound</code>)</h3>
-      <ul>
-        <li>Devono implementare un <b>ordinamento debole stretto</b>: transitivo, antisimmetrico, consistente.</li>
-        <li>Usa <code>&lt;</code> (non <code>&lt;=</code>) e tie-break chiari (cognome→nome, ecc.).</li>
-        <li>Niente effetti collaterali: non modificare gli oggetti dentro il comparatore.</li>
-      </ul>
-
-      <h3>6) Checklist rapida</h3>
-      <ul>
-        <li>Predicati (<code>find_if</code>, <code>remove_if</code>): <code>bool(const T&amp;)</code>, nessun effetto collaterale.</li>
-        <li>Comparatori (<code>sort</code>): <code>bool(const T&amp;, const T&amp;)</code>, coerenti; per <code>lower_bound</code> anche forme eterogenee.</li>
-        <li>Catture specifiche (<code>[k]</code>, <code>[&amp;k]</code>), evita <code>[=]</code>/<code>[&amp;]</code>.</li>
-        <li>Attento alla <b>vita</b> delle variabili catturate; se in dubbio, cattura per valore.</li>
-      </ul>
+      <div class="box">
+        <h3>Evita puntatori e bit-field nel formato</h3>
+        <p>Per stringhe salva <b>prima la lunghezza</b>, poi i caratteri. Per record variabili usa blocchi “TLV” (Type-Length-Value) o un piccolo <b>header</b> con <i>magic</i>, versione e conteggi.</p>
+      </div>
     </div>
 
-    <!-- ORDINAMENTO E RICERCA BINARIA -->
-    <div class="box">
-      <h2>Archivio ordinato: ricerca binaria</h2>
-<pre><code class="language-cpp">#include &lt;algorithm&gt; // sort, lower_bound
-
-// Supponiamo archivio.v ordinato per (cognome, nome)
-int trovaBinaria(const std::vector&lt;Studente&gt;& v,
-                 const std::string&amp; cogn, const std::string&amp; nome)
-{
-    auto key = [&](const Studente&amp; s){ return std::pair{s.cognome, s.nome}; };
-    auto target = std::pair{cogn, nome};
-
-    auto it = std::lower_bound(v.begin(), v.end(), target,
-        [&](const Studente&amp; s, const std::pair&lt;std::string,std::string&gt;& t){
-            return key(s) &lt; t;
-        });
-
-    if (it != v.end() &amp;&amp; it-&gt;cognome==cogn &amp;&amp; it-&gt;nome==nome)
-        return static_cast&lt;int&gt;(it - v.begin());
-    return -1;
-}
-</code></pre>
-      <p class="ok"><b>Vantaggio:</b> su archivio ordinato la ricerca passa da <code>O(n)</code> (lineare) a <code>O(log n)</code> (binaria). Inserimenti “al posto giusto” con <code>lower_bound</code>.</p>
-    </div>
-
-    <!-- APPENDICE CAST -->
-    <div class="inner-box box">
-      <h2>Appendice — <code>static_cast</code> vs cast in stile C (C++)</h2>
-      <p>
-        In C++ esistono i <b>cast espliciti “sicuri”</b> (come <code>static_cast</code>) e il <b>cast tradizionale</b> “in stile C”
-        <code>(Tipo)espr</code>. Sembrano equivalenti ma NON lo sono: il C-cast è più permissivo, meno leggibile e può nascondere
-        conversioni rischiose.
-      </p>
-      <h3>1) Perché preferire <code>static_cast</code></h3>
-      <ul>
-        <li><b>Intenzionalità</b>: si legge “qui voglio una conversione statica a quel tipo”.</li>
-        <li><b>Controllo del compilatore</b>: permette solo conversioni <em>consentite</em> a compile-time; non rimuove <code>const</code>, non fa reinterpretazioni selvagge.</li>
-        <li><b>Diagnostica migliore</b>: in caso di errore, messaggi più chiari.</li>
-      </ul>
-
-      <h3>2) Esempi pratici (dal nostro codice)</h3>
-<pre><code class="language-cpp">// differenza tra iteratori (ptrdiff_t / signed size) -> int
-// ✔️ meglio esplicitarlo con static_cast
-int idx = static_cast&lt;int&gt;(it - v.begin());
-
-// ❌ stile C: compila ma è meno chiaro e può "nascondere" warning
-int idx2 = (int)(it - v.begin());
-</code></pre>
-      <p class="note">La conversione resta a carico tuo: se l’indice non entra in <code>int</code> potresti perdere informazioni.
-        Il <code>static_cast</code> non “magicamente” rende sicuro: rende solo <em>esplicito</em> l’intento e lascia al compilatore fare più controlli.</p>
-
-      <h3>3) Confronto sintetico</h3>
-      <ul>
-        <li><code>(T)expr</code> (C-cast) ⇢ può comportarsi come <code>static_cast</code>, <code>const_cast</code> o <code>reinterpret_cast</code> a seconda dei casi:
-            <b>troppo potente</b>, meno leggibile, rischioso.</li>
-        <li><code>static_cast&lt;T&gt;(expr)</code> ⇢ solo conversioni “di tipo” ammesse a compile-time (numeriche, up/downcast senza virtual,
-            puntatore base⇄derivata con responsabilità tua, ecc.); <b>non</b> rimuove <code>const</code>, <b>non</b> reinterpretazioni di bit.</li>
-      </ul>
-
-      <h3>4) Linee guida didattiche</h3>
-      <ul>
-        <li>In C++ usa <b><code>static_cast</code></b> per conversioni numeriche o tra tipi correlati (iterator diff → int, double → int consapevole, ecc.).</li>
-        <li>Evita il C-cast: può nascondere operazioni “forti” non ovvie a chi legge.</li>
-      </ul>
-      <p class="ok"><b>TL;DR</b>: in C++ <em>quasi sempre</em> meglio <code>static_cast</code> del C-cast: è più leggibile, limitato, controllabile.</p>
-    </div>
-
-    <!-- PARTE C -->
-    <div class="box">
-      <h2>C — Archivio con array di struct</h2>
-<pre><code class="language-c">#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-
-#define MAXN 100
-
-typedef struct { char nome[32], cognome[32]; int eta; double media; } Studente;
-
-typedef struct {
-    Studente v[MAXN];
-    size_t n;
-} Archivio;
-
-int inserisci(Archivio* A, Studente s){
-    if (A-&gt;n == MAXN) return 0;
-    A-&gt;v[A-&gt;n++] = s;
-    return 1;
-}
-
-int trova(const Archivio* A, const char* cogn, const char* nome){
-    for (size_t i=0; i&lt;A-&gt;n; ++i)
-        if (strcmp(A-&gt;v[i].cognome,cogn)==0 &amp;&amp; strcmp(A-&gt;v[i].nome,nome)==0)
-            return (int)i;
-    return -1;
-}
-
-int rimuoviIndice(Archivio* A, size_t idx){
-    if (idx &gt;= A-&gt;n) return 0;
-    for (size_t i=idx+1; i&lt;A-&gt;n; ++i) A-&gt;v[i-1] = A-&gt;v[i];
-    --A-&gt;n;
-    return 1;
-}
-</code></pre>
-      <p><b>Spiegazione.</b> Stessa logica dell’array statico in C++: contatore <code>n</code>, ricerca lineare, rimozione con compattazione.</p>
-    </div>
-
-    <!-- COMPLESSITÀ -->
-    <div class="inner-box box">
-      <h2>Complessità (riassunto)</h2>
-      <ul>
-        <li><b>Inserisci in coda</b>: <code>O(1)</code> (array se c’è spazio) / <em>amortized</em> <code>O(1)</code> (<code>vector</code>).</li>
-        <li><b>Ricerca lineare</b>: <code>O(n)</code>; <b>ricerca binaria</b> su archivio ordinato: <code>O(log n)</code>.</li>
-        <li><b>Rimozione per indice</b>: <code>O(n)</code> (shift).</li>
-        <li><b>Ordinamento</b>: <code>O(n log n)</code> con <code>std::sort</code>.</li>
-      </ul>
-    </div>
-
-    <!-- PITFALL -->
     <div class="inner-box">
-      <h2>Pitfall comuni (e rimedi)</h2>
-      <ul>
-        <li><b>Duplicati non gestiti</b>. <br/><br/><span class="ok">Stabilisci una <b>policy</b>: vietati (rifiuta inserimento) o consentiti (consapevole).</span></li>
-        <li><b>Vector: invalidazione</b> di iteratori/riferimenti dopo <code>push_back</code>/<code>erase</code>. <br/><br/><span class="ok">Usa indici o <code>reserve()</code> e ricrea gli iteratori dopo le operazioni.</span></li>
-        <li><b>Comparatori incoerenti</b> in sort. <br/><br/><span class="ok">Definisci un ordine chiaro (chiavi in cascata) e usa <code>&lt;</code>, non <code>&lt;=</code>.</span></li>
-        <li><b>Uso di <code>strcmp</code> senza controllo</b> (C). <br/><br/><span class="ok">Assicurati che le stringhe siano terminate da <code>'\0'</code> e che i campi abbiano capienza.</span></li>
+      <h2>Esempio “prima/dopo” (chiaro e concreto)</h2>
+      <div class="box">
+        <h3>❌ Sconsigliato (dump “raw”)</h3>
+<pre><code class="language-cpp">struct Rec { char tag; int value; };
+fwrite(&rec, sizeof rec, 1, f); // dipende da padding, endianness, ABI: NON portabile</code></pre>
+      </div>
+      <div class="box">
+        <h3>✅ Consigliato (formato esplicito)</h3>
+<pre><code class="language-c">// Formato: tag (1 byte), value (u32 big-endian)
+fputc(rec.tag, f);
+write_u32_be(f, (uint32_t)rec.value);
+
+// Lettura
+rec.tag   = fgetc(f);
+rec.value = (int)read_u32_be(f);</code></pre>
+        <p class="ok">Ora il file è stabile: qualsiasi lettore che rispetta le stesse regole rilegge i dati corretti.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Checklist rapida (prima di scrivere su file)</h2>
+      <ul class="checklist">
+        <li>[ ] Tipi a larghezza fissa (<code>uint32_t</code>, …)</li>
+        <li>[ ] Endianness di formato decisa (spesso big-endian)</li>
+        <li>[ ] Niente puntatori/bit-field nel formato</li>
+        <li>[ ] Evita <code>long</code>/<code>size_t</code>/<code>bool</code> “raw”</li>
+        <li>[ ] Header con magic + versione (+ checksum se utile)</li>
+        <li>[ ] File in modalità <b>binaria</b> (<code>"wb"</code>/<code>"rb"</code>)</li>
+        <li>[ ] In C++ confronta i <b>campi</b>, non i byte (niente <code>memcmp</code> sulle struct)</li>
       </ul>
     </div>
 
-    <!-- ESERCIZI -->
+    <!-- Esercizi brevi con soluzione a comparsa -->
     <div class="inner-box">
-      <h2>Esercizi (testi completi + soluzioni a comparsa)</h2>
+      <h2>Esercizi (brevi, mirati)</h2>
       <ol>
-        <li><strong>E1 — Archivio studenti (C++)</strong><br/>
-          <div class="spec"><b>Richiesta:</b> implementa <code>aggiungiSeNuovo(ArchivioVector&amp;, const Studente&amp;)</code> che inserisce solo se la chiave (cognome,nome) non esiste già.</div>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra soluzione ▼</button></div>
+        <li><b>E1 — Individua i rischi</b><br/>
+          <em>Testo:</em> Hai <code>struct A{char c; int x;}</code>. Spiega perché <code>fwrite(&amp;a,sizeof a,1,f)</code> non è portabile e cosa succede cambiando compilatore/ABI.
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
           <div id="box-e1" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">void aggiungiSeNuovo(ArchivioVector&amp; A, const Studente&amp; s) {
-    auto it = std::find_if(A.v.begin(), A.v.end(),
-        [&](const Studente&amp; x){ return x.cognome==s.cognome &amp;&amp; x.nome==s.nome; });
-    if (it == A.v.end()) A.v.push_back(s);
-}
-</code></pre>
+            <p class="note">Per via del <b>padding</b> e dell’<b>allineamento</b> <code>sizeof(A)</code> include byte non “logici”. Cambiando compilatore/ABI cambia il layout → il file diventa incompatibile.</p>
           </div>
         </li>
-
-        <li><strong>E2 — Promossi (C++)</strong><br/>
-          <div class="spec"><b>Richiesta:</b> data una soglia <code>k</code>, restituisci un nuovo <code>std::vector&lt;Studente&gt;</code> con chi ha <code>media ≥ k</code> e <code>eta ≥ 14</code>, senza modificare l’archivio originale.</div>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra soluzione ▼</button></div>
+        <li><b>E2 — Riscrivi in formato esplicito</b><br/>
+          <em>Testo:</em> Per <code>struct Rec{char tag; int value;}</code> scrivi la strategia di salvataggio/lettura portabile.
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
           <div id="box-e2" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">std::vector&lt;Studente&gt; promossi(const ArchivioVector&amp; A, double k){
-    std::vector&lt;Studente&gt; out;
-    out.reserve(A.v.size());
-    std::copy_if(A.v.begin(), A.v.end(), std::back_inserter(out),
-                 [k](const Studente&amp; s){ return s.media >= k &amp;&amp; s.eta >= 14; });
-    return out;
-}
-</code></pre>
-          </div>
-        </li>
-
-        <li><strong>E3 — Inserimento ordinato (C++)</strong><br/>
-          <div class="spec"><b>Richiesta:</b> mantieni l’archivio sempre ordinato per (cognome, nome). Implementa <code>inserisciOrdinato(ArchivioVector&amp;, const Studente&amp;)</code> con <code>lower_bound</code> (no duplicati).</div>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra soluzione ▼</button></div>
-          <div id="box-e3" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">void inserisciOrdinato(ArchivioVector&amp; A, const Studente&amp; s){
-    auto key = [](const Studente&amp; t){ return std::pair{t.cognome, t.nome}; };
-    auto it = std::lower_bound(A.v.begin(), A.v.end(), key(s),
-        [&](const Studente&amp; x, const std::pair&lt;std::string,std::string&gt;&amp; k){
-            return key(x) &lt; k;
-        });
-    if (it == A.v.end() || key(*it) != key(s)) A.v.insert(it, s);
-}
-</code></pre>
-          </div>
-        </li>
-
-        <li><strong>E4 — C: rimozione per condizione</strong><br/>
-          <div class="spec"><b>Richiesta:</b> in C, scrivi <code>rimuovi_media_sotto(Archivio*, double k)</code> che rimuove <em>in place</em> tutti gli studenti con media &lt; k (compattando con shift).</div>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e4" onclick="toggleBox('btn-e4','box-e4')">Mostra soluzione ▼</button></div>
-          <div id="box-e4" style="display:none;margin-top:8px">
-<pre><code class="language-c">void rimuovi_media_sotto(Archivio* A, double k){
-    size_t write = 0;
-    for (size_t read=0; read&lt;A-&gt;n; ++read){
-        if (A-&gt;v[read].media &gt;= k) {
-            if (write != read) A-&gt;v[write] = A-&gt;v[read];
-            ++write;
-        }
-    }
-    A-&gt;n = write; // compattato
-}
-</code></pre>
+<pre><code class="language-text">Scrivi: 1) tag (1 byte), 2) value come uint32_t in big-endian (con bswap se serve).
+Leggi: 1) tag, 2) leggi 4 byte e riconverti da big-endian a host.</code></pre>
           </div>
         </li>
       </ol>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Takeaways</h2>
-      <ul>
-        <li><b>Array statico</b>: semplice e veloce, ma capacità fissa e rimozioni con shift (<code>O(n)</code>).</li>
-        <li><b><code>std::vector</code></b>: dinamico, algoritmi STL (<code>sort</code>, <code>find_if</code>, <code>erase-remove</code>); attenzione all’invalidazione su riallocazioni.</li>
-        <li><b>Archivio ordinato</b> ⇒ <b>ricerca binaria</b> (<code>O(log n)</code>) e inserimenti con <code>lower_bound</code>.</li>
-        <li><b>Definisci la chiave</b> e la <b>policy sui duplicati</b> prima di scrivere codice; poi rispettala ovunque.</li>
-        <li><b>Casting</b> in C++: preferisci <code>static_cast</code> al C-cast; più leggibilità e controlli.</li>
-      </ul>
     </div>
 
   </div>
