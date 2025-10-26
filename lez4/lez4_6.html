@@ -95,6 +95,24 @@
       <p class="note"><b>Header hygiene (igiene dell’header):</b> niente <code>using namespace std;</code> in header; includi il <b>minimo indispensabile</b>; preferisci <b>forward declaration</b> quando bastano.</p>
     </div>
 
+	<div class="inner-box box">
+  <h2>Che cos'è una Translation Unit (TU)</h2>
+  <p>
+    Una <strong>translation unit</strong> (TU) è l'unità base che il compilatore C++ compila in un singolo passaggio. In pratica:
+    prendi un file <code>.cpp</code>, sostituisci tutti i <code>#include</code> con il contenuto reale degli header inclusi,
+    applica le direttive del preprocessore (<code>#define</code>, <code>#ifdef</code>, ...), e il risultato finale di
+    questo “collage espanso” è la TU. Il compilatore trasforma ogni TU in un file oggetto separato (<code>.o</code> / <code>.obj</code>).
+    Poi il <strong>linker</strong> unisce tutti questi oggetti in un unico eseguibile finale.
+  </p>
+  <p class="note">
+    Conseguenza importante: se definisci la <em>stessa</em> funzione normale (non <code>inline</code>) in due TU diverse,
+    il linker trova due definizioni della stessa cosa e va in errore (violazione della One Definition Rule).
+    Per questo nei file <code>.hpp</code> mettiamo solo dichiarazioni, mentre le <em>definizioni</em> vere
+    di solito stanno in un solo <code>.cpp</code>.
+  </p>
+</div>
+
+
     <!-- Include guard vs pragma once -->
     <div class="inner-box box">
       <h2>Include-guard vs <code>#pragma once</code></h2>
