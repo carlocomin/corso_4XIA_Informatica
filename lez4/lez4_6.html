@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez4_6 · Header/Sorgenti, include-guard, build</title>
+
+  <!-- Template coerente -->
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez4_5.html"; }
+    function nextSlide(){ window.location.href = "../programma.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+
+  <style>
+    /* Allineamento forte a sinistra per testo/elenco/codice */
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
+    .inner-box pre, .inner-box code, .inner-box h2, .inner-box h3 { text-align:left !important; }
+    .inner-box ul, .inner-box ol { margin:.5rem 0 1rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li { margin:.35rem 0 }
+    pre, pre code { white-space:pre; tab-size:4; margin:.5rem 0 1rem 0; padding:.6rem .8rem; }
+
+    /* Box tematici */
+    .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:16px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0; display:inline-block }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .bad  { background:#ffefef; border-left:4px solid #ef4444; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+
+    table { width:100%; border-collapse:collapse; margin-top:.5rem }
+    th, td { border-bottom:1px solid #e5e7eb; padding:.6rem .6rem; text-align:left; vertical-align:top; font-size:.95rem; line-height:1.4 }
+    th { background:#f8fafc; font-weight:600 }
+    code.k { background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
+  </style>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 4 — OOP in C++ (introduzione)</h2>
+  <ul>
+    <li><a href="lez4_1.html">Lez4_1: Perché OOP? Concetti di base</a></li>
+    <li><a href="lez4_2.html">Lez4_2: Definire una classe (sintassi minima)</a></li>
+    <li><a href="lez4_3.html">Lez4_3: Costruttori, distruttore, lista d’iniz.</a></li>
+    <li><a href="lez4_4.html">Lez4_4: Incapsulamento, metodi const, overload</a></li>
+    <li><a href="lez4_5.html">Lez4_5: to_string(), operator&lt;&lt;, pre/postcondiz.</a></li>
+    <li><a class="active" href="lez4_6.html">Lez4_6: Header/Sorgenti, include-guard, build</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Separare interfaccia/implementazione: header, sorgenti, guardie e build</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <!-- Obiettivi -->
+    <div class="inner-box box">
+      <h2>Obiettivi</h2>
+      <ul>
+        <li>Capire <b>perché</b> separare interfaccia (<code>.hpp</code>) e implementazione (<code>.cpp</code>).</li>
+        <li>Imparare a scrivere header <b>robusti</b>: include-guard, dipendenze minime, forward declaration.</li>
+        <li>Evitare errori di <b>ODR</b> (One Definition Rule) e duplicazioni al link.</li>
+        <li>Costruire un progetto a riga di comando con <b>g++/clang++</b> e con <b>MSVC</b>.</li>
+        <li>Capire quando i <b>template</b> vanno nel header (e perché).</li>
+      </ul>
+      <p class="ok"><b>Idea chiave:</b> l’header espone il <em>contratto pubblico</em>, il <code>.cpp</code> nasconde i dettagli. Meno dipendenze nell’header ⇒ build più veloce e meno accoppiamento.</p>
+    </div>
+
+    <!-- Che cos'è un header -->
+    <div class="inner-box box">
+      <h2>Che cos’è un header (<code>.hpp</code>) e perché usarlo</h2>
+      <ul>
+        <li>L’header contiene <b>dichiarazioni</b> pubbliche (classi, funzioni, costanti) visibili ai client.</li>
+        <li>Il file <code>.cpp</code> contiene le <b>definizioni</b> (corpo dei metodi/funzioni) e i dettagli interni.</li>
+        <li>Separazione netta ⇒ i client ricompilano solo se cambiano le <b>dichiarazioni</b>, non ogni volta che modifichi l’implementazione.</li>
+      </ul>
+      <p class="note"><b>Header hygiene (igiene dell’header):</b> niente <code>using namespace std;</code> in header; includi il <b>minimo indispensabile</b>; preferisci <b>forward declaration</b> quando bastano.</p>
+    </div>
+
+    <!-- Include guard vs pragma once -->
+    <div class="inner-box box">
+      <h2>Include-guard vs <code>#pragma once</code></h2>
+      <ul>
+        <li><b>Include-guard</b> (portabile): evita inclusioni multiple nello stesso TU.
+<pre><code class="language-cpp">#ifndef PUNTO_HPP_INCLUDED
+#define PUNTO_HPP_INCLUDED
+// ... dichiarazioni ...
+#endif // PUNTO_HPP_INCLUDED</code></pre>
+        </li>
+        <li><b><code>#pragma once</code></b>: più conciso, supportato da quasi tutti i compilatori moderni; <em>non</em> standard ISO ma de facto.
+<pre><code class="language-cpp">// #pragma once
+</code></pre>
+        </li>
+      </ul>
+      <p class="ok">A scuola e in progetti portabili: preferisci l’<b>include-guard</b>. In contesti noti (toolchain unica) anche <code>#pragma once</code> va benissimo.</p>
+    </div>
+
+    <!-- Esempio completo: punto.hpp/cpp/main.cpp -->
+    <div class="inner-box box">
+      <h2>Esempio completo: <code>punto.hpp</code> + <code>punto.cpp</code> + <code>main.cpp</code></h2>
+
+      <p><b>Obiettivo didattico:</b> progettare una piccola classe con interfaccia pulita e implementazione separata, includendo un <code>operator&lt;&lt;</code> “idiomatico”.</p>
+
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-h" onclick="toggleBox('btn-h','hdr')">Mostra ▼</button></div>
+      <div id="hdr" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">// ===== file: punto.hpp =====
+#ifndef PUNTO_HPP_INCLUDED
+#define PUNTO_HPP_INCLUDED
+
+#include &lt;iosfwd&gt;   // forward dichiarazioni di iostream (evita pesanti &lt;iostream&gt;)
+#include &lt;string&gt;   // usiamo std::string nella dichiarazione
+
+class Punto {
+private:
+    double x_{0}, y_{0};          // stato incapsulato
+public:
+    // Costruttori essenziali
+    Punto() = default;            // default esplicito (triviale se possibile)
+    Punto(double x, double y);    // parametrico
+
+    // Osservatori const (accesso in sola lettura)
+    double x() const { return x_; }
+    double y() const { return y_; }
+
+    // Mutatori (li terremo piccoli)
+    void sposta(double dx, double dy);
+
+    // Rappresentazione testuale "per umani"
+    std::string to_string() const;
+};
+
+// Operatore di stampa: funzione libera nel medesimo namespace
+std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const Punto&amp; p);
+
+#endif // PUNTO_HPP_INCLUDED
+</code></pre>
+      </div>
+
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-c" onclick="toggleBox('btn-c','src')">Mostra ▼</button></div>
+      <div id="src" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">// ===== file: punto.cpp =====
+#include "punto.hpp"
+#include &lt;ostream&gt;
+#include &lt;sstream&gt;
+#include &lt;iomanip&gt;
+
+Punto::Punto(double x, double y) : x_{x}, y_{y} {}
+
+void Punto::sposta(double dx, double dy){
+    x_ += dx; y_ += dy;
+}
+
+std::string Punto::to_string() const {
+    std::ostringstream os;
+    os.setf(std::ios::fixed, std::ios::floatfield);
+    os &lt;&lt; std::setprecision(2);
+    os &lt;&lt; "Punto(" &lt;&lt; x_ &lt;&lt; ", " &lt;&lt; y_ &lt;&lt; ")";
+    return os.str();
+}
+
+std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const Punto&amp; p){
+    return os &lt;&lt; p.to_string();  // delega: un solo "punto di verità" sul formato
+}
+</code></pre>
+      </div>
+
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-m" onclick="toggleBox('btn-m','main')">Mostra ▼</button></div>
+      <div id="main" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">// ===== file: main.cpp =====
+#include "punto.hpp"
+#include &lt;iostream&gt;
+
+int main(){
+    Punto p;                // (0,0)
+    std::cout &lt;&lt; p &lt;&lt; "\n";
+
+    Punto q{3.5, -1.2};
+    std::cout &lt;&lt; q &lt;&lt; "\n";
+
+    q.sposta(1.0, 1.0);
+    std::cout &lt;&lt; "dopo sposta: " &lt;&lt; q &lt;&lt; "\n";
+}
+</code></pre>
+      </div>
+
+      <p class="note"><b>Perché l’operatore è nel <code>.cpp</code>?</b> Evitiamo più definizioni della stessa funzione al link. La <b>dichiarazione</b> è nel <code>.hpp</code>, la <b>definizione</b> nel <code>.cpp</code>.</p>
+    </div>
+
+    <!-- Build -->
+    <div class="inner-box box">
+      <h2>Compilazione e linking (riga di comando)</h2>
+
+      <p><b>GCC/Clang (Linux/macOS/MinGW):</b></p>
+<pre><code class="language-bash"># Compilazione separata in oggetti
+g++ -std=c++17 -Wall -Wextra -O2 -c punto.cpp
+g++ -std=c++17 -Wall -Wextra -O2 -c main.cpp
+
+# Link finale
+g++ -o app main.o punto.o
+./app
+</code></pre>
+
+      <p><b>MSVC (Windows, Developer Command Prompt):</b></p>
+<pre><code class="language-bash">cl /std:c++17 /EHsc /W4 /O2 main.cpp punto.cpp /Fe:app.exe
+app.exe
+</code></pre>
+
+      <p class="ok"><b>Regola d’oro:</b> ogni <code>.cpp</code> diventa un <em>translation unit</em>. Il linker unisce gli oggetti in un eseguibile. Se definisci la stessa funzione in due <code>.cpp</code>, violi l’<b>ODR</b> ⇒ errore di link (“multiple definition”).</p>
+    </div>
+
+    <!-- ODR, inline, funzioni in header -->
+    <div class="inner-box box">
+      <h2>ODR, funzioni in header, <code>inline</code> e variabili globali</h2>
+      <ul>
+        <li><b>ODR (One Definition Rule):</b> in tutto il programma ci deve essere <b>una sola definizione</b> di ogni funzione non-<code>inline</code> e di ogni oggetto con linkage esterno.</li>
+        <li><b>Metodi definiti dentro la classe</b> sono <em>implicitamente</em> <code>inline</code> ⇒ puoi metterli nel <code>.hpp</code> senza violare l’ODR (se identici in tutti i TU).</li>
+        <li><b>Funzioni libere in header:</b> se le definisci in header, dichiarale <code>inline</code> per evitare multi-definizioni al link.</li>
+        <li><b>Variabili globali in header (C++17+):</b> usa <code>inline</code> per costanti con definizione in header (altrimenti metti solo <code>extern</code> e definisci in un <code>.cpp</code>).</li>
+      </ul>
+<pre><code class="language-cpp">// header.hpp
+#ifndef HEADER_HPP_INCLUDED
+#define HEADER_HPP_INCLUDED
+
+inline int somma(int a, int b){ return a+b; }   // OK: definizione inline
+
+extern const int MAX_ELEM;                      // solo dichiarazione
+
+#endif
+</code></pre>
+<pre><code class="language-cpp">// header.cpp
+#include "header.hpp"
+const int MAX_ELEM = 1024;                      // unica definizione
+</code></pre>
+      <p class="warn"><b>Anti-pattern:</b> definire funzioni non-inline o oggetti globali direttamente nell’header ⇒ linker error inesorabile su progetti reali.</p>
+    </div>
+
+    <!-- Forward declarations e dipendenze -->
+    <div class="inner-box box">
+      <h2>Ridurre le dipendenze: forward declaration, ordine degli include</h2>
+      <ul>
+        <li><b>Forward declaration</b>: dichiari un nome senza includere l’header completo quando ti basta un puntatore/riferimento.
+<pre><code class="language-cpp">// A.h
+#ifndef A_HPP
+#define A_HPP
+class B;               // forward declaration
+
+class A {
+    B* pb_;            // OK: puntatore, non serve sapere com'è B
+public:
+    void set(B* p);
+};
+#endif
+</code></pre>
+        </li>
+        <li><b>Ordine consigliato degli include</b> nei <code>.cpp</code>:
+          <ol>
+            <li>Il <b>proprio</b> header prima: <code>#include "punto.hpp"</code></li>
+            <li>Header standard (<code>&lt;vector&gt;</code>, <code>&lt;string&gt;</code>…)</li>
+            <li>Header di terze parti</li>
+            <li>Header del progetto</li>
+          </ol>
+        </li>
+      </ul>
+      <p class="ok">Mettere <b>per primo</b> il proprio header aiuta a scoprire subito se l’header è “auto-consistente” (compila da solo senza dipendere da includer esterni nascosti).</p>
+    </div>
+
+    <!-- Template -->
+    <div class="inner-box box">
+      <h2>Template: perché la definizione sta nel header</h2>
+      <ul>
+        <li>Le funzioni/classi <b>template</b> vengono <em>istanziate</em> dal compilatore quando servono, nel TU che le usa.</li>
+        <li>Perché l’istanza avvenga, il compilatore deve “vedere” <b>sia dichiarazione che definizione</b> del template ⇒ di solito tutto nel <b>header</b>.</li>
+        <li>Alternativa avanzata: <b>esplicita istanziazione</b> in un <code>.cpp</code>, ma è fuori dallo scopo di questa lezione.</li>
+      </ul>
+<pre><code class="language-cpp">// vec_util.hpp (header-only)
+#ifndef VEC_UTIL_HPP
+#define VEC_UTIL_HPP
+#include &lt;vector&gt;
+
+template &lt;typename T&gt;
+T somma(const std::vector&lt;T&gt;&amp; v){
+    T acc{}; for(const auto&amp; x : v) acc += x; return acc;
+}
+#endif
+</code></pre>
+      <p class="note">Molte librerie generiche C++ sono “header-only” proprio per i template (es. <code>&lt;algorithm&gt;</code>, <code>&lt;optional&gt;</code>...).</p>
+    </div>
+
+    <!-- Build system accenni + CMake -->
+    <div class="inner-box box">
+      <h2>Build: oltre la riga di comando (accenno a CMake)</h2>
+      <p>Per progetti con più file e piattaforme diverse, usare un sistema di build è pratico. Con <b>CMake</b> puoi generare soluzione MSVC, makefile, Xcode, Ninja, ecc. da un unico file di configurazione.</p>
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-cm" onclick="toggleBox('btn-cm','cmake')">Mostra CMakeLists.txt ▼</button></div>
+      <div id="cmake" style="display:none;margin-top:8px">
+<pre><code class="language-cpp"># ===== file: CMakeLists.txt =====
+cmake_minimum_required(VERSION 3.16)
+project(PuntoDemo CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_executable(app main.cpp punto.cpp)
+# punto.hpp è header: verrà incluso automatic. (aggiungilo come PUBLIC_HEADER se installi)
+</code></pre>
+      </div>
+      <p class="ok">CMake evita di ricordare sintassi diverse per <code>cl</code>, <code>g++</code> e <code>clang++</code>; utile da subito negli esercizi di classe.</p>
+    </div>
+
+    <!-- Pitfall -->
+    <div class="inner-box box">
+      <h2>Pitfall comuni (e rimedi pratici)</h2>
+      <ul>
+        <li><strong>Header senza guardie</strong> ⇒ inclusioni multiple, errori di definizione. <br/><br/><span class="ok">Metti sempre include-guard (o <code>#pragma once</code>).</span></li>
+        <li><strong><code>using namespace std;</code> in header</strong> ⇒ inquina lo spazio dei nomi dei client. <br/><br/><span class="ok">Mai nei header; al limite nei <code>.cpp</code>.</span></li>
+        <li><strong>Troppe dipendenze nell’header</strong> ⇒ build lenta e accoppiamento eccessivo. <br/><br/><span class="ok">Includi solo ciò che serve; preferisci forward declaration.</span></li>
+        <li><strong>Definizioni duplicate</strong> in più <code>.cpp</code>. <br/><br/><span class="ok">Una definizione per TU; se definisci in header, usa <code>inline</code> e mantieni identiche le definizioni.</span></li>
+        <li><strong>Template definiti in <code>.cpp</code></strong> senza istanziazione esplicita. <br/><br/><span class="ok">Tieni le definizioni dei template nel header.</span></li>
+      </ul>
+    </div>
+
+    <!-- Esercizi -->
+    <div class="inner-box box">
+      <h2>Esercizi guidati (mostra/nascondi soluzioni)</h2>
+      <ol>
+        <li><b>E1 — Refactor di una classe monolitica</b><br/>
+          <em>Testo:</em> Prendi una classe scritta tutta in un unico <code>.cpp</code>. Separala in <code>.hpp</code>/<code>.cpp</code> con include-guard, dichiarazioni pubbliche nell’header e definizioni nel sorgente. Compila a oggetti separati e poi linka.
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
+          <div id="box-e1" style="display:none;margin-top:8px">
+<pre><code class="language-bash">g++ -std=c++17 -Wall -Wextra -O2 -c classe.cpp
+g++ -std=c++17 -Wall -Wextra -O2 -c main.cpp
+g++ -o app main.o classe.o</code></pre>
+            <p class="note">Se il linker segnala “multiple definition”, significa che hai definito qualcosa in un header non-<code>inline</code>. Sposta la definizione nel <code>.cpp</code> o marcala <code>inline</code> (se appropriato).</p>
+          </div>
+        </li>
+
+        <li><b>E2 — Header hygiene</b><br/>
+          <em>Testo:</em> Crea un header “pulito” che espone solo ciò che serve. Elimina <code>using namespace</code>, rimpiazza includi pesanti con forward declaration quando possibile, verifica che l’header compili da solo.
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
+          <div id="box-e2" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">// prova a compilare solo l'header
+g++ -std=c++17 -fsyntax-only punto.hpp</code></pre>
+            <p class="ok">Se compila con <code>-fsyntax-only</code> (o equivalente), l’header è autosufficiente (non dipende da includer “misteriosi”).</p>
+          </div>
+        </li>
+
+        <li><b>E3 — Piccolo template header-only</b><br/>
+          <em>Testo:</em> Scrivi una funzione template <code>media</code> che ritorna la media degli elementi in un <code>std::vector&lt;T&gt;</code>. Mettila in un header e testala in due <code>.cpp</code> diversi.
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra ▼</button></div>
+          <div id="box-e3" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">// media.hpp
+#ifndef MEDIA_HPP
+#define MEDIA_HPP
+#include &lt;vector&gt;
+template &lt;typename T&gt;
+T media(const std::vector&lt;T&gt;&amp; v){
+    T acc{}; for(const auto&amp; x : v) acc += x;
+    return v.empty()? T{} : acc/static_cast&lt;T&gt;(v.size());
+}
+#endif
+</code></pre>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="inner-box note">
+      <b>Conclusione operativa.</b> Un header “pulito” e una corretta separazione delle definizioni fanno la differenza tra un progetto didattico e un codice davvero manutenibile. Applica sistematicamente: guardie, dipendenze minime, <code>inline</code> quando serve, e build in più fasi (compila, poi linka).
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>
