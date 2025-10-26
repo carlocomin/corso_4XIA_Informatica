@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez4_5 · to_string(), operator&lt;&lt;, pre/postcondizioni</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez4_4.html"; }
+    function nextSlide(){ window.location.href = "lez4_6.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+
+  <style>
+    /* Allineamento forte a sinistra per testo/elenco/codice */
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
+    .inner-box pre, .inner-box code, .inner-box h2, .inner-box h3 { text-align:left !important; }
+    .inner-box ul, .inner-box ol { margin:.5rem 0 1rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li { margin:.35rem 0 }
+    pre, pre code { white-space:pre; tab-size:4; margin:.5rem 0 1rem 0; padding:.6rem .8rem; }
+
+    .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:16px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0; display:inline-block }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .bad  { background:#ffefef; border-left:4px solid #ef4444; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+
+    table { width:100%; border-collapse:collapse; margin-top:.5rem }
+    th, td { border-bottom:1px solid #e5e7eb; padding:.6rem .6rem; text-align:left; vertical-align:top; font-size:.95rem; line-height:1.4 }
+    th { background:#f8fafc; font-weight:600 }
+  </style>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 4 — OOP in C++ (introduzione)</h2>
+  <ul>
+    <li><a href="lez4_1.html">Lez4_1: Perché OOP? Concetti di base</a></li>
+    <li><a href="lez4_2.html">Lez4_2: Definire una classe (sintassi minima)</a></li>
+    <li><a href="lez4_3.html">Lez4_3: Costruttori, distruttore, lista d’iniz.</a></li>
+    <li><a href="lez4_4.html">Lez4_4: Incapsulamento, metodi const, overload</a></li>
+    <li><a class="active" href="lez4_5.html">Lez4_5: to_string(), operator&lt;&lt;, pre/postcondiz.</a></li>
+    <li><a href="lez4_6.html">Lez4_6: Header/Sorgenti, include-guard, build</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Rendere leggibili gli oggetti: <code>to_string()</code>, <code>operator&lt;&lt;</code>, contratti d’uso</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <!-- OBIETTIVI -->
+    <div class="inner-box box">
+      <h2>Obiettivi della lezione</h2>
+      <ul>
+        <li>Capire perché ogni classe “seria” dovrebbe sapersi descrivere da sola in modo leggibile.</li>
+        <li>Progettare <code>to_string() const</code> in modo chiaro, stabile e privo di sorprese.</li>
+        <li>Scrivere <code>operator&lt;&lt;</code> per poter stampare oggetti con <code>std::cout &lt;&lt; oggetto</code>.</li>
+        <li>Capire la differenza tra <b>una stampa per esseri umani</b> e <b>una serializzazione per le macchine</b>.</li>
+        <li>Introdurre la disciplina delle <b>precondizioni</b> e <b>postcondizioni</b>: come dichiarare cosa è lecito chiamare e cosa è garantito dopo la chiamata.</li>
+      </ul>
+      <p class="ok"><b>Idea chiave:</b> leggibilità e contratti chiari non sono “decorazioni”, sono strumenti tecnici per ridurre bug, fraintendimenti e perdita di tempo nel debugging.</p>
+    </div>
+
+    <!-- to_string -->
+    <div class="inner-box box">
+      <h2><code>to_string() const</code>: a cosa serve davvero</h2>
+
+      <p>
+        <code>to_string()</code> è un metodo (tipicamente pubblico e <code>const</code>) che restituisce una
+        <code>std::string</code> con una rappresentazione testuale dell’oggetto. Lo scopo è
+        <b>far vedere rapidamente lo stato interno rilevante</b> dell’oggetto in modo
+        compatto e leggibile da un umano. Lo usiamo per:
+      </p>
+
+      <ul>
+        <li><b>Debug veloce:</b> stampi l’oggetto in un log o in console per capire “cosa contiene adesso?”.</li>
+        <li><b>Logging/storico:</b> scrivi lo stato in un file di log testuale e poi lo rileggi a occhio.</li>
+        <li><b>Messaggi di errore:</b> quando segnali un problema, includi dentro il messaggio informazioni sullo stato corrente dell’oggetto che ha causato l’errore.</li>
+      </ul>
+
+      <p>
+        Una caratteristica fondamentale: il metodo <code>to_string()</code> deve essere
+        <b>privo di effetti collaterali</b>, cioè non deve modificare l’oggetto. Per questo
+        viene dichiarato <code>const</code>. Inoltre, deve essere quanto più possibile <b>semplice e
+        affidabile</b>, in modo da poterlo chiamare anche in situazioni delicate (per
+        esempio durante un’eccezione).
+      </p>
+
+<pre><code class="language-cpp">#include &lt;string&gt;
+#include &lt;sstream&gt;
+#include &lt;iomanip&gt;
+
+class Punto {
+private:
+    double x_{0}, y_{0};
+public:
+    double x() const { return x_; }
+    double y() const { return y_; }
+
+    // Restituisce una descrizione leggibile dello stato dell'oggetto
+    std::string to_string() const {
+        std::ostringstream os;
+
+        // Impostiamo un formato ripetibile: numeri con 2 cifre decimali
+        os.setf(std::ios::fixed, std::ios::floatfield);
+        os << std::setprecision(2);
+
+        os << "Punto(" << x_ << ", " << y_ << ")";
+        return os.str();
+    }
+};</code></pre>
+
+      <p class="note">
+        <b>Formattazione e chiarezza.</b> Qui imponiamo 2 cifre decimali con
+        <code>std::setprecision(2)</code> e <code>std::fixed</code>, così l’output di
+        <code>to_string()</code> è stabile e “carino”. Non lasciamo la
+        formattazione predefinita del compilatore (che potrebbe stampare troppi o troppo pochi decimali).
+        Il vantaggio è che, se devi confrontare rapidamente più stampe di diversi oggetti, hai sempre lo
+        stesso stile visivo.
+      </p>
+
+      <p class="warn">
+        <b>Attenzione alla “locale”.</b> In C++ l’oggetto <code>std::locale</code> può cambiare il modo in cui i numeri
+        vengono stampati (per esempio usare la virgola invece del punto come separatore decimale).
+        Per debugging interno spesso vogliamo il punto decimale standard. Se ti serve un formato
+        indipendente dalla lingua del PC, puoi associare allo stream la <em>locale classica</em>
+        (<code>std::locale::classic()</code>), così sei sicuro che l’output usi il punto.
+      </p>
+    </div>
+
+    <!-- operator<< -->
+    <div class="inner-box box">
+      <h2><code>operator&lt;&lt;</code> su <code>std::ostream</code>: perché ci serve e come si scrive bene</h2>
+
+      <p>
+        L’operatore di inserimento <code>operator&lt;&lt;</code> permette di scrivere:
+        <code>std::cout &lt;&lt; mioOggetto;</code>.
+        È un modo molto naturale per stampare l’oggetto dentro uno stream (console,
+        file di testo, <code>std::ostringstream</code> ecc.).
+        Questa cosa è talmente utile che è diventata uno standard di fatto nella programmazione C++:
+        “se ho un tipo importante, voglio poterlo stampare con <code>&lt;&lt;</code>”.
+      </p>
+
+      <p>
+        Tecnicamente, <code>operator&lt;&lt;</code> è in genere una <b>funzione libera</b>
+        (cioè dichiarata fuori dalla classe), non un metodo, che prende un riferimento allo stream
+        (<code>std::ostream&amp;</code>) e un riferimento costante all’oggetto da stampare
+        (<code>const T&amp;</code>), e restituisce ancora lo stream per permettere la concatenazione
+        (<code>std::cout &lt;&lt; a &lt;&lt; b &lt;&lt; c;</code>).
+      </p>
+
+<pre><code class="language-cpp">#include &lt;ostream&gt;
+#include &lt;iomanip&gt;
+#include &lt;sstream&gt;
+
+class Punto {
+private:
+    double x_{0}, y_{0};
+public:
+    double x() const { return x_; }
+    double y() const { return y_; }
+
+    std::string to_string() const {
+        std::ostringstream os;
+        os.setf(std::ios::fixed, std::ios::floatfield);
+        os &lt;&lt; std::setprecision(2);
+        os &lt;&lt; "Punto(" &lt;&lt; x_ &lt;&lt; ", " &lt;&lt; y_ &lt;&lt; ")";
+        return os.str();
+    }
+};
+
+// Variante A: delega a to_string()
+// Semplice da scrivere e manutenere: un solo "punto di verità" sul formato testuale.
+std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const Punto&amp; p) {
+    return os &lt;&lt; p.to_string();
+}</code></pre>
+
+      <p>
+        Nella “Variante A” l’operatore si limita a richiamare <code>to_string()</code>.
+        Questo è ottimo perché:
+      </p>
+
+      <ul>
+        <li>c’è <b>un solo posto</b> in cui decidi il formato di stampa: <code>to_string()</code>;</li>
+        <li>se cambi lo stile di stampa (più decimali? meno testo?) cambi una sola funzione;</li>
+        <li>il codice è semplice da leggere, cosa importante per gli studenti e per chi fa manutenzione.</li>
+      </ul>
+
+      <p class="warn">
+        <b>Piccolo svantaggio:</b> questa tecnica crea temporaneamente una <code>std::string</code>.
+        In quasi tutti i casi scolastici / gestionali va benissimo. Se un domani avrai tipi enormi
+        e stampe iper-performanti migliaia di volte al secondo, puoi ottimizzare scrivendo
+        direttamente nello stream.
+      </p>
+
+      <p>
+        Ecco la “Variante B”: invece di delegare a <code>to_string()</code>, formattiamo
+        direttamente sullo stream. Qui bisogna essere un po’ più attenti a non “sporcare”
+        lo stato dello stream (precisione, formato numerico…).
+      </p>
+
+<pre><code class="language-cpp">// Variante B: stampa diretta sullo stream
+// (salviamo e poi ripristiniamo lo stato dello stream)
+std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const Punto&amp; p) {
+    // Salviamo impostazioni correnti dello stream (precisione, flag di formattazione)
+    auto oldp = os.precision();
+    auto oldf = os.flags();
+
+    os.setf(std::ios::fixed, std::ios::floatfield);
+    os.precision(2);
+
+    os &lt;&lt; "Punto(" &lt;&lt; p.x() &lt;&lt; ", " &lt;&lt; p.y() &lt;&lt; ")";
+
+    // Ripristiniamo lo stato per non disturbare chi stamperà dopo di noi
+    os.flags(oldf);
+    os.precision(oldp);
+
+    return os;
+}</code></pre>
+
+      <p class="note">
+        <b>Perché ripristinare lo stream?</b> Immagina che un altro pezzo di codice dopo di te stampi dei numeri con
+        <code>std::cout</code> e si aspetti il formato “di default”. Se tu cambi la precisione e la lasci cambiata,
+        l’altro codice stamperà numeri con 2 decimali anche quando non dovrebbe.
+        Salvare e ripristinare è un segno di buona educazione tra funzioni di stampa.
+      </p>
+
+      <p class="ok">
+        <b>Linea guida didattica:</b> per ora usa la Variante A (riuso di <code>to_string()</code>) — è più leggibile,
+        più coerente e basta per il 99% dei casi scolastici e dei piccoli progetti.
+      </p>
+
+      <p class="warn">
+        <b>Non stampare il newline dentro <code>operator&lt;&lt;</code>.</b>
+        L’operatore dovrebbe stampare la rappresentazione dell’oggetto ma lasciare al chiamante
+        decidere se vuole andare a capo o no:
+        <code>std::cout &lt;&lt; p &lt;&lt; "\n";</code>.
+        Questo ti evita stampe “a sorpresa” e rende l’operatore più flessibile.
+      </p>
+    </div>
+
+    <!-- umani vs parser -->
+    <div class="inner-box box">
+      <h2>Output “per umani” vs output “per parser”</h2>
+
+      <p>
+        È importantissimo distinguere due concetti che <em>sembrano</em> uguali ma in realtà hanno
+        scopi completamente diversi:
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Output per umani</th>
+            <th>Formato per parser / salvataggio dati</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Leggibile, amichevole, con etichette o testo esplicativo.<br/>
+                Esempio: <code>Punto(3.10, -1.50)</code></td>
+            <td>Strutturato, rigido, facile da rileggere automaticamente.<br/>
+                Esempio CSV: <code>3.1,-1.5</code><br/>
+                Esempio JSON: <code>{"x":3.1,"y":-1.5}</code></td>
+          </tr>
+          <tr>
+            <td>Serve a un programmatore (o utente umano) per capire cosa sta succedendo <em>ora</em>.</td>
+            <td>Serve al programma stesso, domani, per ricaricare gli stessi dati senza perdere informazioni.</td>
+          </tr>
+          <tr>
+            <td>Prodotto tipico: <code>to_string()</code>, <code>operator&lt;&lt;</code>.</td>
+            <td>Prodotto tipico: funzioni di <b>serializzazione</b> dedicate (scrittura su file o rete) e di <b>deserializzazione</b>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="note">
+        <b>Perché separarli?</b><br/>
+        Per debugging umano vuoi frasi comprensibili: “<code>Punto(3.10, -1.50)</code>”.
+        Per memorizzare su disco e poi rileggere vuoi invece un formato che sia stabile,
+        non ambiguo, e facile da fare il parsing (CSV, JSON, binario con campi ben definiti, ecc.).
+        Mescolare i due obiettivi nello stesso metodo porta presto caos:
+        o ottieni un formato difficile da leggere per le persone,
+        o ottieni un formato ambiguo e fragile per il codice.
+      </p>
+    </div>
+
+    <!-- contratti: pre/post -->
+    <div class="inner-box box">
+      <h2>Contratti d’uso: precondizioni e postcondizioni</h2>
+
+      <p>
+        Quando scriviamo un metodo pubblico di una classe, in realtà stiamo firmando un mini-contratto
+        con chi userà quel metodo. Questo contratto ha due parti fondamentali:
+      </p>
+
+      <ul>
+        <li><b>Precondizione</b> = cosa <u>deve essere vero</u> prima di chiamare il metodo,
+            altrimenti il comportamento non è garantito.</li>
+        <li><b>Postcondizione</b> = cosa <u>sarà vero</u> dopo che il metodo ha finito,
+            se la precondizione era rispettata.</li>
+      </ul>
+
+      <p>
+        Scrivere (e rispettare) queste due cose è cruciale soprattutto quando la classe incapsula
+        uno stato interno con certe regole, e vogliamo che quell’invariante non venga violato.
+      </p>
+
+<pre><code class="language-cpp">#include &lt;cassert&gt;
+#include &lt;vector&gt;
+
+class Stack {
+public:
+    // PRE: nessuna
+    // POST: ritorna true se NON ci sono elementi nello stack
+    bool empty() const {
+        return data_.empty();
+    }
+
+    // PRE: nessuna
+    // POST: dopo la chiamata, !empty() e top() == v
+    void push(int v) {
+        data_.push_back(v);
+    }
+
+    // PRE: nessuna
+    // POST: se prima c'era almeno un elemento, lo rimuove e ritorna true;
+    //       se era vuoto, ritorna false e non cambia nulla.
+    bool pop() {
+        if (data_.empty()) return false;
+        data_.pop_back();
+        return true;
+    }
+
+    // PRE: !empty() deve essere vero.
+    // POST: ritorna l'ultimo elemento senza rimuoverlo; lo stato dell'oggetto non cambia.
+    int top() const {
+        assert(!data_.empty());   // in debug: se violi la precondizione, ti ferma
+        return data_.back();
+    }
+
+private:
+    std::vector&lt;int&gt; data_;
+};</code></pre>
+
+      <p>
+        <b>Dove scrivere le pre/postcondizioni?</b><br/>
+        Il modo più semplice è: mettile come commenti sopra la dichiarazione del metodo nell’header
+        (<code>.hpp</code>). Così chi usa la classe le vede subito.
+        In aggiunta, per i metodi con precondizioni “non negoziabili”, puoi mettere un
+        <code>assert(...)</code> all’inizio del metodo. Questo non sostituisce la documentazione,
+        ma aiuta a individuare rapidamente gli errori di utilizzo durante i test.
+      </p>
+
+      <p class="warn">
+        <b>Attenzione:</b> <code>assert</code> tipicamente è disattivato nelle build “release”
+        (quando metti <code>NDEBUG</code>). Quindi <code>assert</code> è soprattutto uno strumento didattico
+        e di debug, non un sistema di gestione degli errori per l’utente finale. Per codice robusto in
+        produzione si valutano eccezioni, valori di ritorno speciali, o altri meccanismi controllati.
+      </p>
+
+      <p class="ok">
+        <b>Effetto educativo:</b> abituarsi a scrivere pre/postcondizioni ti obbliga a chiarire la semantica
+        dei tuoi metodi. Se un metodo è difficile da descrivere (“Mah, dipende, a volte fa X, a volte Y...”), è
+        spesso un segnale che l’interfaccia non è ancora ben progettata.
+      </p>
+    </div>
+
+    <!-- PITFALL -->
+    <div class="inner-box box">
+      <h2>Pitfall comuni (e come evitarli)</h2>
+      <ul>
+        <li>
+          <strong>Formati incoerenti tra <code>to_string()</code> e <code>operator&lt;&lt;</code></strong>  
+          <br/><br/>
+          <span class="ok">Stabilisci un unico formato ufficiale e riusalo ovunque. Se cambi, cambia in un solo punto.</span>
+        </li>
+
+        <li>
+          <strong>Dimenticare di ripristinare lo stato dello stream</strong> (precisione, <code>std::fixed</code>, ecc.)  
+          <br/><br/>
+          <span class="ok">Se modifichi lo stream dentro <code>operator&lt;&lt;</code>, salva le impostazioni prima e ripristinale dopo. Così non rompi la stampa successiva.</span>
+        </li>
+
+        <li>
+          <strong>Stampare sempre il newline dentro l’operatore</strong>  
+          <br/><br/>
+          <span class="ok">Non farlo: è l’esterno che decide se andare a capo o meno. Il tuo operatore deve solo “descrivere l’oggetto”.</span>
+        </li>
+
+        <li>
+          <strong>Mescolare output umano e formato dati riutilizzabile</strong>  
+          <br/><br/>
+          <span class="ok">Tieni separati: <code>to_string()</code> / <code>operator&lt;&lt;</code> per umani, funzioni di serializzazione per file/ rete/ri-lettura.</span>
+        </li>
+
+        <li>
+          <strong>Nessuna documentazione su pre/postcondizione</strong>  
+          <br/><br/>
+          <span class="ok">Scrivi SEMPRE cosa è lecito chiamare e cosa viene garantito. Anche due righe di commento sono già un enorme passo.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- ESERCIZI -->
+    <div class="inner-box box">
+      <h2>Esercizi guidati (mostra/nascondi soluzioni)</h2>
+
+      <ol>
+        <li>
+          <b>E1 — Progetta <code>to_string()</code> per una classe <code>Orario</code></b><br/>
+          <em>Testo completo:</em> Definisci una classe <code>Orario</code> con campi ora, minuto, secondo.
+          Implementa <code>to_string()</code> che restituisce sempre una stringa nel formato <code>"hh:mm:ss"</code>,
+          con zeri iniziali (es. <code>09:05:07</code>). Assicurati che <code>to_string()</code> sia <code>const</code>
+          e non modifichi lo stato.
+          <div class="nav-buttons" style="justify-content:left">
+            <button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button>
+          </div>
+          <div id="box-e1" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">#include &lt;string&gt;
+#include &lt;sstream&gt;
+#include &lt;iomanip&gt;
+
+class Orario {
+private:
+    int hh_{0}, mm_{0}, ss_{0};
+public:
+    Orario() = default;
+    Orario(int h,int m,int s) : hh_{h}, mm_{m}, ss_{s} {}
+
+    // Restituisce una rappresentazione leggibile, sempre nel formato hh:mm:ss
+    std::string to_string() const {
+        std::ostringstream os;
+        os &lt;&lt; std::setfill('0') &lt;&lt; std::setw(2) &lt;&lt; hh_ &lt;&lt; ":"
+           &lt;&lt; std::setw(2) &lt;&lt; mm_ &lt;&lt; ":"
+           &lt;&lt; std::setw(2) &lt;&lt; ss_;
+        return os.str();
+    }
+};</code></pre>
+            <p class="note">
+              Qui imponiamo uno standard fisso, indipendente dall’ambiente. Non vogliamo “9:5:7”
+              ma sempre “09:05:07”, così il formato è facilmente confrontabile tra due stampe
+              e anche un umano lo può leggere più velocemente.
+            </p>
+          </div>
+        </li>
+
+        <li>
+          <b>E2 — Scrivi <code>operator&lt;&lt;</code> per <code>Orario</code></b><br/>
+          <em>Testo completo:</em> Definisci <code>operator&lt;&lt;</code> per <code>Orario</code> che stampi
+          esattamente la stessa cosa che produce <code>to_string()</code>. Spiega anche perché
+          <b>non</b> devi mettere <code>'\n'</code> dentro l’operatore.
+          <div class="nav-buttons" style="justify-content:left">
+            <button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button>
+          </div>
+          <div id="box-e2" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">#include &lt;ostream&gt;
+
+std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const Orario&amp; t) {
+    return os &lt;&lt; t.to_string();
+}</code></pre>
+            <p class="ok">
+              Non stampiamo <code>'\n'</code> dentro l’operatore. Così chi chiama può decidere:
+              <code>std::cout &lt;&lt; t &lt;&lt; "\n";</code> oppure
+              <code>logfile &lt;&lt; timestamp &lt;&lt; " =&gt; " &lt;&lt; t;</code> senza andare a capo.
+            </p>
+          </div>
+        </li>
+
+        <li>
+          <b>E3 — Aggiungi pre/postcondizioni alla tua classe Stack</b><br/>
+          <em>Testo completo:</em> Prendi una classe <code>Stack</code> di interi. Documenta per ogni metodo:
+          cosa ti aspetti prima della chiamata (precondizione) e cosa garantisci dopo
+          (postcondizione). Inserisci <code>assert</code> dove rompe l’uso scorretto
+          (ad esempio, chiamare <code>top()</code> su uno stack vuoto).
+          <div class="nav-buttons" style="justify-content:left">
+            <button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra ▼</button>
+          </div>
+          <div id="box-e3" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">class Stack {
+public:
+    // PRE: nessuna.
+    // POST: ritorna true sse lo stack non ha elementi.
+    bool empty() const;
+
+    // PRE: nessuna.
+    // POST: dopo la chiamata, !empty() e top() == v.
+    void push(int v);
+
+    // PRE: nessuna.
+    // POST: se c'era almeno un elemento, lo rimuove e ritorna true;
+    //       se era vuoto, ritorna false e lascia invariato lo stato.
+    bool pop();
+
+    // PRE: !empty() deve essere vero (stack non vuoto).
+    // POST: ritorna l'elemento in cima, lo stato dello stack non cambia.
+    int top() const;
+};</code></pre>
+            <p class="note">
+              Qui stai iniziando a fare “programmazione per contratto”: chi usa la classe
+              sa cosa è <u>lecito</u> chiedere e cosa <u>otterrà</u>. Questo rende il codice più
+              prevedibile e i bug più facili da diagnosticare.
+            </p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- CONCLUSIONE -->
+    <div class="inner-box note">
+      <b>Conclusione operativa.</b>
+      <br/><br/>
+      Una buona classe C++ non è solo “campi privati + metodi pubblici”.
+      Dovrebbe anche:
+      <ul>
+        <li>sapere descriversi con <code>to_string()</code>, in modo leggibile e costante;</li>
+        <li>poter essere stampata facilmente con <code>operator&lt;&lt;</code> per analisi e debugging;</li>
+        <li>dichiarare esplicitamente come va usata (precondizioni) e cosa promette di fare (postcondizioni);</li>
+        <li>tenere separato ciò che è per gli umani (debug/log) da ciò che è per le macchine (serializzazione strutturata).</li>
+      </ul>
+      Nella <b>Lez4_6</b> vedremo come mettere tutto questo in pratica separando header (<code>.hpp</code>) e sorgente (<code>.cpp</code>), con include-guard e build corretta del progetto.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>
