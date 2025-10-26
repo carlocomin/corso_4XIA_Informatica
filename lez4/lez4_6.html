@@ -282,48 +282,7 @@ public:
       <p class="ok">Mettere <b>per primo</b> il proprio header aiuta a scoprire subito se l’header è “auto-consistente” (compila da solo senza dipendere da includer esterni nascosti).</p>
     </div>
 
-    <!-- Template -->
-    <div class="inner-box box">
-      <h2>Template: perché la definizione sta nel header</h2>
-      <ul>
-        <li>Le funzioni/classi <b>template</b> vengono <em>istanziate</em> dal compilatore quando servono, nel TU che le usa.</li>
-        <li>Perché l’istanza avvenga, il compilatore deve “vedere” <b>sia dichiarazione che definizione</b> del template ⇒ di solito tutto nel <b>header</b>.</li>
-        <li>Alternativa avanzata: <b>esplicita istanziazione</b> in un <code>.cpp</code>, ma è fuori dallo scopo di questa lezione.</li>
-      </ul>
-<pre><code class="language-cpp">// vec_util.hpp (header-only)
-#ifndef VEC_UTIL_HPP
-#define VEC_UTIL_HPP
-#include &lt;vector&gt;
-
-template &lt;typename T&gt;
-T somma(const std::vector&lt;T&gt;&amp; v){
-    T acc{}; for(const auto&amp; x : v) acc += x; return acc;
-}
-#endif
-</code></pre>
-      <p class="note">Molte librerie generiche C++ sono “header-only” proprio per i template (es. <code>&lt;algorithm&gt;</code>, <code>&lt;optional&gt;</code>...).</p>
-    </div>
-
-    <!-- Build system accenni + CMake -->
-    <div class="inner-box box">
-      <h2>Build: oltre la riga di comando (accenno a CMake)</h2>
-      <p>Per progetti con più file e piattaforme diverse, usare un sistema di build è pratico. Con <b>CMake</b> puoi generare soluzione MSVC, makefile, Xcode, Ninja, ecc. da un unico file di configurazione.</p>
-      <div class="nav-buttons" style="justify-content:left"><button id="btn-cm" onclick="toggleBox('btn-cm','cmake')">Mostra CMakeLists.txt ▼</button></div>
-      <div id="cmake" style="display:none;margin-top:8px">
-<pre><code class="language-cpp"># ===== file: CMakeLists.txt =====
-cmake_minimum_required(VERSION 3.16)
-project(PuntoDemo CXX)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-add_executable(app main.cpp punto.cpp)
-# punto.hpp è header: verrà incluso automatic. (aggiungilo come PUBLIC_HEADER se installi)
-</code></pre>
-      </div>
-      <p class="ok">CMake evita di ricordare sintassi diverse per <code>cl</code>, <code>g++</code> e <code>clang++</code>; utile da subito negli esercizi di classe.</p>
-    </div>
-
-    <!-- Pitfall -->
+        <!-- Pitfall -->
     <div class="inner-box box">
       <h2>Pitfall comuni (e rimedi pratici)</h2>
       <ul>
