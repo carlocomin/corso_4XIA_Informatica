@@ -94,6 +94,33 @@ public:
       <p class="note">Stato sempre valido: l’esterno non può violare l’invariante senza passare dai controlli dell’interfaccia.</p>
     </div>
 
+<div class="inner-box box">
+  <h2>Che cosa significa “incapsulamento forte”</h2>
+  <p>
+    L’<strong>incapsulamento forte</strong> è il principio secondo cui lo stato interno
+    di un oggetto deve essere <em>totalmente nascosto</em> e <em>protetto</em> da accessi diretti.
+    Solo i metodi pubblici (l’interfaccia) e privati (la logica interna) hanno il diritto di modificare o leggere i dati interni.
+    Tutte le modifiche passano quindi attraverso <b>controlli espliciti</b> che mantengono gli
+    <b>invarianti di stato</b> (cioè le condizioni che devono rimanere sempre vere, come
+    <code>saldo ≥ 0</code> o <code>temperatura ≤ 100</code>).
+  </p>
+  <p>
+    L’incapsulamento forte riduce gli errori, perché impedisce a codice esterno
+    di cambiare i dati arbitrariamente: nessuno può rompere la coerenza logica
+    dell’oggetto. L’oggetto diventa così una sorta di “scatola nera” che garantisce
+    il proprio stato interno. Il programmatore che la usa non ha bisogno di sapere
+    come i dati sono rappresentati, ma solo quali operazioni può invocare in modo sicuro.
+  </p>
+  <p class="note">
+    In un programma ben progettato, i campi (<code>data members</code>) sono <code>private</code>,
+    i metodi di accesso (<code>public</code>) sono pochi e mirati, e ogni modifica è
+    filtrata da controlli interni. Questo permette di cambiare l’implementazione
+    senza rompere il codice che utilizza la classe, garantendo una vera <b>modularità</b>
+    e una <b>manutenibilità</b> a lungo termine.
+  </p>
+</div>
+
+
     <div class="inner-box box">
       <h2>Metodi <code>const</code>: significato e benefici</h2>
       <ul>
@@ -215,7 +242,7 @@ public:
     </div>
 
     <div class="inner-box box">
-      <h2>Esercizi guidati (solution reveal)</h2>
+      <h2>Esercizi guidati</h2>
       <ol>
         <li><b>E1 — <code>Orario</code> con overload</b><br/>
           <em>Testo:</em> Aggiungi due <code>aggiungi</code>: uno che somma <code>h,m,s</code>, uno che somma solo <code>secondi</code>. Rinormalizza in 0≤hh&lt;24, 0≤mm,ss&lt;60. Fornisci <code>to_string() const</code>.
