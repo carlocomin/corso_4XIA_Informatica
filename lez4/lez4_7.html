@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez4_7 · Costruttore di copia e semantica di copia</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez4_6.html"; }
+    function nextSlide(){ window.location.href = "lez4_8.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+
+  <style>
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
+    .inner-box pre, .inner-box code, .inner-box h2, .inner-box h3 { text-align:left !important; }
+    .inner-box ul, .inner-box ol { margin:.5rem 0 1rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li { margin:.35rem 0 }
+    pre, pre code { white-space:pre; tab-size:4; margin:.5rem 0 1rem 0; padding:.6rem .8rem; }
+
+    .box  { background:#fff; border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:16px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0; display:inline-block }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .bad  { background:#ffefef; border-left:4px solid #ef4444; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+
+    table { width:100%; border-collapse:collapse; margin-top:.5rem }
+    th, td { border-bottom:1px solid #e5e7eb; padding:.6rem .6rem; text-align:left; vertical-align:top; font-size:.95rem; line-height:1.4 }
+    th { background:#f8fafc; font-weight:600 }
+    code.k { background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
+  </style>
+</head>
+
+<body>
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 4 — OOP in C++ (introduzione)</h2>
+  <ul>
+    <li><a href="lez4_1.html">Lez4_1: Perché OOP? Concetti di base</a></li>
+    <li><a href="lez4_2.html">Lez4_2: Definire una classe (sintassi minima)</a></li>
+    <li><a href="lez4_3.html">Lez4_3: Costruttori, distruttore, lista d’iniz.</a></li>
+    <li><a href="lez4_4.html">Lez4_4: Incapsulamento, metodi const, overload</a></li>
+    <li><a href="lez4_5.html">Lez4_5: to_string(), operator&lt;&lt;, pre/postcondiz.</a></li>
+    <li><a href="lez4_6.html">Lez4_6: Header/Sorgenti, include-guard, build</a></li>
+    <li><a class="active" href="lez4_7.html">Lez4_7: Costruttore di copia e semantica di copia</a></li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1>Il costruttore di copia e la semantica di copia in C++</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <!-- Obiettivi -->
+    <div class="inner-box box">
+      <h2>Obiettivi</h2>
+      <ul>
+        <li>Capire cos’è esattamente un <b>costruttore di copia</b> e quando viene chiamato.</li>
+        <li>Capire la differenza tra <b>copia superficiale</b> (shallow copy) e <b>copia profonda</b> (deep copy).</li>
+        <li>Analizzare i problemi classici: <b>doppia delete</b>, <b>dangling pointer</b>, <b>aliasing involontario</b>.</li>
+        <li>Capire la <b>Rule of Three / Rule of Five</b>: se devi gestire risorse manualmente, non basta scrivere “un pezzettino”.</li>
+        <li>Vedere quando è <b>sufficiente il costruttore di copia generato dal compilatore</b> e quando invece va scritto a mano.</li>
+      </ul>
+      <p class="note"><b>Idea chiave:</b> in C++ la copia non è “magica”: può significare <em>duplicare il valore</em> oppure <em>duplicare anche la risorsa posseduta dal valore</em> (memoria heap, file aperti, socket, ecc.). Se sbagli, distruggi risorse due volte o le condividi senza controllo.</p>
+    </div>
+
+    <!-- Definizione formale -->
+    <div class="inner-box box">
+      <h2>Definizione formale di costruttore di copia</h2>
+
+      <p>Un <b>costruttore di copia</b> è un costruttore speciale che crea un nuovo oggetto a partire da un oggetto esistente della <em>stessa classe</em>.</p>
+
+<pre><code class="language-cpp">class Classe {
+public:
+    // firma canonica:
+    Classe(const Classe&amp; altro);
+};
+</code></pre>
+
+      <ul>
+        <li>Il primo parametro è una <b>referenza</b> a un oggetto della stessa classe. In pratica è quasi sempre <code>const Classe&amp;</code>, così puoi copiare anche oggetti temporanei o const.</li>
+        <li>Può avere parametri aggiuntivi con default (quindi “formalmente” può avere più argomenti), ma nella pratica scolastica e industriale si usa <code>Classe(const Classe&amp;)</code> puro.</li>
+        <li>Viene chiamato quando crei un nuovo oggetto da uno esistente:
+          <ul>
+            <li>inizializzazione: <code>Classe b = a;</code></li>
+            <li>passaggio per valore ad una funzione: <code>f(a);</code></li>
+            <li>ritorno per valore da una funzione (se il compilatore non elimina la copia tramite ottimizzazione tipo RVO/copy elision).</li>
+          </ul>
+        </li>
+      </ul>
+
+      <p class="ok"><b>Nota terminologica:</b> “copy constructor” ≠ “copy assignment operator”. Il primo <em>inizializza</em> un oggetto nuovo. Il secondo <em>assegna</em> a un oggetto già esistente.</p>
+    </div>
+
+    <!-- Quando il compilatore lo genera -->
+    <div class="inner-box box">
+      <h2>Costruttore di copia implicito (generato dal compilatore)</h2>
+      <p>Se <b>tu</b> non scrivi un costruttore di copia, il compilatore ne genera uno automaticamente (“implicit copy constructor”).</p>
+
+<pre><code class="language-cpp">class Punto {
+private:
+    double x_;
+    double y_;
+public:
+    Punto(double x, double y): x_{x}, y_{y} {}
+    // Nessun costruttore di copia scritto a mano
+};
+
+int main() {
+    Punto p1(3.0, 5.0);
+    Punto p2 = p1;  // usa il costruttore di copia generato dal compilatore
+}
+</code></pre>
+
+      <ul>
+        <li>Il compilatore copia <b>membro per membro</b>: i tipi primitivi (int, double, …) vengono copiati per valore; i membri di tipo classe vengono copiati chiamando a loro volta il loro costruttore di copia.</li>
+        <li>Se la classe contiene <b>solo dati “banali”</b> (niente gestione manuale di risorse), la copia implicita va benissimo: è corretta e sicura.</li>
+        <li>Se invece la classe possiede risorse dinamiche (puntatori raw, handle di file aperti…), la copia implicita fa tipicamente una <b>copia superficiale (shallow)</b> del puntatore ⇒ <b>BUG</b>.</li>
+      </ul>
+
+      <p class="warn"><b>Pericolo:</b> copia superficiale ⇒ 2 oggetti puntano la <em>stessa</em> area di memoria heap. Quando il primo oggetto viene distrutto, libera la memoria; il secondo resta con un puntatore “morto” (dangling). Se prova a liberarla di nuovo ⇒ crash / comportamento indefinito.</p>
+    </div>
+
+    <!-- Shallow vs Deep -->
+    <div class="inner-box box">
+      <h2>Shallow copy vs Deep copy</h2>
+
+      <p><b>Shallow copy</b>: copia solo i valori dei membri così come sono, inclusi i puntatori. Dopo la copia, <em>sia l’originale sia la copia puntano alla stessa risorsa</em>.</p>
+
+      <p><b>Deep copy</b>: crea una <em>nuova</em> risorsa e ne copia il contenuto. Dopo la copia, ogni oggetto possiede la <em>propria</em> risorsa, indipendente.</p>
+
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;cstring&gt;
+
+class Stringa {
+private:
+    char* dati;
+public:
+    // costruttore "normale"
+    Stringa(const char* s) {
+        dati = new char[std::strlen(s) + 1];
+        std::strcpy(dati, s);
+    }
+
+    // costruttore di copia personalizzato (deep copy)
+    Stringa(const Stringa&amp; altra) {
+        dati = new char[std::strlen(altra.dati) + 1];
+        std::strcpy(dati, altra.dati);  // duplichiamo il contenuto
+    }
+
+    ~Stringa() {
+        delete[] dati;
+    }
+
+    void stampa() const {
+        std::cout &lt;&lt; dati &lt;&lt; "\n";
+    }
+};
+
+int main() {
+    Stringa a("ciao");
+    Stringa b = a;    // invoca il costruttore di copia personalizzato
+
+    a.stampa();       // "ciao"
+    b.stampa();       // "ciao" (sua copia privata)
+
+    // Nessun double free: 'a' e 'b' hanno buffer diversi.
+}
+</code></pre>
+
+      <p class="ok"><b>Conclusione pratica:</b> Se la tua classe gestisce memoria dinamica (o altre risorse non condivisibili), <b>DEVI</b> implementare un costruttore di copia che realizza una deep copy, oppure <b>vietare la copia</b> (vedi più avanti con <code>=delete</code>).</p>
+    </div>
+
+    <!-- Sequenza di vita degli oggetti -->
+    <div class="inner-box box">
+      <h2>Ciclo di vita di un oggetto e ruoli speciali</h2>
+
+      <table>
+        <tr>
+          <th>Fase</th>
+          <th>Funzione speciale coinvolta</th>
+          <th>Responsabilità</th>
+        </tr>
+        <tr>
+          <td>Costruzione “normale”</td>
+          <td>Costruttore</td>
+          <td>Alloca / inizializza lo stato iniziale.</td>
+        </tr>
+        <tr>
+          <td>Costruzione da un altro oggetto</td>
+          <td><b>Costruttore di copia</b></td>
+          <td>Crea una nuova istanza duplicando lo stato dell’originale. Può copiare risorse o clonararle (deep copy).</td>
+        </tr>
+        <tr>
+          <td>Assegnazione a oggetto già esistente</td>
+          <td><b>Operatore di assegnazione per copia</b> <code>operator=(const T&amp;)</code></td>
+          <td>Libera le vecchie risorse dell’oggetto di sinistra e copia quelle dell’oggetto di destra.</td>
+        </tr>
+        <tr>
+          <td>Fine vita</td>
+          <td>Distruttore</td>
+          <td>Rilascia risorse (delete[], close(), ecc.).</td>
+        </tr>
+      </table>
+
+      <p class="note">Il costruttore di copia e l’operatore di assegnazione sono simili ma non identici: il primo <em>costruisce</em> un nuovo oggetto, il secondo <em>ricicla</em> un oggetto esistente. Questa distinzione è fondamentale quando progetti classi sicure.</p>
+    </div>
+
+    <!-- Copy vs assignment dettagliati -->
+    <div class="inner-box box">
+      <h2>Copy constructor vs copy assignment operator</h2>
+
+<pre><code class="language-cpp">class Buffer {
+private:
+    int* data;
+    std::size_t n;
+public:
+    // costruttore "normale"
+    Buffer(std::size_t size)
+        : data{ new int[size] }, n{ size } {
+        for(std::size_t i=0; i&lt;n; ++i) data[i] = 0;
+    }
+
+    // costruttore di copia
+    Buffer(const Buffer&amp; other)
+        : data{ new int[other.n] }, n{ other.n } {
+        for(std::size_t i=0; i&lt;n; ++i)
+            data[i] = other.data[i];
+    }
+
+    // operatore di assegnazione per copia
+    Buffer&amp; operator=(const Buffer&amp; other) {
+        if(this != &amp;other) {
+            // 1. libera le risorse correnti
+            delete[] data;
+
+            // 2. rialloca e copia
+            n    = other.n;
+            data = new int[n];
+            for(std::size_t i=0; i&lt;n; ++i)
+                data[i] = other.data[i];
+        }
+        return *this;
+    }
+
+    ~Buffer() {
+        delete[] data;
+    }
+};
+</code></pre>
+
+      <ul>
+        <li><b>Riga “Buffer(const Buffer&amp; other)”:</b> costruttore di copia ⇒ viene chiamato per costruire <code>Buffer b = a;</code>.</li>
+        <li><b>Riga “Buffer&amp; operator=(const Buffer&amp; other)”:</b> assegnazione ⇒ viene chiamato per <code>b = a;</code> quando <code>b</code> esiste già.</li>
+        <li>Entrambi devono garantire <b>deep copy</b> se la classe gestisce risorse (qui <code>int* data</code>).</li>
+      </ul>
+
+      <p class="warn"><b>Errore tipico:</b> dimenticare la clausola <code>if(this != &amp;other)</code> e quindi auto-cancellarsi i dati quando si fa <code>b = b;</code>. È raro ma va gestito, specialmente in codice didattico / d’esame.</p>
+    </div>
+
+    <!-- Translation Unit / ODR / Rule of Three-Five -->
+    <div class="inner-box box">
+      <h2>ODR, Rule of Three / Five / Zero</h2>
+
+      <h3>ODR (One Definition Rule)</h3>
+      <p>L’ODR dice (semplificando) che in tutto il programma deve esserci <b>una sola definizione</b> per ogni funzione non-<code>inline</code> e per ogni oggetto con linkage esterno. Se definisci la stessa funzione in due sorgenti diversi (<code>.cpp</code>), il linker va in errore “multiple definition”.</p>
+
+      <h3>Rule of Three</h3>
+      <p>Se devi scrivere <b>a mano</b> uno tra:</p>
+      <ul>
+        <li>Distruttore</li>
+        <li>Costruttore di copia</li>
+        <li>Operatore di assegnazione per copia</li>
+      </ul>
+      <p>allora molto probabilmente devi scrivere <b>tutti e tre</b>. Perché? Perché se la tua classe gestisce risorse manualmente in un punto (per esempio nel distruttore), allora deve gestirle in modo coerente anche quando viene copiata o assegnata.</p>
+
+      <h3>Rule of Five (C++11+)</h3>
+      <p>Con C++11 sono arrivati move constructor e move assignment operator. Quindi oggi parliamo spesso di <b>Rule of Five</b>:</p>
+      <ul>
+        <li>Distruttore</li>
+        <li>Costruttore di copia</li>
+        <li>Operatore di assegnazione per copia</li>
+        <li>Costruttore di spostamento (move constructor)</li>
+        <li>Operatore di assegnazione per spostamento (move assignment)</li>
+      </ul>
+      <p>Se gestisci una risorsa non banale, devi ragionare su tutti questi cinque, decidendo se:
+        <ul>
+          <li>implementarli tu;</li>
+          <li>marcarli <code>=default</code> (cioè chiedere al compilatore la versione implicita);</li>
+          <li>marcarli <code>=delete</code> per vietare certe operazioni (es.: oggetti non copiabili).</li>
+        </ul>
+      </p>
+
+      <h3>Rule of Zero</h3>
+      <p><b>Approccio moderno (RAII):</b> se tutti i membri della tua classe sono già tipi sicuri (es. <code>std::string</code>, <code>std::vector&lt;int&gt;</code>, smart pointer), allora non hai bisogno di scrivere manualmente nessuna di queste funzioni speciali. Lascia fare tutto al compilatore. Questo è lo stile consigliato nel C++ moderno perché riduce enormemente il rischio di bug di copia.</p>
+
+      <p class="ok"><b>Morale:</b> o fai gestione manuale delle risorse in modo completo e coerente, o la deleghi a tipi standard che già rispettano la Rule of Five. Evita vie di mezzo improvvisate.</p>
+    </div>
+
+    <!-- Ottimizzazioni: copy elision -->
+    <div class="inner-box box">
+      <h2>Copy elision e RVO (Return Value Optimization)</h2>
+      <p>In molti casi moderni il compilatore può <b>evitare proprio di chiamare il costruttore di copia</b> quando ritorni un oggetto per valore da una funzione o quando inizializzi da un temporaneo. Questo si chiama <b>copy elision</b> o, in un caso specifico, <b>RVO</b>.</p>
+
+<pre><code class="language-cpp">Buffer crea_buffer(std::size_t n) {
+    Buffer tmp(n);
+    return tmp; // in pratica spesso NON viene chiamato il costruttore di copia
+                // l'oggetto finale viene costruito "direttamente"
+}
+</code></pre>
+
+      <ul>
+        <li>Significa che a volte il tuo costruttore di copia <em>non</em> verrà invocato, anche se “sembra” che dovrebbe.</li>
+        <li>Questo è importante per le prestazioni: evita copie costose di oggetti grandi.</li>
+        <li>Non devi fare nulla per abilitarlo: è una ottimizzazione standard del compilatore moderno.</li>
+      </ul>
+
+      <p class="note">Attenzione: il fatto che la copia <em>possa</em> essere elisa non ti autorizza a scrivere un costruttore di copia sbagliato “tanto non si chiama”. Il compilatore è libero di elidere la copia oppure no a seconda del caso e dello standard. Il tuo codice <b>deve</b> essere corretto anche se la copia avviene davvero.</p>
+    </div>
+
+    <!-- Domanda guida -->
+    <div class="inner-box box">
+      <h2>Domanda-guida</h2>
+      <p>Come posso ridurre la duplicazione di codice tra costruttore di copia e operatore di assegnazione per copia?</p>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn1" onclick="toggleBox('btn1','risp1')">Mostra ▼</button>
+      </div>
+
+      <div id="risp1" style="display:none;margin-top:8px">
+        <p class="note">
+          Tecniche classiche:
+        </p>
+        <ul>
+          <li><b>Funzione privata di supporto</b> (es. <code>copyFrom(const Buffer&amp;)</code>) che incapsula la logica di deep copy. Il costruttore di copia e l’operatore <code>=</code> la riusano.</li>
+          <li><b>Copy-and-swap idiom</b>: si implementa <code>operator=</code> passando l’argomento per valore (quindi usando il costruttore di copia o di move), poi si fa <code>swap</code> sicuro. Questo rende l’operatore di assegnazione <b>eccezione-safe</b>: se qualcosa va storto durante la copia, l’oggetto originale resta intatto.</li>
+          <li>Usare tipi RAII (es. <code>std::string</code>, <code>std::vector&lt;T&gt;</code>, <code>std::unique_ptr&lt;T&gt;</code>) così che la copia sia già corretta senza doverla riscrivere.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Esercizi guidati -->
+    <div class="inner-box box">
+      <h2>Esercizi guidati (mostra/nascondi soluzioni)</h2>
+
+      <ol>
+        <li>
+          <b>E1 — Buffer con deep copy corretta</b><br/>
+          <em>Testo:</em> Progetta una classe <code>Buffer</code> che possiede un array dinamico di <code>int</code>. Implementa:
+          <ul>
+            <li>costruttore che alloca;</li>
+            <li>costruttore di copia con deep copy;</li>
+            <li>operatore di assegnazione per copia (<code>operator=</code>);</li>
+            <li>distruttore.</li>
+          </ul>
+          Verifica che <code>Buffer b = a;</code> e <code>b = a;</code> producano copie indipendenti e nessun double free.
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
+          <div id="box-e1" style="display:none;margin-top:8px">
+
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+class Buffer {
+private:
+    int* data;
+    std::size_t n;
+
+    void copyFrom(const Buffer&amp; other) {
+        n    = other.n;
+        data = new int[n];
+        for(std::size_t i=0; i&lt;n; ++i)
+            data[i] = other.data[i];
+    }
+
+public:
+    Buffer(std::size_t size)
+        : data{ new int[size] }, n{ size } {
+        for(std::size_t i=0; i&lt;n; ++i) data[i] = 0;
+    }
+
+    Buffer(const Buffer&amp; other) {  // costruttore di copia
+        copyFrom(other);
+    }
+
+    Buffer&amp; operator=(const Buffer&amp; other) { // assegnazione per copia
+        if(this != &amp;other){
+            delete[] data;
+            copyFrom(other);
+        }
+        return *this;
+    }
+
+    ~Buffer() {
+        delete[] data;
+    }
+
+    void stampa() const {
+        for(std::size_t i=0; i&lt;n; ++i)
+            std::cout &lt;&lt; data[i] &lt;&lt; ' ';
+        std::cout &lt;&lt; "\n";
+    }
+};
+
+int main() {
+    Buffer a(5);
+    Buffer b = a;   // costruttore di copia
+    Buffer c(10);
+    c = a;          // operatore di assegnazione
+
+    a.stampa();
+    b.stampa();
+    c.stampa();
+}
+</code></pre>
+
+            <p class="ok"><b>Verifica pratica:</b> metti breakpoint nel distruttore e controlla che ogni <code>delete[]</code> liberi un buffer diverso. Nessuna doppia liberazione ⇒ deep copy riuscita.</p>
+          </div>
+        </li>
+
+        <li>
+          <b>E2 — Vietare la copia</b><br/>
+          <em>Testo:</em> Alcune risorse <em>non si possono</em> copiare in modo sensato (per esempio un handle di file aperto in “scrittura esclusiva”). Impedisci la copia.
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
+          <div id="box-e2" style="display:none;margin-top:8px">
+
+<pre><code class="language-cpp">class FileHandle {
+public:
+    FileHandle(const char* path);
+    ~FileHandle();
+
+    FileHandle(const FileHandle&amp;) = delete;            // vieta copia
+    FileHandle&amp; operator=(const FileHandle&amp;) = delete; // vieta assegnazione
+
+    // eventualmente: FileHandle(FileHandle&amp;&amp;) noexcept; // move
+    //                FileHandle&amp; operator=(FileHandle&amp;&amp;) noexcept;
+};
+</code></pre>
+
+            <p class="note">Qui diciamo esplicitamente al compilatore “questa classe <b>non è copiabile</b>”. È lecito e anzi consigliabile se la risorsa non è duplicabile in modo sicuro.</p>
+          </div>
+        </li>
+
+        <li>
+          <b>E3 — RAII moderno</b><br/>
+          <em>Testo:</em> Riscrivi la classe <code>Buffer</code> usando <code>std::vector&lt;int&gt;</code> invece di un <code>int*</code> manuale. Osserva che non hai più bisogno di costruttore di copia custom, né di distruttore custom.
+          <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra ▼</button></div>
+          <div id="box-e3" style="display:none;margin-top:8px">
+
+<pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;cstddef&gt;
+
+class BufferSmart {
+private:
+    std::vector&lt;int&gt; data;
+public:
+    BufferSmart(std::size_t size) : data(size, 0) {}
+
+    // NIENTE distruttore custom
+    // NIENTE costruttore di copia custom
+    // NIENTE operator= custom
+    //
+    // tutto fornito in automatico dal compilatore + std::vector
+};
+</code></pre>
+
+            <p class="ok"><b>Questa è la Rule of Zero:</b> delega la gestione delle risorse a tipi RAII ben progettati. Meno codice manuale ⇒ meno bug.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Riepilogo finale -->
+    <div class="inner-box note">
+      <b>In sintesi.</b>
+      <ul>
+        <li>Il costruttore di copia crea un <b>nuovo</b> oggetto copiando lo stato di un oggetto esistente.</li>
+        <li>Se usi solo tipi standard sicuri (string, vector, smart pointer), la copia implicita è corretta e non devi fare nulla (Rule of Zero).</li>
+        <li>Se gestisci risorse “a mano”, devi fornire tu copia profonda, distruttore e operator=. Questa è la Rule of Three, estesa in C++11 alla Rule of Five con le operazioni di move.</li>
+        <li>Shallow copy (copia solo dei puntatori) è pericolosa perché porta a doppia liberazione, dangling pointer e corruzione di memoria. Usa deep copy o vieta la copia.</li>
+        <li>Copy elision/RVO può evitare chiamate al costruttore di copia per motivi di efficienza, ma il tuo costruttore di copia deve comunque essere corretto.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>
