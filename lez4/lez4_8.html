@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez4_8 · Move constructor e move assignment</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez4_7.html"; }
+    function nextSlide(){ window.location.href = "lez4_9.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+
+  <style>
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
+    .inner-box pre, .inner-box code, .inner-box h2, .inner-box h3 { text-align:left !important; }
+    .inner-box ul, .inner-box ol { margin:.5rem 0 1rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li { margin:.35rem 0 }
+    pre, pre code { white-space:pre; tab-size:4; margin:.5rem 0 1rem 0; padding:.6rem .8rem; }
+
+    .box  { background:#fff; border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:16px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0; display:inline-block }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .bad  { background:#ffefef; border-left:4px solid #ef4444; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+
+    table { width:100%; border-collapse:collapse; margin-top:.5rem }
+    th, td { border-bottom:1px solid #e5e7eb; padding:.6rem .6rem; text-align:left; vertical-align:top; font-size:.95rem; line-height:1.4 }
+    th { background:#f8fafc; font-weight:600 }
+    code.k { background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
+  </style>
+</head>
+
+<body>
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 4 — OOP in C++ (introduzione)</h2>
+  <ul>
+    <li><a href="lez4_1.html">Lez4_1: Perché OOP? Concetti di base</a></li>
+    <li><a href="lez4_2.html">Lez4_2: Definire una classe (sintassi minima)</a></li>
+    <li><a href="lez4_3.html">Lez4_3: Costruttori, distruttore, lista d’iniz.</a></li>
+    <li><a href="lez4_4.html">Lez4_4: Incapsulamento, metodi const, overload</a></li>
+    <li><a href="lez4_5.html">Lez4_5: to_string(), operator&lt;&lt;, pre/postcondiz.</a></li>
+    <li><a href="lez4_6.html">Lez4_6: Header/Sorgenti, include-guard, build</a></li>
+    <li><a href="lez4_7.html">Lez4_7: Costruttore di copia e semantica di copia</a></li>
+    <li><a class="active" href="lez4_8.html">Lez4_8: Move constructor e move assignment</a></li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1>Move constructor e move assignment: spostare invece di copiare</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <!-- Obiettivi -->
+    <div class="inner-box box">
+      <h2>Obiettivi</h2>
+      <ul>
+        <li>Capire cos’è uno <b>spostamento</b> (move) rispetto alla <b>copia</b>.</li>
+        <li>Capire perché il C++ moderno (C++11+) ha introdotto <b>move constructor</b> e <b>move assignment operator</b>.</li>
+        <li>Scrivere correttamente un costruttore di move e un operatore di assegnazione di move per una classe che gestisce memoria dinamica.</li>
+        <li>Evitare copie inutili di oggetti temporanei costosi (es. <code>std::vector</code>, buffer di grandi dimensioni).</li>
+        <li>Capire il legame con la “Rule of Five”.</li>
+      </ul>
+      <p class="note"><b>Idea chiave:</b> Copiare = duplicare la risorsa. Spostare = trasferire la risorsa, lasciando il vecchio oggetto in uno stato “vuoto ma valido”. Questo evita lavoro inutile e rende il codice più veloce.</p>
+    </div>
+
+    <!-- Motivazione concettuale -->
+    <div class="inner-box box">
+      <h2>Perché esiste il "move"?</h2>
+      <p>Prima del C++11, ogni passaggio/ritorno per valore poteva comportare una <b>copia</b>. Copiare oggetti grandi è costoso, e copiare oggetti che gestiscono risorse uniche (file aperti, memoria heap esclusiva, socket) può essere addirittura <b>vietato</b> o pericoloso.</p>
+
+      <p>Il C++ moderno introduce il concetto di <b>trasferire la proprietà</b> della risorsa da un oggetto “sorgente” a un oggetto “destinazione”. Questo trasferimento è lo spostamento (<em>move</em>).</p>
+
+      <ul>
+        <li>Move = “questa risorsa ora è tua, io (oggetto sorgente) la mollo”.</li>
+        <li>Dopo il move, l’oggetto sorgente resta in uno stato “valido ma indeterminato”, cioè:
+          <ul>
+            <li>può essere distrutto senza problemi,</li>
+            <li>ma non garantiamo il vecchio contenuto logico (es. il buffer può essere stato messo a <code>nullptr</code>).</li>
+          </ul>
+        </li>
+      </ul>
+
+      <p class="ok"><b>Risultato pratico:</b> Il move evita copie profonde e rende efficienti pattern comuni come <code>return oggetto_grande;</code> da una funzione.</p>
+    </div>
+
+    <!-- Sintassi e firma -->
+    <div class="inner-box box">
+      <h2>Move constructor e move assignment: firme canoniche</h2>
+
+      <p><b>Move constructor</b> (costruttore di spostamento):</p>
+<pre><code class="language-cpp">Classe(Classe&amp;&amp; altro) noexcept;
+</code></pre>
+
+      <p><b>Move assignment operator</b> (operatore di assegnazione per spostamento):</p>
+<pre><code class="language-cpp">Classe&amp; operator=(Classe&amp;&amp; altro) noexcept;
+</code></pre>
+
+      <ul>
+        <li>Il parametro è una <b>rvalue reference</b> <code>&amp;&amp;</code>, cioè una referenza a un oggetto “temporaneo / sacrificabile”.</li>
+        <li><code>noexcept</code>: è buona pratica dichiararli <code>noexcept</code> per permettere ottimizzazioni nelle librerie standard (ad esempio <code>std::vector</code> preferisce spostare elementi che hanno move <code>noexcept</code>).</li>
+        <li>Osserva la differenza con il costruttore di copia:
+          <ul>
+            <li>copia: <code>const T&amp;</code></li>
+            <li>move: <code>T&amp;&amp;</code></li>
+          </ul>
+        </li>
+      </ul>
+
+      <p class="warn"><b>Attenzione terminologica:</b> L’operatore <code>operator=(T&amp;&amp;)</code> gestisce l’assegnazione <b>da rvalue</b>, quindi si chiama “move assignment”. Non sostituisce <code>operator=(const T&amp;)</code>: i due convivono.</p>
+    </div>
+
+    <!-- Esempio pratico con buffer dinamico -->
+    <div class="inner-box box">
+      <h2>Esempio: classe Buffer con move constructor e move assignment</h2>
+
+      <p>Riprendiamo una classe che gestisce manualmente memoria dinamica (senza <code>std::vector</code>) per vedere chiaramente cosa succede alle risorse:</p>
+
+<pre><code class="language-cpp">#include &lt;cstddef&gt;
+#include &lt;utility&gt;   // std::exchange (C++14+) è comodo
+
+class Buffer {
+private:
+    int* data;
+    std::size_t n;
+
+public:
+    // costruttore "normale"
+    Buffer(std::size_t size)
+        : data{ new int[size] }, n{ size } {
+        for(std::size_t i = 0; i &lt; n; ++i) data[i] = 0;
+    }
+
+    // costruttore di copia (deep copy)
+    Buffer(const Buffer&amp; other)
+        : data{ new int[other.n] }, n{ other.n } {
+        for(std::size_t i = 0; i &lt; n; ++i) data[i] = other.data[i];
+    }
+
+    // operatore di assegnazione per copia
+    Buffer&amp; operator=(const Buffer&amp; other) {
+        if (this != &amp;other) {
+            delete[] data;
+            n    = other.n;
+            data = new int[n];
+            for(std::size_t i = 0; i &lt; n; ++i)
+                data[i] = other.data[i];
+        }
+        return *this;
+    }
+
+    // ===========================
+    // MOVE CONSTRUCTOR
+    // ===========================
+    Buffer(Buffer&amp;&amp; other) noexcept
+        : data{ other.data }, n{ other.n } {
+
+        // "rubiamo" le risorse da other
+        other.data = nullptr;
+        other.n    = 0;
+    }
+
+    // ===========================
+    // MOVE ASSIGNMENT
+    // ===========================
+    Buffer&amp; operator=(Buffer&amp;&amp; other) noexcept {
+        if (this != &amp;other) {
+            // libera le risorse attuali
+            delete[] data;
+
+            // trasferisci la proprietà
+            data = other.data;
+            n    = other.n;
+
+            // svuota l'oggetto sorgente
+            other.data = nullptr;
+            other.n    = 0;
+        }
+        return *this;
+    }
+
+    ~Buffer() {
+        delete[] data;
+    }
+
+    std::size_t size() const { return n; }
+    int* raw() const { return data; }
+};
+</code></pre>
+
+      <ul>
+        <li><b>Move constructor:</b> prende le risorse <code>data</code> e <code>n</code> da <code>other</code> senza fare copie profonde. Poi imposta <code>other</code> a stato vuoto.</li>
+        <li><b>Move assignment:</b> prima libera le <em>vecchie</em> risorse di <code>*this</code>, poi prende possesso delle risorse di <code>other</code> e svuota <code>other</code>.</li>
+        <li>Entrambi sono <code>noexcept</code>: è fortemente consigliato, perché gli standard container sfruttano questa garanzia per muovere elementi in modo sicuro e veloce.</li>
+      </ul>
+
+      <p class="ok"><b>Effetto:</b> dopo uno spostamento, l’oggetto “sorgente” è generalmente ancora distruttibile senza crash, ma non garantisce più di avere dati utili. È come avergli “staccato il disco rigido”.</p>
+    </div>
+
+    <!-- Stato dell'oggetto sorgente dopo move -->
+    <div class="inner-box box">
+      <h2>Dopo il move, cosa resta nell’oggetto sorgente?</h2>
+
+      <p>Dopo il move constructor o il move assignment, l’oggetto sorgente (il parametro <code>other</code>):</p>
+      <ul>
+        <li>deve essere lasciato in uno <b>stato valido</b>, cioè può essere distrutto senza provocare problemi;</li>
+        <li>può anche essere riassegnato e riutilizzato (per esempio con <code>operator=</code>), anche se il suo contenuto logico non è più quello originale.</li>
+      </ul>
+
+      <p>Nel nostro esempio, dopo lo spostamento mettiamo:</p>
+      <ul>
+        <li><code>other.data = nullptr;</code></li>
+        <li><code>other.n = 0;</code></li>
+      </ul>
+
+      <p class="warn"><b>Importante:</b> “Valido” non significa “uguale a prima”. Significa soltanto “sicuro da distruggere / sovrascrivere / riassegnare”. Fare affidamento sui vecchi dati di un oggetto che è stato mosso è un errore logico tipico degli studenti.</p>
+    </div>
+
+    <!-- Rvalue reference e std::move -->
+    <div class="inner-box box">
+      <h2>Rvalue reference (<code>&amp;&amp;</code>) e <code>std::move()</code></h2>
+
+      <p>Come fa il compilatore a capire quando può spostare invece che copiare?</p>
+      <ul>
+        <li>Un <b>rvalue</b> è tipicamente un <b>temporaneo</b>, qualcosa che “sta per morire”. Esempio: il valore di ritorno di una funzione.</li>
+        <li>Un parametro <code>T&amp;&amp;</code> promette: “puoi rubarmi le risorse, non mi offendo”.</li>
+        <li>Se invece hai un oggetto normale (un lvalue con un nome), il compilatore <em>non</em> lo tratta come temporaneo a meno che tu non usi <code>std::move()</code>.</li>
+      </ul>
+
+<pre><code class="language-cpp">Buffer creaBuffer(std::size_t n) {
+    Buffer tmp(n);
+    return tmp;            // tmp è temporaneo -> si può muovere
+}
+
+int main() {
+    Buffer a(1000);
+    Buffer b = creaBuffer(2000);  // chiama move constructor (di solito)
+
+    Buffer c(10);
+    c = creaBuffer(500);          // chiama move assignment (di solito)
+
+    Buffer d(1);
+    d = std::move(a);             // forziamo "a" a comportarsi come rvalue
+                                  // => move assignment
+}
+</code></pre>
+
+      <ul>
+        <li><code>std::move(x)</code> NON sposta da solo: è un cast che dice “tratta <code>x</code> come rvalue”. Poi, solo se la classe <b>supporta</b> il move, avverrà lo spostamento reale.</li>
+        <li>Dopo <code>d = std::move(a);</code>, l’oggetto <code>a</code> è stato svuotato. Non usarlo assumendo che contenga ancora i vecchi dati significativi.</li>
+      </ul>
+
+      <p class="note"><b>Regola di stile:</b> usa <code>std::move()</code> quando:
+        <ul>
+          <li>stai trasferendo proprietà da un oggetto locale che non ti serve più,</li>
+          <li>stai implementando move assignment e vuoi “trascinare” dentro risorse dai membri di un altro oggetto.</li>
+        </ul>
+      </p>
+    </div>
+
+    <!-- Rule of Five -->
+    <div class="inner-box box">
+      <h2>Rule of Five e impatto progettuale</h2>
+
+      <p>Nella lezione precedente abbiamo parlato della “Rule of Three”: se definisci a mano distruttore, costruttore di copia e operator= di copia, probabilmente devi scrivere bene tutti e tre.</p>
+
+      <p>Con C++11 arriva lo <b>spostamento</b>, e quindi si parla di <b>Rule of Five</b>:</p>
+      <ul>
+        <li>Distruttore</li>
+        <li>Costruttore di copia</li>
+        <li>Assegnazione per copia (<code>operator=(const T&amp;)</code>)</li>
+        <li><b>Costruttore di move (<code>T(T&amp;&amp;)</code>)</b></li>
+        <li><b>Assegnazione di move (<code>operator=(T&amp;&amp;)</code>)</b></li>
+      </ul>
+
+      <p class="ok"><b>Messaggio da portare a casa:</b> se la tua classe possiede una risorsa (memoria dinamica, file, socket, mutex, ecc.), devi specificare in modo chiaro:
+        <ul>
+          <li>può essere copiata? come?</li>
+          <li>può essere spostata? come?</li>
+          <li>oppure è solo spostabile ma non copiabile (es. <code>std::unique_ptr</code>)?</li>
+        </ul>
+      </p>
+
+      <p class="note"><b>Stile moderno (Rule of Zero):</b> se possibile, <em>non gestire tu la risorsa a mano</em>. Usa <code>std::vector</code>, <code>std::string</code>, smart pointer. Queste classi della libreria standard hanno già implementato move e copy in modo sicuro ed efficiente. Così la tua classe non ha bisogno né di costruttori di copia personalizzati né di move personalizzati: tutto “gratis”.</p>
+    </div>
+
+    <!-- Domanda guida -->
+    <div class="inner-box box">
+      <h2>Domanda-guida</h2>
+      <p>Quando è meglio vietare la copia ma permettere il move?</p>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn1" onclick="toggleBox('btn1','risp1')">Mostra ▼</button>
+      </div>
+
+      <div id="risp1" style="display:none;margin-top:8px">
+        <p class="note">
+          Esempio tipico: una classe che rappresenta la “proprietà esclusiva” di una risorsa unica, tipo un file aperto in modalità esclusiva o un socket di rete.  
+          Ha senso trasferire questa proprietà a un nuovo oggetto (move), ma copiarla no, perché due oggetti non possono “possessare” lo stesso handle esclusivo.  
+          In quel caso:
+        </p>
+
+<pre><code class="language-cpp">class FileHandle {
+public:
+    FileHandle(const char* path);   // apre il file
+    ~FileHandle();                  // chiude il file
+
+    FileHandle(const FileHandle&amp;) = delete;            // niente copia
+    FileHandle&amp; operator=(const FileHandle&amp;) = delete; // niente copia
+
+    FileHandle(FileHandle&amp;&amp;) noexcept;                 // sì move
+    FileHandle&amp; operator=(FileHandle&amp;&amp;) noexcept;      // sì move
+};
+</code></pre>
+
+        <p class="ok"><b>Risultato:</b> L’oggetto è “non copiabile ma spostabile”. Questo è esattamente il comportamento di molti tipi “unici” del C++ moderno, come <code>std::unique_ptr&lt;T&gt;</code>.</p>
+      </div>
+    </div>
+
+    <!-- Esercizi -->
+    <div class="inner-box box">
+      <h2>Esercizi guidati (mostra/nascondi soluzioni)</h2>
+
+      <ol>
+        <li>
+          <b>E1 — Aggiungi il move a Buffer</b><br/>
+          <em>Testo:</em> Parti dalla classe <code>Buffer</code> vista sopra.  
+          Scrivi il costruttore di move e il move assignment come mostrato, marcandoli <code>noexcept</code>.  
+          Spiega perché <code>noexcept</code> è importante per le performance di <code>std::vector</code> e di altri container.
+          <div class="nav-buttons" style="justify-content:left">
+            <button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button>
+          </div>
+          <div id="box-e1" style="display:none;margin-top:8px">
+            <p class="note"><b>Soluzione ragionata:</b> Se il move può lanciare eccezioni, i container standard potrebbero preferire copiare invece che spostare durante una riallocazione interna, costringendoti a copie lente. Se garantisci <code>noexcept</code>, il container può spostare in sicurezza elementi grandi invece di copiarli, riducendo drasticamente i costi.</p>
+          </div>
+        </li>
+
+        <li>
+          <b>E2 — Usa std::move consapevolmente</b><br/>
+          <em>Testo:</em> Scrivi una funzione che prende un <code>Buffer</code> per valore e lo ritorna. Verifica (mentalmente o con il debugger) quali costruttori vengono chiamati se compili in C++17 con ottimizzazioni. Prova poi a forzare l’uso di <code>std::move()</code> su una variabile locale per vedere quando scatta il move constructor, e descrivi cosa succede all’oggetto originario.
+          <div class="nav-buttons" style="justify-content:left">
+            <button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button>
+          </div>
+          <div id="box-e2" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">Buffer fabbrica() {
+    Buffer tmp(1000);
+    return tmp;     // RVO / move
+}
+
+int main() {
+    Buffer a = fabbrica();      // move o RVO
+    Buffer b(10);
+    b = fabbrica();             // move assignment
+    Buffer c(20);
+    c = std::move(a);           // move esplicito da 'a'
+}
+</code></pre>
+            <p class="ok"><b>Punto didattico:</b> dopo <code>c = std::move(a);</code>, l’oggetto <code>a</code> è “svuotato”. Deve comunque poter essere distrutto senza crash.</p>
+          </div>
+        </li>
+
+        <li>
+          <b>E3 — Progetta una classe non copiabile ma spostabile</b><br/>
+          <em>Testo:</em> Disegna una classe <code>Connection</code> che rappresenti una connessione di rete “unica”.  
+          Vietane la copia (<code>=delete</code>) ma consenti il move.  
+          Spiega perché questo modello è più realistico del permettere copie arbitrarie.
+          <div class="nav-buttons" style="justify-content:left">
+            <button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra ▼</button>
+          </div>
+          <div id="box-e3" style="display:none;margin-top:8px">
+            <p class="note"><b>Spiegazione attesa:</b> Due oggetti diversi che “credono” di essere connessi in esclusiva alla stessa risorsa di rete causerebbero comportamenti non definiti (doppia chiusura, confusione sugli stati, ecc.). Il move trasferisce in modo chiaro la proprietà della connessione, lasciando l’oggetto sorgente scollegato/svuotato.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Riepilogo finale -->
+    <div class="inner-box note">
+      <b>In sintesi.</b>
+      <ul>
+        <li>Il move constructor e il move assignment operator permettono di <b>trasferire</b> una risorsa invece di copiarla.</li>
+        <li>Dopo lo spostamento, l’oggetto sorgente rimane valido ma tipicamente “svuotato”. Non assumere che contenga ancora dati utili.</li>
+        <li>Marcare queste funzioni come <code>noexcept</code> è cruciale per le performance nelle strutture dati standard.</li>
+        <li>La possibilità di copiare e/o muovere fa parte del contratto semantico della classe. Devi decidere cosa ha senso:
+          <ul>
+            <li>copiabile e spostabile,</li>
+            <li>solo spostabile,</li>
+            <li>né copiabile né spostabile (oggetti rigidamente non trasferibili).</li>
+          </ul>
+        </li>
+        <li>Nel C++ moderno, la gestione delle risorse e la definizione di copia/move rientrano nella <b>Rule of Five</b>. Se deleghi tutto a tipi RAII standard, entri nella <b>Rule of Zero</b> e spesso non devi scrivere nulla a mano.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>
