@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez4_11 · Esercizi svolti (livello avanzato)</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez4_10.html"; }
+    function nextSlide(){ window.location.href = "../programma.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+
+  <style>
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
+    .inner-box pre, .inner-box code, .inner-box h2, .inner-box h3 { text-align:left !important; }
+    .inner-box ul, .inner-box ol { margin:.5rem 0 1rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li { margin:.35rem 0 }
+    pre, pre code { white-space:pre; tab-size:4; margin:.5rem 0 1rem 0; padding:.6rem .8rem; }
+
+    .box  { background:#fff; border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:16px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0; display:inline-block }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .bad  { background:#ffefef; border-left:4px solid #ef4444; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+
+    table { width:100%; border-collapse:collapse; margin-top:.5rem }
+    th, td { border-bottom:1px solid #e5e7eb; padding:.6rem .6rem; text-align:left; vertical-align:top; font-size:.95rem; line-height:1.4 }
+    th { background:#f8fafc; font-weight:600 }
+    code.k { background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
+  </style>
+</head>
+
+<body>
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 4 — OOP in C++ (introduzione)</h2>
+  <ul>
+    <li><a href="lez4_1.html">Lez4_1: Perché OOP? Concetti di base</a></li>
+    <li><a href="lez4_2.html">Lez4_2: Definire una classe (sintassi minima)</a></li>
+    <li><a href="lez4_3.html">Lez4_3: Costruttori, distruttore, lista d’iniz.</a></li>
+    <li><a href="lez4_4.html">Lez4_4: Incapsulamento, metodi const, overload</a></li>
+    <li><a href="lez4_5.html">Lez4_5: to_string(), operator&lt;&lt;, pre/postcondiz.</a></li>
+    <li><a href="lez4_6.html">Lez4_6: Header/Sorgenti, include-guard, build</a></li>
+    <li><a href="lez4_7.html">Lez4_7: Costruttore di copia e semantica di copia</a></li>
+    <li><a href="lez4_8.html">Lez4_8: Move constructor e move assignment</a></li>
+    <li><a href="lez4_9.html">Lez4_9: Esercizi svolti · livello base</a></li>
+    <li><a href="lez4_10.html">Lez4_10: Esercizi svolti · livello intermedio</a></li>
+    <li><a class="active" href="lez4_11.html">Lez4_11: Esercizi svolti · livello avanzato</a></li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1>Esercizi svolti · Livello avanzato<br><small>Ownership, move semantics, Rule of Five / Rule of Zero</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <!-- Introduzione -->
+    <div class="inner-box box">
+      <h2>Obiettivo di questi esercizi</h2>
+      <p>
+        Ora non basta più “saper scrivere una classe che compila”.
+        Dobbiamo ragionare come progettisti di libreria:
+      </p>
+      <ul>
+        <li>Chi <b>possiede</b> la risorsa (memoria, file, socket...)?</li>
+        <li>La risorsa può essere <b>copiata</b> (duplicata) o solo <b>spostata</b> (trasferita)?</li>
+        <li>Dopo un <b>move</b>, in che stato lasciamo l’oggetto sorgente?</li>
+        <li>La nostra classe rientra nella <b>Rule of Five</b> (gestione manuale)
+            oppure possiamo usare la <b>Rule of Zero</b> (delego tutto a std::vector, std::string...)?</li>
+      </ul>
+      <p class="note">
+        Questi esercizi integrano lez4_7 (semantica di copia profonda),
+        lez4_8 (move constructor e move assignment),
+        e richiamano lez4_5–lez4_6 per l’idea di interfaccia pulita e responsabilità ben definite.
+      </p>
+    </div>
+
+    <!-- Esercizio A1: FileHandle non copiabile ma spostabile -->
+    <div class="inner-box box">
+      <h2>Esercizio A1 — <code>FileHandle</code>: risorsa esclusiva, <u>non copiabile</u> ma <u>spostabile</u></h2>
+
+      <p><b>Scenario:</b></p>
+      <ul>
+        <li>Un oggetto <code>FileHandle</code> rappresenta la “proprietà esclusiva” di una risorsa di basso livello (per esempio un file aperto).</li>
+        <li>Due oggetti diversi <b>non</b> devono mai credere di possedere lo stesso handle in parallelo,
+            altrimenti rischiano doppia chiusura / stato incoerente.</li>
+        <li>Ha senso però <b>trasferire</b> la proprietà da un oggetto a un altro → operazioni di move (spostamento).</li>
+      </ul>
+
+      <p><b>Richiesta progettuale:</b></p>
+      <ul>
+        <li>Attributo privato, ad esempio <code>int fd_;</code> che rappresenta l’handle del file aperto
+            (per l’esercizio basta trattarlo come un intero).</li>
+        <li>Costruttore che “apre” (per la didattica puoi simulare aprendo un finto descrittore, tipo assegnare un numero &gt;=0).</li>
+        <li>Distruttore che “chiude” (per la didattica: stampa un commento o immagina di chiamare <code>close(fd_)</code>).</li>
+        <li><b>Vietare la copia</b>:
+          <ul>
+            <li><code>FileHandle(const FileHandle&amp;) = delete;</code></li>
+            <li><code>FileHandle&amp; operator=(const FileHandle&amp;) = delete;</code></li>
+          </ul>
+        </li>
+        <li><b>Consentire lo spostamento</b>:
+          <ul>
+            <li>Costruttore di move <code>FileHandle(FileHandle&amp;&amp;) noexcept;</code></li>
+            <li>Move assignment <code>FileHandle&amp; operator=(FileHandle&amp;&amp;) noexcept;</code></li>
+            <li>Dopo il move: l’oggetto sorgente deve essere lasciato in stato “svuotato ma valido”
+                (ad esempio <code>fd_ = -1</code>).</li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-a1" onclick="toggleBox('btn-a1','sol-a1')">Mostra ▼</button>
+      </div>
+      <div id="sol-a1" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">#include &lt;utility&gt;   // std::exchange (C++14+ opzionale)
+#include &lt;iostream&gt;
+
+class FileHandle {
+private:
+    int fd_; // "file descriptor" simulato; -1 significa "nessun file"
+
+public:
+    // Costruttore "fittizio": simula apertura risorsa
+    explicit FileHandle(int fakeFd)
+        : fd_{ fakeFd } {
+        // In un caso reale, qui apriresti il file e assegneresti l'handle reale.
+        // Se l'apertura fallisse, potresti settare fd_ = -1.
+    }
+
+    // Distruttore: rilascia la risorsa se valida
+    ~FileHandle() {
+        if (fd_ != -1) {
+            // In reale: close(fd_);
+            // Qui solo dimostrativo:
+            // std::cout &lt;&lt; "Chiudo fd " &lt;&lt; fd_ &lt;&lt; "\n";
+        }
+    }
+
+    // Vietiamo la copia (ownership esclusiva!)
+    FileHandle(const FileHandle&amp;)            = delete;
+    FileHandle&amp; operator=(const FileHandle&amp;) = delete;
+
+    // Costruttore di move
+    FileHandle(FileHandle&amp;&amp; other) noexcept
+        : fd_{ other.fd_ } {
+        other.fd_ = -1; // l'oggetto sorgente viene "svuotato"
+    }
+
+    // Operatore di assegnazione di move
+    FileHandle&amp; operator=(FileHandle&amp;&amp; other) noexcept {
+        if (this != &amp;other) {
+            // 1. Chiudiamo l'eventuale handle che già possedevamo
+            if (fd_ != -1) {
+                // close(fd_) nel mondo reale
+            }
+
+            // 2. Trasferiamo la proprietà
+            fd_ = other.fd_;
+
+            // 3. Svuotiamo l'altro
+            other.fd_ = -1;
+        }
+        return *this;
+    }
+
+    // Osservatore "const"
+    int descriptor() const {
+        return fd_;
+    }
+
+    bool valido() const {
+        return fd_ != -1;
+    }
+};</code></pre>
+
+        <p class="ok"><b>Commento progettuale:</b>
+        Questa classe è <b>non copiabile</b> ma <b>spostabile</b>.  
+        È un pattern fondamentale nel C++ moderno per rappresentare risorse uniche
+        (es. <code>std::unique_ptr</code>): puoi trasferire l’ownership, ma non puoi clonarla a caso.
+        </p>
+
+        <p class="note">
+        Seguiamo lo schema visto in lez4_8:
+        <ul>
+          <li>il move constructor e il move assignment sono marcati <code>noexcept</code>,</li>
+          <li>lo stato dell’oggetto sorgente dopo il move viene “svuotato” (<code>fd_ = -1</code>),</li>
+          <li>il distruttore deve poter essere chiamato su un oggetto svuotato senza crash.</li>
+        </ul>
+        Questo è il contratto di una risorsa “spostabile in modo sicuro”.
+        </p>
+      </div>
+    </div>
+
+    <!-- Esercizio A2: Image copiabile e spostabile -->
+    <div class="inner-box box">
+      <h2>Esercizio A2 — <code>Image</code>: risorsa duplicabile (deep copy) ma anche spostabile (move)</h2>
+
+      <p><b>Scenario:</b></p>
+      <ul>
+        <li><code>Image</code> rappresenta un’immagine in memoria: larghezza, altezza, buffer di pixel.</li>
+        <li>Qui <b>ha senso</b> poter fare una copia profonda (duplicare i pixel).</li>
+        <li>Ma vogliamo anche che il tipo sia efficiente quando ritorna da funzioni → serve il move.</li>
+      </ul>
+
+      <p><b>Richiesta progettuale:</b></p>
+      <ul>
+        <li>Attributi privati:
+          <ul>
+            <li><code>unsigned char* data_;</code>  (pixel in raw)</li>
+            <li><code>std::size_t w_;</code> (larghezza)</li>
+            <li><code>std::size_t h_;</code> (altezza)</li>
+          </ul>
+        </li>
+        <li>Metodi richiesti:
+          <ul>
+            <li>Costruttore <code>Image(std::size_t w, std::size_t h)</code> che alloca <code>w*h*3</code> byte (RGB) e li inizializza a 0.</li>
+            <li>Distruttore: libera <code>data_</code>.</li>
+            <li><b>Costruttore di copia</b> e <b>operatore di assegnazione per copia</b>: deep copy.</li>
+            <li><b>Move constructor</b> e <b>move assignment</b> <code>noexcept</code>: trasferiscono il buffer e azzerano l’oggetto sorgente.</li>
+            <li>Un metodo <code>std::string to_string() const</code> tipo <code>"Image[640x480]"</code>.</li>
+          </ul>
+        </li>
+        <li>Questa è una classe “Rule of Five”: gestisce manualmente una risorsa e quindi definisce distruttore, copy/move constructor e copy/move assignment (lez4_7, lez4_8).</li>
+      </ul>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-a2" onclick="toggleBox('btn-a2','sol-a2')">Mostra ▼</button>
+      </div>
+      <div id="sol-a2" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">#include &lt;cstddef&gt;
+#include &lt;cstring&gt;   // std::memcpy
+#include &lt;string&gt;
+#include &lt;sstream&gt;
+
+class Image {
+private:
+    unsigned char* data_;
+    std::size_t w_;
+    std::size_t h_;
+
+    static std::size_t bytesFor(std::size_t w, std::size_t h) {
+        return w * h * 3; // RGB 24-bit
+    }
+
+public:
+    // Costruttore
+    Image(std::size_t w, std::size_t h)
+        : data_{ nullptr }, w_{ w }, h_{ h } {
+
+        const std::size_t bytes = bytesFor(w_, h_);
+        data_ = new unsigned char[bytes];
+        for (std::size_t i = 0; i &lt; bytes; ++i) {
+            data_[i] = 0; // nero
+        }
+    }
+
+    // Distruttore
+    ~Image() {
+        delete[] data_;
+    }
+
+    // Costruttore di copia (deep copy)
+    Image(const Image&amp; other)
+        : data_{ nullptr }, w_{ other.w_ }, h_{ other.h_ } {
+
+        const std::size_t bytes = bytesFor(w_, h_);
+        data_ = new unsigned char[bytes];
+        std::memcpy(data_, other.data_, bytes);
+    }
+
+    // Operatore di assegnazione per copia (deep copy)
+    Image&amp; operator=(const Image&amp; other) {
+        if (this != &amp;other) {
+            // Rialloco buffer e copio
+            const std::size_t bytes = bytesFor(other.w_, other.h_);
+            unsigned char* nuovo = new unsigned char[bytes];
+            std::memcpy(nuovo, other.data_, bytes);
+
+            // Libero il vecchio buffer
+            delete[] data_;
+
+            // Aggiorno lo stato
+            data_ = nuovo;
+            w_    = other.w_;
+            h_    = other.h_;
+        }
+        return *this;
+    }
+
+    // Move constructor
+    Image(Image&amp;&amp; other) noexcept
+        : data_{ other.data_ }, w_{ other.w_ }, h_{ other.h_ } {
+
+        // "svuotiamo" l'altro
+        other.data_ = nullptr;
+        other.w_ = 0;
+        other.h_ = 0;
+    }
+
+    // Move assignment
+    Image&amp; operator=(Image&amp;&amp; other) noexcept {
+        if (this != &amp;other) {
+            // 1. Libera la risorsa attuale
+            delete[] data_;
+
+            // 2. Trasferisci la proprietà
+            data_ = other.data_;
+            w_    = other.w_;
+            h_    = other.h_;
+
+            // 3. Svuota l'altro
+            other.data_ = nullptr;
+            other.w_ = 0;
+            other.h_ = 0;
+        }
+        return *this;
+    }
+
+    std::size_t width()  const { return w_; }
+    std::size_t height() const { return h_; }
+
+    std::string to_string() const {
+        std::ostringstream os;
+        os &lt;&lt; "Image[" &lt;&lt; w_ &lt;&lt; "x" &lt;&lt; h_ &lt;&lt; "]";
+        return os.str();
+    }
+};</code></pre>
+
+        <p class="ok"><b>Commento progettuale:</b>
+        Questa classe è sia copiabile che spostabile:
+        <ul>
+          <li><b>Copia:</b> produce un duplicato profondo dei pixel → due immagini indipendenti.</li>
+          <li><b>Move:</b> trasferisce l’ownership del buffer, evitando copie pesanti
+              (utile quando ritorni una <code>Image</code> da una funzione).</li>
+        </ul>
+        È l’esempio tipico della <b>Rule of Five</b>:  
+        distruttore + costruttore di copia + assegnazione per copia + costruttore di move + assegnazione di move.
+        </p>
+
+        <p class="note">
+        Dopo il move, l’oggetto sorgente è ancora “valido ma svuotato”:
+        può essere distrutto senza crash, ma non garantiamo che contenga ancora l’immagine originale.  
+        Questo è coerente con la semantica di move di lez4_8.
+        </p>
+      </div>
+    </div>
+
+    <!-- Esercizio A3: Rule of Zero -->
+    <div class="inner-box box">
+      <h2>Esercizio A3 — <code>BufferSmart</code> e la Rule of Zero</h2>
+
+      <p><b>Scenario:</b></p>
+      <ul>
+        <li>Hai visto <code>BufferInt</code> (lez4_10) e <code>Image</code> (sopra): entrambe gestiscono manualmente memoria grezza (<code>new[]</code>/<code>delete[]</code>).</li>
+        <li>Questo obbliga a implementare tutto: distruttore, copia profonda, move, ecc.</li>
+        <li>Domanda: possiamo “smettere di gestire la memoria a mano”
+            e lasciare tutto a un contenitore standard come <code>std::vector&lt;int&gt;</code>?</li>
+      </ul>
+
+      <p><b>Richiesta progettuale:</b></p>
+      <ul>
+        <li>Progetta una classe <code>BufferSmart</code> che internamente usa <code>std::vector&lt;int&gt;</code>.</li>
+        <li>Chiediamo:
+          <ul>
+            <li>costruttore che crea un vettore di N interi inizializzati a zero;</li>
+            <li>metodi <code>size()</code>, <code>get(i)</code>, <code>set(i,v)</code>, <code>to_string()</code>;</li>
+          </ul>
+        </li>
+        <li>NON scrivere distruttore custom, NON scrivere costruttore di copia custom, NON scrivere move custom:
+            lascia fare al compilatore e a <code>std::vector</code>.</li>
+        <li>Spiega perché questo approccio è chiamato <b>Rule of Zero</b>.</li>
+      </ul>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-a3" onclick="toggleBox('btn-a3','sol-a3')">Mostra ▼</button>
+      </div>
+      <div id="sol-a3" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;sstream&gt;
+#include &lt;cstddef&gt;
+
+class BufferSmart {
+private:
+    std::vector&lt;int&gt; data_;
+
+public:
+    // Costruttore: delega tutto a std::vector
+    explicit BufferSmart(std::size_t n)
+        : data_(n, 0) { // n elementi inizializzati a 0
+    }
+
+    std::size_t size() const {
+        return data_.size();
+    }
+
+    int get(std::size_t i) const {
+        if (i &gt;= data_.size()) return 0;
+        return data_[i];
+    }
+
+    void set(std::size_t i, int v) {
+        if (i &lt; data_.size()) {
+            data_[i] = v;
+        }
+    }
+
+    std::string to_string() const {
+        std::ostringstream os;
+        os &lt;&lt; "BufferSmart[n=" &lt;&lt; data_.size() &lt;&lt; "]{";
+        for (std::size_t i = 0; i &lt; data_.size(); ++i) {
+            os &lt;&lt; data_[i];
+            if (i + 1 &lt; data_.size()) os &lt;&lt; ",";
+        }
+        os &lt;&lt; "}";
+        return os.str();
+    }
+};</code></pre>
+
+        <p class="ok"><b>Commento progettuale:</b>
+        Qui non abbiamo scritto:
+        <ul>
+          <li>distruttore,</li>
+          <li>costruttore di copia/assegnazione,</li>
+          <li>costruttore di move/move assignment.</li>
+        </ul>
+        Eppure la classe è perfettamente usabile, copiabile e spostabile in modo sicuro.
+        Perché? Perché <code>std::vector</code> implementa già tutto questo in modo corretto.
+        Questo stile si chiama <b>Rule of Zero</b>:
+        la classe non gestisce direttamente risorse grezze, quindi non ha bisogno
+        di funzioni speciali. Il compilatore può generare
+        copia, assegnazione, move, ecc. senza che noi facciamo nulla.
+        </p>
+
+        <p class="note">
+        Nella vita reale, questa è spesso la soluzione migliore:
+        <ul>
+          <li>meno codice = meno bug,</li>
+          <li>copia e move sono già ottimizzate e testate nella libreria standard,</li>
+          <li>la semantica di proprietà è chiara: il <code>std::vector</code> è <b>owned</b> dalla classe e nessun altro lo tocca.</li>
+        </ul>
+        Questo è il punto di arrivo “maturo” del progettista C++ moderno:
+        <b>prima</b> pensi l’ownership, <b>poi</b> decidi se devi davvero sporcarti le mani con i puntatori grezzi.
+        </p>
+      </div>
+    </div>
+
+    <!-- Riepilogo finale -->
+    <div class="inner-box note">
+      <b>Riepilogo ragionato · livello avanzato</b>
+      <ul>
+        <li><b>Ownership esplicita:</b> chi è responsabile di liberare la risorsa?</li>
+        <li><b>Copia o move?</b>  
+            - Se la risorsa ha senso duplicarla (pixel di un’immagine), fornisci deep copy.  
+            - Se ha senso solo trasferirla (file aperto), vieta la copia e permetti il move.</li>
+        <li><b>Stato dopo il move:</b> l’oggetto sorgente deve rimanere “valido ma svuotato”, pronto a essere distrutto senza crash (lez4_8).</li>
+        <li><b>Rule of Five:</b> se gestisci manualmente memoria o altre risorse, devi implementare distruttore, copia e move in modo coerente (lez4_7 + lez4_8).</li>
+        <li><b>Rule of Zero:</b> se deleghi la risorsa a tipi RAII standard (<code>std::vector</code>, <code>std::string</code>, smart pointer), spesso non hai bisogno di scrivere nulla di speciale.</li>
+        <li><b>Obiettivo finale:</b> Progettare classi che chiariscono chiaramente:  
+            “questo oggetto è copiabile?”, “è spostabile?”, “cosa succede dopo il move?”.  
+            Questa chiarezza è ciò che distingue un codice didattico da un codice di libreria riusabile.
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez4_10 · Esercizi svolti (livello intermedio)</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez4_9.html"; }
+    function nextSlide(){ window.location.href = "lez4_11.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+
+  <style>
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
+    .inner-box pre, .inner-box code, .inner-box h2, .inner-box h3 { text-align:left !important; }
+    .inner-box ul, .inner-box ol { margin:.5rem 0 1rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li { margin:.35rem 0 }
+    pre, pre code { white-space:pre; tab-size:4; margin:.5rem 0 1rem 0; padding:.6rem .8rem; }
+
+    .box  { background:#fff; border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:16px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0; display:inline-block }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .bad  { background:#ffefef; border-left:4px solid #ef4444; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+
+    table { width:100%; border-collapse:collapse; margin-top:.5rem }
+    th, td { border-bottom:1px solid #e5e7eb; padding:.6rem .6rem; text-align:left; vertical-align:top; font-size:.95rem; line-height:1.4 }
+    th { background:#f8fafc; font-weight:600 }
+    code.k { background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
+  </style>
+</head>
+
+<body>
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 4 — OOP in C++ (introduzione)</h2>
+  <ul>
+    <li><a href="lez4_1.html">Lez4_1: Perché OOP? Concetti di base</a></li>
+    <li><a href="lez4_2.html">Lez4_2: Definire una classe (sintassi minima)</a></li>
+    <li><a href="lez4_3.html">Lez4_3: Costruttori, distruttore, lista d’iniz.</a></li>
+    <li><a href="lez4_4.html">Lez4_4: Incapsulamento, metodi const, overload</a></li>
+    <li><a href="lez4_5.html">Lez4_5: to_string(), operator&lt;&lt;, pre/postcondiz.</a></li>
+    <li><a href="lez4_6.html">Lez4_6: Header/Sorgenti, include-guard, build</a></li>
+    <li><a href="lez4_7.html">Lez4_7: Costruttore di copia e semantica di copia</a></li>
+    <li><a href="lez4_8.html">Lez4_8: Move constructor e move assignment</a></li>
+    <li><a href="lez4_9.html">Lez4_9: Esercizi svolti · livello base</a></li>
+    <li><a class="active" href="lez4_10.html">Lez4_10: Esercizi svolti · livello intermedio</a></li>
+    <li><a href="lez4_11.html">Lez4_11: Esercizi svolti · livello avanzato</a></li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1>Esercizi svolti · Livello intermedio<br><small>Copy semantics, stampa leggibile, separazione header/sorgente</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <!-- Introduzione -->
+    <div class="inner-box box">
+      <h2>Obiettivo di questi esercizi</h2>
+      <p>
+        Qui iniziamo a comportarci da programmatori “seri”.  
+        Non basta più avere una classe con due <code>double</code>.  
+        Ora la classe:
+      </p>
+      <ul>
+        <li>possiede risorse (memoria dinamica),</li>
+        <li>deve sapersi <b>copiare in modo corretto</b> (deep copy),</li>
+        <li>deve permetterci di <b>ispezionare lo stato</b> facilmente con <code>to_string()</code> e <code>operator&lt;&lt;</code>,</li>
+        <li>deve poter essere suddivisa in <code>.hpp</code> e <code>.cpp</code> in modo pulito.</li>
+      </ul>
+      <p class="note">
+        Questi esercizi si agganciano direttamente a lez4_5 (rappresentazione testuale), lez4_6 (separazione interfaccia/implementazione),
+        lez4_7 (copia profonda, Rule of Three).  
+        Non usiamo ancora lo spostamento (move) della lez4_8: quello sarà nel livello avanzato (lez4_11).
+      </p>
+    </div>
+
+    <!-- Esercizio I1: BufferInt -->
+    <div class="inner-box box">
+      <h2>Esercizio I1 — Classe <code>BufferInt</code> con copia profonda</h2>
+
+      <p><b>Specifiche progettuali:</b></p>
+      <ul>
+        <li><code>BufferInt</code> rappresenta un array dinamico di <code>int</code> di lunghezza fissata al momento della costruzione.</li>
+        <li>Attributi privati:
+          <ul>
+            <li><code>int* data_;</code></li>
+            <li><code>std::size_t n_;</code></li>
+          </ul>
+        </li>
+        <li>Devi fornire:
+          <ul>
+            <li>Costruttore che alloca <code>n_</code> celle e le inizializza a 0.</li>
+            <li>Distruttore che rilascia la memoria con <code>delete[]</code>.</li>
+            <li><b>Costruttore di copia</b> (deep copy): alloca un nuovo blocco e copia gli elementi.</li>
+            <li><b>Operatore di assegnazione per copia</b>: gestisce autoassegnazione e ricopia profonda.</li>
+            <li>Metodo <code>std::size_t size() const</code>.</li>
+            <li>Metodi <code>int get(std::size_t i) const</code> e <code>void set(std::size_t i, int v)</code> con controllo di indice.</li>
+            <li>Metodo <code>std::string to_string() const</code> che produce qualcosa tipo <code>"BufferInt[n=5]{0,0,0,0,0}"</code>.</li>
+          </ul>
+        </li>
+        <li><b>Vincolo didattico:</b> evitare di stampare direttamente dentro la classe. La classe descrive lo stato, ma la presentazione la deleghiamo a funzioni esterne (lez4_5).</li>
+      </ul>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-i1" onclick="toggleBox('btn-i1','sol-i1')">Mostra ▼</button>
+      </div>
+      <div id="sol-i1" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">#include &lt;cstddef&gt;
+#include &lt;string&gt;
+#include &lt;sstream&gt;
+
+class BufferInt {
+private:
+    int* data_;
+    std::size_t n_;
+
+public:
+    // Costruttore: alloca e azzera
+    BufferInt(std::size_t n)
+        : data_{ new int[n] }, n_{ n } {
+        for (std::size_t i = 0; i &lt; n_; ++i) {
+            data_[i] = 0;
+        }
+    }
+
+    // Distruttore: rilascio risorsa
+    ~BufferInt() {
+        delete[] data_;
+    }
+
+    // Costruttore di copia (deep copy)
+    BufferInt(const BufferInt&amp; other)
+        : data_{ new int[other.n_] }, n_{ other.n_ } {
+        for (std::size_t i = 0; i &lt; n_; ++i) {
+            data_[i] = other.data_[i];
+        }
+    }
+
+    // Operatore di assegnazione per copia (deep copy)
+    BufferInt&amp; operator=(const BufferInt&amp; other) {
+        if (this != &amp;other) {
+            // 1. Rilascio il vecchio buffer
+            delete[] data_;
+
+            // 2. Rialloco e ricopio
+            n_    = other.n_;
+            data_ = new int[n_];
+            for (std::size_t i = 0; i &lt; n_; ++i) {
+                data_[i] = other.data_[i];
+            }
+        }
+        return *this;
+    }
+
+    std::size_t size() const {
+        return n_;
+    }
+
+    // Osservatore con controllo di indice
+    int get(std::size_t i) const {
+        // Per semplicità didattica:
+        // Se index fuori range, ritorniamo 0.
+        // (In codice reale lanceremmo eccezione o gestiremmo l'errore in altro modo.)
+        if (i &gt;= n_) return 0;
+        return data_[i];
+    }
+
+    // Modificatore con controllo di indice
+    void set(std::size_t i, int v) {
+        if (i &lt; n_) {
+            data_[i] = v;
+        }
+        // Se i &gt;= n_ ignoriamo la richiesta.
+        // Scelta progettuale: non vogliamo rompere l'invariante
+        // dimensionale del buffer.
+    }
+
+    // Rappresentazione "umana"
+    std::string to_string() const {
+        std::ostringstream os;
+        os &lt;&lt; "BufferInt[n=" &lt;&lt; n_ &lt;&lt; "]{";
+        for (std::size_t i = 0; i &lt; n_; ++i) {
+            os &lt;&lt; data_[i];
+            if (i + 1 &lt; n_) os &lt;&lt; ",";
+        }
+        os &lt;&lt; "}";
+        return os.str();
+    }
+};</code></pre>
+
+        <p class="ok"><b>Commento progettuale:</b> Qui abbiamo applicato la
+        <b>Rule of Three</b> (lez4_7): se una classe gestisce risorse dinamiche,
+        deve definire in modo coerente distruttore, costruttore di copia e
+        operatore di assegnazione per copia. Così evitiamo:
+        <ul>
+          <li><b>double delete</b> (due oggetti che cancellano lo stesso buffer),</li>
+          <li><b>aliasing doloroso</b> (due oggetti che condividono accidentalmente il medesimo <code>int*</code>),</li>
+          <li>memory leak in caso di riassegnazioni.</li>
+        </ul>
+        </p>
+
+        <p class="note">
+        Inoltre abbiamo aggiunto <code>to_string()</code>: serve per fare
+        debug / logging senza mischiare logica e I/O standard.  
+        Questo approccio è stato motivato in lez4_5.
+        </p>
+      </div>
+    </div>
+
+    <!-- Esercizio I2: operator<< -->
+    <div class="inner-box box">
+      <h2>Esercizio I2 — Definire <code>operator&lt;&lt;</code> in modo pulito</h2>
+
+      <p><b>Specifiche progettuali:</b></p>
+      <ul>
+        <li>Scrivere una funzione libera:
+          <br/><code>std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const BufferInt&amp; buf);</code>
+        </li>
+        <li>L’operatore deve stampare il contenuto del buffer in modo leggibile, ad esempio:
+          <br/><code>BufferInt[n=5]{10,20,30,40,50}</code>
+        </li>
+        <li>Non deve violare l’incapsulamento:
+          <ul>
+            <li>se possibile, usa i metodi pubblici (<code>size()</code>, <code>get()</code>) e non accedere direttamente ai membri privati;</li>
+            <li>solo se strettamente necessario, puoi dichiarare <code>operator&lt;&lt;</code> come <code>friend</code>.</li>
+          </ul>
+        </li>
+        <li>Spiega perché è utile avere sia <code>to_string()</code> che <code>operator&lt;&lt;</code>:
+          <ul>
+            <li><code>to_string()</code> → ottieni una stringa riutilizzabile,</li>
+            <li><code>operator&lt;&lt;</code> → stampi direttamente su uno <code>ostream</code> (cout, file, log...).</li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-i2" onclick="toggleBox('btn-i2','sol-i2')">Mostra ▼</button>
+      </div>
+      <div id="sol-i2" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+// Funzione libera, NON membro della classe
+std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const BufferInt&amp; buf) {
+    os &lt;&lt; "BufferInt[n=" &lt;&lt; buf.size() &lt;&lt; "]{";
+    for (std::size_t i = 0; i &lt; buf.size(); ++i) {
+        os &lt;&lt; buf.get(i);
+        if (i + 1 &lt; buf.size()) {
+            os &lt;&lt; ",";
+        }
+    }
+    os &lt;&lt; "}";
+    return os;
+}
+
+int main() {
+    BufferInt b(5);
+    b.set(0,10);
+    b.set(1,20);
+    b.set(2,30);
+
+    std::cout &lt;&lt; b &lt;&lt; "\n";
+    // Stampa: BufferInt[n=5]{10,20,30,0,0}
+}
+</code></pre>
+
+        <p class="ok"><b>Commento progettuale:</b>
+        L’operatore di stream è <b>non membro</b> e usa solo l’interfaccia pubblica di <code>BufferInt</code>.
+        Questo rispetta il principio “l’oggetto mantiene il controllo sui suoi dati”:
+        non stiamo violando l’incapsulamento aprendo i campi privati.  
+        Se l’interfaccia pubblica è ben progettata, non servono scorciatoie sporche.
+        </p>
+
+        <p class="note">
+        Avere sia <code>to_string()</code> che <code>operator&lt;&lt;</code> ci permette:
+        <ul>
+          <li>logging in stringa → <code>auto s = b.to_string();</code></li>
+          <li>stampa diretta → <code>std::cout &lt;&lt; b;</code></li>
+        </ul>
+        Due strumenti diversi per due casi d’uso diversi. (Questo è lo stile visto in lez4_5.)
+        </p>
+      </div>
+    </div>
+
+    <!-- Esercizio I3: Header / sorgente -->
+    <div class="inner-box box">
+      <h2>Esercizio I3 — Separare interfaccia (<code>.hpp</code>) e implementazione (<code>.cpp</code>)</h2>
+
+      <p><b>Richiesta:</b></p>
+      <ul>
+        <li>Scrivi un file <code>buffer_int.hpp</code> che contenga:
+          <ul>
+            <li>include guard,</li>
+            <li>dichiarazione della classe <code>BufferInt</code> con le firme dei metodi, ma senza i corpi lunghi,</li>
+            <li>dichiarazione dell’operatore <code>operator&lt;&lt;</code> (solo <b>prototipo</b>).</li>
+          </ul>
+        </li>
+        <li>Scrivi poi un file <code>buffer_int.cpp</code> che:
+          <ul>
+            <li>include <code>"buffer_int.hpp"</code> come primo include (lez4_6),</li>
+            <li>fornisce tutte le definizioni dei metodi della classe,</li>
+            <li>fornisce la definizione di <code>operator&lt;&lt;</code>.</li>
+          </ul>
+        </li>
+        <li>Spiega perché questa separazione:
+          <ul>
+            <li>Evita ricompilazioni inutili per chi usa la classe.</li>
+            <li>Evita violazioni della ODR (One Definition Rule) mettendo ogni definizione “lunga” in un solo <code>.cpp</code>.</li>
+            <li>Tiene nascosti i dettagli interni (incapsulamento non solo a livello di classe, ma anche a livello di progetto).</li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-i3" onclick="toggleBox('btn-i3','sol-i3')">Mostra ▼</button>
+      </div>
+      <div id="sol-i3" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">// ===== buffer_int.hpp =====
+#ifndef BUFFER_INT_HPP_INCLUDED
+#define BUFFER_INT_HPP_INCLUDED
+
+#include &lt;cstddef&gt;
+#include &lt;string&gt;
+#include &lt;iosfwd&gt; // forward dichiarazioni per ostream senza includere &lt;iostream&gt;
+
+class BufferInt {
+private:
+    int* data_;
+    std::size_t n_;
+
+public:
+    BufferInt(std::size_t n);
+    ~BufferInt();
+
+    BufferInt(const BufferInt&amp; other);
+    BufferInt&amp; operator=(const BufferInt&amp; other);
+
+    std::size_t size() const;
+    int  get(std::size_t i) const;
+    void set(std::size_t i, int v);
+
+    std::string to_string() const;
+};
+
+// dichiarazione dell'operatore di output
+std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const BufferInt&amp; buf);
+
+#endif // BUFFER_INT_HPP_INCLUDED
+</code></pre>
+
+<pre><code class="language-cpp">// ===== buffer_int.cpp =====
+#include "buffer_int.hpp"
+#include &lt;ostream&gt;
+#include &lt;sstream&gt;
+
+BufferInt::BufferInt(std::size_t n)
+    : data_{ new int[n] }, n_{ n } {
+    for (std::size_t i = 0; i &lt; n_; ++i) {
+        data_[i] = 0;
+    }
+}
+
+BufferInt::~BufferInt() {
+    delete[] data_;
+}
+
+BufferInt::BufferInt(const BufferInt&amp; other)
+    : data_{ new int[other.n_] }, n_{ other.n_ } {
+    for (std::size_t i = 0; i &lt; n_; ++i) {
+        data_[i] = other.data_[i];
+    }
+}
+
+BufferInt&amp; BufferInt::operator=(const BufferInt&amp; other) {
+    if (this != &amp;other) {
+        delete[] data_;
+        n_    = other.n_;
+        data_ = new int[n_];
+        for (std::size_t i = 0; i &lt; n_; ++i) {
+            data_[i] = other.data_[i];
+        }
+    }
+    return *this;
+}
+
+std::size_t BufferInt::size() const {
+    return n_;
+}
+
+int BufferInt::get(std::size_t i) const {
+    if (i &gt;= n_) return 0;
+    return data_[i];
+}
+
+void BufferInt::set(std::size_t i, int v) {
+    if (i &lt; n_) {
+        data_[i] = v;
+    }
+}
+
+std::string BufferInt::to_string() const {
+    std::ostringstream os;
+    os &lt;&lt; "BufferInt[n=" &lt;&lt; n_ &lt;&lt; "]{";
+    for (std::size_t i = 0; i &lt; n_; ++i) {
+        os &lt;&lt; data_[i];
+        if (i + 1 &lt; n_) os &lt;&lt; ",";
+    }
+    os &lt;&lt; "}";
+    return os.str();
+}
+
+std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, const BufferInt&amp; buf) {
+    os &lt;&lt; buf.to_string();
+    return os;
+}
+</code></pre>
+
+        <p class="ok"><b>Commento progettuale:</b>
+        Notare l’ordine degli <code>#include</code> nel <code>.cpp</code>: prima includiamo
+        <code>"buffer_int.hpp"</code>, poi gli header standard.  
+        Questo segue la buona pratica vista in lez4_6:
+        in questo modo verifichiamo subito che l’header sia “auto-consistente”
+        (compilabile da solo senza dipendere da include nascosti).
+        </p>
+
+        <p class="note">
+        Abbiamo anche separato:
+        <ul>
+          <li><b>dichiarazioni pubbliche</b> (in <code>.hpp</code>): cosa promette la classe;</li>
+          <li><b>definizioni</b> (in <code>.cpp</code>): come mantiene quella promessa.</li>
+        </ul>
+        Questo riduce l’accoppiamento e accelera la compilazione in progetti più grandi,
+        come discusso in lez4_6.
+        </p>
+      </div>
+    </div>
+
+    <!-- Conclusione -->
+    <div class="inner-box note">
+      <b>Checklist di robustezza (livello intermedio)</b>
+      <ul>
+        <li><b>Copia profonda corretta?</b> Distruttore, costruttore di copia e operator= per copia sono coerenti (Rule of Three, lez4_7).</li>
+        <li><b>Ispezionabilità?</b> L’oggetto sa esportare il suo stato in modo leggibile (<code>to_string()</code>, <code>operator&lt;&lt;</code>) senza mischiare logica e I/O utente diretto (lez4_5).</li>
+        <li><b>Interfaccia pulita?</b> L’header (<code>.hpp</code>) espone solo le promesse pubbliche. Le implementazioni lunghe stanno nel <code>.cpp</code> (lez4_6).</li>
+        <li><b>ODR rispettata?</b> Ogni funzione non-inline è definita una sola volta in un solo <code>.cpp</code>; niente doppioni che farebbero esplodere il linker (lez4_6).</li>
+        <li><b>Controllo degli indici?</b> I metodi che accedono a memoria controllano i parametri in ingresso: l’oggetto si protegge da solo e non si lascia corrompere dall’esterno.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>

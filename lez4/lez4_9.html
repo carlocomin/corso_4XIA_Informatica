@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA – Lez4_9 · Esercizi svolti (livello base)</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez4_8.html"; }
+    function nextSlide(){ window.location.href = "lez4_10.html"; }
+    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+    function toggleBox(btnId, boxId){
+      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
+      const open = box.style.display==='block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+
+  <style>
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
+    .inner-box pre, .inner-box code, .inner-box h2, .inner-box h3 { text-align:left !important; }
+    .inner-box ul, .inner-box ol { margin:.5rem 0 1rem 1rem; padding-left:1.25rem; list-style-position:outside }
+    .inner-box li { margin:.35rem 0 }
+    pre, pre code { white-space:pre; tab-size:4; margin:.5rem 0 1rem 0; padding:.6rem .8rem; }
+
+    .box  { background:#fff; border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:16px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0; display:inline-block }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+    .bad  { background:#ffefef; border-left:4px solid #ef4444; padding:.6rem .8rem; border-radius:8px; margin:.5rem 0 }
+
+    table { width:100%; border-collapse:collapse; margin-top:.5rem }
+    th, td { border-bottom:1px solid #e5e7eb; padding:.6rem .6rem; text-align:left; vertical-align:top; font-size:.95rem; line-height:1.4 }
+    th { background:#f8fafc; font-weight:600 }
+    code.k { background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
+  </style>
+</head>
+
+<body>
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 4 — OOP in C++ (introduzione)</h2>
+  <ul>
+    <li><a href="lez4_1.html">Lez4_1: Perché OOP? Concetti di base</a></li>
+    <li><a href="lez4_2.html">Lez4_2: Definire una classe (sintassi minima)</a></li>
+    <li><a href="lez4_3.html">Lez4_3: Costruttori, distruttore, lista d’iniz.</a></li>
+    <li><a href="lez4_4.html">Lez4_4: Incapsulamento, metodi const, overload</a></li>
+    <li><a href="lez4_5.html">Lez4_5: to_string(), operator&lt;&lt;, pre/postcondiz.</a></li>
+    <li><a href="lez4_6.html">Lez4_6: Header/Sorgenti, include-guard, build</a></li>
+    <li><a href="lez4_7.html">Lez4_7: Costruttore di copia e semantica di copia</a></li>
+    <li><a href="lez4_8.html">Lez4_8: Move constructor e move assignment</a></li>
+    <li><a class="active" href="lez4_9.html">Lez4_9: Esercizi svolti · livello base</a></li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1>Esercizi svolti · Livello base<br><small>Incapsulamento, costruttori semplici, metodi const</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <!-- Introduzione -->
+    <div class="inner-box box">
+      <h2>Come lavorare sugli esercizi</h2>
+      <p>
+        Lo scopo NON è solo “scrivere codice che compila”, ma:
+      </p>
+      <ul>
+        <li>Progettare una classe che parta sempre in <b>stato valido</b> (invariante rispettato).</li>
+        <li>Separare <b>dati interni</b> (<code>private</code>) e <b>funzioni pubbliche</b> (<code>public</code>), come da lez4_1–lez4_4.</li>
+        <li>Scrivere <b>metodi osservatori</b> marcati <code>const</code> quando leggono e basta.</li>
+        <li>Usare un <b>costruttore parametrico</b> con lista di inizializzazione per dare un senso subito agli attributi (lez4_3).</li>
+      </ul>
+      <p class="note">
+        Queste classi sono volutamente piccole e “lineari”: niente memoria dinamica, niente copia profonda, niente move.
+        Stiamo controllando che le basi dell’OOP siano chiare prima di affrontare la gestione delle risorse (lez4_7, lez4_8).
+      </p>
+    </div>
+
+    <!-- Esercizio B1: Rettangolo -->
+    <div class="inner-box box">
+      <h2>Esercizio B1 — Modellare un rettangolo</h2>
+      <p><b>Specifiche:</b></p>
+      <ul>
+        <li>Progetta una classe <code>Rettangolo</code> con due attributi privati <code>base_</code> e <code>altezza_</code> (tipo <code>double</code>).</li>
+        <li>Invariante: <code>base_ ≥ 0</code> e <code>altezza_ ≥ 0</code>.</li>
+        <li>Scrivi:
+          <ul>
+            <li>un costruttore parametrico <code>Rettangolo(double b, double h)</code> che forza automaticamente i valori negativi a 0;</li>
+            <li>un metodo <code>double area() const</code>;</li>
+            <li>un metodo <code>double perimetro() const</code>;</li>
+            <li>un metodo <code>void scala(double fattore)</code> che moltiplica base e altezza per <code>fattore</code> ma:
+              <ul>
+                <li>se <code>fattore &lt; 0</code> ignora la richiesta (non vogliamo dimensioni negative);</li>
+                <li>se <code>fattore == 0</code> permette di azzerare l’oggetto (rettangolo “degenerato”).</li>
+              </ul>
+            </li>
+            <li>metodi osservatori <code>double base() const</code> e <code>double altezza() const</code>.</li>
+          </ul>
+        </li>
+        <li><b>Non</b> devi stampare nulla in <code>cout</code>: la classe descrive lo stato, non fa I/O utente (lez4_5).</li>
+      </ul>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-b1" onclick="toggleBox('btn-b1','sol-b1')">Mostra ▼</button>
+      </div>
+      <div id="sol-b1" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">class Rettangolo {
+private:
+    double base_;
+    double altezza_;
+
+public:
+    // Costruttore parametrico:
+    // - usa lista di inizializzazione (lez4_3)
+    // - forza i negativi a 0 per rispettare l'invariante
+    Rettangolo(double b, double h)
+        : base_{ (b &gt;= 0) ? b : 0.0 },
+          altezza_{ (h &gt;= 0) ? h : 0.0 } {
+    }
+
+    // Osservatori "const" (lez4_2, lez4_4)
+    double base() const    { return base_;    }
+    double altezza() const { return altezza_; }
+
+    double area() const {
+        return base_ * altezza_;
+    }
+
+    double perimetro() const {
+        return 2.0 * (base_ + altezza_);
+    }
+
+    // Modificatore controllato
+    void scala(double fattore) {
+        if (fattore &lt; 0) {
+            // richiesta non valida: non faccio nulla
+            return;
+        }
+        base_    *= fattore;
+        altezza_ *= fattore;
+        // invariante (>=0) rimane vero anche se fattore == 0
+    }
+};</code></pre>
+
+        <p class="ok"><b>Commento progettuale:</b> L’oggetto difende da solo il proprio invariante
+        (nessuna base negativa, nessuna altezza negativa). Chi usa la classe
+        non può creare uno stato “impossibile” senza passare dai controlli dell’interfaccia.
+        Questo è incapsulamento forte (lez4_4).</p>
+      </div>
+    </div>
+
+    <!-- Esercizio B2: ContoBancario -->
+    <div class="inner-box box">
+      <h2>Esercizio B2 — Modellare un conto bancario</h2>
+      <p><b>Specifiche:</b></p>
+      <ul>
+        <li>Classe <code>ContoBancario</code> con attributo privato <code>saldo_</code> (<code>double</code>).</li>
+        <li>Invariante: <code>saldo_ ≥ 0</code> sempre.</li>
+        <li>Scrivi:
+          <ul>
+            <li>costruttore parametrico che accetta un saldo iniziale. Se negativo, porta a 0;</li>
+            <li><code>bool versa(double x)</code>:
+              <ul>
+                <li>aggiunge <code>x</code> al saldo solo se <code>x ≥ 0</code>,</li>
+                <li>ritorna <code>true</code> se è andata a buon fine, <code>false</code> altrimenti;</li>
+              </ul>
+            </li>
+            <li><code>bool preleva(double x)</code>:
+              <ul>
+                <li>toglie <code>x</code> solo se <code>x ≥ 0</code> e <code>x ≤ saldo_</code>,</li>
+                <li>ritorna <code>true</code> se è riuscito, <code>false</code> se fondi insufficienti;</li>
+              </ul>
+            </li>
+            <li><code>double saldo() const</code> come osservatore puro (<code>const</code>).</li>
+          </ul>
+        </li>
+        <li>Non scrivere <code>std::cout</code> dentro i metodi: la classe gestisce lo <b>stato</b>, non l’<b>interfaccia utente</b> (lez4_5).</li>
+      </ul>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-b2" onclick="toggleBox('btn-b2','sol-b2')">Mostra ▼</button>
+      </div>
+      <div id="sol-b2" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">class ContoBancario {
+private:
+    double saldo_;
+
+public:
+    // Costruttore: stato sempre valido
+    ContoBancario(double saldo_iniziale)
+        : saldo_{ (saldo_iniziale &gt;= 0.0) ? saldo_iniziale : 0.0 } {
+    }
+
+    // Osservatore const
+    double saldo() const {
+        return saldo_;
+    }
+
+    bool versa(double x) {
+        if (x &lt; 0.0) return false;   // niente versamenti negativi
+        saldo_ += x;
+        return true;
+    }
+
+    bool preleva(double x) {
+        if (x &lt; 0.0) return false;   // niente prelievi negativi
+        if (x &gt; saldo_) return false; // non puoi andare sotto zero
+        saldo_ -= x;
+        return true;
+    }
+};</code></pre>
+
+        <p class="ok"><b>Commento progettuale:</b> Questo è un esempio didattico di
+        “API pulita”: invece di stampare messaggi d’errore dentro <code>preleva()</code>,
+        facciamo restituire <code>true/false</code>.  
+        Chi usa la classe (main, interfaccia grafica, ecc.) deciderà come reagire
+        (messaggio, eccezione, log...). Questo rispetta la separazione dei ruoli
+        tra logica dei dati e presentazione (lez4_5).</p>
+      </div>
+    </div>
+
+    <!-- Esercizio B3: SensoreTemperatura -->
+    <div class="inner-box box">
+      <h2>Esercizio B3 — Sensore di temperatura con limite fisico</h2>
+      <p><b>Specifiche:</b></p>
+      <ul>
+        <li>Classe <code>SensoreTemperatura</code> con attributi privati:
+          <ul>
+            <li><code>double valoreC_;</code>  (gradi Celsius letti)</li>
+            <li><code>double maxAssoluto_;</code> (limite massimo fisico del sensore)</li>
+          </ul>
+        </li>
+        <li>Invariante:
+          <ul>
+            <li><code>valoreC_ ≤ maxAssoluto_</code></li>
+            <li><code>maxAssoluto_ &gt;= 0</code></li>
+          </ul>
+        </li>
+        <li>Scrivi:
+          <ul>
+            <li>costruttore parametrico <code>SensoreTemperatura(double val, double max)</code>;</li>
+            <li>se <code>max &lt; 0</code>, forza <code>max</code> a 0;</li>
+            <li>se <code>val &gt; max</code>, tronca <code>val</code> a <code>max</code>;</li>
+            <li><code>double valore() const</code> osservatore;</li>
+            <li><code>double massimo() const</code> osservatore;</li>
+            <li><code>bool aggiorna(double nuovaLettura)</code>:
+              <ul>
+                <li>accetta solo valori ≤ <code>maxAssoluto_</code>,</li>
+                <li>in caso contrario lascia invariato e ritorna <code>false</code>.</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>Ancora una volta: niente I/O dentro la classe; la classe difende l’invariante fisico.</li>
+      </ul>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-b3" onclick="toggleBox('btn-b3','sol-b3')">Mostra ▼</button>
+      </div>
+      <div id="sol-b3" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">class SensoreTemperatura {
+private:
+    double valoreC_;
+    double maxAssoluto_;
+
+public:
+    SensoreTemperatura(double val, double max)
+        : valoreC_{val}, maxAssoluto_{max}
+    {
+        // Normalizziamo maxAssoluto_
+        if (maxAssoluto_ &lt; 0.0)
+            maxAssoluto_ = 0.0;
+
+        // Se il valore iniziale supera il massimo fisico,
+        // tronchiamo per mantenere l'invariante
+        if (valoreC_ &gt; maxAssoluto_)
+            valoreC_ = maxAssoluto_;
+    }
+
+    double valore() const {
+        return valoreC_;
+    }
+
+    double massimo() const {
+        return maxAssoluto_;
+    }
+
+    bool aggiorna(double nuovaLettura) {
+        // accettiamo solo letture fisicamente possibili
+        if (nuovaLettura &gt; maxAssoluto_) {
+            return false; // rifiutata
+        }
+        valoreC_ = nuovaLettura;
+        return true;
+    }
+};</code></pre>
+
+        <p class="ok"><b>Commento progettuale:</b> Qui stai modellando un pezzo
+        di mondo reale: un sensore non può leggere fisicamente oltre un certo massimo.
+        Questo massimo è parte dell’invariante.  
+        Nota come il costruttore, subito, “ripulisce” gli input per garantire che
+        l’oggetto inizi la vita in uno stato coerente (lez4_3).</p>
+      </div>
+    </div>
+
+    <!-- Riepilogo -->
+    <div class="inner-box note">
+      <b>Checklist personale prima di consegnare un esercizio di progettazione base</b>
+      <ul>
+        <li><b>Invariante:</b> Ho pensato a quali condizioni devono essere sempre vere per l’oggetto? Le sto facendo rispettare in costruzione e modifica?</li>
+        <li><b>Incapsulamento:</b> I membri dati sono <code>private</code>? L’esterno può rompere lo stato interno o deve usare i metodi controllati?</li>
+        <li><b>Metodi const:</b> Ho marcato <code>const</code> i metodi che leggono e basta? (lez4_2, lez4_4)</li>
+        <li><b>Niente I/O dentro la logica:</b> Le classi gestiscono solo lo stato e le regole. La stampa e l’interazione utente stanno fuori (lez4_5).</li>
+        <li><b>Stato valido fin dall’inizio:</b> Il costruttore porta SEMPRE l’oggetto in uno stato coerente e utilizzabile (lez4_3).</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+<script>
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
+</script>
+</body>
+</html>
