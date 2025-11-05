@@ -289,9 +289,30 @@ int write_k(const char* path, uint32_t k, const Rec* rec){
         <div class="tip mini">
           <p><strong>Micro-esercizi guidati</strong> (5&#8211;10 minuti):</p>
           <ul class="mini">
-            <li><b>Correggi un record specifico.</b> Leggi il record <code>k</code>, modifica un campo in memoria, torna indietro con <code>fseek</code> e sovrascrivi; riapri il file in sola lettura e verifica la modifica.</li>
-            <li><b>Verifica l&#8217;alternanza I/O.</b> Alterna letture e scritture sullo stesso <code>FILE*</code> ricordandoti di interporre <code>fseek</code> o <code>fflush</code>; logga cosa accade se dimentichi il passaggio.</li>
-            <li><b>Snapshot dell&#8217;header.</b> Usa <code>ftell</code> per salvare la posizione corrente, salta all&#8217;header per leggere un campo di stato e poi torna al record che stavi aggiornando.</li>
+            <li><b>Correggi un record specifico.</b> Leggi il record <code>k</code>, modifica un campo in memoria, torna indietro con <code>fseek</code> e sovrascrivi; riapri il file in sola lettura e verifica la modifica.
+              <div class="nav-buttons" style="justify-content:left"><button id="btn-me1" onclick="toggleBox('btn-me1','box-me1')">Mostra ▼</button></div>
+              <div id="box-me1" style="display:none;margin-top:8px">
+                <div class="ok mini">
+                  <p><strong>Soluzione:</strong> apri <code>data.bin</code> con <code>"rb+"</code>, chiama <code>fseek(f, k*sizeof(Rec), SEEK_SET)</code> e <code>fread</code> il record. Aggiorna in RAM il campo (es. <code>rec.val += 1.5</code>), fai <code>fseek</code> allo stesso offset e <code>fwrite</code> una singola struct. Chiudi; riapri in <code>"rb"</code>, ripeti la <code>fseek</code>/<code>fread</code> e stampa il campo per verificare.</p>
+                </div>
+              </div>
+            </li>
+            <li><b>Verifica l&#8217;alternanza I/O.</b> Alterna letture e scritture sullo stesso <code>FILE*</code> ricordandoti di interporre <code>fseek</code> o <code>fflush</code>; logga cosa accade se dimentichi il passaggio.
+              <div class="nav-buttons" style="justify-content:left"><button id="btn-me2" onclick="toggleBox('btn-me2','box-me2')">Mostra ▼</button></div>
+              <div id="box-me2" style="display:none;margin-top:8px">
+                <div class="ok mini">
+                  <p><strong>Soluzione:</strong> apri con <code>"rb+"</code>, leggi il record corrente con <code>fread</code>, modifica un campo, poi chiama <code>fseek(f, - (long)sizeof(Rec), SEEK_CUR)</code> o <code>fflush</code> prima di <code>fwrite</code>. Ripeti il ciclo e registra un log. Per mostrare l&#8217;errore, commenta il <code>fseek</code>: il <code>fwrite</code> scriverà nel punto sbagliato (di solito a fine file) o fallirà, evidenziando perché l&#8217;alternanza necessita del riposizionamento.</p>
+                </div>
+              </div>
+            </li>
+            <li><b>Snapshot dell&#8217;header.</b> Usa <code>ftell</code> per salvare la posizione corrente, salta all&#8217;header per leggere un campo di stato e poi torna al record che stavi aggiornando.
+              <div class="nav-buttons" style="justify-content:left"><button id="btn-me3" onclick="toggleBox('btn-me3','box-me3')">Mostra ▼</button></div>
+              <div id="box-me3" style="display:none;margin-top:8px">
+                <div class="ok mini">
+                  <p><strong>Soluzione:</strong> durante la scansione salva <code>long pos = ftell(f)</code> subito dopo aver letto un record. Chiama <code>fseek(f, 0, SEEK_SET)</code> e leggi l&#8217;header (es. stato o contatore). Poi ripristina con <code>fseek(f, pos, SEEK_SET)</code> e usa <code>fwrite</code> per completare l&#8217;aggiornamento del record corrente, dimostrando l&#8217;uso del “segnalibro”.</p>
+                </div>
+              </div>
+            </li>
           </ul>
         </div>
       </div>

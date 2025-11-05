@@ -222,9 +222,30 @@ void retrieve_record(const char* dataPath, const char* idxPath, uint32_t key, ui
       <div class="tip mini">
         <p><strong>Micro-esercizi guidati</strong> (durata suggerita 10 minuti ciascuno):</p>
         <ul class="mini">
-          <li><b>Fix mirato.</b> Scrivi una funzione che dato l&#8217;<code>id</code> e un nuovo valore aggiorni il record in <code>data.bin</code> usando l&#8217;indice per posizionarti; verifica il risultato con una seconda lettura diretta.</li>
-          <li><b>Rebuild sicuro.</b> Implementa una <code>rebuild_index()</code> che scriva l&#8217;indice in un file temporaneo, chiami <code>flush</code>/<code>fsync</code> e poi esegua <code>rename()</code> per sostituire <code>index.bin</code> senza lasciare file corrotti.</li>
-          <li><b>Audit dell&#8217;indice.</b> Confronta i record su disco con le coppie <code>{key, offset}</code>: scansiona <code>data.bin</code> e segnala eventuali chiavi mancanti o duplicati rispetto al vettore ordinato.</li>
+          <li><b>Fix mirato.</b> Scrivi una funzione che dato l&#8217;<code>id</code> e un nuovo valore aggiorni il record in <code>data.bin</code> usando l&#8217;indice per posizionarti; verifica il risultato con una seconda lettura diretta.
+            <div class="nav-buttons" style="justify-content:left"><button id="btn-mi1" onclick="toggleBox('btn-mi1','box-mi1')">Mostra ▼</button></div>
+            <div id="box-mi1" style="display:none;margin-top:8px">
+              <div class="ok mini">
+                <p><strong>Soluzione:</strong> carica l&#8217;indice in RAM, cerca con binary search l&#8217;offset del record, poi apri <code>data.bin</code> in <code>std::fstream</code>/<code>"rb+"</code>, <code>seek</code> a quell&#8217;offset e leggi il record. Aggiorna il campo richiesto, fai <code>seekp(offset)</code> (o <code>fseek</code>) e sovrascrivi. Riapri in sola lettura e conferma con una nuova read puntuale.</p>
+              </div>
+            </div>
+          </li>
+          <li><b>Rebuild sicuro.</b> Implementa una <code>rebuild_index()</code> che scriva l&#8217;indice in un file temporaneo, chiami <code>flush</code>/<code>fsync</code> e poi esegua <code>rename()</code> per sostituire <code>index.bin</code> senza lasciare file corrotti.
+            <div class="nav-buttons" style="justify-content:left"><button id="btn-mi2" onclick="toggleBox('btn-mi2','box-mi2')">Mostra ▼</button></div>
+            <div id="box-mi2" style="display:none;margin-top:8px">
+              <div class="ok mini">
+                <p><strong>Soluzione:</strong> crea un vettore <code>{key, offset}</code> iterando <code>data.bin</code>. Scrivilo in <code>index.tmp</code> (header + array) usando <code>std::ofstream</code>/<code>"wb"</code>, poi chiama <code>flush()</code> e <code>fsync(fileno(f))</code> (o <code>_commit</code> su Windows). Chiudi e invoca <code>std::filesystem::rename("index.tmp", "index.bin")</code> per rimpiazzare in modo atomico.</p>
+              </div>
+            </div>
+          </li>
+          <li><b>Audit dell&#8217;indice.</b> Confronta i record su disco con le coppie <code>{key, offset}</code>: scansiona <code>data.bin</code> e segnala eventuali chiavi mancanti o duplicati rispetto al vettore ordinato.
+            <div class="nav-buttons" style="justify-content:left"><button id="btn-mi3" onclick="toggleBox('btn-mi3','box-mi3')">Mostra ▼</button></div>
+            <div id="box-mi3" style="display:none;margin-top:8px">
+              <div class="ok mini">
+                <p><strong>Soluzione:</strong> percorri <code>index.bin</code> e per ogni entry esegui <code>seekg(offset)</code> su <code>data.bin</code> per leggere la chiave reale: se differisce, logga l&#8217;errore. Parallelamente, scansiona <code>data.bin</code> sequenzialmente costruendo un <code>std::unordered_set</code> di chiavi e confrontalo con quelle presenti nell&#8217;indice per individuare duplicati o assenze.</p>
+              </div>
+            </div>
+          </li>
         </ul>
       </div>
     </div>
