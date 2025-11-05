@@ -286,6 +286,14 @@ int write_k(const char* path, uint32_t k, const Rec* rec){
             <li><code>fflush</code>: chiede di scrivere immediatamente il buffer su disco.</li>
           </ul>
         </div>
+        <div class="tip mini">
+          <p><strong>Micro-esercizi guidati</strong> (5&#8211;10 minuti):</p>
+          <ul class="mini">
+            <li><b>Correggi un record specifico.</b> Leggi il record <code>k</code>, modifica un campo in memoria, torna indietro con <code>fseek</code> e sovrascrivi; riapri il file in sola lettura e verifica la modifica.</li>
+            <li><b>Verifica l&#8217;alternanza I/O.</b> Alterna letture e scritture sullo stesso <code>FILE*</code> ricordandoti di interporre <code>fseek</code> o <code>fflush</code>; logga cosa accade se dimentichi il passaggio.</li>
+            <li><b>Snapshot dell&#8217;header.</b> Usa <code>ftell</code> per salvare la posizione corrente, salta all&#8217;header per leggere un campo di stato e poi torna al record che stavi aggiornando.</li>
+          </ul>
+        </div>
       </div>
 
       <div class="box">

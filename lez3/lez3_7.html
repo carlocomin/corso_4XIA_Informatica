@@ -219,6 +219,14 @@ void retrieve_record(const char* dataPath, const char* idxPath, uint32_t key, ui
 }
 </code></pre>
       <p class="tip mini">Per indici grandi usa memory-mapping o ricerca binaria “on-disk” leggendo blocchi con <code>seekg</code> “a metà”.</p>
+      <div class="tip mini">
+        <p><strong>Micro-esercizi guidati</strong> (durata suggerita 10 minuti ciascuno):</p>
+        <ul class="mini">
+          <li><b>Fix mirato.</b> Scrivi una funzione che dato l&#8217;<code>id</code> e un nuovo valore aggiorni il record in <code>data.bin</code> usando l&#8217;indice per posizionarti; verifica il risultato con una seconda lettura diretta.</li>
+          <li><b>Rebuild sicuro.</b> Implementa una <code>rebuild_index()</code> che scriva l&#8217;indice in un file temporaneo, chiami <code>flush</code>/<code>fsync</code> e poi esegua <code>rename()</code> per sostituire <code>index.bin</code> senza lasciare file corrotti.</li>
+          <li><b>Audit dell&#8217;indice.</b> Confronta i record su disco con le coppie <code>{key, offset}</code>: scansiona <code>data.bin</code> e segnala eventuali chiavi mancanti o duplicati rispetto al vettore ordinato.</li>
+        </ul>
+      </div>
     </div>
 
     <div class="inner-box">
