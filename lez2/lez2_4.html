@@ -62,17 +62,18 @@
     <div class="inner-box">
       <h2>Obiettivi</h2>
       <ul>
-        <li>Gestire collezioni di record con <code>std::vector&lt;T&gt;</code> (aggiunta, iterazione, modifica, filtri, aggregazioni).</li>
-        <li>Capire cos’è una <strong>lambda</strong>, la sua sintassi (catture/parametri/ritorno) e perché è utile.</li>
-        <li>Usare <code>sort</code>, <code>find_if</code>, <code>count_if</code>, <code>copy_if</code>, <code>erase_remove_if</code> con lambda.</li>
-        <li>Vedere l’equivalente in C: array di struct + <code>qsort</code> con funzione di confronto.</li>
+        <li>Gestire collezioni di record con <code>std::vector&lt;T&gt;</code>, leggendo e modificando gli elementi senza copie inutili.</li>
+        <li>Capire cos’è una <strong>lambda</strong>, come si dichiarano <em>capture</em>, parametri e tipo di ritorno, e quando conviene usarla.</li>
+        <li>Applicare gli algoritmi standard <code>sort</code>, <code>find_if</code>, <code>count_if</code>, <code>copy_if</code>, <code>erase_remove_if</code> insieme alle lambda.</li>
+        <li>Tradurre gli stessi problemi in C usando array di struct e <code>qsort</code> con funzioni di confronto.</li>
       </ul>
-      <p class="note"><b>Perché <code>std::vector</code>?</b> Memoria contigua (cache-friendly), dimensione dinamica, ricco set di algoritmi della STL. È la scelta naturale per insiemi di record.</p>
+      <p class="note"><strong>Perché <code>std::vector</code>?</strong> Offre memoria contigua (più cache-friendly), dimensione dinamica e il pieno supporto degli algoritmi STL. Per insiemi di record è quasi sempre la scelta più robusta.</p>
     </div>
 
     <!-- C++: vector di struct -->
     <div class="box">
       <h2>C++ — Collezioni di struct con <code>std::vector</code></h2>
+      <p>Un <code>std::vector&lt;Studente&gt;</code> si comporta come un array dinamico: gli elementi stanno in memoria contigua ma possiamo aggiungerne altri in qualunque momento. Popolarlo con dati realistici aiuta a testare subito le operazioni sugli insiemi.</p>
 <pre><code class="language-cpp">#include &lt;string&gt;
 #include &lt;vector&gt;
 
@@ -99,14 +100,16 @@ int main() {
 }
 </code></pre>
       <ul>
-        <li><b>push_back</b>: inserisce una copia/move di un oggetto già costruito.</li>
-        <li><b>emplace_back</b>: costruisce l’oggetto direttamente “dentro” il vector (evita una costruzione superflua).</li>
+        <li><strong>push_back</strong>: inserisce una copia o una move di un oggetto già costruito.</li>
+        <li><strong>emplace_back</strong>: costruisce l’oggetto direttamente all’interno del vector e risparmia copie.</li>
+        <li><strong>Range-based for</strong>: con <code>const auto&amp;</code> leggiamo senza copiare; senza <code>const</code> possiamo modificare in-place.</li>
       </ul>
     </div>
 
     <!-- Lambda: spiegazione -->
     <div class="box">
       <h2>C++ — Cos’è una <em>lambda</em> e come si legge</h2>
+      <p>Una lambda è una funzione <em>anonima</em> definita in linea. Per interpretarla conviene guardare i tre blocchi fondamentali: la capture (che cosa preleva dall’esterno), l’elenco dei parametri e il valore di ritorno.</p>
 <pre><code class="language-cpp">// Forma generale (schema mentale):
 [capture] (parametri) -&gt; tipo_ritorno {
     // corpo
@@ -119,12 +122,12 @@ auto sopraS = [soglia](double m){ return m &gt;= soglia; }; // cattura by value 
 auto incS   = [&soglia](){ soglia++; };                  // cattura by reference (alias)
 </code></pre>
       <ul>
-        <li><b>Capture</b>: cosa “importa” dal contesto esterno. Usa catture mirate (<code>[x]</code>, <code>[&amp;x]</code>), evita <code>[=]</code>/<code>[&amp;]</code> indiscriminati.</li>
-        <li><b>Parametri</b>: come una funzione normale (<code>(const Studente&amp; s)</code>...).</li>
-        <li><b>Ritorno</b>: di solito dedotto; usa <code>-&gt; bool</code>/<code>-&gt; double</code> se il corpo ha rami multipli.</li>
-        <li>Una lambda senza catture si può convertire a <em>puntatore a funzione</em>; con catture no.</li>
+        <li><strong>Capture</strong>: indica cosa importare dal contesto. Preferisci <code>[k]</code> o <code>[&amp;risultato]</code> rispetto ai generici <code>[=]</code>/<code>[&amp;]</code>.</li>
+        <li><strong>Parametri</strong>: sono identici a quelli di una funzione ordinaria (es. <code>(const Studente&amp; s)</code>).</li>
+        <li><strong>Ritorno</strong>: viene dedotto automaticamente; specifica <code>-&gt; bool</code> (o altro) se ci sono più rami di <code>return</code>.</li>
+        <li>Una lambda senza capture è convertibile a <em>puntatore a funzione</em>; appena compare una capture non lo è più.</li>
       </ul>
-      <p class="ok"><b>Intuizione didattica</b>: pensa alla lambda come a una “funzione piccola” incollata vicino a dove ti serve.</p>
+      <p class="ok"><strong>Intuizione didattica</strong>: pensa alla lambda come a una “funzione piccola” incollata accanto all’algoritmo che ne ha bisogno.</p>
     </div>
 
     <!-- Ordinamenti -->
@@ -157,12 +160,13 @@ std::stable_sort(classe.begin(), classe.end(),
                      return a.eta &lt; b.eta;
                  });
 </code></pre>
-      <p class="note"><b>Comparatori coerenti</b>: devono definire un <em>ordinamento debole stretto</em>. Un trucco: componi i confronti a cascata come nell’esempio “cognome poi nome”.</p>
+      <p class="note"><strong>Comparatori coerenti</strong>: l’algoritmo richiede un <em>ordinamento debole stretto</em>. Costruisci i confronti a cascata (cognome, poi nome, …) e restituisci sempre un semplice <code>&lt;</code>.</p>
     </div>
 
     <!-- Ricerca, conteggio, filtro -->
     <div class="box">
       <h2>C++ — Ricerca, conteggio e filtro</h2>
+      <p>Gli algoritmi STL percorrono il vector con scopi diversi: trovare un elemento specifico, contare quante volte una proprietà è vera o filtrare rapidamente i record che non rispettano una condizione.</p>
 <pre><code class="language-cpp">#include &lt;algorithm&gt;
 
 // find_if: primo con media &gt;= soglia
@@ -182,12 +186,13 @@ classe.erase(std::remove_if(classe.begin(), classe.end(),
                             [](const Studente&amp; s){ return s.media &lt; 6.0; }),
              classe.end());
 </code></pre>
-      <p class="ok"><b>Erase–remove idiom</b> (step-by-step): <code>remove_if</code> compatt<a> gli elementi “da tenere” in testa e restituisce un iteratore alla nuova “fine logica”; <code>erase</code> elimina la coda fisicamente.</p>
+      <p class="ok"><strong>Erase–remove idiom</strong>: <code>remove_if</code> compatta gli elementi da tenere e restituisce la nuova fine logica; <code>erase</code> taglia la coda eliminando fisicamente quelli da scartare.</p>
     </div>
 
     <!-- Aggregazioni -->
     <div class="box">
       <h2>C++ — Aggregazioni (media, massimo) con lambda</h2>
+      <p>Per calcolare metriche globali ci appoggiamo a <code>std::accumulate</code> (somma, media, conteggi personalizzati) e <code>std::max_element</code> per individuare il record “migliore”. La lambda descrive l’operazione elementare: come aggiornare l’accumulatore o come confrontare due elementi.</p>
 <pre><code class="language-cpp">#include &lt;numeric&gt;   // accumulate
 #include &lt;algorithm&gt; // max_element
 
@@ -202,23 +207,36 @@ auto itBest = std::max_element(classe.begin(), classe.end(),
                                    return a.media &lt; b.media; // true se a "peggio" di b
                                });
 </code></pre>
-      <p class="tip">Le lambda incapsulano la “logica di confronto/somma” accanto all’algoritmo: leggibilità ⬆, errori ⬇.</p>
+      <p class="tip">Le lambda incollano la logica di confronto o di somma accanto all’algoritmo: la lettura è immediata e diminuisce il rischio di errori nascosti.</p>
     </div>
 
     <!-- Pitfall -->
     <div class="inner-box">
       <h2>Pitfall comuni (e rimedi pratici)</h2>
       <ul>
-        <li><b>Catture troppo ampie</b> (<code>[=]</code> / <code>[&amp;]</code>) → difficile capire cosa usa la lambda. <br/><br/><span class="ok">Catture mirate: <code>[k]</code>, <code>[&amp;k]</code>.</span></li>
-        <li><b>Comparatori incoerenti</b> (es. usare <code>&lt;=</code>) → sort non deterministico. <br/><br/><span class="ok">Usa <code>&lt;</code> e tie-break chiari.</span></li>
-        <li><b>Erase senza remove</b> (o viceversa) → risultato inatteso. <br/><br/><span class="ok">Usa sempre la coppia <code>erase(remove_if(...), end)</code>.</span></li>
-        <li><b>Copie inutili</b> negli algoritmi STL. <br/><br/><span class="ok">Itera con <code>const auto&amp;</code>; usa <code>emplace_back</code> quando costruisci.</span></li>
+        <li>
+          <strong>Catture troppo ampie</strong> (<code>[=]</code> / <code>[&amp;]</code>): rende difficile capire da quali variabili dipende la lambda.
+          <div class="ok">Preferisci capture mirate come <code>[k]</code> o <code>[&amp;totale]</code>.</div>
+        </li>
+        <li>
+          <strong>Comparatori incoerenti</strong> (es. usare <code>&lt;=</code>): <code>sort</code> può diventare non deterministico.
+          <div class="ok">Costruisci il confronto con soli <code>&lt;</code> e aggiungi tie-break espliciti.</div>
+        </li>
+        <li>
+          <strong>Erase senza remove</strong> (o viceversa): il filtro non elimina davvero gli elementi indesiderati.
+          <div class="ok">Applica sempre la coppia <code>erase(remove_if(...), end)</code>.</div>
+        </li>
+        <li>
+          <strong>Copie inutili</strong> dentro gli algoritmi STL: rallentano e consumano memoria.
+          <div class="ok">Itera con <code>const auto&amp;</code> e usa <code>emplace_back</code> per costruire gli elementi.</div>
+        </li>
       </ul>
     </div>
 
     <!-- Parte C -->
     <div class="box">
       <h2>C — Array di struct e <code>qsort</code> con funzione di confronto</h2>
+      <p>Nel C “puro” non esistono le lambda: gli algoritmi standard lavorano con puntatori a funzioni libere. Con <code>qsort</code> dobbiamo quindi scrivere esplicitamente il confronto tra due elementi e lasciare all’algoritmo la logica di ordinamento.</p>
 <pre><code class="language-c">#include &lt;stdlib.h&gt;  // qsort
 #include &lt;string.h&gt;  // strcmp
 
@@ -256,16 +274,17 @@ int main(void) {
     return 0;
 }
 </code></pre>
-      <p class="note">In C non esistono le lambda: <code>qsort</code> richiede un <b>puntatore a funzione</b> che sappia confrontare due elementi generici (cast da <code>void*</code>).</p>
+      <p class="note">In C non esistono le lambda: <code>qsort</code> richiede un <strong>puntatore a funzione</strong> che sappia confrontare due elementi generici (cast da <code>void*</code>).</p>
     </div>
 
     <!-- Esercizi -->
     <div class="inner-box">
       <h2>Esercizi (testi completi + soluzioni a comparsa)</h2>
       <ol>
-        <li><b>E1 — Ordinamento multi-chiave (C++)</b><br/>
-          <em>Input</em>: <code>std::vector&lt;Studente&gt;</code>.<br/>
-          <em>Richiesta</em>: ordina per <u>cognome crescente</u>, poi <u>nome crescente</u>, poi <u>media decrescente</u> (tie-break deterministico).<br/>
+        <li>
+          <strong>E1 — Ordinamento multi-chiave (C++)</strong>
+          <p><em>Input:</em> <code>std::vector&lt;Studente&gt;</code>.</p>
+          <p><em>Obiettivo:</em> ordinare per <u>cognome crescente</u>, poi <u>nome crescente</u>, infine <u>media decrescente</u> per rendere deterministico l’ordinamento.</p>
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
           <div id="box-e1" style="display:none;margin-top:8px">
 <pre><code class="language-cpp">std::sort(classe.begin(), classe.end(),
@@ -278,9 +297,10 @@ int main(void) {
           </div>
         </li>
 
-        <li><b>E2 — Filtra promossi (C++)</b><br/>
-          <em>Input</em>: <code>std::vector&lt;Studente&gt;</code>; soglia promozione <code>k</code> (double).<br/>
-          <em>Richiesta</em>: crea un nuovo vector con chi ha <code>media ≥ k</code> e <code>eta ≥ 14</code>, senza modificare l’originale.<br/>
+        <li>
+          <strong>E2 — Filtra promossi (C++)</strong>
+          <p><em>Input:</em> <code>std::vector&lt;Studente&gt;</code> e soglia di promozione <code>k</code> (double).</p>
+          <p><em>Obiettivo:</em> creare un nuovo vector con chi ha <code>media ≥ k</code> e <code>eta ≥ 14</code>, lasciando intatto l’originale.</p>
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
           <div id="box-e2" style="display:none;margin-top:8px">
 <pre><code class="language-cpp">double k = 6.0;
@@ -292,9 +312,10 @@ std::copy_if(classe.begin(), classe.end(), std::back_inserter(promossi),
           </div>
         </li>
 
-        <li><b>E3 — Primo insufficiente (C++)</b><br/>
-          <em>Input</em>: vector e soglia <code>t</code>.<br/>
-          <em>Richiesta</em>: usa <code>find_if</code> per ottenere il primo studente con <code>media &lt; t</code>; se non c’è, segnalarlo.<br/>
+        <li>
+          <strong>E3 — Primo insufficiente (C++)</strong>
+          <p><em>Input:</em> un vector e la soglia <code>t</code>.</p>
+          <p><em>Obiettivo:</em> usare <code>find_if</code> per ottenere il primo studente con <code>media &lt; t</code> e gestire il caso “nessuno trovato”.</p>
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra ▼</button></div>
           <div id="box-e3" style="display:none;margin-top:8px">
 <pre><code class="language-cpp">double t = 6.0;
@@ -309,9 +330,10 @@ if (it == classe.end()) {
           </div>
         </li>
 
-        <li><b>E4 — qsort per media decrescente (C)</b><br/>
-          <em>Input</em>: array C di <code>Studente</code> e lunghezza.<br/>
-          <em>Richiesta</em>: implementa il comparatore per media decrescente e chiama <code>qsort</code>.<br/>
+        <li>
+          <strong>E4 — <code>qsort</code> per media decrescente (C)</strong>
+          <p><em>Input:</em> array C di <code>Studente</code> e lunghezza.</p>
+          <p><em>Obiettivo:</em> implementare il comparatore per la media decrescente e usarlo con <code>qsort</code>.</p>
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e4" onclick="toggleBox('btn-e4','box-e4')">Mostra ▼</button></div>
           <div id="box-e4" style="display:none;margin-top:8px">
 <pre><code class="language-c">int cmp_media_desc(const void* pa, const void* pb) {
