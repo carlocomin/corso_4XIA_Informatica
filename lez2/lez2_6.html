@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA – Lez3_5 · Perché NON serializzare una struct “a crudo”</title>
+  <title>4BIA – Lez2.6 · Perché NON serializzare una struct “a crudo”</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -24,8 +24,12 @@
   <style>
     .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
     .inner-box pre, .inner-box code, .content-box { text-align:left !important; }
-    .inner-box ul, .inner-box ol { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside; }
-    .inner-box li { margin:.25rem 0; }
+    .inner-box ul, .inner-box ol, .content-box > ul, .content-box > ol {
+      margin:.5rem 0 .75rem 1.1rem;
+      padding-left:1.35rem;
+      list-style-position:outside;
+    }
+    .inner-box li, .content-box > ul > li, .content-box > ol > li { margin:.25rem 0; }
     pre, pre code { text-align:left !important; white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; }
 
     .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
@@ -40,22 +44,20 @@
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 3 — File I/O</h2>
+  <h2>Lezione 2 — Struct (ripasso mirato)</h2>
   <ul>
-    <li><a href="lez3_1.html">Lez3_1: Concetti di file</a></li>
-    <li><a href="lez3_2.html">Lez3_2: File testuali (C++)</a></li>
-    <li><a href="lez3_3.html">Lez3_3: File binari (base)</a></li>
-    <li><a href="lez3_4.html">Lez3_4: Binari portabili (formati)</a></li>
-    <li><a href="lez3_5.html" class="active">Lez3_5: Perché NON scrivere struct “raw”</a></li>
-    <li><a href="lez3_6.html">Lez3_6: Binario in C (esercizi)</a></li>
-    <li><a href="lez3_7.html">Lez3_7: Indici per file binari</a></li>
-    <li><a href="lez3_seek.html">Extra: Cursore &amp; posizionamento</a></li>
+    <li><a href="lez2_1.html">Lez2.1: Motivazione &amp; sintassi base</a></li>
+    <li><a href="lez2_2.html">Lez2.2: Inizializzazioni in C/C++</a></li>
+    <li><a href="lez2_3.html">Lez2.3: Passaggio a funzione</a></li>
+    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct &amp; lambda</a></li>
+    <li><a href="lez2_5.html">Lez2.5: Layout, sizeof, padding &amp; align</a></li>
+    <li><a href="lez2_6.html" class="active">Lez2.6: Serializzare le struct in modo sicuro</a></li>
   </ul>
 </div>
 <!-- END MENU -->
 
 <div class="slide">
-  <h1>Perché <em>non conviene</em> scrivere/leggere una <code>struct</code> “a crudo”</h1>
+  <h1>Lez2.6 — Perché <em>non conviene</em> salvare una <code>struct</code> “a crudo”</h1>
 
   <div class="nav-buttons" style="margin-bottom:10px">
     <button onclick="prevSlide()">&#8592; Indietro</button>
@@ -67,109 +69,122 @@
     <div class="inner-box box">
       <h2>Obiettivo della lezione</h2>
       <p>
-        A volte si pensa: “Ho una <code>struct</code>. La salvo su file con un colpo solo usando
-        <code>fwrite(&amp;s, sizeof s, 1, f)</code> e poi la rileggo uguale”. <b>Sembra comodo</b>, ma è
-        <b>fragile e non portabile</b>. In questa lezione capiamo <em>perché</em> e <em>come</em> farlo nel modo giusto.
+        Tentazione classica: «Ho una <code>struct</code>. Chiamo <code>fwrite(&amp;s, sizeof s, 1, f)</code> e ho finito».
+        Il problema è che quel blocco di memoria <strong>non descrive</strong> il contenuto in modo stabile: dipende dalla
+        piattaforma, dal compilatore e persino dalle opzioni di build.
       </p>
-      <p class="ok"><b>Idea chiave:</b> su disco vogliamo un <strong>formato stabile</strong> (uguale su PC diversi e in anni diversi). Per ottenerlo, scriviamo i <em>campi</em> uno alla volta con regole precise.</p>
+      <p class="ok"><strong>Idea guida:</strong> vogliamo file che restano leggibili nel tempo e su PC diversi. Per riuscirci
+        serve un <em>formato esplicito</em>: scriviamo ogni campo con tipo, ordine ed endianness ben definiti.</p>
     </div>
 
     <div class="inner-box">
-      <h2>Glossario</h2>
+      <h2>Glossario minimo</h2>
       <ul>
-        <li><b>Allineamento</b>: alcuni tipi (es. <code>int</code>, <code>double</code>) vogliono partire a indirizzi multipli di 2/4/8 byte. È una regola della CPU/ABI.</li>
-        <li><b>Padding</b>: byte “di riempimento” inseriti dal compilatore per rispettare l’allineamento.</li>
-        <li><b>Endianness</b>: ordine dei byte di un numero (little-endian ↔ big-endian). Computer diversi possono usare ordini diversi.</li>
-        <li><b>ABI</b>: insieme di regole della piattaforma (dimensione dei tipi, allineamenti, convenzioni...). Cambiando ABI, può cambiare il layout in memoria.</li>
+        <li><strong>Allineamento</strong>: alcuni tipi (ad esempio <code>int</code>, <code>double</code>) devono iniziare a indirizzi multipli di 2/4/8 byte. La regola è fissata da CPU + ABI.</li>
+        <li><strong>Padding</strong>: byte “cuscinetto” inseriti automaticamente dal compilatore per rispettare l’allineamento.</li>
+        <li><strong>Endianness</strong>: ordine con cui i byte di un numero multi-byte sono memorizzati. Può essere little-endian o big-endian.</li>
+        <li><strong>ABI</strong> (Application Binary Interface): stabilisce dimensione dei tipi, allineamenti, convenzioni di chiamata… Cambia ABI ⇒ cambia il layout in memoria.</li>
       </ul>
     </div>
 
     <div class="inner-box box">
-      <h2>1) Padding &amp; allineamento: perché sono un problema</h2>
-      <p>Il compilatore può inserire byte “cuscinetto” tra i campi. Quei byte finiscono <b>nel file</b> se salvi la struct a blocchi.</p>
+      <h2>1) Padding &amp; allineamento: perché sono pericolosi su disco</h2>
+      <p>
+        Quando scrivi l’intera struct con un’unica <code>fwrite</code> ottieni anche i byte di padding.
+        Il numero e la posizione di quei byte dipendono dall’ABI e possono cambiare fra compilatori o versioni diverse.
+      </p>
 <pre><code class="language-cpp">struct A { char c; int x; };
 // Spesso: sizeof(A) == 8 (non 5) a causa del padding</code></pre>
       <ul>
-        <li>La quantità e la posizione del padding dipendono da compilatore/ABI/opzioni e possono cambiare nel tempo.</li>
-        <li>Il file scritto oggi potrebbe non essere leggibile domani da una build diversa.</li>
+        <li>Su un’ABI un campo può iniziare a offset 4, su un’altra a offset 2 ⇒ i file diventano incompatibili.</li>
+        <li>Ricompilare con ottimizzazioni diverse può cambiare il layout, rompendo i file già salvati.</li>
       </ul>
-      <p class="warn"><b>Conclusione:</b> il layout “in memoria” non è un buon formato “su disco”.</p>
+      <p class="warn"><strong>Conclusione:</strong> il layout “in memoria” non è un buon formato “su disco”.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>2) Padding non inizializzato: rischi pratici</h2>
+      <h2>2) Padding non inizializzato: rischi concreti</h2>
       <ul>
-        <li>Il padding può contenere <em>spazzatura</em> (byte casuali) → rischi di <b>leak</b> di informazioni.</li>
-        <li>Due struct “uguali” per campi possono essere diverse byte-a-byte → <code>memcmp</code> inaffidabile.</li>
+        <li>I byte di padding possono contenere <em>dati residui</em>: scrivendoli su file potresti leakare informazioni sensibili.</li>
+        <li>Due struct con campi identici possono avere byte di padding diversi ⇒ il confronto <code>memcmp</code> fallisce.</li>
       </ul>
     </div>
 
     <div class="inner-box box">
       <h2>3) Endianness &amp; rappresentazione dei tipi</h2>
       <ul>
-        <li>Gli interi multi-byte dipendono dall’endian del PC: i byte possono risultare invertiti su un’altra macchina.</li>
-        <li>I <code>float/double</code> di solito sono IEEE-754, ma l’ordine dei byte può comunque cambiare.</li>
+        <li>Gli interi multi-byte dipendono dall’endian della CPU: se non converti, i byte risultano invertiti su macchine diverse.</li>
+        <li>I <code>float</code>/<code>double</code> sono quasi sempre IEEE-754, ma l’ordine dei byte non è garantito.</li>
       </ul>
-      <p class="ok"><b>Esempio:</b> <code>uint16_t v = 0x1234;</code> → su little-endian il file contiene <code>34 12</code>, su big-endian <code>12 34</code>.</p>
+      <p class="ok"><strong>Esempio:</strong> <code>uint16_t v = 0x1234;</code> ⇒ su little-endian il file contiene <code>34 12</code>, su big-endian <code>12 34</code>.</p>
     </div>
 
     <div class="inner-box box">
       <h2>4) Dimensioni dei tipi non uniformi</h2>
-      <p>Tipi come <code>long</code>, <code>size_t</code>, <code>wchar_t</code>, <code>enum</code>… non hanno la stessa dimensione ovunque.</p>
-      <p class="warn"><b>Esempio reale:</b> su Windows 64-bit (<em>LLP64</em>) <code>long</code> è 32 bit; su Linux/macOS 64-bit (<em>LP64</em>) <code>long</code> è 64 bit.</p>
+      <p>
+        Tipi come <code>long</code>, <code>size_t</code>, <code>wchar_t</code> o gli <code>enum</code> dipendono dalla piattaforma.
+        Scriverli “a crudo” significa legarsi per sempre a quella configurazione.
+      </p>
+      <p class="warn"><strong>Esempio reale:</strong> su Windows 64 bit (modello LLP64) <code>long</code> occupa 32 bit; su Linux/macOS 64 bit (modello LP64) <code>long</code> è 64 bit.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>5) Bit-field: il packing è “a scelta” dell’implementazione</h2>
-      <p>Stesse dichiarazioni possono diventare byte su disco diversi a seconda del compilatore/ABI. Evita di salvarli “raw”.</p>
+      <h2>5) Bit-field: layout deciso dall’implementazione</h2>
+      <p>
+        Due compilatori possono impacchettare gli stessi bit-field in modo diverso. Se scrivi i byte risultanti, un altro
+        programma non saprà come interpretarli. Meglio codificare i campi come interi e gestire i bit manualmente.
+      </p>
     </div>
 
     <div class="inner-box box">
       <h2>6) (C++) Oggetti “non banali”</h2>
       <ul>
-        <li>Classi con <em>virtual</em> (vtable) o ereditarietà: <b>no</b> alla scrittura “raw”.</li>
-        <li>Membri non trivially copyable (<code>std::string</code>, <code>std::vector</code>…): salveresti puntatori interni, non i dati veri.</li>
+        <li>Classi con <em>virtual</em> (vtable) o ereditarietà implicano puntatori nascosti: il dump binario sarebbe inutile.</li>
+        <li>Membri non <code>trivially copyable</code> (<code>std::string</code>, <code>std::vector</code>…) contengono puntatori verso dati dinamici: sul file salveresti solo indirizzi invalidi.</li>
       </ul>
-      <p class="warn">Anche per tipi banali: cambiare l’ordine/numero dei campi rompe la compatibilità binaria.</p>
+      <p class="warn">Perfino con tipi banali: basta riordinare un campo o aggiungerne uno nuovo per rompere la compatibilità.</p>
     </div>
 
     <div class="inner-box box">
       <h2>7) Sicurezza &amp; manutenzione</h2>
       <ul>
-        <li>Possibile esposizione involontaria di byte di memoria (padding, puntatori).</li>
-        <li>Basta una ricompilazione con altre opzioni per <b>rompere</b> il formato “raw”.</li>
+        <li>Scrivere memoria grezza può esporre dati sensibili, inclusi indirizzi o frammenti di heap.</li>
+        <li>Un cambio di compilatore, di flag o persino di versione della libreria standard può invalidare tutti i file salvati.</li>
       </ul>
     </div>
 
     <div class="inner-box box">
-      <h2>8) “<code>#pragma pack</code>” non è la soluzione</h2>
+      <h2>8) «<code>#pragma pack</code>» non risolve il problema</h2>
       <ul>
-        <li>Riduce il padding ma è <b>non portabile</b> (diverso tra compilatori) e non risolve l’endianness.</li>
-        <li>Può causare accessi disallineati (lenti o addirittura non validi su alcune CPU).</li>
+        <li>Forza un layout compatto, ma la sintassi cambia fra compilatori e non risolve endianness o dimensioni dei tipi.</li>
+        <li>Può generare accessi disallineati: su alcune CPU sono lenti, su altre causano eccezioni hardware.</li>
       </ul>
-      <p class="tip">Usalo solo quando devi rispettare un layout “imposto” e tratta quei record come <em>blob</em> di byte, non come oggetti da dereferenziare.</p>
+      <p class="tip">Se devi imitare un layout imposto (protocollo esterno), tratta quei record come <em>blob</em> di byte e accedi ai campi con funzioni dedicate, non dereferenziare direttamente.</p>
     </div>
 
     <div class="inner-box">
       <h2><em>Mai</em> scrivere “raw”?</h2>
-      <p>Solo per cache temporanee locali, lette e scritte dalla <b>stessa build</b> sulla <b>stessa macchina</b>. Anche lì:</p>
+      <p>
+        Eccezione ammessa: cache temporanee usate solo dalla <strong>stessa build</strong> sul <strong>medesimo PC</strong>.
+        Anche in quel caso bisogna imporre qualche regola di sicurezza.
+      </p>
       <ul>
-        <li>Metti un header con <b>magic</b>, <b>versione</b>, <b>sizeof(T)</b>, checksum.</li>
+        <li>Inserisci un header con <strong>magic</strong>, <strong>versione</strong>, <strong>sizeof(T)</strong> e magari un checksum.</li>
         <li>Limita i tipi a quelli <em>banali</em> (<code>std::is_trivially_copyable_v&lt;T&gt;</code> in C++).</li>
-        <li>Azzera la struct prima di riempirla (per non scrivere padding “sporco”).</li>
+        <li>Azzera la struct prima di riempirla per non scrivere padding non inizializzato.</li>
       </ul>
     </div>
 
     <div class="inner-box">
-      <h2>La strada giusta: <em>formato esplicito</em> campo-per-campo</h2>
+      <h2>La strada giusta: <em>formato esplicito</em> campo per campo</h2>
 
       <div class="box">
-        <h3>Regole semplici (portabili)</h3>
+        <h3>Regole pratiche per file portabili</h3>
         <ul>
-          <li>Scrivi i campi in un <b>ordine documentato</b> e sempre uguale.</li>
-          <li>Usa <b>tipi a larghezza fissa</b> (<code>uint32_t</code>, <code>int16_t</code>, …).</li>
-          <li>Scegli un’<b>endianness di formato</b> (spesso big-endian “network order”) e converti in scrittura/lettura.</li>
-          <li>Apri i file in <b>modalità binaria</b> (<code>"wb"</code>, <code>"rb"</code>) per evitare la traduzione delle newline su Windows.</li>
+          <li>Definisci e documenta l’<strong>ordine dei campi</strong> nel file.</li>
+          <li>Usa <strong>tipi a larghezza fissa</strong> (es. <code>uint32_t</code>, <code>int16_t</code>) disponibili in <code>&lt;cstdint&gt;</code>/<code>&lt;stdint.h&gt;</code>.</li>
+          <li>Stabilisci un’<strong>endianness di formato</strong> (spesso big-endian “network order”) e converti sia in scrittura che in lettura.</li>
+          <li>Apri i file in <strong>modalità binaria</strong> (<code>"wb"</code>, <code>"rb"</code>) per evitare modifiche automatiche alle newline su Windows.</li>
         </ul>
       </div>
 
@@ -215,21 +230,25 @@ T to_be(T x) {
     else
         return x;
 }</code></pre>
-        <p class="note"><b>Se non hai C++23</b>, usa routine come in C (bswap) o librerie/utility equivalenti.</p>
+        <p class="note"><strong>Se non hai C++23</strong>, usa routine come in C (bswap) o librerie/utility equivalenti.</p>
       </div>
 
       <div class="box">
         <h3>Evita puntatori e bit-field nel formato</h3>
-        <p>Per stringhe salva <b>prima la lunghezza</b>, poi i caratteri. Per record variabili usa blocchi “TLV” (Type-Length-Value) o un piccolo <b>header</b> con <i>magic</i>, versione e conteggi.</p>
+        <p>
+          Per le stringhe scrivi prima la <strong>lunghezza</strong> (in byte o in caratteri) e poi i dati.
+          Per record di lunghezza variabile usa una struttura TLV (Type-Length-Value) o un piccolo <strong>header</strong>
+          con magic, versione e conteggi.
+        </p>
       </div>
     </div>
 
     <div class="inner-box">
-      <h2>Esempio “prima/dopo” (chiaro e concreto)</h2>
+      <h2>Esempio “prima/dopo”</h2>
       <div class="box">
         <h3>❌ Sconsigliato (dump “raw”)</h3>
 <pre><code class="language-cpp">struct Rec { char tag; int value; };
-fwrite(&rec, sizeof rec, 1, f); // dipende da padding, endianness, ABI: NON portabile</code></pre>
+fwrite(&amp;rec, sizeof rec, 1, f); // dipende da padding, endianness, ABI: NON portabile</code></pre>
       </div>
       <div class="box">
         <h3>✅ Consigliato (formato esplicito)</h3>
@@ -249,27 +268,26 @@ rec.value = (int)read_u32_be(f);</code></pre>
       <ul class="checklist">
         <li>[ ] Tipi a larghezza fissa (<code>uint32_t</code>, …)</li>
         <li>[ ] Endianness di formato decisa (spesso big-endian)</li>
-        <li>[ ] Niente puntatori/bit-field nel formato</li>
-        <li>[ ] Evita <code>long</code>/<code>size_t</code>/<code>bool</code> “raw”</li>
+        <li>[ ] Evita puntatori e bit-field nel formato</li>
+        <li>[ ] Non usare <code>long</code>/<code>size_t</code>/<code>bool</code> senza specificare la dimensione</li>
         <li>[ ] Header con magic + versione (+ checksum se utile)</li>
-        <li>[ ] File in modalità <b>binaria</b> (<code>"wb"</code>/<code>"rb"</code>)</li>
-        <li>[ ] In C++ confronta i <b>campi</b>, non i byte (niente <code>memcmp</code> sulle struct)</li>
+        <li>[ ] File in modalità <strong>binaria</strong> (<code>"wb"</code>/<code>"rb"</code>)</li>
+        <li>[ ] In C++ confronta i <strong>campi</strong>, non i byte (niente <code>memcmp</code> sulle struct)</li>
       </ul>
     </div>
 
-    <!-- Esercizi brevi con soluzione a comparsa -->
     <div class="inner-box">
-      <h2>Esercizi (brevi, mirati)</h2>
+      <h2>Esercizi rapidi</h2>
       <ol>
-        <li><b>E1 — Individua i rischi</b><br/>
-          <em>Testo:</em> Hai <code>struct A{char c; int x;}</code>. Spiega perché <code>fwrite(&amp;a,sizeof a,1,f)</code> non è portabile e cosa succede cambiando compilatore/ABI.
+        <li><strong>E1 — Individua i rischi</strong><br/>
+          <em>Testo:</em> Hai <code>struct A{char c; int x;}</code>. Spiega perché <code>fwrite(&amp;a, sizeof a, 1, f)</code> non è portabile e cosa succede cambiando compilatore/ABI.
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
           <div id="box-e1" style="display:none;margin-top:8px">
-            <p class="note">Per via del <b>padding</b> e dell’<b>allineamento</b> <code>sizeof(A)</code> include byte non “logici”. Cambiando compilatore/ABI cambia il layout → il file diventa incompatibile.</p>
+            <p class="note">Il padding inserito per allineare <code>x</code> viene scritto sul file ma cambia da ABI ad ABI. Un’altra build può avere un <code>sizeof(A)</code> diverso e leggere byte sfasati ⇒ file incompatibile.</p>
           </div>
         </li>
-        <li><b>E2 — Riscrivi in formato esplicito</b><br/>
-          <em>Testo:</em> Per <code>struct Rec{char tag; int value;}</code> scrivi la strategia di salvataggio/lettura portabile.
+        <li><strong>E2 — Riscrivi in formato esplicito</strong><br/>
+          <em>Testo:</em> Per <code>struct Rec{char tag; int value;}</code> descrivi una strategia di salvataggio/lettura portabile.
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
           <div id="box-e2" style="display:none;margin-top:8px">
 <pre><code class="language-text">Scrivi: 1) tag (1 byte), 2) value come uint32_t in big-endian (con bswap se serve).

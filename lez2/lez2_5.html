@@ -32,8 +32,9 @@
 
     /* hard-left per liste e blocchi codice */
     .inner-box, .inner-box p, .inner-box ul, .inner-box li, .inner-box h2, .inner-box h3 { text-align:left !important; }
-    .inner-box ul { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position: outside; }
-    .inner-box li { margin:.25rem 0 }
+    .inner-box ul { margin:.5rem 0 .75rem 1.25rem; padding-left:1.25rem; list-style-position: outside; }
+    .inner-box ol { margin:.5rem 0 .75rem 1.4rem; padding-left:1.4rem; list-style-position: outside; }
+    .inner-box li { margin:.3rem 0; padding-left:.1rem; }
 
     .inner-box pre,
     .inner-box pre code,
@@ -73,33 +74,34 @@
     <div class="inner-box box">
       <h2>Glossario minimo (per partire con sicurezza)</h2>
       <ul>
-        <li><b>Allineamento</b>: alcuni tipi “preferiscono” iniziare a indirizzi multipli di 2/4/8 byte. L’ABI della piattaforma lo decide.</li>
-        <li><b>Padding</b>: byte “cuscinetto” inseriti dal compilatore tra i campi (o in coda) per rispettare l’allineamento.</li>
-        <li><b><code>sizeof(T)</code></b>: dimensione in byte dell’oggetto <em>incluso</em> il padding.</li>
-        <li><b><code>alignof(T)</code> / <code>_Alignof(T)</code></b>: allineamento richiesto dal tipo (multiplo di byte).</li>
-        <li><b>Offset</b>: distanza (in byte) dall’inizio della struct al campo (<code>offsetof</code>).</li>
+        <li><b>Allineamento</b>: alcuni tipi “preferiscono” indirizzi multipli (2, 4, 8 byte…). La piattaforma fissa la regola e il compilatore la rispetta.</li>
+        <li><b>Padding</b>: byte cuscinetto inseriti dal compilatore prima o dopo i campi così ogni campo inizia allineato.</li>
+        <li><b><code>sizeof(T)</code></b>: misura in byte l’intero oggetto, padding compreso.</li>
+        <li><b><code>alignof(T)</code> / <code>_Alignof(T)</code></b>: multiplo minimo di byte richiesto dal tipo.</li>
+        <li><b>Offset</b>: distanza in byte tra l’inizio della struct e un campo, ottenibile con <code>offsetof</code>.</li>
       </ul>
-      <p class="ok"><b>Idea guida</b>: il layout è deciso dall’implementazione (compilatore + ABI). Non si “indovina”: si misura con <code>sizeof</code>, <code>alignof</code>, <code>offsetof</code>.</p>
+      <p class="ok"><b>Idea guida</b>: il layout dipende dall’accoppiata compilatore + ABI. Niente supposizioni: si osserva con <code>sizeof</code>, <code>alignof</code> e <code>offsetof</code>.</p>
     </div>
 
     <div class="inner-box">
       <h2>Perché contano layout, padding e allineamento</h2>
       <p>
-        Una <strong>struct</strong> non è solo un insieme di campi: in memoria deve rispettare regole di <em>allineamento</em>.
-        Il compilatore può inserire <strong>padding</strong> tra campi o in coda, così ogni campo inizia su un indirizzo adatto.
-        Il risultato è che <code>sizeof(T)</code> può essere <em>maggiore</em> della somma dei <code>sizeof</code> dei campi.
+        Una <strong>struct</strong> deve rispettare regole fisiche di allineamento della piattaforma. Per questo il compilatore
+        può inserire <strong>padding</strong> tra i campi o alla fine dell’oggetto: è normale che <code>sizeof(T)</code> superi
+        la somma dei singoli <code>sizeof</code>.
       </p>
       <ul>
-        <li><strong>Allineamento</strong>: ad es. un <code>double</code> su molte ABI richiede indirizzi multipli di 8.</li>
-        <li><strong>Padding interno</strong>: tra due campi per allineare il successivo.</li>
-        <li><strong>Padding finale</strong>: per mantenere l’allineamento negli <em>array di struct</em>.</li>
+        <li><strong>Allineamento</strong>: esempi comuni sono gli <code>int</code> multipli di 4 byte e i <code>double</code> multipli di 8 byte.</li>
+        <li><strong>Padding interno</strong>: byte aggiunti fra due campi per allineare il campo successivo.</li>
+        <li><strong>Padding finale</strong>: byte conclusivi che mantengono l’allineamento quando la struct è in un array.</li>
       </ul>
-      <p class="warn"><strong>Portabilità:</strong> dimensioni e layout sono <em>implementation-defined</em>. Il tuo codice deve <b>misurare</b>, non assumere.</p>
+      <p class="warn"><strong>Portabilità:</strong> dimensioni e layout sono <em>implementation-defined</em>. Quindi si <b>misura</b>, non si indovina.</p>
     </div>
 
     <!-- C++ PRIMA -->
     <div class="box">
       <h2>C++ — Osservare <code>sizeof</code> e <code>alignof</code> (esempi)</h2>
+      <p>Il modo più sicuro per capire il layout è stamparne le misure. Il frammento seguente raccoglie <code>sizeof</code>, <code>alignof</code> e <code>offsetof</code> per due struct con gli stessi campi ma ordine diverso.</p>
 <pre><code class="language-cpp">#include &lt;cstddef&gt;   // std::size_t, offsetof
 #include &lt;iostream&gt;
 
@@ -134,8 +136,8 @@ int main() {
 }
 </code></pre>
       <p class="note">
-        Su ABI comuni x86-64: <code>sizeof(A)</code> spesso risulta &gt; <code>sizeof(B)</code> perché in <code>A</code> l’<code>int</code> prima del <code>double</code> può indurre più padding.
-        <br><strong>Morale:</strong> ordinare i campi “dal più grande al più piccolo” riduce spesso il padding.
+        Su ABI comuni x86-64 <code>sizeof(A)</code> è più grande di <code>sizeof(B)</code>: l’<code>int</code> piazzato prima del <code>double</code>
+        costringe a inserire padding extra. <strong>Messaggio pratico:</strong> ordinare i campi dal più grande al più piccolo riduce spesso lo spreco.
       </p>
 
       <h3>Schema mentale (disposizione a byte)</h3>
@@ -147,6 +149,7 @@ B:  [c][pad pad pad pad pad pad pad][d x8][i x4]
 
     <div class="box">
       <h2>C++ — Effetto dell’ordine dei campi</h2>
+      <p>Due struct identiche nei tipi ma con ordine diverso evidenziano l’impatto del padding. Basta ricompilare con i campi riordinati per ottenere una versione più compatta.</p>
 <pre><code class="language-cpp">struct C1 {         // ordine "sfavorevole"
     char  c;        // 1
     int   i;        // 4
@@ -163,11 +166,12 @@ struct C2 {         // ordine "favorevole"
 
 static_assert(sizeof(C2) &lt;= sizeof(C1), "C2 non dovrebbe essere più grande di C1");
 </code></pre>
-      <p class="ok">Riordinare i campi non cambia la semantica, ma può migliorare memoria e località (specie in <code>std::vector&lt;C2&gt;</code> grandi).</p>
+      <p class="ok">Riordinare i campi non cambia la logica del programma ma rende la struttura più compatta e gentile con la cache, soprattutto in un <code>std::vector&lt;C2&gt;</code> esteso.</p>
     </div>
 
     <div class="box">
       <h2>C++ — <code>alignof</code>, <code>alignas</code> e <code>offsetof</code></h2>
+      <p>Quando serve un controllo più fine conviene interrogare direttamente le API standard: <code>alignof</code> rivela il requisito, <code>alignas</code> consente di chiederne uno nuovo e <code>offsetof</code> dice dove finiscono i campi.</p>
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
 #include &lt;iostream&gt;
 #include &lt;cstdint&gt;
@@ -193,15 +197,15 @@ int main() {
               &lt;&lt; ", sizeof(Aligned): " &lt;&lt; sizeof(Aligned) &lt;&lt; "\n";
 }
 </code></pre>
-      <p class="warn"><strong>Usa <code>alignas</code> con criterio:</strong> allineamenti maggiorati possono <b>aumentare</b> <code>sizeof</code> (più padding) e sprecare memoria.</p>
+      <p class="warn"><strong>Usa <code>alignas</code> con criterio:</strong> chiedere un allineamento più alto può far crescere <code>sizeof</code> (serve più padding) e quindi consumare più memoria.</p>
     </div>
 
     <div class="box">
       <h2>C++ — Padding, confronto e serializzazione</h2>
       <ul>
-        <li><strong>Padding non inizializzato</strong>: leggere/confrontare il padding è non portabile; evita <code>memcmp</code> su struct.</li>
-        <li><strong>Equality corretta</strong>: confronta <em>i campi</em>, non i byte grezzi.</li>
-        <li><strong>Serializzazione</strong>: non scrivere la struct “a blocchi” su file/socket; serializza campo per campo o usa formati/librerie robusti.</li>
+        <li><strong>Padding non inizializzato</strong>: i byte di padding possono contenere valori non definiti; leggerli o confrontarli è non portabile.</li>
+        <li><strong>Confronti corretti</strong>: metti a confronto i <em>campi</em> significativi, non i byte grezzi con <code>memcmp</code>.</li>
+        <li><strong>Serializzazione</strong>: scrivi i campi in modo esplicito o usa librerie dedicate, non riversare l’intera struct così com’è.</li>
       </ul>
 <pre><code class="language-cpp">struct Studente {
     std::string nome, cognome;
@@ -214,12 +218,13 @@ bool equal(const Studente&amp; a, const Studente&amp; b) {
         &amp;&amp; a.eta==b.eta &amp;&amp; a.media==b.media;
 }
 </code></pre>
-      <p class="note">Per POD binari semplici puoi usare I/O binario consapevole del layout, ma resta non portabile tra compilatori/ABI diverse.</p>
+      <p class="note">Per strutture POD molto semplici si può lavorare in binario conoscendo bene la piattaforma, ma rimane una scelta fragile e non portabile.</p>
     </div>
 
     <!-- PARTE C -->
     <div class="box">
       <h2>C — <code>sizeof</code>, <code>_Alignof</code>, <code>offsetof</code></h2>
+      <p>In C gli strumenti sono analoghi: cambiano solo i nomi delle funzioni standard, introdotte dal C11.</p>
 <pre><code class="language-c">#include &lt;stddef.h&gt;  // offsetof
 #include &lt;stdio.h&gt;   // printf
 #include &lt;stdalign.h&gt;// _Alignof (C11)
@@ -239,11 +244,12 @@ int main(void) {
     return 0;
 }
 </code></pre>
-      <p class="note">Come in C++, layout e dimensioni dipendono dall’implementazione. Misurare, non assumere.</p>
+      <p class="note">Le stesse regole viste in C++ valgono in C: layout e dimensioni cambiano a seconda dell’implementazione, quindi prima si misura e poi si decide.</p>
     </div>
 
     <div class="box">
       <h2>C — Riordinare i campi per ridurre il padding</h2>
+      <p>Stesso gioco anche qui: stessi tipi, ordine diverso, dimensioni diverse. È un esperimento rapido da proporre agli studenti.</p>
 <pre><code class="language-c">typedef struct {     // ordine sfavorevole
     char  c;
     int   i;
@@ -264,8 +270,8 @@ typedef struct {     // ordine favorevole
     <div class="box">
       <h2>C — <code>#pragma pack</code>? Meglio evitarlo (salvo casi specifici)</h2>
       <p>
-        Alcuni compilatori offrono <code>#pragma pack</code> per ridurre/alterare il padding. È <strong>non portabile</strong> e può degradare prestazioni
-        (accessi disallineati). Usarlo solo se indispensabile e <strong>solo sullo scope necessario</strong>.
+        Alcuni compilatori offrono <code>#pragma pack</code> per ridurre o azzerare il padding. È una scorciatoia <strong>non portabile</strong>
+        e può peggiorare le prestazioni (accessi disallineati). Se proprio serve, delimitane l’uso allo stretto indispensabile.
       </p>
     </div>
 
@@ -273,9 +279,9 @@ typedef struct {     // ordine favorevole
     <div class="inner-box box">
       <h2>FAQ — Domande ricorrenti</h2>
       <ul>
-        <li><b>Perché <code>sizeof(T)</code> include il padding?</b> Perché gli elementi di un array di <code>T</code> devono essere tutti correttamente allineati: il padding finale “chiude” l’elemento.</li>
-        <li><b>Posso dipendere dal layout esatto?</b> No in generale: è specifico dell’implementazione. Scrivi codice che <em>misura</em> o che astrae dal layout.</li>
-        <li><b>Perché <code>memcmp</code> su due struct può fallire anche se “uguali”?</b> Il padding può contenere byte indeterminati diversi.</li>
+        <li><b>Perché <code>sizeof(T)</code> include il padding?</b> Perché in un array ogni elemento deve iniziare allineato: il padding finale garantisce che l’elemento successivo parta nel punto giusto.</li>
+        <li><b>Posso dipendere dal layout esatto?</b> In generale no: cambia con compilatore, opzioni e piattaforma. Meglio misurare oppure progettare senza vincoli sul layout.</li>
+        <li><b>Perché <code>memcmp</code> su due struct può fallire anche se “uguali”?</b> Il padding può contenere byte non inizializzati e diversi tra i due oggetti.</li>
       </ul>
     </div>
 
@@ -284,8 +290,7 @@ typedef struct {     // ordine favorevole
       <h2>Esercizi (testi completi + soluzioni a comparsa)</h2>
       <ol>
         <li><strong>E1 — Misura e confronta (C++)</strong><br/>
-          <div class="spec"><b>Richiesta:</b> definisci <code>S1</code> e <code>S2</code> con stessi campi ma ordine diverso (<code>double,int,char,char</code> vs <code>char,int,char,double</code>).
-            Stampa <code>sizeof</code>, <code>alignof</code> e <code>offsetof</code> dei campi. Commenta il risultato.</div>
+          <div class="spec"><b>Richiesta:</b> definisci <code>S1</code> e <code>S2</code> con gli stessi campi ma ordine diverso (<code>double,int,char,char</code> vs <code>char,int,char,double</code>). Stampa <code>sizeof</code>, <code>alignof</code> e gli <code>offsetof</code> principali, poi spiega la differenza.</div>
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra soluzione ▼</button></div>
           <div id="box-e1" style="display:none;margin-top:8px">
 <pre><code class="language-cpp">#include &lt;cstddef&gt;
@@ -310,7 +315,7 @@ int main(){ info&lt;S1&gt;("S1"); info&lt;S2&gt;("S2"); }
         </li>
 
         <li><strong>E2 — Array di struct: impatto del layout</strong><br/>
-          <div class="spec"><b>Richiesta:</b> crea un <code>std::vector&lt;S2&gt;</code> con 1e6 elementi e uno di <code>S1</code>; stima la memoria occupata e commenta caching/località.</div>
+          <div class="spec"><b>Richiesta:</b> crea un <code>std::vector&lt;S2&gt;</code> con 1e6 elementi e uno di <code>S1</code>. Confronta la memoria stimata (<code>sizeof(T) * N</code>) e commenta l’effetto sulla cache.</div>
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra soluzione ▼</button></div>
           <div id="box-e2" style="display:none;margin-top:8px">
 <pre><code class="language-text">Memoria ≈ sizeof(T) * N. Se S1 è più compatto, un vettore di 1e6 elementi
@@ -320,8 +325,7 @@ occuperà meno RAM e avrà migliore località (più elementi per linea di cache)
         </li>
 
         <li><strong>E3 — Evita <code>memcmp</code> sulle struct</strong><br/>
-          <div class="spec"><b>Richiesta:</b> spiega perché confrontare due struct con <code>memcmp(&amp;a,&amp;b,sizeof(a))</code> è sbagliato in generale
-            e scrivi un <code>operator==</code> corretto per una struct C++ con più campi.</div>
+          <div class="spec"><b>Richiesta:</b> argomenta perché <code>memcmp(&amp;a,&amp;b,sizeof(a))</code> è fragile e scrivi un <code>operator==</code> che confronti i campi reali.</div>
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra soluzione ▼</button></div>
           <div id="box-e3" style="display:none;margin-top:8px">
 <pre><code class="language-text">Il padding può contenere byte indeterminati: due oggetti "uguali" per campi
@@ -336,8 +340,7 @@ bool operator==(const P&amp; a, const P&amp; b){
         </li>
 
         <li><strong>E4 (C) — Calcola <code>sizeof</code> e commenta</strong><br/>
-          <div class="spec"><b>Richiesta:</b> in C, definisci <code>R1</code> (<code>char,double,int</code>) e <code>R2</code> (<code>double,int,char</code>),
-            stampa <code>sizeof</code> di entrambi e spiega la differenza.</div>
+          <div class="spec"><b>Richiesta:</b> in C crea <code>R1</code> (<code>char,double,int</code>) e <code>R2</code> (<code>double,int,char</code>), poi stampa i due <code>sizeof</code> e descrivi perché cambiano.</div>
           <div class="nav-buttons" style="justify-content:left"><button id="btn-e4" onclick="toggleBox('btn-e4','box-e4')">Mostra soluzione ▼</button></div>
           <div id="box-e4" style="display:none;margin-top:8px">
 <pre><code class="language-c">#include &lt;stdio.h&gt;
@@ -357,11 +360,11 @@ int main(void){
     <div class="inner-box box">
       <h2>Takeaways</h2>
       <ul>
-        <li><strong><code>sizeof(T)</code></strong> include il padding: non è la somma dei campi.</li>
-        <li><strong>Ordina i campi</strong> (grandi → piccoli) quando possibile: spesso riduce il padding.</li>
-        <li><strong>Misura</strong> con <code>sizeof</code>, <code>alignof</code>/<code>_Alignof</code> e <code>offsetof</code>; evita assunzioni “a occhio”.</li>
-        <li><strong>Evita <code>memcmp</code></strong> sulle struct non trivialmente byte-equal; confronta i campi.</li>
-        <li><strong><code>#pragma pack</code></strong> è non portabile e può peggiorare le prestazioni: usalo solo quando serve davvero.</li>
+        <li><strong><code>sizeof(T)</code></strong> restituisce la dimensione reale della struct, padding compreso.</li>
+        <li><strong>Ordina i campi</strong> dal più “pesante” al più “leggero” quando possibile per ridurre il padding.</li>
+        <li><strong>Misura</strong> con <code>sizeof</code>, <code>alignof</code>/<code>_Alignof</code> e <code>offsetof</code>: l’intuizione non basta.</li>
+        <li><strong>Confronta i campi</strong>, non i byte grezzi: lascia stare <code>memcmp</code> su struct complesse.</li>
+        <li><strong><code>#pragma pack</code></strong> è una soluzione estrema, poco portabile e con impatto prestazionale: usarlo solo se strettamente necessario.</li>
       </ul>
     </div>
 
