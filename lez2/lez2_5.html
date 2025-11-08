@@ -21,29 +21,34 @@
     }
   </script>
   <style>
-    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
-    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
-    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px }
-    .tip  { font-style: italic; opacity:.9 }
+    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
+    .inner-box pre, .inner-box code, .box, .box p, .box ul, .box ol, .box li,
+    .box pre, .box code, .content-box { text-align:left !important; }
+
+    .inner-box ul, .inner-box ol,
+    .box ul, .box ol,
+    .content-box > ul, .content-box > ol {
+      margin:.5rem 0 .75rem 1.1rem;
+      padding-left:1.35rem;
+      list-style-position:outside;
+    }
+
+    .inner-box li,
+    .box li,
+    .content-box > ul > li,
+    .content-box > ol > li { margin:.25rem 0; }
+
+    pre,
+    pre code { text-align:left !important; white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; max-width:100%; overflow-x:auto; }
+
+    .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; }
+    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; }
+    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; display:inline-block; }
+    .tip  { font-style:italic; opacity:.95 }
 
     .spec { margin:.2rem 0 .5rem }
     .spec b { display:inline-block; width:10.5rem }
-
-    /* hard-left per liste e blocchi codice */
-    .inner-box, .inner-box p, .inner-box ul, .inner-box li, .inner-box h2, .inner-box h3 { text-align:left !important; }
-    .inner-box ul { margin:.5rem 0 .75rem 1.25rem; padding-left:1.25rem; list-style-position: outside; }
-    .inner-box ol { margin:.5rem 0 .75rem 1.4rem; padding-left:1.4rem; list-style-position: outside; }
-    .inner-box li { margin:.3rem 0; padding-left:.1rem; }
-
-    .inner-box pre,
-    .inner-box pre code,
-    .box pre,
-    .box pre code,
-    pre,
-    pre code { text-align: left !important; }
-    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
-    pre code { display:block; }
   </style>
 </head>
 <body>

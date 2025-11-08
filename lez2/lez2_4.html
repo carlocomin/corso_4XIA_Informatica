@@ -21,18 +21,55 @@
     }
   </script>
   <style>
-    .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
+    .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin:0 auto 14px; }
     .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
     .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
     .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; display:inline-block }
     .tip  { font-style: italic; opacity:.9 }
-    /* Hard-left per testi/elenco/codice */
-    .inner-box, .inner-box p, .inner-box ul, .inner-box li, .inner-box h3 { text-align:left !important; }
-    .inner-box ul { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
-    .inner-box li { margin:.25rem 0 }
-    .box ul { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
-    .box li { margin:.25rem 0 }
-    pre, pre code, .inner-box pre, .inner-box pre code, .box pre, .box pre code { text-align:left !important; white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; }
+
+    /* Hard-left per testo, elenchi e codice (coerente con le altre lezioni) */
+    .inner-box,
+    .inner-box p,
+    .inner-box ul,
+    .inner-box ol,
+    .inner-box li,
+    .inner-box h2,
+    .inner-box h3,
+    .box p,
+    .box ul,
+    .box ol,
+    .box li,
+    .box h2,
+    .box h3 { text-align:left !important; }
+
+    .inner-box ul,
+    .box ul { margin:.5rem 0 .75rem 1.25rem; padding-left:1.25rem; list-style-position:outside; }
+
+    .inner-box ol,
+    .box ol { margin:.5rem 0 .75rem 1.5rem; padding-left:1.5rem; list-style-position:outside; }
+
+    .inner-box li,
+    .box li { margin:.25rem 0; }
+
+    .inner-box pre,
+    .inner-box pre code,
+    .box pre,
+    .box pre code,
+    pre,
+    pre code {
+      text-align:left !important;
+    }
+
+    pre {
+      white-space:pre;
+      tab-size:4;
+      margin:.4rem 0 1rem 0;
+      padding:.5rem .75rem;
+      width:fit-content;
+      max-width:100%;
+    }
+
+    pre code { display:block; }
   </style>
 </head>
 <body>
