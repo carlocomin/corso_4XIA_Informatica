@@ -8,13 +8,13 @@
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
   <script>try{hljs.highlightAll();}catch(e){}</script>
 
   <script>
     function prevSlide(){ window.location.href = "lez4_1.html"; }
     function nextSlide(){ window.location.href = "lez4_3.html"; }
-    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
-    function toggleBox(btnId, boxId){
+function toggleBox(btnId, boxId){
       const box=document.getElementById(boxId), btn=document.getElementById(btnId);
       const open = box.style.display==='block';
       box.style.display = open ? 'none' : 'block';
@@ -22,39 +22,25 @@
     }
   </script>
 
-  <style>
-    /* Allineamento forte a sinistra e stile coerente */
-    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li,
-    .inner-box pre, .inner-box code, .inner-box h2, .inner-box h3 { text-align:left !important; }
-    .inner-box ul, .inner-box ol { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
-    .inner-box li { margin:.25rem 0 }
-    pre, pre code { white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; }
-    code { white-space:pre-wrap; }
-
-    .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
-    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; display:inline-block }
-    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
-    .kbd  { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:0 .35rem }
-
-    table { width:100%; border-collapse:collapse }
-    th, td { border-bottom:1px solid #e5e7eb; padding:.45rem .5rem; text-align:left; vertical-align:top }
-    th { background:#f8fafc }
-  </style>
 </head>
 <body>
 
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 4 — OOP in C++ (introduzione)</h2>
+  <h2>Lezione 4 - OOP in C++</h2>
   <ul>
-    <li><a href="lez4_1.html">Lez4_1: Perché OOP? Concetti di base</a></li>
-    <li><a class="active" href="lez4_2.html">Lez4_2: Definire una classe (sintassi minima)</a></li>
-    <li><a href="lez4_3.html">Lez4_3: Costruttori, distruttore, lista d’iniz.</a></li>
+    <li><a href="lez4_1.html">Lez4_1: Perche OOP? Concetti di base</a></li>
+    <li><a href="lez4_2.html" class="active">Lez4_2: Definire una classe (sintassi minima)</a></li>
+    <li><a href="lez4_3.html">Lez4_3: Costruttori, distruttore, lista d'iniz.</a></li>
     <li><a href="lez4_4.html">Lez4_4: Incapsulamento, metodi const, overload</a></li>
-    <li><a href="lez4_5.html">Lez4_5: to_string(), stampa, pre/postcondiz.</a></li>
+    <li><a href="lez4_5.html">Lez4_5: to_string(), operator<<, pre/postcondiz.</a></li>
     <li><a href="lez4_6.html">Lez4_6: Header/Sorgenti, include-guard, build</a></li>
+    <li><a href="lez4_7.html">Lez4_7: Costruttore di copia e semantica di copia</a></li>
+    <li><a href="lez4_8.html">Lez4_8: Move constructor e move assignment</a></li>
+    <li><a href="lez4_9.html">Lez4_9: Esercizi svolti - livello base</a></li>
+    <li><a href="lez4_10.html">Lez4_10: Esercizi svolti - livello intermedio</a></li>
+    <li><a href="lez4_11.html">Lez4_11: Esercizi svolti - livello avanzato</a></li>
   </ul>
 </div>
 <!-- END MENU -->
@@ -274,7 +260,6 @@ public:
 </div>
 
 <script>
-function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
 </script>
 </body>
 </html>

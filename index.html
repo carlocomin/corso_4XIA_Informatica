@@ -3,23 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Benvenuto al Corso di Python</title>
+    <title>Corso di Informatica 4BIA - C/C++</title>
     <link rel="stylesheet" href="style.css">
-    <script>
+        <script src="menu.js"></script>
+<script>
         function nextSlide() {
             window.location.href = "programma.html";
         }
     </script>
-	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <!-- BEGIN MENU -->
-<button class='menu-toggle' onclick='toggleMenu()'>&#9776; Menu</button>
-<div class='sidebar' id='menu'>
-    <h2>Menu Lezioni</h2>
-    <ul>
-        <li><a href='lez1/lez1_1.html'>Lezione 1: Introduzione</a></li>
-     </ul>
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Menu Lezioni</h2>
+  <ul>
+    <li><a href="lez1/lez1_1.html">Lezione 1: Matrici 2D in C/C++</a></li>
+    <li><a href="lez2/lez2_1.html">Lezione 2: Struct in C/C++</a></li>
+    <li><a href="lez3/lez3_1.html">Lezione 3: File I/O in C/C++</a></li>
+    <li><a href="lez4/lez4_1.html">Lezione 4: OOP in C++</a></li>
+  </ul>
 </div>
 <!-- END MENU -->
 
@@ -28,7 +31,8 @@
 
     <div class="slide">
         <h1>Benvenuti al Corso di Informatica 4BIA!</h1>
-        <p>Un viaggio alla scoperta della programmazione, degli algoritmi e delle applicazioni AI!</p>
+        <p>Un percorso di ripasso e consolidamento su C/C++, strutture dati, file e OOP.</p>
+        <p><strong>Standard di riferimento:</strong> C++17. Gli approfondimenti C++20/C++23 sono segnalati come extra.</p>
         <div class="image-container">
             <img src="img/logo.png" alt="Un logo simpatico">
         </div>
@@ -36,11 +40,5 @@
             <button onclick="nextSlide()">Inizia il Corso &#8594;</button>
         </div>
     </div>
-<script>
-function toggleMenu() {
-    const menu = document.getElementById('menu');
-    menu.classList.toggle('open');
-}
-</script>
 </body>
 </html>

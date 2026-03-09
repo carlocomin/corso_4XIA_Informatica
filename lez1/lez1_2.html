@@ -7,12 +7,12 @@
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
   <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
     function prevSlide(){ window.location.href = "lez1_1.html"; }
     function nextSlide(){ window.location.href = "lez1_3.html"; }
-    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
-    function toggleBox(btnId, boxId){
+function toggleBox(btnId, boxId){
       const box = document.getElementById(boxId);
       const btn = document.getElementById(btnId);
       const open = box.style.display === 'block';
@@ -25,10 +25,15 @@
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 1 — Matrici 2D (4BIA)</h2>
+  <h2>Lezione 1 - Matrici 2D (4BIA)</h2>
   <ul>
-    <li><a href="lez1_1.html">L1.1 · Introduzione & obiettivi</a></li>
-    <li><a href="lez1_2.html">L1.2 · Definizioni, indici, row-major</a></li>
+    <li><a href="lez1_1.html">L1.1 - Introduzione e obiettivi</a></li>
+    <li><a href="lez1_2.html" class="active">L1.2 - Definizioni, indici, row-major</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarazione e attraversamento</a></li>
+    <li><a href="lez1_4.html">L1.4 - I/O e utility</a></li>
+    <li><a href="lez1_5.html">L1.5 - Passare matrici a funzione</a></li>
+    <li><a href="lez1_6.html">L1.6 - Matrici dinamiche</a></li>
+    <li><a href="lez1_7.html">L1.7 - Operazioni base</a></li>
   </ul>
 </div>
 <!-- END MENU -->
@@ -165,7 +170,6 @@ Per (R,C)=(3,5) e (r,c)=(2,3) &rarr; k = 2*5 + 3 = 13</code></pre>
 </div>
 
 <script>
-function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
 </script>
 </body>
 </html>

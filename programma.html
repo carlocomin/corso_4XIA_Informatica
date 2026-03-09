@@ -3,52 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programma del Corso</title>
+    <title>Programma del Corso 4BIA - C/C++</title>
     <link rel="stylesheet" href="style.css">
-    <script>
+        <script src="menu.js"></script>
+<script>
         function prevSlide() {
             window.location.href = "index.html";
         }
         function nextSlide() {
             window.location.href = "lez1/lez1_1.html";
         }
-        function toggleMenu() {
-            const menu = document.getElementById('menu');
-            menu.classList.toggle('open');
-        }
-    </script>
+</script>
 </head>
 <body>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-    <h2>Menu Lezioni</h2>
-    <ul>
-        <li><a href="lez1/lez1_1.html">Lezione 1: Matrici in C/C++</a></li>
-        <li><a href="lez2/lez2_1.html">Lezione 2: Struct in C/C++</a></li>
-        <li><a href="lez3/lez3_1.html">Lezione 3: File I/O in C/C++</a></li>
-		<li><a href="lez3/lez4_1.html">Lezione 4: Introduzione all'OOP in C/C++</a></li>
-    </ul>
+  <h2>Menu Lezioni</h2>
+  <ul>
+    <li><a href="lez1/lez1_1.html">Lezione 1: Matrici 2D in C/C++</a></li>
+    <li><a href="lez2/lez2_1.html">Lezione 2: Struct in C/C++</a></li>
+    <li><a href="lez3/lez3_1.html">Lezione 3: File I/O in C/C++</a></li>
+    <li><a href="lez4/lez4_1.html">Lezione 4: OOP in C++</a></li>
+  </ul>
 </div>
 <!-- END MENU -->
 
 <div class="slide">
-    <h1>Programma del Corso</h1>
+    <h1>Programma del Corso 4BIA</h1>
 
     <div class="nav-buttons">
         <button onclick="prevSlide()">&#8592; Indietro</button>
         <button onclick="nextSlide()">Avanti &#8594;</button>
     </div>
 
-    <h2>Modulo 1: Ripasso programmazione C/C++, Algoritmi e Strutture Dati</h2>
+    <h2>Modulo 1: Ripasso di programmazione C/C++, algoritmi e strutture dati</h2>
     <p><strong>📌 Obiettivo:</strong> Rispolverare un livello sufficiente per affrontare gli argomenti del quarto anno.</p>
+
+    <p><strong>Standard C++ di base:</strong> C++17. Gli esempi che richiedono C++20/C++23 sono etichettati esplicitamente.</p>
 
     <!-- BOX con link cliccabili alle lezioni -->
     <ul class="inner-box">
         <li><a href="lez1/lez1_1.html"><strong>Lezione 1:</strong> Matrici (array bi-dimensionali) in C/C++</a></li>
         <li><a href="lez2/lez2_1.html"><strong>Lezione 2:</strong> Struct in C/C++</a></li>
         <li><a href="lez3/lez3_1.html"><strong>Lezione 3:</strong> File I/O in C/C++</a></li>
-		<li><a href="lez4/lez4_1.html"><strong>Lezione 4:</strong> Introduzione all'OOP in C/C++</a></li>
+        <li><a href="lez4/lez4_1.html"><strong>Lezione 4:</strong> OOP in C++</a></li>
     </ul>
 
     <div class="nav-buttons">

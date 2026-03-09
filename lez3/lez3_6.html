@@ -7,50 +7,26 @@
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
   <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
     function prevSlide(){ window.location.href = "lez3_5.html"; }
     function nextSlide(){ window.location.href = "lez3_7.html"; }
-    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
-  </script>
-  <!-- patch allineamento + box colorate -->
-  <style>
-    /* Testo/liste/codice SEMPRE a sinistra nelle inner-box */
-    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li, .inner-box pre, .inner-box code {
-      text-align: left !important;
-    }
-    .inner-box ul, .inner-box ol {
-      margin: .5rem 0 .75rem 1rem;
-      padding-left: 1.25rem;
-      list-style-position: outside;
-    }
-    .inner-box li { margin: .25rem 0; }
-    pre, pre code { text-align: left !important; white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
-    .content-box { text-align: left !important; }
-    .center { text-align: center; }
-    /* Box colorate */
-    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; }
-    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; display:inline-block; margin:.35rem 0; }
-    .tip  { font-style: italic; opacity:.95; }
-    /* Lista compatta opzionale */
-    .tight li { margin:.25rem 0; }
-  </style>
+</script>
 </head>
 <body>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 3 — File I/O</h2>
+  <h2>Lezione 3 - File I/O</h2>
   <ul>
-    <li><a href="lez3_1.html">Lez3_1: Concetti di file</a></li>
-    <li><a href="lez3_2.html">Lez3_2: File testuali (C++)</a></li>
-    <li><a href="lez3_3.html">Lez3_3: File binari (base)</a></li>
-    <li><a href="lez3_4.html">Lez3_4: Binari portabili (formati)</a></li>
-    <li><a href="lez3_5.html">Lez3_5: fseek/ftell &amp; seekg/tellg</a></li>
-    <li><a href="lez3_6.html" class="active">Lez3_6: fseek/ftell &amp; seekg/tellg (text mode)</a></li>
+    <li><a href="lez3_1.html">Lez3_1: File, concetti e modelli</a></li>
+    <li><a href="lez3_2.html">Lez3_2: I/O su file testuali (C++)</a></li>
+    <li><a href="lez3_3.html">Lez3_3: File binari (base) in C++ e C</a></li>
+    <li><a href="lez3_4.html">Lez3_4: Spostamento del cursore nei file binari</a></li>
+    <li><a href="lez3_5.html">Lez3_5: Perche non scrivere struct raw</a></li>
+    <li><a href="lez3_6.html" class="active">Lez3_6: fseek/ftell e seekg/tellg (text mode)</a></li>
     <li><a href="lez3_7.html">Lez3_7: Indici per file binari</a></li>
-    <li><a href="lez3_seek.html">Extra: Cursore &amp; posizionamento</a></li>
   </ul>
 </div>
 <!-- END MENU -->
@@ -220,7 +196,6 @@ int main(){
 </div>
 
 <script>
-function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
 </script>
 </body>
 </html>

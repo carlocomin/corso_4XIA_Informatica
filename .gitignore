@@ -1,8 +1,10 @@
 # Generated visual test artifacts
 _visual_test/
 tools/
-PIANO_VERIFICA_CORSO_SLIDE.md
-REPORT_VERIFICA.md
+
+# Keep only the repository README as Markdown source
+*.md
+!/README.md
 
 # Node / JavaScript dependencies and logs
 node_modules/

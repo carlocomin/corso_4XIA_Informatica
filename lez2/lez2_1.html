@@ -7,39 +7,26 @@
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
   <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
     function prevSlide(){ window.location.href = "../programma.html"; }
     function nextSlide(){ window.location.href = "lez2_2.html"; }
-    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
-  </script>
-  <style>
-    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
-    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
-    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
-    /* --- hard-left per code block (evita centrature ereditate) --- */
-    .inner-box pre,
-    .inner-box pre code,
-    .box pre,
-    .box pre code,
-    pre,
-    pre code { text-align: left !important; }
-    pre { white-space: pre; tab-size: 4; margin: 0 0 1rem 0; padding: .5rem .75rem; }
-    pre code { display:block; }
-  </style>
+</script>
+
 </head>
 <body>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 2 — Struct (ripasso mirato)</h2>
+  <h2>Lezione 2 - Struct (ripasso mirato)</h2>
   <ul>
-    <li><a href="lez2_1.html">Lez2.1: Motivazione & sintassi base</a></li>
+    <li><a href="lez2_1.html" class="active">Lez2.1: Motivazione e sintassi base</a></li>
     <li><a href="lez2_2.html">Lez2.2: Inizializzazioni in C/C++</a></li>
-    <!-- prossime:
     <li><a href="lez2_3.html">Lez2.3: Passaggio a funzione</a></li>
-    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct & lambda</a></li>
-    -->
+    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct e lambda</a></li>
+    <li><a href="lez2_5.html">Lez2.5: Layout, sizeof, padding e align</a></li>
+    <li><a href="lez2_6.html">Lez2.6: Serializzare le struct in modo sicuro</a></li>
   </ul>
 </div>
 <!-- END MENU -->
@@ -167,7 +154,6 @@ s.media = 9.4;
 </div>
 
 <script>
-function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
 </script>
 </body>
 </html>

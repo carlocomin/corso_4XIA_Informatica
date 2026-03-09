@@ -7,12 +7,12 @@
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
   <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
     function prevSlide(){ window.location.href = "lez2_2.html"; }
     function nextSlide(){ window.location.href = "lez2_4.html"; }
-    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
-    function toggleBox(btnId, boxId){
+function toggleBox(btnId, boxId){
       const box = document.getElementById(boxId);
       const btn = document.getElementById(btnId);
       const open = box.style.display === 'block';
@@ -20,29 +20,20 @@
       if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
     }
   </script>
-  <style>
-    .box  { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
-    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px }
-    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; display:inline-block }
-    .tip  { font-style: italic; opacity:.95 }
-    /* hard-left per testo, elenchi e codice */
-    .inner-box, .inner-box p, .inner-box ul, .inner-box li, .inner-box h3, .box p, .box ul, .box li { text-align:left !important; }
-    .inner-box ul, .box ul { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
-    .inner-box li, .box li { margin:.25rem 0 }
-    pre, pre code { text-align:left !important; white-space:pre; tab-size:4; margin:0 0 1rem 0; padding:.5rem .75rem; }
-  </style>
+
 </head>
 <body>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 2 — Struct (ripasso mirato)</h2>
+  <h2>Lezione 2 - Struct (ripasso mirato)</h2>
   <ul>
-    <li><a href="lez2_1.html">Lez2.1: Motivazione &amp; sintassi base</a></li>
+    <li><a href="lez2_1.html">Lez2.1: Motivazione e sintassi base</a></li>
     <li><a href="lez2_2.html">Lez2.2: Inizializzazioni in C/C++</a></li>
     <li><a href="lez2_3.html" class="active">Lez2.3: Passaggio a funzione</a></li>
-    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct &amp; lambda</a></li>
+    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct e lambda</a></li>
+    <li><a href="lez2_5.html">Lez2.5: Layout, sizeof, padding e align</a></li>
+    <li><a href="lez2_6.html">Lez2.6: Serializzare le struct in modo sicuro</a></li>
   </ul>
 </div>
 <!-- END MENU -->
@@ -303,7 +294,6 @@ Studente& scegliPrimo(std::vector&lt;Studente&gt;& v) {
 </div>
 
 <script>
-function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
 </script>
 </body>
 </html>

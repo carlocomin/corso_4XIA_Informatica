@@ -7,53 +7,32 @@
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
   <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
     function prevSlide(){ window.location.href = "lez3_2.html"; }
     function nextSlide(){ window.location.href = "lez3_4.html"; }
-    function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
-    function toggleBox(btnId, boxId){
+function toggleBox(btnId, boxId){
       const box=document.getElementById(boxId), btn=document.getElementById(btnId);
       const open = box.style.display==='block';
       box.style.display = open ? 'none':'block';
       if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
     }
   </script>
-  <style>
-    /* stile box + colorate */
-    .box { background:var(--panel,#fff); border-radius:12px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,.08); margin-bottom:14px }
-    .note { background:#f7faff; border-left:4px solid #3b82f6; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
-    .warn { background:#fff7ed; border-left:4px solid #f59e0b; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0 }
-    .ok   { background:#eefbf1; border-left:4px solid #22c55e; padding:.6rem .8rem; border-radius:8px; margin:.35rem 0; display:inline-block }
-    .tip  { font-style: italic; opacity:.95 }
 
-    /* allineamento a sinistra nelle inner-box */
-    .inner-box, .inner-box p, .inner-box ul, .inner-box ol, .inner-box li, .inner-box pre, .inner-box code { text-align:left !important; }
-    .inner-box ul, .inner-box ol { margin:.5rem 0 .75rem 1rem; padding-left:1.25rem; list-style-position:outside }
-    .inner-box li { margin:.25rem 0 }
-
-    /* code block */
-    pre { white-space: pre; tab-size: 4; margin:0 0 1rem 0; padding:.5rem .75rem }
-    pre code { display:block; text-align:left !important; }
-
-    table { width:100%; border-collapse: collapse; }
-    th, td { border-bottom:1px solid #e5e7eb; padding:.45rem .5rem; vertical-align:top; text-align:left }
-    th { background:#f8fafc }
-    .mini { font-size:.95rem }
-  </style>
 </head>
 <body>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 3 — File I/O</h2>
+  <h2>Lezione 3 - File I/O</h2>
   <ul>
-    <li><a href="lez3_1.html">Lez3_1: File: concetti e modelli</a></li>
+    <li><a href="lez3_1.html">Lez3_1: File, concetti e modelli</a></li>
     <li><a href="lez3_2.html">Lez3_2: I/O su file testuali (C++)</a></li>
     <li><a href="lez3_3.html" class="active">Lez3_3: File binari (base) in C++ e C</a></li>
-    <li><a href="lez3_4.html">Lez3_4: Binari portabili (formati)</a></li>
-    <li><a href="lez3_5.html">Lez3_5: Perché non scrivere struct “raw”</a></li>
-    <li><a href="lez3_6.html">Lez3_6: fseek/ftell &amp; seekg/tellg (text mode)</a></li>
+    <li><a href="lez3_4.html">Lez3_4: Spostamento del cursore nei file binari</a></li>
+    <li><a href="lez3_5.html">Lez3_5: Perche non scrivere struct raw</a></li>
+    <li><a href="lez3_6.html">Lez3_6: fseek/ftell e seekg/tellg (text mode)</a></li>
     <li><a href="lez3_7.html">Lez3_7: Indici per file binari</a></li>
   </ul>
 </div>
@@ -470,7 +449,6 @@ int main(void){
 </div>
 
 <script>
-function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); }
 </script>
 </body>
 </html>
