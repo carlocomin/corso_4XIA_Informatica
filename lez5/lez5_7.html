@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez5_7 · Casting tra base e derivata</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez5_6.html"; }
+    function nextSlide(){ window.location.href = "lez5_8.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 5 - Ereditarietà e polimorfismo</h2>
+  <ul>
+    <li><a href="lez5_1.html">Lez5_1: Ereditarietà: significato</a></li>
+    <li><a href="lez5_2.html">Lez5_2: Sintassi della derivazione e accessi</a></li>
+    <li><a href="lez5_3.html">Lez5_3: Costruttori, distruttori, ordine</a></li>
+    <li><a href="lez5_4.html">Lez5_4: Object slicing</a></li>
+    <li><a href="lez5_5.html">Lez5_5: Polimorfismo e virtual</a></li>
+    <li><a href="lez5_6.html">Lez5_6: override, classi astratte, distruttore virtuale</a></li>
+    <li><a href="lez5_7.html" class="active">Lez5_7: Casting tra base e derivata</a></li>
+    <li><a href="lez5_8.html">Lez5_8: Multipla, diamond problem, buone pratiche</a></li>
+    <li><a href="lez5_9.html">Lez5_9: Esercizi guidati - base</a></li>
+    <li><a href="lez5_10.html">Lez5_10: Esercizi guidati - concetti e progettazione</a></li>
+    <li><a href="lez5_11.html">Lez5_11: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Casting tra base e derivata<br><small>Upcast, downcast, <code>dynamic_cast</code> e uso prudente</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Perché parlare di cast in una gerarchia</h2>
+      <p>Una volta che hai una gerarchia con base e derivate, può capitarti di voler passare da un tipo all'altro. Non tutti questi passaggi hanno però lo stesso grado di sicurezza.</p>
+      <p>Il testo distingue bene due casi:</p>
+      <ul>
+        <li><b>upcast</b>: da derivata a base;</li>
+        <li><b>downcast</b>: da base a derivata.</li>
+      </ul>
+      <p>Questa distinzione è essenziale, perché i due movimenti non sono simmetrici. Salire verso la base è naturale; scendere verso una derivata specifica richiede molta più cautela.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Upcast: passare da derivata a base è sicuro</h2>
+      <p>L'upcast consiste nel trattare un oggetto derivato come un oggetto della sua base. Questo passaggio è sicuro, perché la derivata è davvero anche una base.</p>
+      <p>Il testo usa questo esempio:</p>
+<pre><code class="language-cpp">Cane c;
+Animale& ra = c;
+Animale* pa = &amp;c;</code></pre>
+      <p>Qui tutto funziona perché un <code>Cane</code> è anche un <code>Animale</code>. Non stiamo inventando una relazione che non c'è: stiamo semplicemente guardando l'oggetto da una prospettiva più generale.</p>
+      <p class="ok"><b>Regola mentale:</b> salire verso la base è coerente con il significato di <code>IS-A</code>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Downcast: passare da base a derivata è più delicato</h2>
+      <p>Il downcast è l'operazione opposta: hai un puntatore o riferimento a base e vuoi recuperare una derivata specifica. Qui bisogna stare attenti, perché non ogni <code>Base*</code> punta davvero a un oggetto di tipo <code>Derivata</code>.</p>
+      <p>Questo è il punto cruciale: dal fatto che un oggetto derivato possa essere visto come base non segue automaticamente che ogni base possa essere trattata come una certa derivata. Sarebbe un salto logico ingiustificato.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Quando entra in gioco <code>dynamic_cast</code></h2>
+      <p>Quando serve controllare il tipo reale a runtime, si può usare <code>dynamic_cast</code>. Questa operazione non "indovina" a caso: verifica se l'oggetto reale appartiene davvero al tipo richiesto.</p>
+      <p>Il testo propone questo esempio:</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+struct Base {
+    virtual ~Base() = default;
+};
+
+struct Der1 : Base {
+    void x() const { std::cout &lt;&lt; "Der1\n"; }
+};
+
+struct Der2 : Base {
+    void y() const { std::cout &lt;&lt; "Der2\n"; }
+};
+
+void prova(Base* p) {
+    if (auto d1 = dynamic_cast&lt;Der1*&gt;(p)) {
+        d1-&gt;x();
+    } else if (auto d2 = dynamic_cast&lt;Der2*&gt;(p)) {
+        d2-&gt;y();
+    } else {
+        std::cout &lt;&lt; "Tipo sconosciuto\n";
+    }
+}</code></pre>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa osservare nell'esempio</h2>
+      <p>La funzione <code>prova(...)</code> riceve un <code>Base*</code>. Quindi, a livello statico, sa solo che sta lavorando con qualcosa che appartiene alla gerarchia di <code>Base</code>. Non sa ancora se quel qualcosa sia un <code>Der1</code>, un <code>Der2</code> o altro.</p>
+      <p>Per questo prova in modo prudente:</p>
+      <ul>
+        <li>se il cast a <code>Der1*</code> riesce, usa <code>x()</code>;</li>
+        <li>altrimenti prova con <code>Der2*</code>;</li>
+        <li>se anche quello fallisce, gestisce il caso sconosciuto.</li>
+      </ul>
+      <p>Questa è la logica corretta del downcast sicuro: non si assume, si verifica.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Due cose da ricordare su <code>dynamic_cast</code></h2>
+      <ul>
+        <li><code>dynamic_cast</code> richiede una <b>gerarchia polimorfica</b>, cioè una base con almeno un metodo virtuale. Nell'esempio il distruttore virtuale nella base serve anche a questo.</li>
+        <li>se il cast a puntatore fallisce, il risultato è <code>nullptr</code>.</li>
+      </ul>
+      <p>Questo dettaglio è importante perché rende il fallimento verificabile in modo pulito e sicuro. Non ottieni un oggetto finto o un comportamento casuale: ottieni un puntatore nullo, e il programma può reagire di conseguenza.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché non bisogna abusare del downcast</h2>
+      <p>Il testo chiude con una regola progettuale molto sana: se puoi ottenere lo stesso risultato con un metodo virtuale ben progettato, quello è di solito l'approccio migliore.</p>
+      <p>Questa osservazione va presa sul serio. Se un programma passa il tempo a fare cast dalla base alle varie derivate per capire "chi è" l'oggetto, probabilmente la base non sta esprimendo abbastanza bene il contratto comune.</p>
+      <p class="warn"><b>Segnale d'allarme:</b> se devi fare <code>dynamic_cast</code> ovunque, forse il progetto sta chiedendo una interfaccia virtuale migliore, non più cast.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Micro-confronto: quando il cast non serve</h2>
+      <p>Molte volte il bisogno di <code>dynamic_cast</code> scompare se la base espone già il comportamento giusto. In quel caso il codice chiamante non deve più chiedere "che tipo sei?", ma solo usare il contratto comune.</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+struct Base {
+    virtual ~Base() = default;
+    virtual void descrivi() const = 0;
+};
+
+struct Der1 : Base {
+    void descrivi() const override { std::cout &lt;&lt; "Sono Der1\n"; }
+};
+
+struct Der2 : Base {
+    void descrivi() const override { std::cout &lt;&lt; "Sono Der2\n"; }
+};
+
+void mostra(const Base& b) {
+    b.descrivi();   // nessun cast
+}</code></pre>
+      <p>Qui il codice ad alto livello non ha bisogno di distinguere manualmente tra <code>Der1</code> e <code>Der2</code>. Chiede direttamente il comportamento comune, ed è la gerarchia a fare il resto.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Quando <code>dynamic_cast</code> ha senso</h2>
+      <p>Dire che va usato con prudenza non significa che vada demonizzato. Ci sono casi in cui ha senso:</p>
+      <ul>
+        <li>quando devi davvero distinguere sottotipi concreti in un punto specifico del programma;</li>
+        <li>quando stai integrando codice esistente e la gerarchia non è stata progettata fin dall'inizio nel modo migliore;</li>
+        <li>quando vuoi fare un controllo runtime esplicito su una gerarchia polimorfica.</li>
+      </ul>
+      <p>Ma la regola generale resta valida: prima prova a modellare il comportamento comune con metodi virtuali; solo dopo valuta se un cast è davvero inevitabile.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Sintesi finale</h2>
+      <ul>
+        <li>l'upcast da derivata a base è sicuro;</li>
+        <li>il downcast da base a derivata è delicato e va verificato;</li>
+        <li><code>dynamic_cast</code> richiede una gerarchia polimorfica;</li>
+        <li>se il cast a puntatore fallisce, ottieni <code>nullptr</code>;</li>
+        <li>quando è possibile, un metodo virtuale ben progettato è preferibile a cast frequenti.</li>
+      </ul>
+      <p class="ok"><b>Sintesi finale:</b> salire verso la base è il gesto naturale della gerarchia; scendere verso una derivata richiede una verifica, perché il tipo reale potrebbe non essere quello che speri.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> A questo punto resta da chiudere la teoria con i temi finali del testo: ereditarietà multipla, diamond problem, buone pratiche, esempio completo ed errori tipici. Nella <strong>Lez5_8</strong> raccoglieremo proprio questi ultimi pezzi.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+

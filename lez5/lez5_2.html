@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez5_2 · Sintassi della derivazione e livelli di accesso</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez5_1.html"; }
+    function nextSlide(){ window.location.href = "lez5_3.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 5 - Ereditarietà e polimorfismo</h2>
+  <ul>
+    <li><a href="lez5_1.html">Lez5_1: Ereditarietà: significato</a></li>
+    <li><a href="lez5_2.html" class="active">Lez5_2: Sintassi della derivazione e accessi</a></li>
+    <li><a href="lez5_3.html">Lez5_3: Costruttori, distruttori, ordine</a></li>
+    <li><a href="lez5_4.html">Lez5_4: Object slicing</a></li>
+    <li><a href="lez5_5.html">Lez5_5: Polimorfismo e virtual</a></li>
+    <li><a href="lez5_6.html">Lez5_6: override, classi astratte, distruttore virtuale</a></li>
+    <li><a href="lez5_7.html">Lez5_7: Casting tra base e derivata</a></li>
+    <li><a href="lez5_8.html">Lez5_8: Multipla, diamond problem, buone pratiche</a></li>
+    <li><a href="lez5_9.html">Lez5_9: Esercizi guidati - base</a></li>
+    <li><a href="lez5_10.html">Lez5_10: Esercizi guidati - concetti e progettazione</a></li>
+    <li><a href="lez5_11.html">Lez5_11: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Sintassi base della derivazione<br><small><code>public inheritance</code>, <code>private</code>, <code>protected</code>, <code>public</code></small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Da dove partiamo</h2>
+      <p>Nella pagina precedente abbiamo chiarito il criterio concettuale: usare ereditarietà solo quando la relazione tra derivata e base è davvero un "è-un". Ora possiamo vedere come questa idea prende forma in C++.</p>
+      <p>Questa pagina copre la sintassi essenziale e i livelli di accesso. Non stiamo ancora parlando di polimorfismo dinamico: per adesso ci basta capire che cosa eredita davvero una classe derivata, che cosa può usare, e che cosa invece resta nascosto.</p>
+      <p class="ok"><b>Idea chiave:</b> la derivazione <code>public</code> è la forma normale quando vogliamo modellare una vera relazione concettuale tra base e derivata.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Derivazione <code>public</code>: la forma più comune</h2>
+      <p>La forma più comune e più importante da padroneggiare è la <b>derivazione <code>public</code></b>. Quando scriviamo una classe derivata in questo modo, stiamo dicendo che l'interfaccia pubblica della base resta pubblica anche nella derivata.</p>
+      <p>In altri termini, se la base espone operazioni che hanno senso per tutti i suoi casi particolari, allora anche la derivata le eredita come parte della propria interfaccia pubblica. Questo è coerente con il significato di <code>IS-A</code>: se <code>Studente</code> è una <code>Persona</code>, allora deve poter fare almeno le cose che ogni persona sa fare, oltre ad eventuali comportamenti specifici.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio completo: <code>Persona</code> e <code>Studente</code></h2>
+      <p>Qui sotto c'è l'esempio centrale del testo sorgente. Va letto lentamente, perché in poche righe mostra già quasi tutto quello che ci serve: costruttore della base, derivazione <code>public</code>, uso di un metodo <code>protected</code>, attributo <code>private</code> e metodo ereditato.</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;utility&gt;
+
+class Persona {
+public:
+    Persona(std::string nome) : nome_(std::move(nome)) {}
+
+    void saluta() const {
+        std::cout &lt;&lt; "Ciao, sono " &lt;&lt; nome_ &lt;&lt; "\n";
+    }
+
+protected:
+    const std::string&amp; nome() const { return nome_; }
+
+private:
+    std::string nome_;
+};
+
+class Studente : public Persona {
+public:
+    Studente(std::string nome, int classe)
+        : Persona(std::move(nome)), classe_(classe) {}
+
+    void presenta() const {
+        std::cout &lt;&lt; "Sono " &lt;&lt; nome() &lt;&lt; " e sono in " &lt;&lt; classe_ &lt;&lt; "a.\n";
+    }
+
+private:
+    int classe_;
+};
+
+int main() {
+    Studente s("Carlo", 4);
+    s.saluta();
+    s.presenta();
+}</code></pre>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Output atteso</h2>
+      <p>Il programma produce:</p>
+<pre><code class="language-text">Ciao, sono Carlo
+Sono Carlo e sono in 4a.</code></pre>
+      <p>Questo output è importante perché mostra due cose diverse. La prima riga arriva da un metodo ereditato dalla base. La seconda riga arriva da un metodo specifico della derivata. In un solo <code>main()</code> vediamo quindi convivere riuso e specializzazione.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa osservare davvero nel codice</h2>
+      <p>Il testo sorgente evidenzia tre osservazioni che vanno fissate bene, perché sono la base di quasi tutte le scelte successive.</p>
+      <ul>
+        <li><b><code>Studente</code> eredita <code>saluta()</code> da <code>Persona</code>.</b> Questo è l'effetto più visibile della derivazione <code>public</code>: un metodo pubblico della base resta utilizzabile anche sulla derivata.</li>
+        <li><b><code>Studente</code> non può accedere direttamente a <code>nome_</code>.</b> L'attributo è <code>private</code> dentro <code>Persona</code>, quindi la derivata non lo vede direttamente. Questo dettaglio è fondamentale: derivare non significa "avere accesso a tutto".</li>
+        <li><b><code>Studente</code> può usare <code>nome()</code>.</b> Il metodo è dichiarato <code>protected</code>, quindi è accessibile nelle classi derivate ma non dal codice esterno.</li>
+      </ul>
+      <p class="note"><b>Tradotto in termini progettuali:</b> la base protegge i propri dati interni, ma può offrire alle derivate alcuni punti di accesso controllati se questo aiuta a specializzare il comportamento senza rompere l'incapsulamento.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Il ruolo di <code>private</code>, <code>protected</code> e <code>public</code> nella base</h2>
+      <p>Quando una classe è destinata a fare da base, i tre livelli di accesso non vanno pensati solo in rapporto all'esterno, ma anche in rapporto alle future derivate.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Specifica nella base</th>
+            <th>Che cosa significa per la derivata</th>
+            <th>Che cosa significa per il codice esterno</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>private</code></td>
+            <td>Non accessibile direttamente</td>
+            <td>Non accessibile</td>
+          </tr>
+          <tr>
+            <td><code>protected</code></td>
+            <td>Accessibile nella derivata</td>
+            <td>Non accessibile</td>
+          </tr>
+          <tr>
+            <td><code>public</code></td>
+            <td>Resta accessibile normalmente con derivazione <code>public</code></td>
+            <td>Accessibile</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Questa tabella riassume una regola semplice ma decisiva:</p>
+      <ul>
+        <li><code>private</code> nella base: non accessibile dalla derivata;</li>
+        <li><code>protected</code> nella base: accessibile nella derivata, ma non dall'esterno;</li>
+        <li><code>public</code> nella base: resta accessibile normalmente con derivazione <code>public</code>.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché <code>nome_</code> è <code>private</code> ma <code>nome()</code> è <code>protected</code>?</h2>
+      <p>Questa scelta è didatticamente molto istruttiva. Se la classe base rendesse l'attributo <code>nome_</code> direttamente accessibile alla derivata, la derivata conoscerebbe troppo dei dettagli interni della base. Invece, esponendo un metodo <code>protected</code> come <code>nome()</code>, la base conserva il controllo del proprio stato ma offre alle derivate una vista controllata sul dato che serve davvero.</p>
+      <p>In altre parole, <code>protected</code> può essere utile quando vogliamo aiutare le classi derivate a lavorare con la base senza aprire completamente l'interno della classe. Va comunque usato con attenzione: una base troppo esposta alle derivate rischia di diventare fragile nel tempo.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Il costruttore della derivata e il costruttore della base</h2>
+      <p>Guarda questa riga della classe <code>Studente</code>:</p>
+<pre><code class="language-cpp">Studente(std::string nome, int classe)
+    : Persona(std::move(nome)), classe_(classe) {}</code></pre>
+      <p>Qui la derivata non "si costruisce da sola". Deve inizializzare anche la parte di base. Il costruttore di <code>Studente</code> richiama esplicitamente il costruttore di <code>Persona</code> nella lista di inizializzazione. Questo punto diventerà ancora più importante nella prossima pagina, quando parleremo di ordine di costruzione e distruzione.</p>
+      <p>Per ora basta fissare il principio: un oggetto derivato contiene anche la parte base, quindi la base deve essere inizializzata correttamente fin dall'inizio.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esistono anche derivazione <code>protected</code> e <code>private</code></h2>
+      <p>Il linguaggio C++ prevede anche altre forme di derivazione:</p>
+      <ul>
+        <li><code>protected inheritance</code>;</li>
+        <li><code>private inheritance</code>.</li>
+      </ul>
+      <p>In questi casi cambia la visibilità dei membri ereditati nella derivata. Non entrare troppo presto nei dettagli è una scelta saggia: all'inizio, la cosa davvero importante è capire bene la derivazione <code>public</code>, perché è quella che modella in modo naturale una vera relazione "è-un".</p>
+      <p>Negli usi introduttivi e in molti progetti applicativi:</p>
+      <ul>
+        <li>si usa soprattutto <code>public inheritance</code> per modellare una vera relazione concettuale tra tipi;</li>
+        <li>negli altri casi si preferisce spesso la composizione.</li>
+      </ul>
+      <p class="warn"><b>Regola pratica:</b> se stai pensando a <code>private inheritance</code> solo per riusare implementazione, fermati un attimo e chiediti se non sia più pulita la composizione.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Sintesi finale</h2>
+      <p>Se questa seconda lezione è stata capita bene, dovresti aver fissato questi punti:</p>
+      <ul>
+        <li>la derivazione <code>public</code> è la forma standard quando la derivata è davvero un caso particolare della base;</li>
+        <li>non tutto ciò che sta nella base diventa accessibile alla derivata: <code>private</code> resta interno alla base;</li>
+        <li><code>protected</code> può essere un ponte controllato verso le derivate;</li>
+        <li>la derivata può riusare l'interfaccia pubblica della base e aggiungere comportamento specifico;</li>
+        <li>il costruttore della derivata deve anche inizializzare la parte di base.</li>
+      </ul>
+      <p class="ok"><b>Sintesi finale:</b> la derivazione <code>public</code> non è solo una formula sintattica. È il modo con cui C++ rende concreta, nel codice, una gerarchia progettata in modo sensato.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Ora che la sintassi di base è chiara, possiamo affrontare uno dei punti in cui si sbaglia più facilmente: il ciclo di vita degli oggetti in gerarchia. Nella <strong>Lez5_3</strong> vedremo ordine di costruzione, ordine di distruzione e inizializzazione della base.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+

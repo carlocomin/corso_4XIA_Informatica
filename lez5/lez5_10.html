@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez5_10 · Esercizi guidati: concetti e progettazione</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez5_9.html"; }
+    function nextSlide(){ window.location.href = "lez5_11.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra traccia/soluzione' : 'Nascondi traccia/soluzione';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 5 - Ereditarietà e polimorfismo</h2>
+  <ul>
+    <li><a href="lez5_1.html">Lez5_1: Ereditarietà: significato</a></li>
+    <li><a href="lez5_2.html">Lez5_2: Sintassi della derivazione e accessi</a></li>
+    <li><a href="lez5_3.html">Lez5_3: Costruttori, distruttori, ordine</a></li>
+    <li><a href="lez5_4.html">Lez5_4: Object slicing</a></li>
+    <li><a href="lez5_5.html">Lez5_5: Polimorfismo e virtual</a></li>
+    <li><a href="lez5_6.html">Lez5_6: override, classi astratte, distruttore virtuale</a></li>
+    <li><a href="lez5_7.html">Lez5_7: Casting tra base e derivata</a></li>
+    <li><a href="lez5_8.html">Lez5_8: Multipla, diamond problem, buone pratiche</a></li>
+    <li><a href="lez5_9.html">Lez5_9: Esercizi guidati - base</a></li>
+    <li><a href="lez5_10.html" class="active">Lez5_10: Esercizi guidati - concetti e progettazione</a></li>
+    <li><a href="lez5_11.html">Lez5_11: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Esercizi guidati · Concetti e progettazione<br><small>Risposta aperta, spiegazione ragionata, lessico corretto</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivo di questa pagina</h2>
+      <p>In questa parte dell'esercitazione non basta più riconoscere una risposta corretta. Bisogna spiegare i concetti con parole proprie, facendo riferimento agli esempi visti a lezione e usando un lessico preciso.</p>
+      <p>Il testo suggerisce risposte chiare e sintetiche, circa 5-8 righe per domanda. Questo è un ottimo vincolo didattico: costringe a essere precisi senza diventare prolissi e, soprattutto, obbliga a distinguere le idee davvero essenziali dal rumore.</p>
+      <p class="note"><b>Metodo di lavoro:</b> prima prova a costruire da solo una risposta breve. Poi confrontala con la traccia guidata qui sotto e verifica se stai nominando i concetti giusti e nel giusto ordine.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Domanda 16 · Differenza tra <code>override</code> e <code>overload</code></h2>
+      <p><b>Testo.</b> Spiega con parole tue la differenza tra <code>override</code> e <code>overload</code>. Per aiutarti, aggiungi anche un mini-esempio, anche solo scrivendo le firme dei metodi.</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-a16" onclick="toggleBox('btn-a16','sol-a16')">Mostra traccia/soluzione</button>
+      </div>
+      <div id="sol-a16" style="display:none;margin-top:8px">
+        <p><b>Traccia minima:</b> devi dire che <code>override</code> riguarda la ridefinizione di un metodo virtuale della base, mentre <code>overload</code> riguarda più metodi con lo stesso nome ma firme diverse.</p>
+<pre><code class="language-cpp">struct Base {
+    virtual void f() const {}
+};
+
+struct Der : Base {
+    void f() const override {}   // override
+
+    void g(int) {}
+    void g(double) {}            // overload
+};</code></pre>
+        <p class="ok"><b>Risposta modello.</b> <code>override</code> significa che una derivata ridefinisce un metodo virtuale già presente nella base, mantenendo una firma compatibile. Serve anche a far controllare al compilatore che la ridefinizione sia corretta. <code>overload</code>, invece, significa usare lo stesso nome per metodi diversi che hanno parametri differenti; non riguarda direttamente il polimorfismo dinamico. Quindi l'override è legato all'ereditarietà e ai virtual, mentre l'overload è legato alla risoluzione del nome in base alla firma.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Domanda 17 · "Auto è un Motore"</h2>
+      <p><b>Testo.</b> Rifletti su questa frase: "Auto è un Motore". Spiega perché non rappresenta un buon uso dell'ereditarietà e indica quale relazione modelleresti al suo posto, motivando la scelta.</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-a17" onclick="toggleBox('btn-a17','sol-a17')">Mostra traccia/soluzione</button>
+      </div>
+      <div id="sol-a17" style="display:none;margin-top:8px">
+        <p><b>Traccia minima:</b> devi nominare la distinzione tra <code>IS-A</code> e <code>HAS-A</code>, e spiegare che qui il modello corretto è la composizione.</p>
+        <p class="ok"><b>Risposta modello.</b> Dire "Auto è un Motore" non è corretto, perché un'auto non è un caso particolare di motore. Un motore è solo una componente dell'auto. Quindi non c'è una relazione di tipo <code>IS-A</code>, ma una relazione di tipo <code>HAS-A</code>: un'auto <i>ha</i> un motore. In questo caso il modello giusto non è l'ereditarietà, ma la composizione. Usare ereditarietà qui porterebbe a una gerarchia concettualmente sbagliata, con interfacce poco chiare e metodi ereditati che non avrebbero senso.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Domanda 18 · Fragile base class problem</h2>
+      <p><b>Testo.</b> Descrivi che cosa si intende per "fragile base class problem". Concludi indicando almeno due accorgimenti pratici che aiutano a ridurre questo rischio.</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-a18" onclick="toggleBox('btn-a18','sol-a18')">Mostra traccia/soluzione</button>
+      </div>
+      <div id="sol-a18" style="display:none;margin-top:8px">
+        <p><b>Traccia minima:</b> devi spiegare che una base progettata male o modificata senza attenzione può rompere il comportamento delle derivate.</p>
+        <p class="ok"><b>Risposta modello.</b> Il "fragile base class problem" indica una situazione in cui una classe base è progettata o modificata in modo tale da rendere instabili o imprevedibili le classi derivate. Se la base espone troppo dei propri dettagli interni, oppure se cambia il proprio comportamento senza un contratto chiaro, tutte le derivate possono diventare fragili. Per ridurre questo rischio conviene mantenere la base semplice, con responsabilità chiare, e usare un'interfaccia pubblica/protetta il più possibile controllata. Inoltre è utile usare <code>override</code> nelle derivate e progettare la base pensando fin dall'inizio a come verrà estesa.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Domanda 19 · Spiegare bene lo slicing</h2>
+      <p><b>Testo.</b> Soffermati sul problema dello slicing. Nella tua risposta chiarisci:
+      <br/>- in quale situazione si verifica;
+      <br/>- quale conseguenza produce sugli oggetti;
+      <br/>- come lo si può evitare nel C++ moderno.</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-a19" onclick="toggleBox('btn-a19','sol-a19')">Mostra traccia/soluzione</button>
+      </div>
+      <div id="sol-a19" style="display:none;margin-top:8px">
+        <p><b>Traccia minima:</b> devi dire chiaramente che lo slicing avviene quando una derivata viene copiata in una base per valore.</p>
+        <p class="ok"><b>Risposta modello.</b> Lo slicing si verifica quando un oggetto derivato viene copiato in un oggetto base per valore, per esempio con un'istruzione come <code>Base b = d;</code>. In quel momento viene copiata solo la parte relativa alla base e la parte specifica della derivata viene persa. La conseguenza è che il nuovo oggetto non conserva più il comportamento completo del tipo derivato. Nel C++ moderno lo slicing si evita usando riferimenti a base, puntatori a base e, quando serve gestione dinamica della memoria, smart pointer come <code>std::unique_ptr&lt;Base&gt;</code>.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Riflessione finale 22 · Quando useresti <code>dynamic_cast</code>?</h2>
+      <p><b>Testo.</b> In quali casi useresti <code>dynamic_cast</code> in questo progetto, e in quali situazioni preferiresti invece evitare il cast e affidarti ai metodi virtuali?</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-a22" onclick="toggleBox('btn-a22','sol-a22')">Mostra traccia/soluzione</button>
+      </div>
+      <div id="sol-a22" style="display:none;margin-top:8px">
+        <p><b>Traccia minima:</b> devi far capire che <code>dynamic_cast</code> è un controllo runtime utile ma non dovrebbe diventare il meccanismo normale del progetto.</p>
+        <p class="ok"><b>Risposta modello.</b> In un progetto ben progettato userei <code>dynamic_cast</code> solo in casi particolari, quando serve davvero distinguere un sottotipo concreto a runtime e non esiste già un metodo virtuale adatto. In generale preferirei evitare il cast e affidarmi ai metodi virtuali, perché in questo modo il comportamento corretto viene scelto dal polimorfismo senza fare controlli espliciti sul tipo. Se devo fare <code>dynamic_cast</code> molto spesso, probabilmente la classe base non sta esprimendo abbastanza bene il contratto comune e il progetto va ripensato.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa rende buona una risposta aperta</h2>
+      <ul>
+        <li>usa il lessico giusto: <code>IS-A</code>, composizione, tipo statico, tipo dinamico, slicing, classe astratta, distruttore virtuale;</li>
+        <li>nomina il problema con precisione e poi spiegane la conseguenza;</li>
+        <li>collega sempre la definizione a un esempio o a una situazione concreta;</li>
+        <li>chiudi, quando possibile, con una regola pratica di progettazione.</li>
+      </ul>
+      <p class="note"><b>Errore tipico nelle risposte aperte:</b> ripetere parole chiave senza mostrare di aver capito il rapporto tra loro. Qui conta il ragionamento, non l'elenco di termini tecnici.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>Lez5_11</strong> si passa al laboratorio finale: non più definizioni o spiegazioni brevi, ma una gerarchia completa da progettare e usare in modo polimorfico.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+

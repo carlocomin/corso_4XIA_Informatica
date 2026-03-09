@@ -1,0 +1,212 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez5_5 · Polimorfismo e virtual</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez5_4.html"; }
+    function nextSlide(){ window.location.href = "lez5_6.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 5 - Ereditarietà e polimorfismo</h2>
+  <ul>
+    <li><a href="lez5_1.html">Lez5_1: Ereditarietà: significato</a></li>
+    <li><a href="lez5_2.html">Lez5_2: Sintassi della derivazione e accessi</a></li>
+    <li><a href="lez5_3.html">Lez5_3: Costruttori, distruttori, ordine</a></li>
+    <li><a href="lez5_4.html">Lez5_4: Object slicing</a></li>
+    <li><a href="lez5_5.html" class="active">Lez5_5: Polimorfismo e virtual</a></li>
+    <li><a href="lez5_6.html">Lez5_6: override, classi astratte, distruttore virtuale</a></li>
+    <li><a href="lez5_7.html">Lez5_7: Casting tra base e derivata</a></li>
+    <li><a href="lez5_8.html">Lez5_8: Multipla, diamond problem, buone pratiche</a></li>
+    <li><a href="lez5_9.html">Lez5_9: Esercizi guidati - base</a></li>
+    <li><a href="lez5_10.html">Lez5_10: Esercizi guidati - concetti e progettazione</a></li>
+    <li><a href="lez5_11.html">Lez5_11: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Polimorfismo: <code>virtual</code> e dispatch dinamico<br><small>Tipo statico, tipo dinamico, metodo chiamato davvero</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Che cos'è il polimorfismo</h2>
+      <p>Il polimorfismo consente di trattare oggetti di tipi derivati diversi attraverso un riferimento o un puntatore alla classe base, mantenendo però il comportamento corretto del tipo reale.</p>
+      <p>Questa frase contiene già l'idea decisiva della pagina. Non stiamo parlando solo di "ereditarietà" in senso statico. Stiamo parlando della capacità del programma di usare una base comune senza perdere la specificità dell'oggetto concreto che c'è dietro.</p>
+      <p>La parola chiave centrale, in C++, è <code>virtual</code>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Tipo statico e tipo dinamico</h2>
+      <p>Per capire il polimorfismo bisogna distinguere con chiarezza due nozioni:</p>
+      <ul>
+        <li><b>tipo statico</b>: il tipo con cui una variabile, un puntatore o un riferimento è dichiarato nel codice;</li>
+        <li><b>tipo dinamico</b>: il tipo reale dell'oggetto a cui quella variabile, quel puntatore o quel riferimento si riferiscono.</li>
+      </ul>
+      <p>Se un puntatore ha tipo <code>Animale*</code> ma punta a un oggetto <code>Cane</code>, allora:</p>
+      <ul>
+        <li>il tipo statico è <code>Animale*</code>;</li>
+        <li>il tipo dinamico dell'oggetto reale è <code>Cane</code>.</li>
+      </ul>
+      <p class="note"><b>Domanda guida:</b> quando chiami un metodo tramite una base, il programma deve guardare il tipo statico o quello dinamico? La risposta dipende proprio dal fatto che il metodo sia o non sia <code>virtual</code>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Senza <code>virtual</code>: binding statico</h2>
+      <p>Se un metodo non è dichiarato <code>virtual</code>, il metodo chiamato dipende dal <b>tipo statico</b> della variabile attraverso cui fai la chiamata.</p>
+      <p>Il testo lo mostra con questo esempio:</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+struct Animale {
+    void verso() const { std::cout &lt;&lt; "Verso generico\n"; }
+};
+
+struct Cane : public Animale {
+    void verso() const { std::cout &lt;&lt; "Bau!\n"; }
+};
+
+int main() {
+    Cane c;
+    Animale* p = &amp;c;
+    p-&gt;verso();
+}</code></pre>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Output del caso senza <code>virtual</code></h2>
+      <p>L'output è:</p>
+<pre><code class="language-text">Verso generico</code></pre>
+      <p>A prima vista può sembrare strano, perché l'oggetto reale è un <code>Cane</code>. Ma il compilatore guarda il tipo statico del puntatore, che è <code>Animale*</code>, e dato che il metodo non è virtuale decide la chiamata in modo statico.</p>
+      <p class="warn"><b>Perché accade?</b> Perché <code>p</code> ha tipo <code>Animale*</code> e il metodo non è virtuale. Il compilatore sceglie la versione da chiamare guardando il tipo dichiarato, non il tipo reale dell'oggetto.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Con <code>virtual</code>: dispatch dinamico</h2>
+      <p>Se invece il metodo è dichiarato <code>virtual</code> nella base, il metodo chiamato dipende dal <b>tipo dinamico</b> dell'oggetto reale. Qui il comportamento cambia radicalmente, ed è proprio questo il cuore del polimorfismo.</p>
+      <p>Il testo propone questo secondo esempio:</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+struct Animale {
+    virtual void verso() const { std::cout &lt;&lt; "Verso generico\n"; }
+    virtual ~Animale() = default;
+};
+
+struct Cane : public Animale {
+    void verso() const override { std::cout &lt;&lt; "Bau!\n"; }
+};
+
+struct Gatto : public Animale {
+    void verso() const override { std::cout &lt;&lt; "Miao!\n"; }
+};
+
+void faiVerso(const Animale& a) {
+    a.verso();
+}
+
+int main() {
+    Cane c;
+    Gatto g;
+    faiVerso(c);
+    faiVerso(g);
+}</code></pre>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Output del caso con <code>virtual</code></h2>
+      <p>L'output ora diventa:</p>
+<pre><code class="language-text">Bau!
+Miao!</code></pre>
+      <p>Qui il programma usa il tipo reale dell'oggetto. Anche se <code>faiVerso</code> riceve un riferimento a <code>Animale</code>, viene chiamata la versione corretta del metodo in base all'oggetto concreto passato alla funzione.</p>
+      <p class="ok"><b>Idea chiave:</b> il polimorfismo non significa solo "ho classi in ereditarietà". Significa che il codice può lavorare con la base e ottenere comunque il comportamento corretto della derivata reale.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché l'esempio con <code>faiVerso(const Animale&)</code> è così importante</h2>
+      <p>Questa piccola funzione è didatticamente perfetta:</p>
+<pre><code class="language-cpp">void faiVerso(const Animale& a) {
+    a.verso();
+}</code></pre>
+      <p>Mostra che il codice chiamante non ha bisogno di sapere se sta ricevendo un <code>Cane</code>, un <code>Gatto</code> o un altro animale. Gli basta sapere che sta lavorando con qualcosa che rispetta il contratto di <code>Animale</code>.</p>
+      <p>Questa è la vera forza del polimorfismo: il codice ad alto livello si semplifica, perché smette di fare controlli sul tipo concreto e si affida a un'interfaccia comune ben progettata.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Confronto rapido: senza e con <code>virtual</code></h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Situazione</th>
+            <th>Da che cosa dipende il metodo chiamato?</th>
+            <th>Effetto pratico</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Senza <code>virtual</code></td>
+            <td>Dal tipo statico della variabile</td>
+            <td>Si ottiene binding statico</td>
+          </tr>
+          <tr>
+            <td>Con <code>virtual</code></td>
+            <td>Dal tipo dinamico dell'oggetto reale</td>
+            <td>Si ottiene dispatch dinamico</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Questa tabella condensa l'intero passaggio teorico della pagina. Il resto della lezione servirà a rendere questo meccanismo robusto, leggibile e progettualmente corretto, introducendo <code>override</code>, distruttore virtuale e classi astratte.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Sintesi finale</h2>
+      <ul>
+        <li>il polimorfismo permette di usare una base comune senza perdere il comportamento corretto del tipo reale;</li>
+        <li>senza <code>virtual</code>, il metodo chiamato dipende dal tipo statico;</li>
+        <li>con <code>virtual</code>, il metodo chiamato dipende dal tipo dinamico dell'oggetto;</li>
+        <li>riferimenti e puntatori a base sono il canale naturale attraverso cui il polimorfismo opera;</li>
+        <li>una funzione come <code>faiVerso(const Animale&)</code> mostra perché il polimorfismo semplifica il codice cliente.</li>
+      </ul>
+      <p class="ok"><b>Sintesi finale:</b> <code>virtual</code> dice al programma di non fermarsi al tipo con cui una variabile è dichiarata, ma di guardare il tipo reale dell'oggetto per scegliere il comportamento giusto.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Ora che il meccanismo del dispatch dinamico è chiaro, nella <strong>Lez5_6</strong> vedremo come usarlo bene e senza errori: <code>override</code>, distruttore virtuale e classi astratte.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+

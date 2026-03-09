@@ -1,0 +1,273 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez5_8 · Multipla, diamond problem, buone pratiche</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez5_7.html"; }
+    function nextSlide(){ window.location.href = "lez5_9.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 5 - Ereditarietà e polimorfismo</h2>
+  <ul>
+    <li><a href="lez5_1.html">Lez5_1: Ereditarietà: significato</a></li>
+    <li><a href="lez5_2.html">Lez5_2: Sintassi della derivazione e accessi</a></li>
+    <li><a href="lez5_3.html">Lez5_3: Costruttori, distruttori, ordine</a></li>
+    <li><a href="lez5_4.html">Lez5_4: Object slicing</a></li>
+    <li><a href="lez5_5.html">Lez5_5: Polimorfismo e virtual</a></li>
+    <li><a href="lez5_6.html">Lez5_6: override, classi astratte, distruttore virtuale</a></li>
+    <li><a href="lez5_7.html">Lez5_7: Casting tra base e derivata</a></li>
+    <li><a href="lez5_8.html" class="active">Lez5_8: Multipla, diamond problem, buone pratiche</a></li>
+    <li><a href="lez5_9.html">Lez5_9: Esercizi guidati - base</a></li>
+    <li><a href="lez5_10.html">Lez5_10: Esercizi guidati - concetti e progettazione</a></li>
+    <li><a href="lez5_11.html">Lez5_11: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Chiusura della teoria<br><small>Ereditarietà multipla, diamond problem, buone pratiche</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Ereditarietà multipla: che cos'è e quando ha senso</h2>
+      <p>In C++ una classe può derivare da più classi base. Questo fatto rende il linguaggio molto espressivo, ma anche più delicato da progettare. L'ereditarietà multipla non è "sbagliata" in assoluto: va capita e usata con criterio.</p>
+      <p>Il testo propone un esempio semplice e ragionevole:</p>
+<pre><code class="language-cpp">struct Stampabile {
+    virtual ~Stampabile() = default;
+    virtual void stampa() const = 0;
+};
+
+struct Salvabile {
+    virtual ~Salvabile() = default;
+    virtual void salva() const = 0;
+};
+
+struct Documento : Stampabile, Salvabile {
+    void stampa() const override {}
+    void salva() const override {}
+};</code></pre>
+      <p>Questo uso è spesso sensato quando le basi rappresentano <b>interfacce astratte</b>. In questo caso non stiamo ereditando stato o implementazioni complesse da due lati diversi: stiamo dicendo che <code>Documento</code> soddisfa due contratti distinti.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Diamond problem</h2>
+      <p>Il problema compare quando due classi derivano dalla stessa base e una terza eredita da entrambe. Il disegno classico è questo:</p>
+<pre><code class="language-text">    A
+   / \
+  B   C
+   \ /
+    D</code></pre>
+      <p>Senza ereditarietà virtuale, <code>D</code> può contenere due copie separate di <code>A</code>. Questo crea ambiguità e complicazioni: quale copia di <code>A</code> stai usando? quale dato comune stai leggendo? quale metodo stai invocando?</p>
+      <p>Per evitare il problema, il testo mostra questa soluzione:</p>
+<pre><code class="language-cpp">struct A { int v = 0; };
+struct B : virtual A {};
+struct C : virtual A {};
+struct D : B, C {};</code></pre>
+      <p>Per questa lezione basta conoscere il problema a livello introduttivo. Il punto non è diventare esperti di gerarchie complesse, ma capire perché l'ereditarietà multipla va trattata con prudenza e quasi sempre limitata a casi chiari.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Buone pratiche da portare via</h2>
+      <p>Il testo chiude la teoria con una lista molto sana. Vale la pena lasciarla quasi intatta, perché funziona come checklist mentale di progettazione:</p>
+      <ol>
+        <li>Se usi il polimorfismo, metti un distruttore virtuale nella base.</li>
+        <li>Usa <code>override</code> su ogni metodo virtuale ridefinito.</li>
+        <li>Evita lo slicing: preferisci riferimenti, puntatori e smart pointer.</li>
+        <li>Non usare ereditarietà se la relazione corretta è "ha-un".</li>
+        <li>Mantieni la classe base semplice e con responsabilità chiare.</li>
+        <li>Evita gerarchie troppo profonde.</li>
+        <li>Progetta la base pensando anche alle classi che deriveranno da essa.</li>
+      </ol>
+      <p class="warn"><b>Osservazione importante:</b> una base progettata male può rendere fragili tutte le derivate. Questo è uno dei motivi per cui una gerarchia va progettata con molta più disciplina di una semplice collezione di classi scollegate.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio completo: sistema di notifiche</h2>
+      <p>L'obiettivo del testo è molto chiaro: inviare notifiche su canali diversi senza che il codice chiamante conosca i dettagli concreti. Questo è esattamente il tipo di scenario in cui una base astratta e il polimorfismo fanno davvero ordine.</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;memory&gt;
+#include &lt;string&gt;
+#include &lt;utility&gt;
+#include &lt;vector&gt;
+
+class Notifica {
+public:
+    virtual ~Notifica() = default;
+    virtual void invia(const std::string& messaggio) const = 0;
+};
+
+class Email : public Notifica {
+public:
+    explicit Email(std::string destinatario) : destinatario_(std::move(destinatario)) {}
+
+    void invia(const std::string& messaggio) const override {
+        std::cout &lt;&lt; "[EMAIL a " &lt;&lt; destinatario_ &lt;&lt; "] " &lt;&lt; messaggio &lt;&lt; "\n";
+    }
+private:
+    std::string destinatario_;
+};
+
+class SMS : public Notifica {
+public:
+    explicit SMS(std::string numero) : numero_(std::move(numero)) {}
+
+    void invia(const std::string& messaggio) const override {
+        std::cout &lt;&lt; "[SMS a " &lt;&lt; numero_ &lt;&lt; "] " &lt;&lt; messaggio &lt;&lt; "\n";
+    }
+private:
+    std::string numero_;
+};
+
+class Push : public Notifica {
+public:
+    explicit Push(std::string deviceId) : deviceId_(std::move(deviceId)) {}
+
+    void invia(const std::string& messaggio) const override {
+        std::cout &lt;&lt; "[PUSH a " &lt;&lt; deviceId_ &lt;&lt; "] " &lt;&lt; messaggio &lt;&lt; "\n";
+    }
+private:
+    std::string deviceId_;
+};
+
+int main() {
+    std::vector&lt;std::unique_ptr&lt;Notifica&gt;&gt; canali;
+    canali.push_back(std::make_unique&lt;Email&gt;("alice@example.com"));
+    canali.push_back(std::make_unique&lt;SMS&gt;("+39 333 1234567"));
+    canali.push_back(std::make_unique&lt;Push&gt;("DEVICE-XYZ"));
+
+    for (const auto& c : canali) {
+        c-&gt;invia("Compito assegnato: esercizi di C++");
+    }
+}</code></pre>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa mostra davvero l'esempio delle notifiche</h2>
+      <ul>
+        <li><code>main()</code> usa un'interfaccia comune: <code>Notifica</code>.</li>
+        <li>Ogni canale implementa il proprio comportamento concreto.</li>
+        <li>Aggiungere un nuovo canale non richiede modifiche al ciclo principale.</li>
+      </ul>
+      <p>Questo è un caso pulito di polimorfismo con base astratta. Il codice che usa il sistema non ha bisogno di sapere se il messaggio partirà via email, SMS o push. Gli basta sapere che sta lavorando con qualcosa che sa inviare una notifica.</p>
+      <p class="ok"><b>Messaggio chiave:</b> un buon progetto sposta la variabilità dentro le derivate e lascia il codice cliente stabile, semplice e leggibile.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Errori tipici da mostrare in classe</h2>
+      <p>Il testo chiude con quattro errori molto ben scelti, perché sono proprio quelli che producono fraintendimenti ricorrenti.</p>
+
+      <p><b>(A) Metodo non virtuale</b></p>
+      <p><b>Sintomo:</b> chiami un metodo su <code>Base*</code>, ma viene eseguita la versione della base anche quando il puntatore punta a una derivata.</p>
+      <p><b>Correzione:</b> rendere il metodo <code>virtual</code> nella base e usare <code>override</code> nella derivata.</p>
+
+      <p><b>(B) Distruttore non virtuale</b></p>
+      <p><b>Sintomo:</b> elimini un oggetto derivato tramite puntatore a base e la distruzione non è corretta.</p>
+      <p><b>Correzione:</b> aggiungere <code>virtual ~Base() = default;</code></p>
+
+      <p><b>(C) Firma sbagliata</b></p>
+      <p><b>Sintomo:</b> pensi di aver fatto override, ma in realtà hai creato un altro metodo.</p>
+      <p><b>Correzione:</b> usare <code>override</code>, così il compilatore controlla la firma.</p>
+
+      <p><b>(D) Slicing</b></p>
+      <p><b>Sintomo:</b> copi una derivata in una base per valore e perdi il comportamento specifico.</p>
+      <p><b>Correzione:</b> usare riferimenti, puntatori o smart pointer.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Mini-esercizi finali</h2>
+      <p>Il testo della lezione si chiude con quattro mini-esercizi molto mirati. Sono utili per trasformare la teoria in allenamento immediato, senza aspettare il laboratorio finale.</p>
+      <ol>
+        <li>Crea una gerarchia con classe base <code>Dipendente</code> e metodo virtuale <code>stipendioMensile() const</code>. Deriva <code>DipendenteFisso</code> e <code>DipendenteOrario</code>. Poi somma gli stipendi in un <code>vector&lt;unique_ptr&lt;Dipendente&gt;&gt;</code>.</li>
+        <li>Definisci una classe astratta <code>Figura</code> con <code>area()</code> e <code>perimetro()</code>. Implementa <code>Quadrato</code>, <code>Rettangolo</code> e <code>Cerchio</code>. Stampa le aree con un ciclo polimorfico.</li>
+        <li>Togli <code>virtual</code> da un metodo che dovrebbe essere polimorfico e osserva che cosa succede. Poi ripristina <code>virtual</code> e aggiungi <code>override</code>.</li>
+        <li>Prova un caso di name hiding e risolvilo con <code>using Base::nomeMetodo;</code>.</li>
+      </ol>
+      <p class="note"><b>Osservazione didattica:</b> questi esercizi sono piccoli, ma ognuno colpisce uno snodo concettuale importante: base astratta, ciclo polimorfico, ruolo di <code>virtual</code>, ruolo di <code>override</code>, gestione del name hiding.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Appendice: parole chiave da ricordare</h2>
+      <ul>
+        <li><code>virtual</code>: abilita il dispatch dinamico</li>
+        <li><code>override</code>: verifica che il metodo ridefinisca correttamente quello della base</li>
+        <li><code>final</code>: impedisce ulteriori override o ulteriori derivazioni</li>
+        <li><code>protected</code>: accessibile alle derivate ma non dall'esterno</li>
+        <li><code>dynamic_cast</code>: downcast sicuro a runtime</li>
+        <li>classe astratta: contiene almeno un metodo virtuale puro</li>
+      </ul>
+      <p>Il testo chiude con un piccolo esempio su <code>final</code>, utile per vedere sia un metodo finale sia una classe finale.</p>
+<pre><code class="language-cpp">struct Base {
+    virtual void f() {}
+};
+
+struct Der : Base {
+    void f() override final {}
+};
+
+struct Der2 : Der {
+    // void f() override {}   // errore: f() è final
+};
+
+struct ClasseFinale final : Base {
+    void f() override {}
+};
+
+// struct Impossibile : ClasseFinale {};  // errore</code></pre>
+      <p class="ok"><b>Perché è utile ricordarlo:</b> <code>final</code> non è centrale come <code>virtual</code> o <code>override</code>, ma completa bene il quadro: puoi impedire sia ulteriori ridefinizioni di un metodo sia ulteriori derivazioni di una classe.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Sintesi finale</h2>
+      <ul>
+        <li>l'ereditarietà multipla esiste, ma va usata con molta disciplina;</li>
+        <li>il diamond problem mostra perché certe gerarchie possono diventare ambigue;</li>
+        <li>la base deve restare semplice, chiara e progettata pensando alle future derivate;</li>
+        <li>gli esempi migliori di polimorfismo sono quelli in cui il codice cliente non conosce i dettagli concreti;</li>
+        <li>gli errori tipici si ripetono sempre sugli stessi punti: <code>virtual</code>, distruttore, firma, slicing.</li>
+      </ul>
+      <p class="ok"><b>Sintesi finale della teoria:</b> l'ereditarietà in C++ è potente, ma diventa davvero utile solo quando la relazione concettuale è corretta, la base è progettata bene e il polimorfismo viene usato per semplificare il codice, non per complicarlo.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Da qui iniziano gli esercizi.</b> Nella <strong>Lez5_9</strong> passiamo alla verifica guidata dei concetti base, così da consolidare tutto il percorso prima del laboratorio finale.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+

@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez5_4 · Object slicing</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez5_3.html"; }
+    function nextSlide(){ window.location.href = "lez5_5.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 5 - Ereditarietà e polimorfismo</h2>
+  <ul>
+    <li><a href="lez5_1.html">Lez5_1: Ereditarietà: significato</a></li>
+    <li><a href="lez5_2.html">Lez5_2: Sintassi della derivazione e accessi</a></li>
+    <li><a href="lez5_3.html">Lez5_3: Costruttori, distruttori, ordine</a></li>
+    <li><a href="lez5_4.html" class="active">Lez5_4: Object slicing</a></li>
+    <li><a href="lez5_5.html">Lez5_5: Polimorfismo e virtual</a></li>
+    <li><a href="lez5_6.html">Lez5_6: override, classi astratte, distruttore virtuale</a></li>
+    <li><a href="lez5_7.html">Lez5_7: Casting tra base e derivata</a></li>
+    <li><a href="lez5_8.html">Lez5_8: Multipla, diamond problem, buone pratiche</a></li>
+    <li><a href="lez5_9.html">Lez5_9: Esercizi guidati - base</a></li>
+    <li><a href="lez5_10.html">Lez5_10: Esercizi guidati - concetti e progettazione</a></li>
+    <li><a href="lez5_11.html">Lez5_11: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Object slicing<br><small>Che cosa perdi quando copi una derivata in una base per valore</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Che cos'è lo slicing</h2>
+      <p>Lo <b>object slicing</b> si verifica quando un oggetto derivato viene copiato in un oggetto base <b>per valore</b>. In quel momento la parte specifica della derivata viene "tagliata via".</p>
+      <p>Il nome è molto efficace: immagina davvero di prendere un oggetto più ricco e di tenerne solo il pezzo che corrisponde alla base. Tutto ciò che appartiene solo alla derivata non entra nel nuovo oggetto base.</p>
+      <p class="warn"><b>Punto critico:</b> lo slicing non è un bug del compilatore e non è un comportamento misterioso. È la conseguenza normale del fatto che stai creando un oggetto di tipo <code>Base</code>, non un alias dell'oggetto derivato originale.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché è un problema didatticamente importante</h2>
+      <p>Questa è una delle prime situazioni in cui gli studenti vedono chiaramente che "ereditarietà" non significa che tutti i tipi della gerarchia siano intercambiabili in qualunque modo. Trattare una derivata come una base è sicuro solo in certi contesti. Se lo fai <b>per valore</b>, cambi la natura dell'oggetto.</p>
+      <p>Lo slicing è quindi un punto di svolta concettuale: spinge a capire perché il polimorfismo reale in C++ si appoggia a <b>riferimenti</b>, <b>puntatori</b> e, nel C++ moderno, spesso a <b>smart pointer</b>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio minimo</h2>
+      <p>Il testo propone questo esempio, volutamente piccolo:</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+class Base {
+public:
+    void f() const { std::cout &lt;&lt; "Base::f\n"; }
+};
+
+class Derivata : public Base {
+public:
+    void g() const { std::cout &lt;&lt; "Derivata::g\n"; }
+};
+
+int main() {
+    Derivata d;
+    Base b = d;   // slicing
+    b.f();
+    // b.g();     // errore: b è un oggetto Base
+}</code></pre>
+      <p>Il cuore dell'esempio sta tutto nella riga:</p>
+<pre><code class="language-cpp">Base b = d;</code></pre>
+      <p>Questa riga non "ricorda" che <code>d</code> era una <code>Derivata</code>. Sta creando un nuovo oggetto di tipo <code>Base</code>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa succede davvero?</h2>
+      <p>Il punto più importante del testo è questo: <code>b</code> non è un alias di <code>d</code>. <code>b</code> è un nuovo oggetto di tipo <code>Base</code>, ottenuto copiando soltanto la parte <code>Base</code> di <code>d</code>.</p>
+      <p>Questo significa che tutto ciò che appartiene solo alla derivata non entra nel nuovo oggetto. Nel nostro esempio, il metodo <code>g()</code> non può essere chiamato su <code>b</code> per una ragione molto semplice: <code>b</code> non è una <code>Derivata</code>. È davvero e soltanto un oggetto <code>Base</code>.</p>
+      <p class="note"><b>Formula mentale corretta:</b> non pensare "ho una derivata vista come base". Qui devi pensare: "ho costruito una nuova base copiando solo la parte di base della derivata".</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché il codice compila ma il significato cambia</h2>
+      <p>Il codice compila perché una derivata contiene anche una parte base, quindi il compilatore sa come costruire un oggetto <code>Base</code> a partire da quella porzione. Dal punto di vista del linguaggio non c'è nulla di scorretto.</p>
+      <p>Il problema è semantico e progettuale: se il tuo obiettivo era preservare l'identità completa dell'oggetto derivato, allora la copia per valore nella base non fa quello che pensavi. Ti lascia in mano un oggetto più povero, con meno comportamento e meno informazione.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Come si evita lo slicing</h2>
+      <p>Il testo indica tre strade fondamentali:</p>
+      <ul>
+        <li>usare riferimenti a base (<code>Base&amp;</code>);</li>
+        <li>usare puntatori a base (<code>Base*</code>);</li>
+        <li>usare smart pointer quando serve gestione dinamica della memoria.</li>
+      </ul>
+      <p>Queste tre soluzioni hanno in comune una cosa: non stanno creando una nuova <code>Base</code> per valore. Stanno mantenendo un legame con l'oggetto reale, che può continuare a essere una <code>Derivata</code>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Riferimento a base: nessuna copia, nessun taglio</h2>
+      <p>Se usi un riferimento, non stai creando un nuovo oggetto. Stai dando un altro nome allo stesso oggetto già esistente.</p>
+<pre><code class="language-cpp">Derivata d;
+Base&amp; r = d;</code></pre>
+      <p>Qui non avviene slicing, perché <code>r</code> non è un oggetto <code>Base</code> autonomo: è un riferimento che si appoggia a <code>d</code>. Questa distinzione è essenziale e prepara direttamente il terreno al polimorfismo che vedremo nella prossima pagina.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Puntatore a base: stesso principio</h2>
+      <p>Anche con i puntatori il principio è lo stesso:</p>
+<pre><code class="language-cpp">Derivata d;
+Base* p = &amp;d;</code></pre>
+      <p>Nemmeno qui nasce una nuova <code>Base</code>. Il puntatore punta all'oggetto esistente. Di conseguenza, il programma può ancora lavorare sullo stesso oggetto reale, senza perdere la sua parte derivata.</p>
+      <p>Naturalmente, il semplice fatto di usare un puntatore non basta ancora a ottenere polimorfismo dinamico: per quello ci serviranno i metodi <code>virtual</code>. Ma intanto abbiamo evitato il taglio dell'oggetto.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Smart pointer e C++ moderno</h2>
+      <p>Quando la gestione degli oggetti richiede allocazione dinamica, nel C++ moderno non conviene pensare subito a <code>new</code> e <code>delete</code>. Conviene pensare a smart pointer come <code>std::unique_ptr</code> e, più raramente, <code>std::shared_ptr</code>.</p>
+      <p>In questo contesto, gli smart pointer sono utili per due motivi:</p>
+      <ul>
+        <li>evitano lo slicing, perché non copiano l'oggetto derivato in una base per valore;</li>
+        <li>gestiscono in modo più sicuro la memoria e il ciclo di vita degli oggetti.</li>
+      </ul>
+      <p class="ok"><b>Regola pratica:</b> se vuoi polimorfismo e gestione sicura della memoria, <code>std::unique_ptr&lt;Base&gt;</code> è spesso il punto di partenza migliore.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Sintesi finale</h2>
+      <ul>
+        <li>lo slicing avviene quando una derivata viene copiata in una base per valore;</li>
+        <li>in quel caso la parte specifica della derivata viene persa;</li>
+        <li>l'oggetto base ottenuto non è un alias dell'oggetto derivato originale;</li>
+        <li>per evitare slicing si usano riferimenti, puntatori e smart pointer;</li>
+        <li>questa è una delle ragioni per cui il polimorfismo in C++ non si costruisce su copie per valore.</li>
+      </ul>
+      <p class="ok"><b>Sintesi finale:</b> se copi una derivata in una base per valore, non stai "conservando il polimorfismo". Stai costruendo un nuovo oggetto base, più povero dell'originale.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Adesso abbiamo in mano il pezzo che mancava: sappiamo che per evitare slicing dobbiamo lavorare tramite riferimenti o puntatori a base. Nella <strong>Lez5_5</strong> vedremo allora la domanda decisiva: quando chiami un metodo tramite una base, quale versione viene eseguita davvero?
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+

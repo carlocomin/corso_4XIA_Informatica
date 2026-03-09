@@ -1,0 +1,323 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez5_11 · Esercizio pratico finale: gerarchia Dipendente</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez5_10.html"; }
+    function nextSlide(){ window.location.href = "../programma.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra soluzione' : 'Nascondi soluzione';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 5 - Ereditarietà e polimorfismo</h2>
+  <ul>
+    <li><a href="lez5_1.html">Lez5_1: Ereditarietà: significato</a></li>
+    <li><a href="lez5_2.html">Lez5_2: Sintassi della derivazione e accessi</a></li>
+    <li><a href="lez5_3.html">Lez5_3: Costruttori, distruttori, ordine</a></li>
+    <li><a href="lez5_4.html">Lez5_4: Object slicing</a></li>
+    <li><a href="lez5_5.html">Lez5_5: Polimorfismo e virtual</a></li>
+    <li><a href="lez5_6.html">Lez5_6: override, classi astratte, distruttore virtuale</a></li>
+    <li><a href="lez5_7.html">Lez5_7: Casting tra base e derivata</a></li>
+    <li><a href="lez5_8.html">Lez5_8: Multipla, diamond problem, buone pratiche</a></li>
+    <li><a href="lez5_9.html">Lez5_9: Esercizi guidati - base</a></li>
+    <li><a href="lez5_10.html">Lez5_10: Esercizi guidati - concetti e progettazione</a></li>
+    <li><a href="lez5_11.html" class="active">Lez5_11: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Esercizio pratico finale<br><small>Gerarchia <code>Dipendente</code>, polimorfismo, smart pointer</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivo dell'esercizio pratico</h2>
+      <p>Qui la teoria deve diventare progetto. Non basta più dire che una classe è astratta o che un metodo è virtuale: bisogna costruire una piccola gerarchia credibile, usarla in modo polimorfico e far vedere che le scelte progettuali reggono anche nel <code>main()</code>.</p>
+      <p>L'esercizio è molto buono perché costringe a tenere insieme più concetti nello stesso programma: base astratta, <code>override</code>, contenitore di oggetti eterogenei, assenza di slicing, distruttore virtuale, e scelta sensata tra puntatori grezzi e smart pointer.</p>
+      <p>La sezione pratica dell'esercitazione ti chiede proprio questo: passare da domande e definizioni a un piccolo progetto funzionante, in cui il polimorfismo non sia nominato soltanto in teoria ma usato davvero.</p>
+      <p class="ok"><b>Idea chiave:</b> il polimorfismo diventa davvero utile quando il codice chiamante lavora con un'interfaccia comune e non ha bisogno di conoscere tutti i dettagli delle classi concrete.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Testo dell'esercizio</h2>
+      <p>Implementa una piccola gerarchia di classi per la gestione degli stipendi.</p>
+      <p><b>Requisiti richiesti:</b></p>
+      <ol>
+        <li>Parti dalla classe astratta <code>Dipendente</code> e inserisci:
+          <ul>
+            <li>distruttore virtuale;</li>
+            <li>metodo puro <code>double stipendioMensile() const = 0;</code>;</li>
+            <li>metodo virtuale <code>void stampa() const</code>.</li>
+          </ul>
+        </li>
+        <li>Definisci poi due classi derivate:
+          <ul>
+            <li><code>DipendenteFisso</code> (attributo: stipendio fisso);</li>
+            <li><code>DipendenteOrario</code> (attributi: pagaOraria, oreMese).</li>
+          </ul>
+        </li>
+        <li>In entrambe usa <code>override</code> dove serve.</li>
+        <li>Scrivi quindi la funzione:
+          <br/><code>double totaleStipendi(const std::vector&lt;Dipendente*&gt;&amp; v);</code>
+        </li>
+        <li>Infine, nel <code>main</code>, crea almeno 4 dipendenti di tipo misto, stampa lo stipendio di ciascuno e calcola il totale complessivo.</li>
+      </ol>
+      <p><b>Vincoli:</b></p>
+      <ul>
+        <li>evita slicing;</li>
+        <li>non usare <code>new</code>/<code>delete</code> manuali;</li>
+        <li>usa nomi significativi e codice ordinato.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Strategia progettuale prima di scrivere codice</h2>
+      <p>La parte più interessante dell'esercizio è che contiene una piccola tensione progettuale voluta. Da un lato la consegna chiede una funzione che riceve <code>std::vector&lt;Dipendente*&gt;</code>. Dall'altro vieta <code>new</code> e <code>delete</code> manuali. La soluzione migliore non è ignorare uno dei due vincoli, ma farli convivere in modo pulito.</p>
+      <p>Nel <code>main()</code> possiamo gestire davvero gli oggetti con <code>std::unique_ptr&lt;Dipendente&gt;</code>, evitando quindi gestione manuale della memoria. Quando dobbiamo chiamare <code>totaleStipendi(...)</code>, possiamo costruire una piccola "vista" temporanea di puntatori non proprietari, ricavati dagli <code>unique_ptr</code> con <code>get()</code>. In questo modo:</p>
+      <ul>
+        <li>la ownership resta chiara e sicura;</li>
+        <li>la funzione rispetta la firma chiesta dalla consegna;</li>
+        <li>non c'è slicing, perché lavoriamo sempre tramite puntatori alla base;</li>
+        <li>non usiamo mai <code>delete</code> a mano.</li>
+      </ul>
+      <p class="note"><b>Messaggio metodologico:</b> anche quando una consegna usa puntatori grezzi, in C++ moderno conviene chiedersi chi possiede davvero gli oggetti. Qui la risposta giusta è il contenitore di <code>unique_ptr</code>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa osservare nella soluzione</h2>
+      <ul>
+        <li><b>Base astratta:</b> <code>Dipendente</code> non si può istanziare direttamente, ma definisce il contratto comune.</li>
+        <li><b>Metodo virtuale puro:</b> ogni derivata deve spiegare come si calcola il proprio stipendio.</li>
+        <li><b>Metodo virtuale concreto:</b> <code>stampa()</code> può avere una versione di default nella base, ma le derivate possono personalizzarla.</li>
+        <li><b>Distruttore virtuale:</b> è corretto e necessario per una base usata polimorficamente.</li>
+        <li><b>Polimorfismo vero:</b> il totale viene calcolato senza chiedere "che tipo sei?", ma chiamando lo stesso metodo su oggetti diversi.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Soluzione guidata</h2>
+      <p>Prima prova a progettare la gerarchia da solo. Poi apri la soluzione e verifica soprattutto il <i>perché</i> delle scelte, non solo la sintassi.</p>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-sol1" onclick="toggleBox('btn-sol1','sol1')">Mostra soluzione</button>
+      </div>
+
+      <div id="sol1" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;memory&gt;
+#include &lt;string&gt;
+#include &lt;utility&gt;
+#include &lt;vector&gt;
+
+class Dipendente {
+public:
+    virtual ~Dipendente() = default;
+
+    virtual double stipendioMensile() const = 0;
+
+    virtual void stampa() const {
+        std::cout &lt;&lt; "Dipendente: stipendio = "
+                  &lt;&lt; stipendioMensile()
+                  &lt;&lt; " euro\n";
+    }
+};
+
+class DipendenteFisso : public Dipendente {
+private:
+    std::string nome_;
+    double stipendioFisso_;
+
+public:
+    DipendenteFisso(std::string nome, double stipendioFisso)
+        : nome_{std::move(nome)},
+          stipendioFisso_{stipendioFisso &gt;= 0.0 ? stipendioFisso : 0.0} {
+    }
+
+    double stipendioMensile() const override {
+        return stipendioFisso_;
+    }
+
+    void stampa() const override {
+        std::cout &lt;&lt; "[Fisso] " &lt;&lt; nome_
+                  &lt;&lt; " - stipendio = "
+                  &lt;&lt; stipendioMensile()
+                  &lt;&lt; " euro\n";
+    }
+};
+
+class DipendenteOrario : public Dipendente {
+private:
+    std::string nome_;
+    double pagaOraria_;
+    double oreMese_;
+
+public:
+    DipendenteOrario(std::string nome, double pagaOraria, double oreMese)
+        : nome_{std::move(nome)},
+          pagaOraria_{pagaOraria &gt;= 0.0 ? pagaOraria : 0.0},
+          oreMese_{oreMese &gt;= 0.0 ? oreMese : 0.0} {
+    }
+
+    double stipendioMensile() const override {
+        return pagaOraria_ * oreMese_;
+    }
+
+    void stampa() const override {
+        std::cout &lt;&lt; "[Orario] " &lt;&lt; nome_
+                  &lt;&lt; " - paga oraria = " &lt;&lt; pagaOraria_
+                  &lt;&lt; ", ore mese = " &lt;&lt; oreMese_
+                  &lt;&lt; ", stipendio = " &lt;&lt; stipendioMensile()
+                  &lt;&lt; " euro\n";
+    }
+};
+
+double totaleStipendi(const std::vector&lt;Dipendente*&gt;&amp; v) {
+    double totale = 0.0;
+
+    for (const Dipendente* d : v) {
+        if (d != nullptr) {
+            totale += d-&gt;stipendioMensile();
+        }
+    }
+
+    return totale;
+}
+
+int main() {
+    std::vector&lt;std::unique_ptr&lt;Dipendente&gt;&gt; personale;
+
+    personale.push_back(std::make_unique&lt;DipendenteFisso&gt;("Anna", 1850.0));
+    personale.push_back(std::make_unique&lt;DipendenteOrario&gt;("Luca", 12.5, 120.0));
+    personale.push_back(std::make_unique&lt;DipendenteFisso&gt;("Marta", 2100.0));
+    personale.push_back(std::make_unique&lt;DipendenteOrario&gt;("Paolo", 15.0, 95.0));
+
+    std::cout &lt;&lt; "Stipendi del personale:\n";
+    for (const auto&amp; d : personale) {
+        d-&gt;stampa();
+    }
+
+    std::vector&lt;Dipendente*&gt; vista;
+    vista.reserve(personale.size());
+    for (const auto&amp; d : personale) {
+        vista.push_back(d.get());
+    }
+
+    std::cout &lt;&lt; "\nTotale stipendi = "
+              &lt;&lt; totaleStipendi(vista)
+              &lt;&lt; " euro\n";
+}</code></pre>
+
+        <p class="ok"><b>Perché questa soluzione è buona:</b> il <code>main()</code> possiede davvero gli oggetti tramite <code>unique_ptr</code>, ma la funzione di calcolo vede solo una collezione di <code>Dipendente*</code>. Questa separazione tra ownership e uso polimorfico è pulita e molto istruttiva.</p>
+
+        <p class="note"><b>Osserva bene:</b> <code>totaleStipendi(...)</code> non controlla mai se un oggetto è fisso o orario. Chiama semplicemente <code>stipendioMensile()</code>. Questo è il punto esatto in cui il polimorfismo fa risparmiare condizioni, cast e codice duplicato.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Commento ragionato alla soluzione</h2>
+      <p>La base <code>Dipendente</code> esprime il contratto comune: ogni dipendente deve saper restituire il proprio stipendio mensile. La base non dice <i>come</i> si calcola, perché quello dipende dal tipo concreto. Questo è il motivo corretto per usare un metodo virtuale puro.</p>
+      <p>Le classi derivate non aggiungono semplicemente campi: aggiungono una <b>politica di calcolo</b>. <code>DipendenteFisso</code> restituisce il valore fisso; <code>DipendenteOrario</code> calcola prodotto tra paga oraria e ore mensili. È proprio questa variabilità controllata che rende sensata la gerarchia.</p>
+      <p>La funzione <code>totaleStipendi(...)</code> è volutamente semplice. Se il progetto è buono, il codice ad alto livello deve diventare quasi banale. Quando una base astratta è progettata bene, la logica di aggregazione spesso si riduce a un ciclo e a una chiamata virtuale.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Bonus: aggiungere <code>DipendenteProvvigione</code></h2>
+      <p>Se avanza tempo, la consegna chiede una terza derivata con formula:</p>
+      <p><code>stipendio = fissoBase + percentuale * venditeMensili</code></p>
+      <p>Il punto didattico del bonus non è la formula in sé. È verificare che una nuova derivata possa entrare nel sistema senza costringerti a cambiare la firma di <code>totaleStipendi(...)</code> e senza rompere il ciclo principale del <code>main()</code>.</p>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-sol2" onclick="toggleBox('btn-sol2','sol2')">Mostra soluzione</button>
+      </div>
+
+      <div id="sol2" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">class DipendenteProvvigione : public Dipendente {
+private:
+    std::string nome_;
+    double fissoBase_;
+    double percentuale_;
+    double venditeMensili_;
+
+public:
+    DipendenteProvvigione(std::string nome,
+                          double fissoBase,
+                          double percentuale,
+                          double venditeMensili)
+        : nome_{std::move(nome)},
+          fissoBase_{fissoBase &gt;= 0.0 ? fissoBase : 0.0},
+          percentuale_{percentuale &gt;= 0.0 ? percentuale : 0.0},
+          venditeMensili_{venditeMensili &gt;= 0.0 ? venditeMensili : 0.0} {
+    }
+
+    double stipendioMensile() const override {
+        return fissoBase_ + percentuale_ * venditeMensili_;
+    }
+
+    void stampa() const override {
+        std::cout &lt;&lt; "[Provvigione] " &lt;&lt; nome_
+                  &lt;&lt; " - stipendio = "
+                  &lt;&lt; stipendioMensile()
+                  &lt;&lt; " euro\n";
+    }
+};</code></pre>
+
+        <p class="ok"><b>Osservazione importante:</b> il resto del programma non deve essere riscritto. Ti basta fare una nuova <code>push_back(std::make_unique&lt;DipendenteProvvigione&gt;(...))</code> nel contenitore e il calcolo del totale continua a funzionare.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Riflessione finale: quando useresti <code>dynamic_cast</code>?</h2>
+      <p>In questo progetto, quasi mai. La struttura della gerarchia è stata progettata proprio per evitare cast espliciti. Se ti serve solo conoscere o usare il comportamento stipendiale, il metodo virtuale basta e avanza. Fare <code>dynamic_cast</code> per chiedere "sei un DipendenteOrario?" sarebbe il segnale che stai riportando fuori dalla gerarchia una logica che dovrebbe stare dentro le classi.</p>
+      <p><code>dynamic_cast</code> può avere senso solo in casi particolari: per esempio se, in una fase di debug o in una funzionalità secondaria, devi riconoscere un tipo concreto per gestire un comportamento davvero eccezionale. Ma nel flusso ordinario del programma, la scelta migliore è quasi sempre affidarsi ai metodi virtuali.</p>
+      <p class="warn"><b>Regola pratica:</b> se il tuo progetto richiede cast continui per lavorare con una gerarchia, è probabile che l'interfaccia della base non stia esprimendo abbastanza bene il contratto comune.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Checklist conclusiva della lezione 5</b>
+      <ul>
+        <li>La relazione tra base e derivate è davvero un "è-un"?</li>
+        <li>La base ha un distruttore virtuale se viene usata polimorficamente?</li>
+        <li>I metodi ridefiniti usano <code>override</code>?</li>
+        <li>Stai evitando slicing con riferimenti, puntatori o smart pointer?</li>
+        <li>La logica ad alto livello usa il contratto comune invece di fare cast sui tipi concreti?</li>
+      </ul>
+      <p>Se a tutte queste domande rispondi bene, allora non stai solo scrivendo codice con ereditarietà: stai usando l'ereditarietà in modo progettualmente corretto.</p>
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+

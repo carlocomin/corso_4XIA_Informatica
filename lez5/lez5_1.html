@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez5_1 · Ereditarietà: significato</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "../programma.html"; }
+    function nextSlide(){ window.location.href = "lez5_2.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 5 - Ereditarietà e polimorfismo</h2>
+  <ul>
+    <li><a href="lez5_1.html" class="active">Lez5_1: Ereditarietà: significato</a></li>
+    <li><a href="lez5_2.html">Lez5_2: Sintassi della derivazione e accessi</a></li>
+    <li><a href="lez5_3.html">Lez5_3: Costruttori, distruttori, ordine</a></li>
+    <li><a href="lez5_4.html">Lez5_4: Object slicing</a></li>
+    <li><a href="lez5_5.html">Lez5_5: Polimorfismo e virtual</a></li>
+    <li><a href="lez5_6.html">Lez5_6: override, classi astratte, distruttore virtuale</a></li>
+    <li><a href="lez5_7.html">Lez5_7: Casting tra base e derivata</a></li>
+    <li><a href="lez5_8.html">Lez5_8: Multipla, diamond problem, buone pratiche</a></li>
+    <li><a href="lez5_9.html">Lez5_9: Esercizi guidati - base</a></li>
+    <li><a href="lez5_10.html">Lez5_10: Esercizi guidati - concetti e progettazione</a></li>
+    <li><a href="lez5_11.html">Lez5_11: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Ereditarietà: significato</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi della lezione</h2>
+      <p>In questa prima parte non ci interessa ancora la sintassi nei dettagli. Ci interessa capire che cosa significa davvero usare l'ereditarietà in C++, quando conviene farlo, come si costruisce una gerarchia sensata di classi e perché questo discorso prepara il terreno al polimorfismo.</p>
+      <p>Il punto didattico importante è questo: non basta "riconoscere una parola chiave". Bisogna capire il modello mentale corretto. Se quel modello manca, l'ereditarietà viene usata come scorciatoia per copiare codice, e da lì iniziano quasi tutti gli errori progettuali.</p>
+      <p class="ok"><b>Idea chiave:</b> la domanda giusta non è "posso riusare qualcosa?", ma "la classe derivata è davvero un caso particolare della base?".</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Prerequisiti minimi</h2>
+      <p>Per seguire bene questa lezione bisogna avere già chiari alcuni mattoni che abbiamo visto nelle unità precedenti. In particolare:</p>
+      <ul>
+        <li>classi e oggetti;</li>
+        <li>costruttori e distruttori;</li>
+        <li>metodi e specificatori di accesso (<code>public</code>, <code>private</code>, <code>protected</code>);</li>
+        <li>puntatori e riferimenti.</li>
+      </ul>
+      <p>È anche utile avere almeno un'idea generale di stack, heap e RAII. Non serve dominarli già alla perfezione, ma aiuteranno quando parleremo di polimorfismo, gestione della memoria e distruttori virtuali.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Nota su <code>struct</code> e <code>class</code></h2>
+      <p>Negli esempi che incontrerai nella lezione compaiono sia <code>struct</code> sia <code>class</code>. In C++ il meccanismo di ereditarietà è lo stesso in entrambi i casi. La differenza principale non è "di potenza", ma di default:</p>
+      <ul>
+        <li>in <code>struct</code> i membri sono <code>public</code> per default;</li>
+        <li>in <code>class</code> i membri sono <code>private</code> per default.</li>
+      </ul>
+      <p>Per questo, negli esempi molto brevi a volte si usa <code>struct</code>: toglie un po' di rumore sintattico e rende più immediato il focus sul concetto. Nelle situazioni in cui vogliamo sottolineare meglio incapsulamento e progettazione, useremo più spesso <code>class</code>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cos'è l'ereditarietà?</h2>
+      <p>L'ereditarietà permette a una classe derivata di riusare e specializzare il comportamento di una classe base. Questa frase, da sola, però, non basta ancora. La parola davvero importante è <b>specializzare</b>: una derivata non è una base "con qualcosa in più" in senso generico; è un caso particolare della base.</p>
+      <p>Se diciamo che <code>B</code> deriva da <code>A</code>, allora stiamo affermando che un oggetto di tipo <code>B</code> può essere considerato, quando serve, anche come un oggetto di tipo <code>A</code>. Questa è la famosa relazione <b>IS-A</b>, cioè "è-un".</p>
+      <p>Qui sta il cuore dell'argomento: l'ereditarietà non descrive solo una dipendenza tecnica tra classi. Descrive un rapporto logico tra concetti del dominio.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio intuitivo: <code>Veicolo</code>, <code>Auto</code>, <code>Moto</code></h2>
+      <p>Immagina di avere una classe base <code>Veicolo</code> e due classi derivate, <code>Auto</code> e <code>Moto</code>. In questo caso il modello è naturale, perché ha senso dire:</p>
+      <ul>
+        <li>un'auto è un veicolo;</li>
+        <li>una moto è un veicolo.</li>
+      </ul>
+      <p>Di conseguenza, un oggetto <code>Auto</code> può essere trattato, in certe situazioni, anche come un <code>Veicolo</code>. Questo non significa che auto e moto siano identiche: significa che condividono una base concettuale comune e che la derivata aggiunge o specializza il comportamento.</p>
+      <p>Questo esempio è didatticamente utile perché rende subito visibile la differenza tra "categoria generale" e "caso particolare".</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Attenzione progettuale: non usare l'ereditarietà solo per riusare codice</h2>
+      <p>Uno degli errori più frequenti è pensare: "questa classe contiene cose simili a un'altra, quindi la faccio derivare". Questo ragionamento è troppo debole. Il semplice riuso di codice non basta a giustificare una gerarchia.</p>
+      <p>La domanda corretta è molto più severa: <b>la classe derivata è davvero un tipo particolare della base?</b> Se la risposta è no, di solito l'ereditarietà sta forzando una relazione che nel dominio non esiste davvero.</p>
+      <p>Quando succede questo, il codice può anche compilare, ma il progetto inizia a diventare fragile: interfacce confuse, gerarchie innaturali, metodi ereditati che non hanno senso, dipendenze sempre più difficili da mantenere.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2><code>IS-A</code> contro <code>HAS-A</code></h2>
+      <p>Per orientarsi bene, conviene tenere in testa una distinzione semplice ma potentissima.</p>
+      <p>Se la relazione corretta è <b>"è-un"</b>, allora l'ereditarietà può avere senso. Se invece la relazione corretta è <b>"ha-un"</b>, allora in genere serve la <b>composizione</b>.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Relazione</th>
+            <th>Esempio</th>
+            <th>Scelta progettuale più naturale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>IS-A</b></td>
+            <td><code>Auto</code> è un <code>Veicolo</code></td>
+            <td>Ereditarietà</td>
+          </tr>
+          <tr>
+            <td><b>HAS-A</b></td>
+            <td><code>Auto</code> ha un <code>Motore</code></td>
+            <td>Composizione</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="ok"><b>Regola pratica:</b> usa ereditarietà per modellare un vero "è-un"; usa composizione per modellare un "ha-un".</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Come ragionare bene prima di derivare</h2>
+      <p>Quando stai progettando una gerarchia, prova a formulare la frase a voce alta. Se suona naturale, spesso sei sulla strada giusta. "Un cane è un animale" funziona. "Un rettangolo è una figura" funziona. "Un'auto è un motore" no: lì non stiamo specializzando una categoria, stiamo dicendo che un oggetto contiene un altro oggetto o dipende da esso.</p>
+      <p>Questo piccolo test linguistico non sostituisce la progettazione, ma è un filtro iniziale molto efficace. Ti costringe a ragionare sul significato del modello prima ancora di aprire l'editor.</p>
+      <p>Nel seguito della lezione vedremo che questa scelta concettuale ha conseguenze concrete: accessi ereditati, costruttori della base, slicing, polimorfismo, distruttori virtuali. Se la relazione di partenza è sbagliata, tutto il resto si appoggia su fondamenta deboli.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Da portare con te nella prossima pagina.</b> Prima di pensare a <code>public</code>, <code>protected</code> o <code>virtual</code>, ricordati questo criterio: la derivata deve poter essere trattata come un caso particolare della base senza forzature concettuali. Nella <strong>Lez5_2</strong> vedremo come questa idea prende forma nella sintassi della derivazione.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+

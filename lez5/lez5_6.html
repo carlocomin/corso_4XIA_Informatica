@@ -1,0 +1,259 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez5_6 · override, distruttore virtuale, classi astratte</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez5_5.html"; }
+    function nextSlide(){ window.location.href = "lez5_7.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 5 - Ereditarietà e polimorfismo</h2>
+  <ul>
+    <li><a href="lez5_1.html">Lez5_1: Ereditarietà: significato</a></li>
+    <li><a href="lez5_2.html">Lez5_2: Sintassi della derivazione e accessi</a></li>
+    <li><a href="lez5_3.html">Lez5_3: Costruttori, distruttori, ordine</a></li>
+    <li><a href="lez5_4.html">Lez5_4: Object slicing</a></li>
+    <li><a href="lez5_5.html">Lez5_5: Polimorfismo e virtual</a></li>
+    <li><a href="lez5_6.html" class="active">Lez5_6: override, classi astratte, distruttore virtuale</a></li>
+    <li><a href="lez5_7.html">Lez5_7: Casting tra base e derivata</a></li>
+    <li><a href="lez5_8.html">Lez5_8: Multipla, diamond problem, buone pratiche</a></li>
+    <li><a href="lez5_9.html">Lez5_9: Esercizi guidati - base</a></li>
+    <li><a href="lez5_10.html">Lez5_10: Esercizi guidati - concetti e progettazione</a></li>
+    <li><a href="lez5_11.html">Lez5_11: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Usare bene il polimorfismo<br><small><code>override</code>, distruttore virtuale, classi astratte, <code>override</code> vs <code>overload</code></small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Che cosa aggiungiamo rispetto alla pagina precedente</h2>
+      <p>Nella pagina precedente abbiamo capito il meccanismo del dispatch dinamico: con <code>virtual</code> il programma usa il tipo reale dell'oggetto. Ma per usare questo meccanismo in modo robusto non basta scrivere una parola chiave e sperare che tutto vada bene.</p>
+      <p>Qui entrano in gioco quattro idee strettamente collegate:</p>
+      <ul>
+        <li><code>override</code>, per far controllare al compilatore che stiamo davvero ridefinendo il metodo giusto;</li>
+        <li>il distruttore virtuale, per evitare errori gravi quando si distrugge tramite puntatore a base;</li>
+        <li>le classi astratte, per definire contratti comuni senza istanziare direttamente la base;</li>
+        <li>la distinzione tra <code>override</code> e <code>overload</code>, che non vanno confusi.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché <code>override</code> è importante</h2>
+      <p><code>override</code> dice al compilatore:</p>
+      <p><b>"Sto intenzionalmente sovrascrivendo un metodo virtuale della base."</b></p>
+      <p>Questa piccola parola chiave è molto più preziosa di quanto sembri. Non serve a "rendere più OO" il codice e non cambia il comportamento del programma in senso magico. Serve a far controllare al compilatore che la tua intenzione sia coerente con la firma del metodo nella base.</p>
+      <p>Se la firma non corrisponde, il compilatore segnala errore. Ed è esattamente ciò che vogliamo: meglio un errore in compilazione che un programma che sembra corretto ma in realtà non sta ridefinendo il metodo che pensavi.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio corretto con <code>override</code></h2>
+<pre><code class="language-cpp">struct Base {
+    virtual void f() const {}
+};
+
+struct Der : Base {
+    void f() const override {}
+};</code></pre>
+      <p>Qui tutto è coerente. La derivata dichiara esplicitamente di stare ridefinendo <code>f()</code>, e il compilatore conferma che la firma è compatibile con quella della base.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Errore tipico: firma quasi uguale, ma non uguale davvero</h2>
+      <p>Il testo insiste giustamente su un errore molto comune:</p>
+<pre><code class="language-cpp">struct Base {
+    virtual void f() const {}
+};
+
+struct Der : Base {
+    // void f() {}   // NON è override: manca const
+    void f() const override {}
+};</code></pre>
+      <p>Basta dimenticare un <code>const</code> per cambiare la firma. In quel caso non staresti più ridefinendo il metodo virtuale della base: staresti dichiarando un altro metodo. Proprio per questo <code>override</code> è così utile.</p>
+      <p class="ok"><b>Regola pratica:</b> metti <code>override</code> su tutti i metodi virtuali ridefiniti. Non è rumore: è un controllo di correttezza.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché serve il distruttore virtuale</h2>
+      <p>Se una classe base viene usata polimorficamente, il suo distruttore deve essere virtuale. Questo non è un raffinamento stilistico: è una regola di sicurezza molto concreta.</p>
+      <p>Quando distruggi un oggetto tramite un puntatore a base, il programma deve sapere che deve chiamare anche il distruttore della derivata reale. Se il distruttore della base non è virtuale, questa catena può rompersi.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio problematico</h2>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+struct Base {
+    ~Base() { std::cout &lt;&lt; "~Base\n"; }
+};
+
+struct Der : Base {
+    ~Der() { std::cout &lt;&lt; "~Der\n"; }
+};
+
+int main() {
+    Base* p = new Der();
+    delete p;  // comportamento indefinito
+}</code></pre>
+      <p>Qui il problema non è solo teorico. Eliminando tramite <code>Base*</code> potresti non chiamare il distruttore della derivata. Se la derivata gestisce risorse, il rischio è serio: memoria non rilasciata, file lasciati aperti, stato incoerente.</p>
+      <p class="warn"><b>Regola pratica:</b> se una classe ha almeno un metodo virtuale, di solito deve avere anche:</p>
+<pre><code class="language-cpp">virtual ~Base() = default;</code></pre>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Classi astratte e metodi puri</h2>
+      <p>Una classe astratta definisce un contratto comune. Non può essere istanziata direttamente. Questo è esattamente ciò che vogliamo quando la base rappresenta un'idea generale, ma non un oggetto concreto completo.</p>
+      <p>La sintassi chiave è il metodo virtuale puro:</p>
+<pre><code class="language-cpp">virtual double area() const = 0;</code></pre>
+      <p>Quel <code>= 0</code> significa che la base impone il contratto ma non fornisce un'implementazione completa per quel metodo. Saranno le derivate concrete a farlo.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio: gerarchia <code>Forma</code></h2>
+<pre><code class="language-cpp">#include &lt;cmath&gt;
+#include &lt;iostream&gt;
+#include &lt;memory&gt;
+#include &lt;vector&gt;
+
+class Forma {
+public:
+    virtual ~Forma() = default;
+    virtual double area() const = 0;
+
+    virtual void stampa() const {
+        std::cout &lt;&lt; "Area=" &lt;&lt; area() &lt;&lt; "\n";
+    }
+};
+
+class Cerchio : public Forma {
+public:
+    explicit Cerchio(double r) : r_(r) {}
+
+    double area() const override {
+        constexpr double pi = 3.141592653589793;
+        return pi * r_ * r_;
+    }
+private:
+    double r_;
+};
+
+class Rettangolo : public Forma {
+public:
+    Rettangolo(double w, double h) : w_(w), h_(h) {}
+
+    double area() const override { return w_ * h_; }
+private:
+    double w_, h_;
+};
+
+int main() {
+    std::vector&lt;std::unique_ptr&lt;Forma&gt;&gt; v;
+    v.push_back(std::make_unique&lt;Cerchio&gt;(2.0));
+    v.push_back(std::make_unique&lt;Rettangolo&gt;(3.0, 4.0));
+
+    for (const auto& f : v) {
+        f-&gt;stampa();
+    }
+}</code></pre>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché qui si usano puntatori e <code>unique_ptr</code>?</h2>
+      <p>Il testo risponde in modo molto chiaro, e va tenuto così:</p>
+      <ul>
+        <li><code>Forma</code> è astratta, quindi non si possono creare oggetti <code>Forma</code> diretti;</li>
+        <li>i puntatori a base permettono il polimorfismo;</li>
+        <li><code>unique_ptr</code> evita <code>new</code> e <code>delete</code> manuali e gestisce la memoria in modo sicuro.</li>
+      </ul>
+      <p>Questa è una pagina importante perché salda insieme linguaggio e stile moderno: base astratta, polimorfismo e gestione sicura della memoria entrano nello stesso esempio.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2><code>override</code> non è <code>overload</code></h2>
+      <p>Questi due concetti non vanno confusi.</p>
+      <p><b><code>override</code></b>:</p>
+      <ul>
+        <li>ridefinisce un metodo virtuale della base;</li>
+        <li>richiede una firma compatibile.</li>
+      </ul>
+      <p><b><code>overload</code></b>:</p>
+      <ul>
+        <li>usa lo stesso nome, ma parametri diversi;</li>
+        <li>non riguarda direttamente il polimorfismo dinamico.</li>
+      </ul>
+      <p>Questa distinzione è fondamentale per non fraintendere il ruolo di <code>override</code>: non stiamo creando "un altro metodo con lo stesso nome", stiamo dicendo che una funzione virtuale già esistente deve essere ridefinita con la firma giusta.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Name hiding e <code>using Base::g;</code></h2>
+      <p>Il testo chiude questa parte con un caso molto utile:</p>
+<pre><code class="language-cpp">struct Base {
+    void g(int) {}
+    void g(double) {}
+};
+
+struct Der : Base {
+    using Base::g;
+    void g(int) {}
+};</code></pre>
+      <p>Senza <code>using Base::g;</code>, la nuova definizione in <code>Der</code> nasconde le altre overload della base. Questo fenomeno si chiama <b>name hiding</b>.</p>
+      <p>Il punto didattico qui è sottile ma importante: non tutto ciò che riguarda "stesso nome" ha a che fare con il polimorfismo dinamico. A volte il problema è molto più semplice: la derivata ha nascosto overload utili della base.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Sintesi finale</h2>
+      <ul>
+        <li><code>override</code> serve a far verificare al compilatore che la ridefinizione sia corretta;</li>
+        <li>un distruttore virtuale è necessario quando la base viene usata polimorficamente;</li>
+        <li>una classe astratta definisce un contratto comune e non può essere istanziata direttamente;</li>
+        <li><code>std::unique_ptr&lt;Base&gt;</code> è spesso il modo più pulito per gestire oggetti polimorfici;</li>
+        <li><code>override</code> e <code>overload</code> sono concetti diversi, e il name hiding è un problema a parte.</li>
+      </ul>
+      <p class="ok"><b>Sintesi finale:</b> il polimorfismo non si usa bene solo con <code>virtual</code>; si usa bene quando la base è progettata per essere sicura, chiara e controllabile dal compilatore.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Ora che sono chiari <code>override</code>, distruttore virtuale e classe astratta, nella <strong>Lez5_7</strong> possiamo affrontare l'ultimo tratto tecnico: casting tra base e derivata, <code>dynamic_cast</code> e uso prudente dei downcast.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+

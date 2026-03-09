@@ -1,0 +1,774 @@
+﻿LEZIONE (circa 1 ORA) - Ereditarietà e polimorfismo in C++
+===========================================================
+
+Obiettivo
+---------
+Capire che cosa significa usare l'ereditarietà in C++, quando conviene farlo, come si
+costruisce una gerarchia di classi e come l'ereditarietà si collega al polimorfismo.
+L'obiettivo non è solo conoscere la sintassi, ma anche evitare gli errori più comuni.
+
+Prerequisiti minimi
+-------------------
+- Classi e oggetti
+- Costruttori e distruttori
+- Metodi e specificatori di accesso (`public`, `private`, `protected`)
+- Puntatori e riferimenti
+- Consigliato: idea generale di stack, heap e RAII
+
+Nota su `struct` e `class`
+--------------------------
+Negli esempi troverai sia `struct` sia `class`.
+In C++ la differenza principale è questa:
+- in `struct` i membri sono `public` per default
+- in `class` i membri sono `private` per default
+
+Quindi, dal punto di vista dell'ereditarietà, il meccanismo è lo stesso.
+Negli esempi brevi si usa talvolta `struct` per ridurre il rumore sintattico.
+
+Scaletta con tempi indicativi
+-----------------------------
+1. Concetto di ereditarietà e relazione "è-un"                      (8 min)
+2. Sintassi base e livelli di accesso                                 (8 min)
+3. Costruttori, distruttori, ordine di inizializzazione, slicing      (8 min)
+4. Polimorfismo: `virtual`, `override`, dispatch dinamico, classi astratte (15 min)
+5. Casting, RTTI, `dynamic_cast` e uso prudente                       (5 min)
+6. Ereditarietà multipla e diamond problem (cenni)                   (3 min)
+7. Buone pratiche di progettazione                                    (3 min)
+8. Esempio completo                                                   (5 min)
+9. Errori tipici                                                       (3 min)
+10. Mini-esercizi finali                                               (2 min)
+
+
+1) Che cos'è l'ereditarietà?
+------------------------------
+L'ereditarietà permette a una classe derivata di riusare e specializzare il comportamento
+di una classe base.
+
+Se `B` deriva da `A`, allora `B` deve poter essere considerata un caso particolare di `A`.
+Questo è il significato della relazione "è-un" (`IS-A`).
+
+Esempio intuitivo:
+- `Veicolo` è la classe base
+- `Auto` è una classe derivata
+- `Moto` è un'altra classe derivata
+
+In questo caso ha senso dire:
+- un'auto è un veicolo
+- una moto è un veicolo
+
+Quindi ogni oggetto `Auto` può essere trattato, quando serve, anche come `Veicolo`.
+
+Attenzione progettuale
+----------------------
+Non bisogna usare l'ereditarietà solo per "riusare codice".
+La domanda corretta è:
+
+"La classe derivata è davvero un tipo particolare della base?"
+
+Se la risposta è no, spesso è meglio la composizione.
+
+Esempio:
+- `Auto ha un Motore` -> composizione
+- `Auto è un Veicolo` -> ereditarietà
+
+Regola pratica:
+- usa ereditarietà per "è-un"
+- usa composizione per "ha-un"
+
+
+2) Sintassi base e accessi
+--------------------------
+
+2.1 Derivazione `public`
+------------------------
+È la forma più comune.
+Con derivazione `public`, l'interfaccia pubblica della base resta pubblica nella derivata.
+
+Esempio:
+
+    #include <iostream>
+    #include <string>
+
+    class Persona {
+    public:
+        Persona(std::string nome) : nome_(std::move(nome)) {}
+
+        void saluta() const {
+            std::cout << "Ciao, sono " << nome_ << "\n";
+        }
+
+    protected:
+        const std::string& nome() const { return nome_; }
+
+    private:
+        std::string nome_;
+    };
+
+    class Studente : public Persona {
+    public:
+        Studente(std::string nome, int classe)
+            : Persona(std::move(nome)), classe_(classe) {}
+
+        void presenta() const {
+            std::cout << "Sono " << nome() << " e sono in " << classe_ << "a.\n";
+        }
+
+    private:
+        int classe_;
+    };
+
+    int main() {
+        Studente s("Carlo", 4);
+        s.saluta();
+        s.presenta();
+    }
+
+Output atteso:
+
+    Ciao, sono Carlo
+    Sono Carlo e sono in 4a.
+
+Che cosa osservare?
+-------------------
+- `Studente` eredita `saluta()` da `Persona`
+- `Studente` non può accedere direttamente a `nome_`, perché `nome_` è `private`
+- `Studente` può usare `nome()`, perché quel metodo è `protected`
+
+Da ricordare:
+- `private` nella base: non accessibile dalla derivata
+- `protected` nella base: accessibile nella derivata, ma non dall'esterno
+- `public` nella base: resta accessibile normalmente con derivazione `public`
+
+
+2.2 Derivazione `protected` e `private`
+---------------------------------------
+Esistono anche:
+- `protected inheritance`
+- `private inheritance`
+
+In questi casi cambia la visibilità dei membri ereditati nella derivata.
+
+In pratica, nel codice introduttivo e in molti progetti applicativi:
+- si usa soprattutto `public inheritance` per modellare una vera relazione "è-un"
+- si preferisce la composizione negli altri casi
+
+Per ora, la derivazione `public` è quella davvero importante da padroneggiare bene.
+
+
+3) Costruttori, distruttori, ordine, slicing
+--------------------------------------------
+
+3.1 Ordine di costruzione e distruzione
+---------------------------------------
+Quando si crea un oggetto derivato:
+1. viene costruita prima la parte di base
+2. poi viene costruita la parte specifica della derivata
+
+Quando l'oggetto viene distrutto, l'ordine è inverso:
+1. si distrugge prima la derivata
+2. poi la base
+
+Esempio:
+
+    #include <iostream>
+
+    class Base {
+    public:
+        Base()  { std::cout << "Base()\n"; }
+        ~Base() { std::cout << "~Base()\n"; }
+    };
+
+    class Derivata : public Base {
+    public:
+        Derivata()  { std::cout << "Derivata()\n"; }
+        ~Derivata() { std::cout << "~Derivata()\n"; }
+    };
+
+    int main() {
+        Derivata d;
+    }
+
+Output atteso:
+
+    Base()
+    Derivata()
+    ~Derivata()
+    ~Base()
+
+Questo ordine è importante per capire come vengono inizializzati e distrutti gli oggetti.
+
+
+3.2 Costruttore della base con argomenti
+----------------------------------------
+Se la base richiede argomenti, la derivata deve inizializzarla nella lista di inizializzazione.
+
+Esempio:
+
+    class Rettangolo {
+    public:
+        Rettangolo(double w, double h) : w_(w), h_(h) {}
+        double area() const { return w_ * h_; }
+    private:
+        double w_, h_;
+    };
+
+    class Parallelepipedo : public Rettangolo {
+    public:
+        Parallelepipedo(double w, double h, double d)
+            : Rettangolo(w, h), d_(d) {}
+
+        double volume() const { return area() * d_; }
+    private:
+        double d_;
+    };
+
+Nota didattica:
+questo esempio serve a mostrare il riuso del costruttore e dei metodi della base.
+Dal punto di vista concettuale, in un progetto reale si potrebbe preferire la composizione.
+
+
+3.3 Object slicing
+------------------
+Lo slicing si verifica quando un oggetto derivato viene copiato in un oggetto base per valore.
+In quel momento la parte specifica della derivata viene "tagliata via".
+
+Esempio:
+
+    #include <iostream>
+
+    class Base {
+    public:
+        void f() const { std::cout << "Base::f\n"; }
+    };
+
+    class Derivata : public Base {
+    public:
+        void g() const { std::cout << "Derivata::g\n"; }
+    };
+
+    int main() {
+        Derivata d;
+        Base b = d;   // slicing
+        b.f();
+        // b.g();     // errore: b è un oggetto Base
+    }
+
+Che cosa succede davvero?
+-------------------------
+`b` non è "un alias" di `d`.
+`b` è un nuovo oggetto di tipo `Base`, ottenuto copiando solo la parte `Base` di `d`.
+
+Come si evita?
+- usando riferimenti a base (`Base&`)
+- usando puntatori a base (`Base*`)
+- usando smart pointer quando serve gestione dinamica della memoria
+
+
+4) Polimorfismo: `virtual`, `override`, classi astratte
+-------------------------------------------------------
+Il polimorfismo consente di trattare oggetti di tipi derivati diversi attraverso
+un riferimento o un puntatore alla classe base, mantenendo però il comportamento corretto
+del tipo reale.
+
+La parola chiave centrale è `virtual`.
+
+Senza `virtual`:
+- il metodo chiamato dipende dal tipo statico della variabile
+
+Con `virtual`:
+- il metodo chiamato dipende dal tipo dinamico dell'oggetto reale
+
+
+4.1 Senza `virtual`: binding statico
+------------------------------------
+
+    #include <iostream>
+
+    struct Animale {
+        void verso() const { std::cout << "Verso generico\n"; }
+    };
+
+    struct Cane : public Animale {
+        void verso() const { std::cout << "Bau!\n"; }
+    };
+
+    int main() {
+        Cane c;
+        Animale* p = &c;
+        p->verso();
+    }
+
+Output:
+
+    Verso generico
+
+Perché accade?
+---------------
+Perché `p` ha tipo `Animale*`, e il metodo non è virtuale.
+Il compilatore decide la chiamata guardando il tipo statico del puntatore.
+
+
+4.2 Con `virtual`: dispatch dinamico
+------------------------------------
+
+    #include <iostream>
+
+    struct Animale {
+        virtual void verso() const { std::cout << "Verso generico\n"; }
+        virtual ~Animale() = default;
+    };
+
+    struct Cane : public Animale {
+        void verso() const override { std::cout << "Bau!\n"; }
+    };
+
+    struct Gatto : public Animale {
+        void verso() const override { std::cout << "Miao!\n"; }
+    };
+
+    void faiVerso(const Animale& a) {
+        a.verso();
+    }
+
+    int main() {
+        Cane c;
+        Gatto g;
+        faiVerso(c);
+        faiVerso(g);
+    }
+
+Output:
+
+    Bau!
+    Miao!
+
+Qui il programma usa il tipo reale dell'oggetto.
+Anche se `faiVerso` riceve un riferimento a `Animale`, viene chiamata la versione corretta.
+
+
+4.3 Perché `override` è importante?
+-------------------------------------
+`override` dice al compilatore:
+
+"Sto intenzionalmente sovrascrivendo un metodo virtuale della base."
+
+Se la firma non corrisponde, il compilatore segnala errore.
+
+Esempio:
+
+    struct Base {
+        virtual void f() const {}
+    };
+
+    struct Der : Base {
+        void f() const override {}
+    };
+
+Errore tipico:
+
+    struct Base {
+        virtual void f() const {}
+    };
+
+    struct Der : Base {
+        // void f() {}   // NON è override: manca const
+        void f() const override {}
+    };
+
+Regola pratica:
+metti `override` su tutti i metodi virtuali ridefiniti.
+
+
+4.4 Perché serve il distruttore virtuale?
+------------------------------------------
+Se una classe base viene usata polimorficamente, il suo distruttore deve essere virtuale.
+
+Esempio problematico:
+
+    #include <iostream>
+
+    struct Base {
+        ~Base() { std::cout << "~Base\n"; }
+    };
+
+    struct Der : Base {
+        ~Der() { std::cout << "~Der\n"; }
+    };
+
+    int main() {
+        Base* p = new Der();
+        delete p;  // comportamento indefinito
+    }
+
+Perché è un problema?
+-----------------------
+Perché eliminando tramite `Base*` potresti non chiamare il distruttore della derivata.
+Se la derivata gestisce risorse, il rischio è serio.
+
+Regola pratica:
+se una classe ha almeno un metodo virtuale, di solito deve avere anche:
+
+    virtual ~Base() = default;
+
+
+4.5 Classi astratte e metodi puri
+---------------------------------
+Una classe astratta definisce un contratto comune.
+Non può essere istanziata direttamente.
+
+Esempio:
+
+    #include <cmath>
+    #include <iostream>
+    #include <memory>
+    #include <vector>
+
+    class Forma {
+    public:
+        virtual ~Forma() = default;
+        virtual double area() const = 0;
+
+        virtual void stampa() const {
+            std::cout << "Area=" << area() << "\n";
+        }
+    };
+
+    class Cerchio : public Forma {
+    public:
+        explicit Cerchio(double r) : r_(r) {}
+
+        double area() const override { return M_PI * r_ * r_; }
+    private:
+        double r_;
+    };
+
+    class Rettangolo : public Forma {
+    public:
+        Rettangolo(double w, double h) : w_(w), h_(h) {}
+
+        double area() const override { return w_ * h_; }
+    private:
+        double w_, h_;
+    };
+
+    int main() {
+        std::vector<std::unique_ptr<Forma>> v;
+        v.push_back(std::make_unique<Cerchio>(2.0));
+        v.push_back(std::make_unique<Rettangolo>(3.0, 4.0));
+
+        for (const auto& f : v) {
+            f->stampa();
+        }
+    }
+
+Perché qui si usano puntatori?
+-------------------------------
+- `Forma` è astratta, quindi non si possono creare oggetti `Forma`
+- i puntatori a base permettono il polimorfismo
+- `unique_ptr` evita `new` e `delete` manuali e gestisce la memoria in modo sicuro
+
+
+4.6 `override` non è `overload`
+--------------------------------
+Questi due concetti non vanno confusi.
+
+`override`:
+- ridefinisce un metodo virtuale della base
+- richiede firma compatibile
+
+`overload`:
+- usa lo stesso nome, ma parametri diversi
+- non riguarda direttamente il polimorfismo dinamico
+
+Esempio di name hiding:
+
+    struct Base {
+        void g(int) {}
+        void g(double) {}
+    };
+
+    struct Der : Base {
+        using Base::g;
+        void g(int) {}
+    };
+
+Senza `using Base::g;`, la nuova definizione in `Der` nasconde le altre overload della base.
+
+
+5) Casting tra base e derivata
+------------------------------
+
+5.1 Upcast
+----------
+Passare da derivata a base è sicuro.
+
+Esempio:
+
+    Cane c;
+    Animale& ra = c;
+    Animale* pa = &c;
+
+Questo funziona perché un `Cane` è anche un `Animale`.
+
+
+5.2 Downcast
+------------
+Passare da base a derivata è più delicato.
+Non ogni `Base*` punta davvero a un oggetto `Derivata`.
+
+Quando serve controllare il tipo reale a runtime, si può usare `dynamic_cast`.
+
+Esempio:
+
+    #include <iostream>
+
+    struct Base {
+        virtual ~Base() = default;
+    };
+
+    struct Der1 : Base {
+        void x() const { std::cout << "Der1\n"; }
+    };
+
+    struct Der2 : Base {
+        void y() const { std::cout << "Der2\n"; }
+    };
+
+    void prova(Base* p) {
+        if (auto d1 = dynamic_cast<Der1*>(p)) {
+            d1->x();
+        } else if (auto d2 = dynamic_cast<Der2*>(p)) {
+            d2->y();
+        } else {
+            std::cout << "Tipo sconosciuto\n";
+        }
+    }
+
+Da ricordare:
+- `dynamic_cast` richiede una gerarchia polimorfica
+- se il cast a puntatore fallisce, il risultato è `nullptr`
+
+Regola pratica:
+se puoi ottenere lo stesso risultato con un metodo virtuale ben progettato, quello è
+di solito l'approccio migliore.
+
+
+6) Ereditarietà multipla e diamond problem
+-------------------------------------------
+In C++ una classe può derivare da più classi base.
+
+Esempio semplice:
+
+    struct Stampabile {
+        virtual ~Stampabile() = default;
+        virtual void stampa() const = 0;
+    };
+
+    struct Salvabile {
+        virtual ~Salvabile() = default;
+        virtual void salva() const = 0;
+    };
+
+    struct Documento : Stampabile, Salvabile {
+        void stampa() const override {}
+        void salva() const override {}
+    };
+
+Questo uso è spesso ragionevole quando le basi rappresentano interfacce astratte.
+
+Diamond problem
+---------------
+Il problema compare quando due classi derivano dalla stessa base e una terza eredita da entrambe:
+
+        A
+       / \
+      B   C
+       \ /
+        D
+
+Senza ereditarietà virtuale, `D` può contenere due copie separate di `A`.
+Questo crea ambiguità e complicazioni.
+
+Per evitare il problema:
+
+    struct A { int v = 0; };
+    struct B : virtual A {};
+    struct C : virtual A {};
+    struct D : B, C {};
+
+Per questa lezione basta conoscere il problema a livello introduttivo.
+
+
+7) Buone pratiche
+-----------------
+1. Se usi il polimorfismo, metti un distruttore virtuale nella base.
+2. Usa `override` su ogni metodo virtuale ridefinito.
+3. Evita lo slicing: preferisci riferimenti, puntatori e smart pointer.
+4. Non usare ereditarietà se la relazione corretta è "ha-un".
+5. Mantieni la classe base semplice e con responsabilità chiare.
+6. Evita gerarchie troppo profonde.
+7. Progetta la base pensando anche alle classi che deriveranno da essa.
+
+Osservazione importante:
+una base progettata male può rendere fragili tutte le derivate.
+
+
+8) Esempio completo: sistema di notifiche
+-----------------------------------------
+Obiettivo:
+inviare notifiche su canali diversi senza che il codice chiamante conosca i dettagli concreti.
+
+    #include <iostream>
+    #include <memory>
+    #include <string>
+    #include <vector>
+
+    class Notifica {
+    public:
+        virtual ~Notifica() = default;
+        virtual void invia(const std::string& messaggio) const = 0;
+    };
+
+    class Email : public Notifica {
+    public:
+        explicit Email(std::string destinatario) : destinatario_(std::move(destinatario)) {}
+
+        void invia(const std::string& messaggio) const override {
+            std::cout << "[EMAIL a " << destinatario_ << "] " << messaggio << "\n";
+        }
+    private:
+        std::string destinatario_;
+    };
+
+    class SMS : public Notifica {
+    public:
+        explicit SMS(std::string numero) : numero_(std::move(numero)) {}
+
+        void invia(const std::string& messaggio) const override {
+            std::cout << "[SMS a " << numero_ << "] " << messaggio << "\n";
+        }
+    private:
+        std::string numero_;
+    };
+
+    class Push : public Notifica {
+    public:
+        explicit Push(std::string deviceId) : deviceId_(std::move(deviceId)) {}
+
+        void invia(const std::string& messaggio) const override {
+            std::cout << "[PUSH a " << deviceId_ << "] " << messaggio << "\n";
+        }
+    private:
+        std::string deviceId_;
+    };
+
+    int main() {
+        std::vector<std::unique_ptr<Notifica>> canali;
+        canali.push_back(std::make_unique<Email>("alice@example.com"));
+        canali.push_back(std::make_unique<SMS>("+39 333 1234567"));
+        canali.push_back(std::make_unique<Push>("DEVICE-XYZ"));
+
+        for (const auto& c : canali) {
+            c->invia("Compito assegnato: esercizi di C++");
+        }
+    }
+
+Che cosa mostra questo esempio?
+-------------------------------
+- `main()` usa un'interfaccia comune (`Notifica`)
+- ogni canale implementa il proprio comportamento
+- aggiungere un nuovo canale non richiede modifiche al ciclo principale
+
+Questo è un caso pulito di polimorfismo con base astratta.
+
+
+9) Errori tipici da mostrare in classe
+--------------------------------------
+
+(A) Metodo non virtuale
+-----------------------
+Sintomo:
+chiami un metodo su `Base*`, ma viene eseguita la versione della base anche quando il puntatore
+punta a una derivata.
+
+Correzione:
+rendere il metodo `virtual` nella base e usare `override` nella derivata.
+
+
+(B) Distruttore non virtuale
+----------------------------
+Sintomo:
+elimini un oggetto derivato tramite puntatore a base e la distruzione non è corretta.
+
+Correzione:
+aggiungere `virtual ~Base() = default;`
+
+
+(C) Firma sbagliata
+-------------------
+Sintomo:
+pensi di aver fatto override, ma in realtà hai creato un altro metodo.
+
+Correzione:
+usare `override`, così il compilatore controlla la firma.
+
+
+(D) Slicing
+-----------
+Sintomo:
+copi una derivata in una base per valore e perdi il comportamento specifico.
+
+Correzione:
+usare riferimenti, puntatori o smart pointer.
+
+
+10) Mini-esercizi finali
+------------------------
+1. Crea una gerarchia con classe base `Dipendente` e metodo virtuale
+   `stipendioMensile() const`.
+   Deriva `DipendenteFisso` e `DipendenteOrario`.
+   Poi somma gli stipendi in un `vector<unique_ptr<Dipendente>>`.
+
+2. Definisci una classe astratta `Figura` con `area()` e `perimetro()`.
+   Implementa `Quadrato`, `Rettangolo` e `Cerchio`.
+   Stampa le aree con un ciclo polimorfico.
+
+3. Togli `virtual` da un metodo che dovrebbe essere polimorfico e osserva che cosa succede.
+   Poi ripristina `virtual` e aggiungi `override`.
+
+4. Prova un caso di name hiding e risolvilo con `using Base::nomeMetodo;`.
+
+
+Appendice: parole chiave da ricordare
+-------------------------------------
+- `virtual`: abilita il dispatch dinamico
+- `override`: verifica che il metodo ridefinisca correttamente quello della base
+- `final`: impedisce ulteriori override o ulteriori derivazioni
+- `protected`: accessibile alle derivate ma non dall'esterno
+- `dynamic_cast`: downcast sicuro a runtime
+- classe astratta: contiene almeno un metodo virtuale puro
+
+Esempio con `final`:
+
+    struct Base {
+        virtual void f() {}
+    };
+
+    struct Der : Base {
+        void f() override final {}
+    };
+
+    struct Der2 : Der {
+        // void f() override {}   // errore: f() è final
+    };
+
+    struct ClasseFinale final : Base {
+        void f() override {}
+    };
+
+    // struct Impossibile : ClasseFinale {};  // errore
+
+Fine lezione.
+
+
+

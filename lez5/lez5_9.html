@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez5_9 · Esercizi guidati: concetti base</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez5_8.html"; }
+    function nextSlide(){ window.location.href = "lez5_10.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra soluzione' : 'Nascondi soluzione';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 5 - Ereditarietà e polimorfismo</h2>
+  <ul>
+    <li><a href="lez5_1.html">Lez5_1: Ereditarietà: significato</a></li>
+    <li><a href="lez5_2.html">Lez5_2: Sintassi della derivazione e accessi</a></li>
+    <li><a href="lez5_3.html">Lez5_3: Costruttori, distruttori, ordine</a></li>
+    <li><a href="lez5_4.html">Lez5_4: Object slicing</a></li>
+    <li><a href="lez5_5.html">Lez5_5: Polimorfismo e virtual</a></li>
+    <li><a href="lez5_6.html">Lez5_6: override, classi astratte, distruttore virtuale</a></li>
+    <li><a href="lez5_7.html">Lez5_7: Casting tra base e derivata</a></li>
+    <li><a href="lez5_8.html">Lez5_8: Multipla, diamond problem, buone pratiche</a></li>
+    <li><a href="lez5_9.html" class="active">Lez5_9: Esercizi guidati - base</a></li>
+    <li><a href="lez5_10.html">Lez5_10: Esercizi guidati - concetti e progettazione</a></li>
+    <li><a href="lez5_11.html">Lez5_11: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Esercizi guidati · Livello base<br><small>Diagnosi rapida di ereditarietà, polimorfismo e errori tipici</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivo di questa pagina</h2>
+      <p>L'obiettivo dell'esercitazione è rielaborare i concetti visti a lezione su ereditarietà, polimorfismo, <code>virtual</code>, <code>override</code>, classi astratte, slicing, casting e buone pratiche di progettazione, applicandoli in esercizi progressivi.</p>
+      <p>In questa prima parte lavoriamo con domande a risposta chiusa. Ma non bisogna trattarle come un quiz da indovinare. Ogni risposta corretta corrisponde a un ragionamento preciso, e ogni risposta sbagliata di solito rivela un fraintendimento specifico del modello concettuale.</p>
+      <p class="note"><b>Metodo di lavoro:</b> prova a rispondere da solo, poi apri la soluzione e leggi soprattutto il commento diagnostico, non solo la lettera corretta.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Scelta multipla 1 · Quando ha senso l'ereditarietà?</h2>
+      <p><b>Domanda.</b> In programmazione orientata agli oggetti, in quale caso ha senso modellare due classi con l'ereditarietà?</p>
+      <ul>
+        <li>A. Quando tra le due classi c'è soprattutto una relazione di tipo "ha-un"</li>
+        <li>B. Quando la classe derivata può essere considerata un caso particolare della base, cioè "è-un"</li>
+        <li>C. Quando le due classi usano lo stesso file header</li>
+        <li>D. Quando una classe contiene come attributo un oggetto dell'altra</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q1" onclick="toggleBox('btn-q1','sol-q1')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q1" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: B.</b> L'ereditarietà ha senso quando la derivata è davvero un caso particolare della base, quindi quando la relazione corretta è "è-un".</p>
+        <p class="note"><b>Errore tipico dietro A e D:</b> confondere l'ereditarietà con la composizione. Se una classe <i>ha</i> un altro oggetto, di solito non stiamo parlando di ereditarietà.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Scelta multipla 2 · Che cosa succede ai membri <code>public</code> nella derivazione <code>public</code>?</h2>
+      <p><b>Domanda.</b> Considera una classe <code>Studente</code> che eredita da <code>Persona</code> con derivazione <code>public</code>. Che cosa succede ai membri <code>public</code> definiti nella classe base?</p>
+      <ul>
+        <li>A. Diventano <code>private</code> nella classe derivata</li>
+        <li>B. Diventano <code>protected</code> nella classe derivata</li>
+        <li>C. Restano <code>public</code> anche nella classe derivata</li>
+        <li>D. Non vengono ereditati dalla classe derivata</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q2" onclick="toggleBox('btn-q2','sol-q2')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q2" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: C.</b> Con derivazione <code>public</code>, l'interfaccia pubblica della base resta pubblica nella derivata.</p>
+        <p class="note"><b>Che cosa controlla davvero questa domanda:</b> se hai capito che la derivazione <code>public</code> non cambia arbitrariamente il senso dell'interfaccia della base.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Scelta multipla 3 · Ordine di costruzione</h2>
+      <p><b>Domanda.</b> Quando viene creato un oggetto di una classe derivata, quale parte viene inizializzata per prima?</p>
+      <ul>
+        <li>A. Prima vengono inizializzati i membri specifici della derivata</li>
+        <li>B. Prima viene costruita la parte relativa alla classe base</li>
+        <li>C. L'ordine cambia a seconda del compilatore utilizzato</li>
+        <li>D. Non esiste un ordine preciso garantito</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q3" onclick="toggleBox('btn-q3','sol-q3')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q3" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: B.</b> Quando nasce un oggetto derivato, viene costruita prima la parte di base e poi quella specifica della derivata.</p>
+        <p class="note"><b>Errore da evitare:</b> pensare che l'ordine sia casuale o dipenda dal compilatore. Fa parte del modello del linguaggio.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Scelta multipla 4 · Dove avviene lo slicing?</h2>
+      <p><b>Domanda.</b> In quale delle seguenti istruzioni si verifica il fenomeno dell'object slicing?</p>
+      <ul>
+        <li>A. <code>Base* p = new Derivata();</code></li>
+        <li>B. <code>Base&amp; r = d;</code></li>
+        <li>C. <code>Base b = d;</code></li>
+        <li>D. <code>std::unique_ptr&lt;Base&gt; p = std::make_unique&lt;Derivata&gt;();</code></li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q4" onclick="toggleBox('btn-q4','sol-q4')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q4" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: C.</b> Lo slicing avviene quando copi una derivata in una base <b>per valore</b>.</p>
+        <p class="note"><b>Perché le altre non lo fanno:</b> puntatori, riferimenti e smart pointer non stanno creando un nuovo oggetto <code>Base</code>; stanno mantenendo un collegamento con l'oggetto reale.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Scelta multipla 5 · Metodo non virtuale</h2>
+      <p><b>Domanda.</b> Supponi che il metodo <code>verso()</code> sia definito nella classe base ma <b>non</b> sia dichiarato <code>virtual</code>. Se un puntatore di tipo <code>Base*</code> punta a un oggetto <code>Derivata</code> e chiami <code>p-&gt;verso()</code>, quale implementazione viene eseguita?</p>
+      <ul>
+        <li>A. Viene eseguita comunque la versione della derivata</li>
+        <li>B. Viene eseguita la versione definita nella base</li>
+        <li>C. La scelta dipende dal sistema operativo</li>
+        <li>D. Il programma non compila</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q5" onclick="toggleBox('btn-q5','sol-q5')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q5" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: B.</b> Senza <code>virtual</code>, la chiamata viene risolta in base al tipo statico del puntatore, quindi viene usata la versione della base.</p>
+        <p class="note"><b>Questa è la domanda chiave del binding statico:</b> serve a verificare se hai davvero capito la differenza tra tipo statico e tipo dinamico.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Scelta multipla 6 · A che cosa serve <code>override</code>?</h2>
+      <p><b>Domanda.</b> Qual è lo scopo principale della parola chiave <code>override</code> in una classe derivata?</p>
+      <ul>
+        <li>A. Rendere automaticamente più efficiente il metodo</li>
+        <li>B. Imporre al compilatore di usare il binding statico</li>
+        <li>C. Verificare che il metodo stia davvero ridefinendo un virtual della base con firma corretta</li>
+        <li>D. Evitare di dover scrivere il costruttore</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q6" onclick="toggleBox('btn-q6','sol-q6')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q6" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: C.</b> <code>override</code> dice al compilatore che stai intenzionalmente ridefinendo un metodo virtuale della base e gli chiede di controllare la firma.</p>
+        <p class="note"><b>Errore tipico che previene:</b> pensare di aver fatto override quando in realtà hai scritto un metodo diverso, per esempio perché manca un <code>const</code>.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Scelta multipla 7 · Distruttore virtuale</h2>
+      <p><b>Domanda.</b> Se una classe base è pensata per essere usata tramite puntatori o riferimenti polimorfici, come dovrebbe essere dichiarato il suo distruttore?</p>
+      <ul>
+        <li>A. Come distruttore <code>private</code></li>
+        <li>B. Come distruttore <code>static</code></li>
+        <li>C. Come distruttore <code>virtual</code></li>
+        <li>D. Come distruttore <code>inline</code></li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q7" onclick="toggleBox('btn-q7','sol-q7')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q7" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: C.</b> Una base usata polimorficamente deve avere distruttore virtuale, così la distruzione tramite puntatore a base richiama correttamente anche il distruttore della derivata.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Scelta multipla 8 · Classe astratta</h2>
+      <p><b>Domanda.</b> Come viene classificata una classe che contiene almeno un metodo virtuale puro, per esempio <code>virtual double area() const = 0;</code>?</p>
+      <ul>
+        <li>A. Come classe concreta, quindi istanziabile normalmente</li>
+        <li>B. Come classe finale, quindi non derivabile</li>
+        <li>C. Come classe astratta, quindi non istanziabile direttamente</li>
+        <li>D. Come classe non valida, quindi sempre errata</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q8" onclick="toggleBox('btn-q8','sol-q8')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q8" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: C.</b> Una classe con almeno un metodo virtuale puro è una classe astratta e non può essere istanziata direttamente.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Scelta multipla 9 · <code>dynamic_cast</code></h2>
+      <p><b>Domanda.</b> Considera un <code>dynamic_cast&lt;Derivata*&gt;(pBase)</code>. Se il cast non è valido, che cosa accade?</p>
+      <ul>
+        <li>A. Il cast restituisce sempre il valore numerico <code>0.0</code></li>
+        <li>B. Il cast restituisce <code>nullptr</code></li>
+        <li>C. Il programma termina sempre immediatamente</li>
+        <li>D. Il puntatore viene convertito automaticamente in <code>Base*</code></li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q9" onclick="toggleBox('btn-q9','sol-q9')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q9" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: B.</b> Se il <code>dynamic_cast</code> a puntatore fallisce, il risultato è <code>nullptr</code>.</p>
+        <p class="note"><b>Che cosa controlla questa domanda:</b> se hai capito che il downcast sicuro non "finge" un successo, ma restituisce un esito controllabile.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Scelta multipla 10 · Diamond problem</h2>
+      <p><b>Domanda.</b> Nel cosiddetto diamond problem, a che cosa serve l'ereditarietà virtuale?</p>
+      <ul>
+        <li>A. A fare in modo che la classe finale contenga due copie separate della base comune</li>
+        <li>B. A eliminare la necessità di dichiarare metodi <code>override</code></li>
+        <li>C. A far condividere una sola copia della classe base comune</li>
+        <li>D. A evitare completamente l'uso dei costruttori</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q10" onclick="toggleBox('btn-q10','sol-q10')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q10" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: C.</b> L'ereditarietà virtuale serve a evitare due copie separate della base comune nella classe finale.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Vero/Falso mirato</h2>
+      <p>Chiudiamo con alcune affermazioni brevi. Anche qui il punto non è barrare in fretta, ma riconoscere il ragionamento corretto.</p>
+      <ul>
+        <li><b>11)</b> Trattare un oggetto di tipo <code>Derivata</code> come un oggetto di tipo <code>Base</code> tramite upcast è un'operazione normalmente sicura e non richiede cast espliciti. <b>Vero</b></li>
+        <li><b>12)</b> Per effettuare un downcast da <code>Base*</code> a <code>Derivata*</code>, <code>static_cast</code> rappresenta sempre la scelta più sicura in qualsiasi situazione. <b>Falso</b></li>
+        <li><b>13)</b> L'istruzione <code>using Base::g;</code> può essere utile quando nella derivata si verifica un problema di name hiding sui metodi ereditati dalla base. <b>Vero</b></li>
+        <li><b>14)</b> Usare un contenitore come <code>std::vector&lt;std::unique_ptr&lt;Base&gt;&gt;</code> permette di gestire oggetti derivati evitando il problema dello slicing. <b>Vero</b></li>
+        <li><b>15)</b> Una classe astratta, pur contenendo almeno un metodo virtuale puro, può essere istanziata direttamente come una classe normale. <b>Falso</b></li>
+      </ul>
+      <p class="note"><b>Queste cinque affermazioni riassumono quasi tutto il percorso teorico:</b> upcast, downcast, name hiding, smart pointer e classe astratta.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>Lez5_10</strong> passiamo alle domande aperte e alla riflessione progettuale: lì non basterà più scegliere una lettera giusta, ma spiegare con parole tue perché un modello è corretto oppure no.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+

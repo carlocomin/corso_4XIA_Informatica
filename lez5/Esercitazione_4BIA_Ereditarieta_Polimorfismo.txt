@@ -1,0 +1,167 @@
+﻿ESERCITAZIONE 4BIA - C++: EREDITARIETÀ E POLIMORFISMO
+Durata totale consigliata: 60 minuti
+
+Nome e cognome: ______________________________________
+Data: ______________________
+
+Obiettivo:
+Rielaborare i concetti visti a lezione su ereditarietà, polimorfismo, virtual, override,
+classi astratte, slicing, casting e buone pratiche di progettazione, applicandoli in esercizi
+progressivi.
+
+------------------------------------------------------------
+SEZIONE A - RISPOSTA CHIUSA (25 minuti)
+------------------------------------------------------------
+
+A1) Scelta multipla (una sola risposta corretta)
+
+In questa prima parte lavora con calma sui concetti di base.
+Leggi ogni situazione e scegli l'alternativa che completa meglio il ragionamento.
+
+1) In programmazione orientata agli oggetti, in quale caso ha senso modellare due classi
+   con l'ereditarietà?
+   A. Quando tra le due classi c'è soprattutto una relazione di tipo "ha-un"
+   B. Quando la classe derivata può essere considerata un caso particolare della base, cioè "è-un"
+   C. Quando le due classi usano lo stesso file header
+   D. Quando una classe contiene come attributo un oggetto dell'altra
+
+2) Considera una classe `Studente` che eredita da `Persona` con derivazione `public`.
+   Che cosa succede ai membri `public` definiti nella classe base?
+   A. Diventano `private` nella classe derivata
+   B. Diventano `protected` nella classe derivata
+   C. Restano `public` anche nella classe derivata
+   D. Non vengono ereditati dalla classe derivata
+
+3) Quando viene creato un oggetto di una classe derivata, quale parte viene inizializzata per prima?
+   A. Prima vengono inizializzati i membri specifici della derivata
+   B. Prima viene costruita la parte relativa alla classe base
+   C. L'ordine cambia a seconda del compilatore utilizzato
+   D. Non esiste un ordine preciso garantito
+
+4) In quale delle seguenti istruzioni si verifica il fenomeno dell'object slicing, cioè la perdita
+   della parte specifica della classe derivata?
+   A. `Base* p = new Derivata();`
+   B. `Base& r = d;`
+   C. `Base b = d;`
+   D. `std::unique_ptr<Base> p = std::make_unique<Derivata>();`
+
+5) Supponi che il metodo `verso()` sia definito nella classe base ma NON sia dichiarato `virtual`.
+   Se un puntatore di tipo `Base*` punta a un oggetto `Derivata` e chiami `p->verso()`, quale
+   implementazione viene eseguita?
+   A. Viene eseguita comunque la versione della derivata
+   B. Viene eseguita la versione definita nella base
+   C. La scelta dipende dal sistema operativo
+   D. Il programma non compila
+
+6) Qual è lo scopo principale della parola chiave `override` in una classe derivata?
+   A. Rendere automaticamente più efficiente il metodo
+   B. Imporre al compilatore di usare il binding statico
+   C. Verificare che il metodo stia davvero ridefinendo un virtual della base con firma corretta
+   D. Evitare di dover scrivere il costruttore
+
+7) Se una classe base è pensata per essere usata tramite puntatori o riferimenti polimorfici,
+   come dovrebbe essere dichiarato il suo distruttore?
+   A. Come distruttore `private`
+   B. Come distruttore `static`
+   C. Come distruttore `virtual`
+   D. Come distruttore `inline`
+
+8) Come viene classificata una classe che contiene almeno un metodo virtuale puro,
+   per esempio `virtual double area() const = 0;`?
+   A. Come classe concreta, quindi istanziabile normalmente
+   B. Come classe finale, quindi non derivabile
+   C. Come classe astratta, quindi non istanziabile direttamente
+   D. Come classe non valida, quindi sempre errata
+
+9) Considera un `dynamic_cast<Derivata*>(pBase)`. Se il cast non è valido, che cosa accade?
+   A. Il cast restituisce sempre il valore numerico `0.0`
+   B. Il cast restituisce `nullptr`
+   C. Il programma termina sempre immediatamente
+   D. Il puntatore viene convertito automaticamente in `Base*`
+
+10) Nel cosiddetto diamond problem, a che cosa serve l'ereditarietà virtuale?
+    A. A fare in modo che la classe finale contenga due copie separate della base comune
+    B. A eliminare la necessità di dichiarare metodi `override`
+    C. A far condividere una sola copia della classe base comune
+    D. A evitare completamente l'uso dei costruttori
+
+A2) Vero/Falso
+
+Per ciascuna affermazione, indica se la ritieni vera o falsa.
+
+11) Trattare un oggetto di tipo `Derivata` come un oggetto di tipo `Base` tramite upcast
+    è un'operazione normalmente sicura e non richiede cast espliciti.              V / F
+12) Per effettuare un downcast da `Base*` a `Derivata*`, `static_cast` rappresenta sempre
+    la scelta più sicura in qualsiasi situazione.                                   V / F
+13) L'istruzione `using Base::g;` può essere utile quando nella derivata si verifica
+    un problema di name hiding sui metodi ereditati dalla base.                      V / F
+14) Usare un contenitore come `std::vector<std::unique_ptr<Base>>` permette di gestire
+    oggetti derivati evitando il problema dello slicing.                             V / F
+15) Una classe astratta, pur contenendo almeno un metodo virtuale puro, può essere
+    istanziata direttamente come una classe normale.                                 V / F
+
+------------------------------------------------------------
+SEZIONE B - RISPOSTA APERTA (20 minuti)
+------------------------------------------------------------
+
+In questa parte prova a spiegare i concetti con parole tue, facendo riferimento agli esempi
+visti a lezione. Rispondi in modo chiaro e sintetico (circa 5-8 righe per domanda).
+
+16) Spiega con parole tue la differenza tra `override` e `overload`.
+    Per aiutarti, aggiungi anche un mini-esempio, anche solo scrivendo le firme dei metodi.
+
+17) Rifletti su questa frase: "Auto è un Motore".
+    Spiega perché non rappresenta un buon uso dell'ereditarietà e indica quale relazione
+    modelleresti al suo posto, motivando la scelta.
+
+18) Descrivi che cosa si intende per "fragile base class problem".
+    Concludi indicando almeno due accorgimenti pratici che aiutano a ridurre questo rischio.
+
+19) Soffermati sul problema dello slicing.
+    Nella tua risposta chiarisci:
+    - in quale situazione si verifica;
+    - quale conseguenza produce sugli oggetti;
+    - come lo si può evitare nel C++ moderno.
+
+------------------------------------------------------------
+SEZIONE C - ESERCIZIO PRATICO (15 minuti)
+------------------------------------------------------------
+
+20) Ora passa alla parte pratica.
+    Implementa una piccola gerarchia di classi per la gestione degli stipendi.
+
+Requisiti:
+1. Parti dalla classe astratta `Dipendente` e inserisci:
+   - distruttore virtuale
+   - metodo puro `double stipendioMensile() const = 0;`
+   - metodo virtuale `void stampa() const`
+2. Definisci poi due classi derivate:
+   - `DipendenteFisso` (attributo: stipendio fisso)
+   - `DipendenteOrario` (attributi: pagaOraria, oreMese)
+3. In entrambe usa `override` dove serve.
+4. Scrivi quindi la funzione:
+   `double totaleStipendi(const std::vector<Dipendente*>& v);`
+5. Infine, nel `main`, crea almeno 4 dipendenti di tipo misto, stampa lo stipendio di ciascuno
+   e calcola il totale complessivo.
+
+Vincoli:
+- Evita slicing.
+- Non usare `new`/`delete` manuali.
+- Usa nomi significativi e codice ordinato.
+
+------------------------------------------------------------
+BONUS (facoltativo, se avanza tempo)
+------------------------------------------------------------
+
+21) Se completi il lavoro in anticipo, aggiungi una terza derivata `DipendenteProvvigione`.
+    La formula dello stipendio è la seguente:
+    stipendio = fissoBase + percentuale * venditeMensili.
+    Prova a integrare la nuova classe senza modificare la firma di `totaleStipendi`.
+
+22) Riflessione finale: in quali casi useresti `dynamic_cast` in questo progetto, e in quali
+    situazioni preferiresti invece evitare il cast e affidarti ai metodi virtuali?
+
+Fine esercitazione.
+
+
+

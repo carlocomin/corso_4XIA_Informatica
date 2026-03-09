@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez5_3 · Costruttori, distruttori e ordine di inizializzazione</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez5_2.html"; }
+    function nextSlide(){ window.location.href = "lez5_4.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 5 - Ereditarietà e polimorfismo</h2>
+  <ul>
+    <li><a href="lez5_1.html">Lez5_1: Ereditarietà: significato</a></li>
+    <li><a href="lez5_2.html">Lez5_2: Sintassi della derivazione e accessi</a></li>
+    <li><a href="lez5_3.html" class="active">Lez5_3: Costruttori, distruttori, ordine</a></li>
+    <li><a href="lez5_4.html">Lez5_4: Object slicing</a></li>
+    <li><a href="lez5_5.html">Lez5_5: Polimorfismo e virtual</a></li>
+    <li><a href="lez5_6.html">Lez5_6: override, classi astratte, distruttore virtuale</a></li>
+    <li><a href="lez5_7.html">Lez5_7: Casting tra base e derivata</a></li>
+    <li><a href="lez5_8.html">Lez5_8: Multipla, diamond problem, buone pratiche</a></li>
+    <li><a href="lez5_9.html">Lez5_9: Esercizi guidati - base</a></li>
+    <li><a href="lez5_10.html">Lez5_10: Esercizi guidati - concetti e progettazione</a></li>
+    <li><a href="lez5_11.html">Lez5_11: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Costruttori, distruttori e ordine di inizializzazione<br><small>Che cosa succede davvero quando nasce e muore un oggetto derivato</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Perché questa pagina conta davvero</h2>
+      <p>Dopo aver visto la sintassi della derivazione, il passo successivo è capire il ciclo di vita degli oggetti in una gerarchia. Questa parte viene spesso sottovalutata, ma in realtà è uno dei punti che spiegano meglio come C++ ragiona sugli oggetti derivati.</p>
+      <p>Quando crei un oggetto derivato, non stai creando una cosa "monolitica". Stai creando un oggetto che contiene anche la sua parte di base. Per questo motivo la costruzione e la distruzione seguono un ordine preciso, e quell'ordine non è un dettaglio secondario: determina come si inizializzano i dati e come si rilasciano le risorse.</p>
+      <p class="ok"><b>Idea chiave:</b> prima nasce la base, poi la derivata; quando l'oggetto muore, l'ordine si inverte.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Ordine di costruzione e distruzione</h2>
+      <p>Quando si crea un oggetto derivato accadono due passi fondamentali:</p>
+      <ol>
+        <li>viene costruita prima la parte di base;</li>
+        <li>poi viene costruita la parte specifica della derivata.</li>
+      </ol>
+      <p>Quando invece l'oggetto viene distrutto, l'ordine è inverso:</p>
+      <ol>
+        <li>si distrugge prima la derivata;</li>
+        <li>poi la base.</li>
+      </ol>
+      <p>Questo comportamento è logico. La parte derivata si appoggia sulla base, quindi la base deve esistere per prima. Allo stesso modo, quando si distrugge l'oggetto, la parte più specifica va smontata prima di eliminare il supporto comune su cui si regge.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio: vedere l'ordine con i propri occhi</h2>
+      <p>Il modo più semplice per fissare questa regola è osservare un programma che stampa i messaggi dei costruttori e dei distruttori.</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+class Base {
+public:
+    Base()  { std::cout &lt;&lt; "Base()\n"; }
+    ~Base() { std::cout &lt;&lt; "~Base()\n"; }
+};
+
+class Derivata : public Base {
+public:
+    Derivata()  { std::cout &lt;&lt; "Derivata()\n"; }
+    ~Derivata() { std::cout &lt;&lt; "~Derivata()\n"; }
+};
+
+int main() {
+    Derivata d;
+}</code></pre>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Output atteso</h2>
+      <p>Eseguendo il programma otteniamo:</p>
+<pre><code class="language-text">Base()
+Derivata()
+~Derivata()
+~Base()</code></pre>
+      <p>Questo output rende evidente la regola:</p>
+      <ul>
+        <li>in costruzione: prima <code>Base()</code>, poi <code>Derivata()</code>;</li>
+        <li>in distruzione: prima <code>~Derivata()</code>, poi <code>~Base()</code>.</li>
+      </ul>
+      <p>Non è solo una curiosità. È il comportamento che spiega perché la base deve essere inizializzata correttamente e perché una derivata può contare sul fatto che la parte base esista già quando il suo costruttore inizia a lavorare.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa significa operativamente</h2>
+      <p>Se la base viene costruita per prima, allora la derivata non può comportarsi come se la base fosse un dettaglio facoltativo. La base è una parte reale dell'oggetto, e il linguaggio garantisce che nasca prima della derivata proprio per rendere coerente l'intera struttura.</p>
+      <p>Allo stesso modo, quando l'oggetto viene distrutto, la derivata viene smontata prima. Questo è importante soprattutto quando entreranno in gioco risorse, puntatori, file o altre componenti che richiedono una distruzione ordinata e sicura.</p>
+      <p class="note"><b>Da ricordare:</b> l'ordine non dipende dal compilatore o dall'umore del programma. È parte del modello del linguaggio.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Base con costruttore parametrico</h2>
+      <p>Un altro punto essenziale del testo è questo: se la classe base richiede argomenti, la derivata deve inizializzarla nella lista di inizializzazione. Non può rimandare, non può "sistemare dopo". La base va costruita subito, e va costruita bene.</p>
+      <p>Questo è il motivo per cui nella lista di inizializzazione del costruttore della derivata compare spesso una chiamata esplicita al costruttore della base.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio: <code>Rettangolo</code> e <code>Parallelepipedo</code></h2>
+      <p>Il testo propone questo esempio:</p>
+<pre><code class="language-cpp">class Rettangolo {
+public:
+    Rettangolo(double w, double h) : w_(w), h_(h) {}
+    double area() const { return w_ * h_; }
+private:
+    double w_, h_;
+};
+
+class Parallelepipedo : public Rettangolo {
+public:
+    Parallelepipedo(double w, double h, double d)
+        : Rettangolo(w, h), d_(d) {}
+
+    double volume() const { return area() * d_; }
+private:
+    double d_;
+};</code></pre>
+      <p>Qui <code>Parallelepipedo</code> non si limita ad aggiungere il campo <code>d_</code>. Inizializza anche la parte base <code>Rettangolo</code>, passandole larghezza e altezza. Solo dopo aggiunge la propria profondità e può definire il metodo <code>volume()</code>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché questo esempio è utile</h2>
+      <p>L'esempio serve soprattutto a mostrare due cose:</p>
+      <ul>
+        <li>il riuso del costruttore della base;</li>
+        <li>il riuso dei metodi della base, come <code>area()</code>.</li>
+      </ul>
+      <p>Dal punto di vista strettamente didattico funziona bene, perché permette di concentrarsi su inizializzazione e riuso senza introdurre troppi dettagli. Il testo, però, fa giustamente anche una nota metodologica importante: in un progetto reale, dal punto di vista concettuale, si potrebbe preferire la composizione.</p>
+      <p>Questo è un ottimo promemoria: non tutti gli esempi che sono utili a spiegare la meccanica del linguaggio sono automaticamente il miglior modello del dominio reale.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Nota didattica importante</h2>
+      <p>Quando studi il linguaggio, a volte incontri esempi costruiti per isolare un meccanismo preciso. Qui il meccanismo è chiarissimo: la derivata richiama il costruttore della base e riusa i suoi metodi.</p>
+      <p>Ma progettare bene non significa solo sapere che una cosa si può fare. Significa anche chiedersi se sia il modello più adatto. In questa lezione stiamo quindi lavorando su due piani insieme:</p>
+      <ul>
+        <li><b>piano del linguaggio:</b> come funziona la costruzione di un oggetto derivato;</li>
+        <li><b>piano della progettazione:</b> quando l'ereditarietà è davvero il modello giusto e quando invece è meglio comporre oggetti.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Sintesi finale</h2>
+      <ul>
+        <li>quando nasce un oggetto derivato, nasce prima la base e poi la derivata;</li>
+        <li>quando l'oggetto viene distrutto, si smonta prima la derivata e poi la base;</li>
+        <li>se la base richiede argomenti, la derivata deve inizializzarla nella lista di inizializzazione;</li>
+        <li>riusare costruttori e metodi della base è una parte naturale della derivazione;</li>
+        <li>un esempio tecnicamente corretto non è sempre il miglior modello concettuale del dominio.</li>
+      </ul>
+      <p class="ok"><b>Sintesi finale:</b> capire l'ordine di costruzione e distruzione significa capire che una derivata non vive sopra la base "per modo di dire": la contiene davvero, e C++ gestisce questa relazione in modo rigoroso.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Ora che il ciclo di vita degli oggetti in gerarchia è più chiaro, possiamo affrontare uno degli errori classici del C++ con ereditarietà: lo <strong>object slicing</strong>. Nella <strong>Lez5_4</strong> vedremo che cosa si perde quando una derivata viene copiata in una base per valore.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+
