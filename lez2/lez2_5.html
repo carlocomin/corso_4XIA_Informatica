@@ -49,6 +49,12 @@ function toggleBox(btnId, boxId){
   <div class="content-box">
 
     <div class="inner-box box">
+      <h2>Collocazione didattica di questa pagina</h2>
+      <p>Da qui il livello si alza rispetto al ripasso base sulle <code>struct</code>. Questa pagina non introduce una nuova sintassi fondamentale per usarle nel quotidiano: introduce un <strong>approfondimento tecnico</strong> su layout, padding e allineamento.</p>
+      <p class="note"><strong>Come leggerla bene:</strong> se il tuo obiettivo immediato è saper definire, inizializzare e passare <code>struct</code> a funzione, il cuore del ripasso era nelle pagine precedenti. Qui iniziamo invece a costruire il ponte verso temi di memoria e file binari che torneranno utili nella lezione successiva.</p>
+    </div>
+
+    <div class="inner-box box">
       <h2>Glossario minimo (per partire con sicurezza)</h2>
       <ul>
         <li><b>Allineamento</b>: alcuni tipi “preferiscono” indirizzi multipli (2, 4, 8 byte…). La piattaforma fissa la regola e il compilatore la rispetta.</li>
@@ -343,6 +349,10 @@ int main(void){
         <li><strong>Confronta i campi</strong>, non i byte grezzi: lascia stare <code>memcmp</code> su struct complesse.</li>
         <li><strong><code>#pragma pack</code></strong> è una soluzione estrema, poco portabile e con impatto prestazionale: usarlo solo se strettamente necessario.</li>
       </ul>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> La <strong>Lez2.6</strong> usa proprio queste idee per spiegare perché salvare una <code>struct</code> “a crudo” è fragile, e come passare invece a un formato binario esplicito e più robusto.
     </div>
 
   </div>

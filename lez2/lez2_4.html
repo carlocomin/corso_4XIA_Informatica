@@ -80,8 +80,8 @@ int main() {
     };
 
     // Aggiunte
-    classe.push_back({"Grace","Hopper",20,8.8});          // copia/move di un temporaneo
-    classe.emplace_back("Barbara","Liskov",20,9.2);       // costruzione in-place
+    classe.push_back({"Grace","Hopper",20,8.8});           // aggiunta chiara per aggregate
+    classe.push_back(Studente{"Barbara","Liskov",20,9.2}); // temporaneo esplicito, poi move
 
     // Iterazione: lettura vs modifica
     for (const auto&amp; s : classe) { /* sola lettura, nessuna copia */ }
@@ -89,8 +89,8 @@ int main() {
 }
 </code></pre>
       <ul>
-        <li><strong>push_back</strong>: inserisce una copia o una move di un oggetto già costruito.</li>
-        <li><strong>emplace_back</strong>: costruisce l’oggetto direttamente all’interno del vector e risparmia copie.</li>
+        <li><strong>push_back</strong>: inserisce una copia o una move di un oggetto già costruito; con una <code>struct</code> aggregate in C++17 è spesso la forma più lineare.</li>
+        <li><strong>emplace_back</strong>: diventa particolarmente utile quando il tipo ha un costruttore vero e proprio; in quel caso può costruire l’oggetto direttamente nel <code>vector</code>.</li>
         <li><strong>Range-based for</strong>: con <code>const auto&amp;</code> leggiamo senza copiare; senza <code>const</code> possiamo modificare in-place.</li>
       </ul>
     </div>
@@ -347,6 +347,10 @@ if (it == classe.end()) {
         <li><code>std::sort</code>/<code>stable_sort</code> + lambda per ordinare; <code>find_if</code>/<code>count_if</code>/<code>copy_if</code> per leggere; <code>erase_remove_if</code> per filtrare in-place.</li>
         <li>In C si usa <code>qsort</code> con un <b>puntatore a funzione</b> di confronto (niente lambda standard).</li>
       </ul>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Con <strong>Lez2.4</strong> si chiude il nucleo di ripasso più naturale sulle <code>struct</code>. Le prossime due pagine alzano il livello e funzionano come approfondimento tecnico: layout in memoria, padding e poi collegamento alla serializzazione binaria.
     </div>
 
   </div>

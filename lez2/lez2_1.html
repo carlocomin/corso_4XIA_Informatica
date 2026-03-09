@@ -75,15 +75,11 @@ struct Studente {
 
 // Dichiarazione e accesso ai membri
 int main() {
-    Studente s;                 // oggetto con campi di default-initialization
-    s.nome = "Ada";             // accesso con l'operatore '.'
-    s.cognome = "Lovelace";
-    s.eta = 17;
-    s.media = 9.4;
+    Studente s{"Ada", "Lovelace", 17, 9.4}; // forma sicura: valori espliciti
+    s.media = 9.5;                          // accesso con l'operatore '.'
 }
 </code></pre>
-      <p class="warn"><strong>Attenzione</strong>: le “assegnazioni dopo” sono lecite ma spesso sub-ottimali:
-        nella prossima slide vedremo le <em>inizializzazioni</em> (brace, value, ecc.) più sicure e dichiarative.</p>
+      <p class="warn"><strong>Attenzione</strong>: per un primo contatto conviene partire da una forma <em>già inizializzata</em>, come nell'esempio sopra. Le assegnazioni campo per campo restano lecite, ma nella prossima slide vedremo in modo sistematico perché le forme con brace sono di solito più sicure e più chiare.</p>
       <p>
         Con i <strong>puntatori</strong> a struct si usa <code>→</code>:
         <code>Studente* p = &s;</code> poi <code>p-&gt;eta = 18;</code>. Con un <strong>reference</strong> <code>Studente& r = s;</code> si continua a usare <code>.</code>.

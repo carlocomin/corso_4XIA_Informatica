@@ -101,8 +101,9 @@ delete[] data;
 </code></pre>
 <pre><code class="language-cpp">// RAII senza vector: unique_ptr&lt;T[]&gt;
 #include &lt;memory&gt;
-std::unique_ptr&lt;int[]&gt; data(new int[R*C]());
-auto at = [&](std::size_t r, std::size_t c) -&gt; int&amp; { return data[r*C+c]; }
+std::size_t R=4, C=6;
+auto data = std::make_unique&lt;int[]&gt;(R*C); // elementi value-initialized
+auto at = [&](std::size_t r, std::size_t c) -&gt; int&amp; { return data[r*C+c]; };
 // delete[] implicito via RAII
 </code></pre>
       </div>
@@ -153,7 +154,9 @@ for(int r=0;r&lt;R;++r) free(bad[r]); free(bad);
       <h2>I/O dinamico (C++ e C)</h2>
       <div class="twocol">
 <pre><code class="language-cpp">// C++ — buffer contiguo
-#include &lt;iostream&gt; #include &lt;iomanip&gt; #include &lt;vector&gt;
+#include &lt;iostream&gt;
+#include &lt;iomanip&gt;
+#include &lt;vector&gt;
 void leggi(std::vector&lt;int&gt;&amp; buf, std::size_t R, std::size_t C){
   buf.assign(R*C, 0);
   for(std::size_t r=0;r&lt;R;++r)
@@ -170,7 +173,8 @@ void stampa(const std::vector&lt;int&gt;&amp; buf, std::size_t R, std::size_t C,
 }
 </code></pre>
 <pre><code class="language-c">// C — pointer-to-array (VLA)
-#include &lt;stdio.h&gt; #include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
 void leggi(int R, int C, int m[R][C]){
   for(int r=0;r&lt;R;++r) for(int c=0;c&lt;C;++c) scanf("%d",&m[r][c]);
 }
@@ -266,6 +270,10 @@ free(m);
         <li><strong>C:</strong> usa <code>int (*m)[C]</code> o buffer 1D; evita <code>int**</code> salvo reali esigenze jagged.</li>
         <li>Firme a funzione coerenti: (buf,R,C) in C++; in C usa VLA/pointer-to-array con <code>R,C</code> prima di <code>m[R][C]</code>.</li>
       </ul>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Dopo questa parentesi tecnica su firme e rappresentazioni, nella <strong>L1.7</strong> torniamo ai problemi classici sulle matrici. L'idea è chiudere il ripasso applicando le stesse nozioni a somme, diagonali, simmetria e triangolarità.
     </div>
 
   </div>
