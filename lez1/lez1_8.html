@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - L1.8 · Matrici 2D: perche la firma conta</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez1_7.html"; }
+    function nextSlide(){ window.location.href = "lez1_9.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+  <ul>
+    <li><a href="lez1_1.html">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
+    <li><a href="lez1_2.html">L1.2 - Definizioni e indici</a></li>
+    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
+    <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
+    <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
+    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
+    <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
+    <li><a href="lez1_8.html" class="active">L1.8 - Perche la firma conta</a></li>
+    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
+    <li><a href="lez1_10.html">L1.10 - Matrici dinamiche</a></li>
+    <li><a href="lez1_11.html">L1.11 - Operazioni classiche e chiusura</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Perche la firma conta</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Capire il motivo concettuale per cui passare una matrice a funzione non funziona come passare un semplice intero o un array 1D "qualsiasi".</p>
+      <p class="ok"><b>Idea chiave:</b> per accedere correttamente a <code>a[r][c]</code>, la funzione deve sapere come sono organizzate le righe in memoria. Senza questa informazione, il compilatore non sa calcolare il passo giusto.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa decade davvero</h2>
+      <p>Quando passi una matrice <code>T a[R][C]</code> a una funzione, non stai passando "l'intera tabella per magia". Dal punto di vista del tipo, la matrice decade a un puntatore al suo primo elemento. E il primo elemento non e un singolo <code>T</code>, ma una <b>riga</b> di tipo <code>T[C]</code>.</p>
+      <p>Quindi il tipo concettuale e:</p>
+<pre><code class="language-text">T (*)[C]
+</code></pre>
+      <p>Questa notazione sembra tecnica, ma racconta una cosa semplice: la funzione deve conoscere la lunghezza di una riga.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perche la seconda dimensione e decisiva</h2>
+      <p>Per trovare la cella <code>(r,c)</code>, il programma usa una formula del tipo <code>r*C + c</code>. Se <code>C</code> non e noto in modo coerente, il calcolo dell'indirizzo diventa ambiguo.</p>
+      <p>Non e quindi una stravaganza del linguaggio: e una conseguenza diretta del modello row-major.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa succede se ragioni male sul tipo</h2>
+      <ul>
+        <li>usi una firma incompatibile e il compilatore protesta;</li>
+        <li>oppure forzi il codice in una direzione sbagliata e perdi contiguita, chiarezza o sicurezza;</li>
+        <li>oppure confondi una vera matrice contigua con una struttura di puntatori a righe.</li>
+      </ul>
+      <p class="warn"><b>Errore tipico:</b> pensare che <code>int**</code> sia "la forma naturale" di una matrice. Non lo e per una matrice statica contigua.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L1.9</strong> trasformiamo questo modello mentale in firme corrette: prima in C++, poi nel confronto con il C.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - L4.13 · Esercizi base</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez4_12.html"; }
+    function nextSlide(){ window.location.href = "lez4_14.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra soluzione ▼' : 'Nascondi soluzione ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 4 - OOP in C++ (ripasso guidato)</h2>
+  <ul>
+    <li><a href="lez4_1.html">L4.1 - Perche OOP</a></li>
+    <li><a href="lez4_2.html">L4.2 - Astrazione e incapsulamento</a></li>
+    <li><a href="lez4_3.html">L4.3 - Anatomia minima di una classe</a></li>
+    <li><a href="lez4_4.html">L4.4 - Costruttori e invarianti</a></li>
+    <li><a href="lez4_5.html">L4.5 - Distruttore, ordine, default e delete</a></li>
+    <li><a href="lez4_6.html">L4.6 - Incapsulamento forte e metodi const</a></li>
+    <li><a href="lez4_7.html">L4.7 - Overload e overload const/non-const</a></li>
+    <li><a href="lez4_8.html">L4.8 - Rendere leggibile un oggetto e contratti d'uso</a></li>
+    <li><a href="lez4_9.html">L4.9 - Header, sorgenti e translation unit</a></li>
+    <li><a href="lez4_10.html">L4.10 - Build, linking, ODR e dipendenze</a></li>
+    <li><a href="lez4_11.html">L4.11 - Copy semantics e Rule of Three/Zero</a></li>
+    <li><a href="lez4_12.html">L4.12 - Move semantics, Rule of Five e RVO</a></li>
+    <li><a href="lez4_13.html" class="active">L4.13 - Esercizi base</a></li>
+    <li><a href="lez4_14.html">L4.14 - Esercizi intermedi</a></li>
+    <li><a href="lez4_15.html">L4.15 - Esercizi avanzati e ponte</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Esercizi base</h1>
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+  <div class="content-box">
+    <div class="inner-box box">
+      <h2>Obiettivo di questa pagina</h2>
+      <p>Controllare se sai riconoscere invariante, interfaccia minima e uso corretto di <code>const</code>.</p>
+      <p class="ok"><b>Metodo di lavoro:</b> prima individua la regola del tipo, poi chiediti quali metodi servono davvero, infine decidi quali sono solo osservatori.</p>
+    </div>
+    <div class="inner-box box">
+      <h2>E1 - Qual e l'interfaccia giusta?</h2>
+      <p><b>Scenario:</b> devi modellare un <code>Contatore</code> che non puo mai scendere sotto zero.</p>
+      <p><b>Domanda:</b> e meglio esporre <code>int valore_</code> come pubblico, oppure offrire metodi come <code>incrementa()</code>, <code>decrementa()</code> e <code>valore() const</code>?</p>
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-l41" onclick="toggleBox('btn-l41','box-l41')">Mostra soluzione ▼</button></div>
+      <div id="box-l41" style="display:none;margin-top:8px">
+        <div class="ok">
+          <p><b>Soluzione:</b> servono metodi pubblici, non il campo pubblico. Se il dato fosse libero, chiunque potrebbe assegnare <code>-3</code> e rompere l'invariante.</p>
+          <p><b>Che cosa verificava davvero:</b> non la sintassi di <code>class</code>, ma l'idea che l'incapsulamento serve a difendere una regola di dominio.</p>
+        </div>
+      </div>
+    </div>
+    <div class="inner-box box">
+      <h2>E2 - Dove va const?</h2>
+      <p><b>Scenario:</b> in una classe <code>Rettangolo</code> hai i metodi <code>area()</code>, <code>perimetro()</code> e <code>scala(double)</code>.</p>
+      <p><b>Domanda:</b> quali metodi devono essere <code>const</code> e perche?</p>
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-l42" onclick="toggleBox('btn-l42','box-l42')">Mostra soluzione ▼</button></div>
+      <div id="box-l42" style="display:none;margin-top:8px">
+        <div class="ok">
+          <p><b>Soluzione:</b> <code>area()</code> e <code>perimetro()</code> devono essere <code>const</code> perche osservano soltanto; <code>scala(double)</code> no, perche modifica lo stato.</p>
+          <p><b>Errore tipico:</b> mettere <code>const</code> solo "quando il compilatore lo chiede". In realta e una scelta di contratto, non solo di compilazione.</p>
+        </div>
+      </div>
+    </div>
+    <div class="inner-box box">
+      <h2>E3 - Costruttore o sistemazione dopo?</h2>
+      <p><b>Scenario:</b> una classe <code>Percentuale</code> accetta valori solo tra 0 e 100.</p>
+      <p><b>Domanda:</b> e meglio creare l'oggetto con qualsiasi valore e poi correggerlo con un setter, oppure garantire la validita gia nel costruttore?</p>
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-l43" onclick="toggleBox('btn-l43','box-l43')">Mostra soluzione ▼</button></div>
+      <div id="box-l43" style="display:none;margin-top:8px">
+        <div class="ok">
+          <p><b>Soluzione:</b> il costruttore deve gia far nascere l'oggetto in stato valido. Se il tipo puo esistere anche per un attimo in stato illegale, il modello e piu fragile.</p>
+          <p><b>Che cosa verificava davvero:</b> la comprensione del costruttore come punto di difesa dell'invariante.</p>
+        </div>
+      </div>
+    </div>
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L4.14</strong> alziamo il livello: separazione header/sorgente e semantica di copia.
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+</body>
+</html>

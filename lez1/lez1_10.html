@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - L1.10 · Matrici 2D: matrici dinamiche e rappresentazioni</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez1_9.html"; }
+    function nextSlide(){ window.location.href = "lez1_11.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+  <ul>
+    <li><a href="lez1_1.html">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
+    <li><a href="lez1_2.html">L1.2 - Definizioni e indici</a></li>
+    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
+    <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
+    <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
+    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
+    <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
+    <li><a href="lez1_8.html">L1.8 - Perche la firma conta</a></li>
+    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
+    <li><a href="lez1_10.html" class="active">L1.10 - Matrici dinamiche</a></li>
+    <li><a href="lez1_11.html">L1.11 - Operazioni classiche e chiusura</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Matrici dinamiche e rappresentazioni</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Capire come gestire matrici quando numero di righe e colonne sono noti solo a runtime.</p>
+      <p class="ok"><b>Idea chiave:</b> anche nel caso dinamico conviene ragionare in termini di <b>contiguita</b>. Cambiano gli strumenti, non cambia il modello mentale costruito fin qui.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>C++: scelta consigliata</h2>
+      <p>La soluzione piu pulita, nel contesto di questo corso, e un buffer contiguo <code>std::vector&lt;T&gt;</code> con indicizzazione lineare.</p>
+<pre><code class="language-cpp">std::size_t R = 4, C = 6;
+std::vector&lt;int&gt; buf(R * C, 0);
+
+auto at = [&](std::size_t r, std::size_t c) -&gt; int& {
+  return buf[r * C + c];
+};
+</code></pre>
+      <p>Hai RAII, contiguita, nessun <code>delete[]</code> manuale e un modello perfettamente coerente con il row-major.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>C: due strade corrette</h2>
+      <ul>
+        <li>buffer 1D contiguo con formula <code>r*C + c</code>;</li>
+        <li>puntatore a righe, se vuoi mantenere la sintassi <code>m[r][c]</code>.</li>
+      </ul>
+<pre><code class="language-c">int *buf = malloc(R * C * sizeof *buf);
+/* usa buf[r*C + c] */
+
+int (*m)[C] = malloc(R * sizeof *m);
+/* usa m[r][c] */
+</code></pre>
+      <p>Entrambe le soluzioni sono coerenti. Quella da evitare come modello base e la costruzione a <code>int**</code> con una allocazione per riga.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perche <code>int**</code> non e il modello giusto qui</h2>
+      <p>Una struttura con un puntatore per ogni riga puo avere senso in casi particolari, ma non rappresenta la stessa cosa di una vera matrice contigua. Perdi semplicita di firma, locality e chiarezza didattica.</p>
+      <p class="warn"><b>Regola pratica:</b> se il problema e una matrice regolare, scegli una rappresentazione regolare e contigua.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L1.11</strong> chiudiamo la lezione con i problemi classici di consolidamento: somme, diagonali, simmetria e triangolarita. Li useremo come banco di prova di tutto il percorso.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

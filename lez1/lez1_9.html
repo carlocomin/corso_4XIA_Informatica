@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L1.6 · Matrici 2D: I/O di base</title>
+  <title>4BIA - L1.9 · Matrici 2D: firme corrette in C++ e C</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
   <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez1_5.html"; }
-    function nextSlide(){ window.location.href = "lez1_7.html"; }
+    function prevSlide(){ window.location.href = "lez1_8.html"; }
+    function nextSlide(){ window.location.href = "lez1_10.html"; }
     function toggleBox(btnId, boxId){
       const box = document.getElementById(boxId);
       const btn = document.getElementById(btnId);
@@ -32,10 +32,10 @@
     <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
     <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
     <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
-    <li><a href="lez1_6.html" class="active">L1.6 - I/O di base su matrici</a></li>
+    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
     <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
     <li><a href="lez1_8.html">L1.8 - Perche la firma conta</a></li>
-    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
+    <li><a href="lez1_9.html" class="active">L1.9 - Firme corrette in C++ e C</a></li>
     <li><a href="lez1_10.html">L1.10 - Matrici dinamiche</a></li>
     <li><a href="lez1_11.html">L1.11 - Operazioni classiche e chiusura</a></li>
   </ul>
@@ -43,7 +43,7 @@
 <!-- END MENU -->
 
 <div class="slide">
-  <h1>I/O di base su matrici</h1>
+  <h1>Firme corrette in C++ e C</h1>
 
   <div class="nav-buttons" style="margin-bottom:10px">
     <button onclick="prevSlide()">&#8592; Indietro</button>
@@ -54,70 +54,52 @@
 
     <div class="inner-box box">
       <h2>Obiettivo della pagina</h2>
-      <p>Imparare a leggere e stampare matrici in modo chiaro, senza mescolare logica e improvvisazione. Una buona funzione di I/O rende anche il debug molto piu semplice.</p>
-      <p class="ok"><b>Idea chiave:</b> l'I/O su matrici non e difficile, ma deve essere regolare: stessi cicli, stessi limiti, stessa convenzione di stampa.</p>
+      <p>Tradurre il modello mentale della pagina precedente in firme corrette e leggibili.</p>
+      <p class="ok"><b>Idea chiave:</b> in C++ conviene sfruttare il tipo in modo forte; in C bisogna rendere esplicita almeno la seconda dimensione o usare VLA quando il contesto lo permette.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>C++: lettura e stampa minime</h2>
+      <h2>C++: riferimento a matrice o template</h2>
 <pre><code class="language-cpp">constexpr int R = 3;
 constexpr int C = 4;
 
-void leggiMatrice(int (&a)[R][C]){
+void stampa(const int (&m)[R][C]){
   for (int r = 0; r &lt; R; ++r)
     for (int c = 0; c &lt; C; ++c)
-      std::cin &gt;&gt; a[r][c];
-}
-
-void stampaMatrice(const int (&a)[R][C]){
-  for (int r = 0; r &lt; R; ++r){
-    for (int c = 0; c &lt; C; ++c)
-      std::cout &lt;&lt; a[r][c] &lt;&lt; ' ';
-    std::cout &lt;&lt; '\n';
-  }
+      std::cout &lt;&lt; m[r][c] &lt;&lt; ' ';
 }
 </code></pre>
-      <p>Notare la simmetria: stessi limiti, stessa struttura di cicli. Cambia solo l'azione svolta dentro il corpo.</p>
+      <p>Se vuoi piu flessibilita, puoi usare un template e lasciare al compilatore la deduzione di <code>R</code> e <code>C</code>.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>C: confronto essenziale</h2>
-<pre><code class="language-c">#define R 3
-#define C 4
+      <h2>C: seconda dimensione nota o VLA</h2>
+<pre><code class="language-c">#define C 4
 
-void leggi_matrice(int a[R][C]){
+void stampa(int R, const int m[][C]){
   for (int r = 0; r &lt; R; ++r)
     for (int c = 0; c &lt; C; ++c)
-      scanf("%d", &a[r][c]);
-}
-
-void stampa_matrice(const int a[R][C]){
-  for (int r = 0; r &lt; R; ++r){
-    for (int c = 0; c &lt; C; ++c)
-      printf("%d ", a[r][c]);
-    printf("\n");
-  }
+      printf("%d ", m[r][c]);
 }
 </code></pre>
-      <p>La logica e la stessa. Cambia lo strumento di I/O, non cambia il modello.</p>
+      <p>In C99 puoi anche usare VLA e quindi passare le dimensioni a runtime:</p>
+<pre><code class="language-c">void stampa_vla(int R, int C, const int m[R][C]) { /* ... */ }
+</code></pre>
+      <p class="note">Questo e corretto in C, ma non va trattato come modello standard di C++.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>Che cosa rende leggibile una stampa</h2>
+      <h2>Firme da evitare</h2>
       <ul>
-        <li>tenere ogni riga della matrice su una riga di output;</li>
-        <li>usare spaziature coerenti;</li>
-        <li>non mischiare testo descrittivo e numeri se la funzione deve solo stampare dati;</li>
-        <li>se serve, aggiungere intestazioni di riga e colonna in una funzione piu evoluta, non in quella minima.</li>
+        <li><code>void f(int **m)</code> per una matrice statica <code>int a[R][C]</code>;</li>
+        <li>firme che nascondono il significato delle dimensioni;</li>
+        <li>soluzioni "funzionano nel mio compilatore" ma non sono didatticamente pulite o portabili.</li>
       </ul>
-    </div>
-
-    <div class="inner-box warn">
-      <b>Errore tipico:</b> scrivere direttamente nel <code>main</code> tanti doppi cicli simili ma leggermente diversi. Meglio costruire una piccola funzione chiara e riutilizzarla.
+      <p class="warn"><b>Regola pratica:</b> se la matrice e statica e contigua, la firma deve riflettere proprio questo fatto, non un'altra struttura dati.</p>
     </div>
 
     <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L1.7</strong> passiamo dalle funzioni minime alle utility davvero utili: azzerare, riempire, formattare meglio l'output e gestire input un po' piu robusti.
+      <b>Passo successivo.</b> Nella <strong>L1.10</strong> usciamo dal caso statico e affrontiamo il problema vero delle dimensioni note solo a runtime: matrici dinamiche, contiguita e scelte di rappresentazione.
     </div>
 
   </div>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - L2.9 · Struct: lambda, ordinamento e filtro</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez2_8.html"; }
+    function nextSlide(){ window.location.href = "lez2_10.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
+  <ul>
+    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
+    <li><a href="lez2_2.html">L2.2 - Sintassi minima e accesso ai membri</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
+    <li><a href="lez2_4.html">L2.4 - Inizializzare in C</a></li>
+    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
+    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
+    <li><a href="lez2_9.html" class="active">L2.9 - Lambda, ordinamento e filtro</a></li>
+    <li><a href="lez2_10.html">L2.10 - Layout, padding e serializzazione raw</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Lambda, ordinamento e filtro</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Usare le collezioni di record in modo piu intelligente: ordinare, cercare, contare, filtrare.</p>
+      <p class="ok"><b>Idea chiave:</b> le lambda permettono di scrivere il criterio di confronto o di selezione accanto all'algoritmo che lo usa. Questo rende il codice piu locale e piu leggibile.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cos'e una lambda</h2>
+<pre><code class="language-cpp">auto promosso = [](const Studente& s){
+    return s.media >= 6.0;
+};
+</code></pre>
+      <p>Pensala come una piccola funzione anonima definita nel punto esatto in cui serve. Non sostituisce tutte le funzioni normali, ma e perfetta per criteri brevi e localizzati.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Ordinare una classe di studenti</h2>
+<pre><code class="language-cpp">std::sort(classe.begin(), classe.end(),
+    [](const Studente& a, const Studente& b){
+        return a.cognome < b.cognome;
+    });
+</code></pre>
+      <p>Qui la lambda descrive il criterio. L'algoritmo si occupa dell'ordinamento, la lambda si occupa del significato dell'ordine.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Ricerca e filtro</h2>
+<pre><code class="language-cpp">auto it = std::find_if(classe.begin(), classe.end(),
+    [](const Studente& s){
+        return s.media < 6.0;
+    });
+
+int quanti = std::count_if(classe.begin(), classe.end(),
+    [](const Studente& s){
+        return s.eta >= 18;
+    });
+</code></pre>
+      <p>La domanda didattica giusta qui non e "ricordo il nome della funzione STL?", ma "so esprimere una proprieta chiara su un record?".</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Confronto minimo con il C</h2>
+      <p>Nel C puro non hai lambda standard. Lo stesso tipo di problema si affronta con funzioni di confronto esplicite, per esempio insieme a <code>qsort</code>. Il concetto pero resta lo stesso: separare l'algoritmo dal criterio.</p>
+    </div>
+
+    <div class="inner-box warn">
+      <b>Errore tipico:</b> scrivere lambda troppo opache, con catture inutili o confronti incoerenti. Se il criterio diventa lungo o difficile da leggere, probabilmente e meglio estrarlo in una funzione dedicata.
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L2.10</strong> chiudiamo la lezione alzando il livello: guardiamo dentro la memoria delle <code>struct</code>, parliamo di layout, padding e capiamo perche salvare una struct raw su file e una scelta fragile.
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA – Lez3_2 · I/O su file testuali (C++) — versione spiegata</title>
+  <title>4BIA - L3.2 · File: testo vs binario</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -12,12 +12,12 @@
   <script>
     function prevSlide(){ window.location.href = "lez3_1.html"; }
     function nextSlide(){ window.location.href = "lez3_3.html"; }
-function toggleBox(btnId, boxId){
+    function toggleBox(btnId, boxId){
       const box = document.getElementById(boxId);
       const btn = document.getElementById(btnId);
       const open = box.style.display === 'block';
       box.style.display = open ? 'none' : 'block';
-      if(btn) btn.textContent = open ? 'Mostra soluzione ▼' : 'Nascondi soluzione ▲';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
     }
   </script>
 </head>
@@ -25,21 +25,24 @@ function toggleBox(btnId, boxId){
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 3 - File I/O</h2>
+  <h2>Lezione 3 - File I/O (ripasso guidato)</h2>
   <ul>
-    <li><a href="lez3_1.html">Lez3_1: File, concetti e modelli</a></li>
-    <li><a href="lez3_2.html" class="active">Lez3_2: I/O su file testuali (C++)</a></li>
-    <li><a href="lez3_3.html">Lez3_3: File binari (base) in C++ e C</a></li>
-    <li><a href="lez3_4.html">Lez3_4: Spostamento del cursore nei file binari</a></li>
-    <li><a href="lez3_5.html">Lez3_5: Perche non scrivere struct raw</a></li>
-    <li><a href="lez3_6.html">Lez3_6: fseek/ftell e seekg/tellg (text mode)</a></li>
-    <li><a href="lez3_7.html">Lez3_7: Indici per file binari</a></li>
+    <li><a href="lez3_1.html">L3.1 - Che cos'e un file</a></li>
+    <li><a href="lez3_2.html" class="active">L3.2 - Testo vs binario</a></li>
+    <li><a href="lez3_3.html">L3.3 - Modello d'I/O e scelte pratiche</a></li>
+    <li><a href="lez3_4.html">L3.4 - CSV e TSV: scrivere e leggere</a></li>
+    <li><a href="lez3_5.html">L3.5 - Robustezza: escape, locale, round-trip</a></li>
+    <li><a href="lez3_6.html">L3.6 - Binario: modello base</a></li>
+    <li><a href="lez3_7.html">L3.7 - Read e write in C++ e C</a></li>
+    <li><a href="lez3_8.html">L3.8 - Seek e cursore nei file binari</a></li>
+    <li><a href="lez3_9.html">L3.9 - Perche i seek arbitrari in text mode non sono portabili</a></li>
+    <li><a href="lez3_10.html">L3.10 - Indici per file binari</a></li>
   </ul>
 </div>
 <!-- END MENU -->
 
 <div class="slide">
-  <h1>Lez3_2 — I/O su file <em>testuali</em> in C++ (CSV/TSV)</h1>
+  <h1>Testo vs binario</h1>
 
   <div class="nav-buttons" style="margin-bottom:10px">
     <button onclick="prevSlide()">&#8592; Indietro</button>
@@ -47,411 +50,60 @@ function toggleBox(btnId, boxId){
   </div>
 
   <div class="content-box">
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Capire che la scelta tra file testuale e file binario non e una preferenza estetica, ma una decisione progettuale.</p>
+      <p class="ok"><b>Idea chiave:</b> il testo privilegia leggibilita e interoperabilita; il binario privilegia compattezza, velocita e accesso casuale.</p>
+    </div>
 
-    <div class="inner-box">
-      <h2>Obiettivi (in breve)</h2>
+    <div class="inner-box box">
+      <h2>Che cos'e un file testuale</h2>
+      <p>In un file testuale i byte rappresentano caratteri secondo una codifica, per esempio UTF-8.</p>
       <ul>
-        <li>Aprire/chiudere file testuali con <code>std::ifstream/std::ofstream</code>.</li>
-        <li>Leggere righe con <code>std::getline</code>, scrivere righe con l’operatore <code>&lt;&lt;</code>.</li>
-        <li>Gestire <strong>CSV</strong>/<strong>TSV</strong>: separatori, virgolette, CR/LF, locale numerica.</li>
-        <li>Serializzare/deserializzare un <code>std::vector&lt;Studente&gt;</code> in CSV.</li>
-      </ul>
-      <p class="note">Scelte del corso: <strong>UTF-8</strong>, separatore CSV predefinito <strong>;</strong>, lettura con <code>getline</code> + parser.</p>
-    </div>
-
-    <div class="inner-box box">
-      <h2>CSV e TSV: due esempi</h2>
-      <div style="font-family:ui-monospace,monospace;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:.6rem .8rem;overflow:auto">
-        CSV (sep <code>;</code>)<br/>
-        nome;cognome;eta;media<br/>
-        "Ada";"Lovelace";17;9.40<br/>
-        "Mario Rossi";"Doppia ""virgolette""";16;7.75
-      </div>
-      <p class="tip">Regola CSV: se un campo contiene separatore/virgolette/newline → racchiudi tra <code>"..."</code> e raddoppia le <code>"</code> interne.</p>
-      <div style="font-family:ui-monospace,monospace;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:.6rem .8rem;overflow:auto">
-        TSV (tab):<br/>
-        nome\tcognome\teta\tmedia<br/>
-        Ada\tLovelace\t17\t9.40
-      </div>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Struttura dati</h2>
-<pre><code class="language-cpp">#include &lt;string&gt;
-#include &lt;vector&gt;
-
-struct Studente {
-    std::string nome, cognome;
-    int    eta   = 0;
-    double media = 0.0;
-};
-</code></pre>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Aprire file e gestire errori</h2>
-<pre><code class="language-cpp">#include &lt;fstream&gt;
-#include &lt;iostream&gt;
-
-int main(){
-    std::ifstream in("input.csv");      // TESTO
-    if (!in) { std::cerr &lt;&lt; "Errore apertura input.csv\n"; return 1; }
-
-    std::ofstream out("output.csv");    // TESTO (troncante)
-    if (!out){ std::cerr &lt;&lt; "Errore apertura output.csv\n"; return 1; }
-
-    // ... usa in/out ...
-}
-</code></pre>
-      <div class="mini">
-        <p><strong>Cosa fanno le chiamate usate</strong>:</p>
-        <ul>
-          <li><code>std::ifstream/ std::ofstream</code>: aprono uno stream di <em>input/output</em> su file.</li>
-          <li><code>if(!in)</code> / <code>if(!out)</code>: controllano se l’apertura è fallita (percorso/permessi inesatti, ecc.).</li>
-          <li><code>std::cerr</code>: canale standard degli errori (stampa messaggi diagnostici).</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- ============ SEZIONE 1: SCRIVERE CSV (SPIEGAZIONE ESTESA) ============ -->
-    <div class="inner-box box">
-      <h2>Scrivere CSV (escape corretto)</h2>
-      <p><strong>Obiettivo:</strong> produrre un file CSV che ogni programma (Excel/LibreOffice/reader) legga senza ambiguità.</p>
-      <p><strong>Problema:</strong> se un campo contiene <em>separatore</em> (<code>;</code>), <em>virgolette</em> (<code>"</code>) o <em>newline</em>, non possiamo stamparlo “così com’è”, altrimenti il lettore lo spezzerebbe in colonne sbagliate.</p>
-      <p><strong>Regola CSV standard:</strong> racchiudi il campo tra <code>" ... "</code> e <em>raddoppia</em> ogni <code>"</code> interno (<code>"</code> → <code>""</code>).</p>
-
-      <h3>Algoritmo (a parole)</h3>
-      <ol>
-        <li>Controlla se il campo contiene uno tra: <code>sep</code>, <code>"</code>, <code>\n</code> o <code>\r</code>.</li>
-        <li>Se <em>no</em>, restituisci il campo invariato (nessuna citazione necessaria).</li>
-        <li>Se <em>sì</em>:
-          <ul>
-            <li>crea una nuova stringa, aprila con <code>"</code>;</li>
-            <li>scorri ogni carattere del campo:
-              <ul>
-                <li>se è <code>"</code>, aggiungi <code>""</code> (raddoppio);</li>
-                <li>altrimenti aggiungi il carattere com’è;</li>
-              </ul>
-            </li>
-            <li>chiudi con <code>"</code> e restituisci.</li>
-          </ul>
-        </li>
-      </ol>
-      <p class="ok">Così qualunque parser CSV potrà riconoscere correttamente i campi.</p>
-
-<pre><code class="language-cpp">static std::string csv_escape(const std::string&amp; s, char sep) {
-    // 1) Decido se servono le virgolette (campo 'sensibile')
-    bool need_quotes = s.find_first_of(std::string() + sep + "\"\n\r") != std::string::npos;
-
-    if (!need_quotes) return s;  // 2) Nessun carattere speciale: restituisco s
-
-    // 3) Creo l'output quotato e con virgolette raddoppiate
-    std::string out; out.reserve(s.size()+2);
-    out.push_back('"');          // apre il campo con "
-    for (char c : s) {
-        if (c == '"') out += "\"\"";   // raddoppia le "
-        else          out.push_back(c);
-    }
-    out.push_back('"');          // chiude il campo con "
-    return out;
-}
-
-void save_students_csv(const std::vector&lt;Studente&gt;& v,
-                       const std::string&amp; path, char sep = ';')
-{
-    std::ofstream f(path);                  // apre il file in testo
-    if (!f) throw std::runtime_error("open write");
-
-    // Header (nomi di colonna). Operatore &lt;&lt; stampa testo su file.
-    f &lt;&lt; "nome" &lt;&lt; sep &lt;&lt; "cognome" &lt;&lt; sep &lt;&lt; "eta" &lt;&lt; sep &lt;&lt; "media" &lt;&lt; "\n";
-
-    // Riga dati: ogni campo viene 'escapato' con la funzione sopra.
-    for (const auto&amp; s : v) {
-        f &lt;&lt; csv_escape(s.nome, sep) &lt;&lt; sep
-          &lt;&lt; csv_escape(s.cognome, sep) &lt;&lt; sep
-          &lt;&lt; s.eta &lt;&lt; sep &lt;&lt; s.media &lt;&lt; "\n";
-    }
-}
-</code></pre>
-
-      <div class="mini">
-        <p><strong>Cosa fanno le chiamate usate</strong>:</p>
-        <ul>
-          <li><code>std::string::find_first_of</code>: cerca il primo carattere tra quelli indicati; se non trova, restituisce <em>npos</em>.</li>
-          <li><code>std::ofstream</code>: flusso di output su file di testo.</li>
-          <li><code>operator&lt;&lt;</code> (<code>f &lt;&lt; ...</code>): scrive testo/valori formattati nello stream.</li>
-          <li><code>throw std::runtime_error</code>: segnala errore d’apertura (gestibile con <code>try/catch</code> a livello superiore).</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- ============ SEZIONE 2: LEGGERE CSV (SPIEGAZIONE ESTESA) ============ -->
-    <div class="inner-box box">
-      <h2>Leggere CSV (parser semplice e robusto)</h2>
-      <p><strong>Obiettivo:</strong> trasformare una riga di testo CSV in un vettore di campi <code>std::vector&lt;std::string&gt;</code>.</p>
-      <p><strong>Idea chiave:</strong> implementiamo un piccolo <em>automa a stati</em> con una variabile booleana <code>inq</code> che dice se stiamo leggendo <em>dentro</em> campi tra virgolette.</p>
-
-      <h3>Algoritmo (a parole)</h3>
-      <ol>
-        <li>Imposta <code>inq=false</code> e una stringa vuota <code>cur</code> per accumulare il campo corrente.</li>
-        <li>Scorri la riga carattere per carattere:
-          <ul>
-            <li>Se <code>inq==true</code> (siamo dentro <code>"..."</code>):
-              <ul>
-                <li>se trovi <code>"</code>:
-                  <ul>
-                    <li>se il prossimo carattere è ancora <code>"</code>, aggiungi <code>"</code> a <code>cur</code> e <em>salta</em> il prossimo (raddoppio → una sola <code>"</code> nel risultato);</li>
-                    <li>altrimenti, chiudi il campo quotato: <code>inq=false</code>;</li>
-                  </ul>
-                </li>
-                <li>se non è <code>"</code>, copia il carattere in <code>cur</code>;</li>
-              </ul>
-            </li>
-            <li>Se <code>inq==false</code> (fuori dalle virgolette):
-              <ul>
-                <li>se trovi <code>"</code>, inizia un campo quotato: <code>inq=true</code>;</li>
-                <li>se trovi il separatore <code>sep</code>, chiudi il campo corrente e aggiungilo al vettore;</li>
-                <li>altrimenti, copia il carattere in <code>cur</code>;</li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li>Alla fine, aggiungi l’ultimo campo (<code>cur</code>) al vettore risultati.</li>
-        <li>Se l’ultimo carattere del campo finale è <code>\r</code> (Windows: CRLF), toglilo.</li>
-      </ol>
-      <p class="ok">Questo riconosce correttamente separatori, virgolette raddoppiate e newline quotati.</p>
-
-<pre><code class="language-cpp">static std::vector&lt;std::string&gt; split_csv_line(const std::string&amp; line, char sep){
-    std::vector&lt;std::string&gt; out; std::string cur; cur.reserve(line.size());
-    bool inq=false;                         // siamo dentro "..." ?
-    for(size_t i=0;i&lt;line.size();++i){
-        char c=line[i];
-        if(inq){
-            if(c=='"'){                    // possibile fine campo quotato o "" raddoppiate
-                if(i+1&lt;line.size() &amp;&amp; line[i+1]=='"'){
-                    cur.push_back('"');    // "" -> una " nel risultato
-                    ++i;                   // salta la seconda "
-                } else {
-                    inq=false;             // chiudi le virgolette
-                }
-            } else {
-                cur.push_back(c);          // carattere qualunque dentro "..."
-            }
-        } else {                            // fuori da "..."
-            if(c=='"') inq=true;           // inizia un campo quotato
-            else if(c==sep){               // fine campo non quotato
-                out.push_back(cur); cur.clear();
-            } else {
-                cur.push_back(c);          // carattere normale
-            }
-        }
-    }
-    out.push_back(cur);                     // aggiungi l'ultimo campo
-
-    // Se l'ultimo campo finisce con CR (Windows), rimuovilo.
-    if(!out.empty() &amp;&amp; !out.back().empty() &amp;&amp; out.back().back()=='\r')
-        out.back().pop_back();
-
-    return out;
-}
-
-std::vector&lt;Studente&gt; load_students_csv(const std::string&amp; path, char sep=';'){
-    std::ifstream f(path);                  // apre file in testo
-    if(!f) throw std::runtime_error("open read");
-
-    std::vector&lt;Studente&gt; v; std::string line;
-
-    if(!std::getline(f,line)) return v;     // salta l'header; getline legge una riga di testo
-
-    while(std::getline(f,line)){            // leggi ogni riga finché c'è
-        if(line.empty() || line[0]=='#') continue;       // ignora vuote e commenti
-        auto cols = split_csv_line(line, sep);           // parsifica la riga in colonne
-        if(cols.size() &lt; 4) continue;                    // riga malformata: troppo corta
-        Studente s;
-        try {
-            s.nome    = cols[0];
-            s.cognome = cols[1];
-            s.eta     = std::stoi(cols[2]);             // converte stringa -> int
-            s.media   = std::stod(cols[3]);             // converte stringa -> double
-        }
-        catch(...) { continue; }                         // conversione fallita: scarta
-        v.push_back(s);
-    }
-    return v;
-}
-</code></pre>
-
-      <div class="mini">
-        <p><strong>Cosa fanno le chiamate usate</strong>:</p>
-        <ul>
-          <li><code>std::getline(f, line)</code>: legge dal file una riga fino a <code>\n</code> (su Windows la riga termina <code>\r\n</code>, <code>\r</code> resta nell’ultimo campo, e lo togliamo).</li>
-          <li><code>split_csv_line</code>: nostra funzione che implementa il parser CSV (state machine con <code>inq</code>).</li>
-          <li><code>std::stoi / std::stod</code>: convertono testo in numero; sollevano eccezione se il testo non è un numero valido.</li>
-          <li><code>std::vector::push_back</code>: aggiunge un elemento in coda al vettore (cresce automaticamente).</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="inner-box box">
-      <h2>TSV (Tab-Separated Values)</h2>
-<pre><code class="language-cpp">void save_students_tsv(const std::vector&lt;Studente&gt;& v, const std::string&amp; path){
-    std::ofstream f(path);
-    if(!f) throw std::runtime_error("open write");
-    f &lt;&lt; "nome\tcognome\teta\tmedia\n";
-    for(const auto&amp; s : v){
-        // Se i campi contengono \t o \n servirebbe comunque un'escape policy.
-        f &lt;&lt; s.nome &lt;&lt; '\t' &lt;&lt; s.cognome &lt;&lt; '\t' &lt;&lt; s.eta &lt;&lt; '\t' &lt;&lt; s.media &lt;&lt; '\n';
-    }
-}
-</code></pre>
-      <p class="note">TSV riduce l’uso di virgolette, ma non elimina tutti i casi-limite (per es. tab o newline nei dati).</p>
-    </div>
-
-    <!-- ============ SEZIONE 3: LOCALE NUMERICA & PRECISIONE (SPIEGAZIONE ESTESA) ============ -->
-    <div class="inner-box box">
-      <h2>Locale numerica &amp; precisione</h2>
-      <p><strong>Cos’è la “locale”:</strong> è l’insieme di regole dipendenti da lingua/Paese che governano formattazione di numeri (punto o virgola), date, ordinamenti lessicografici, ecc. In C++ ogni stream eredita una locale; se non la impostiamo, può dipendere dall’ambiente del sistema.</p>
-      <p><strong>Perché impostarla qui:</strong> nei CSV vogliamo sempre il <em>punto</em> come separatore decimale (stile inglese), altrimenti su sistemi con locale italiana (<code>it_IT</code>) potremmo scrivere <code>9,40</code> e poi il parser (che si aspetta <code>.</code>) fallisce.</p>
-
-<pre><code class="language-cpp">#include &lt;iomanip&gt;   // std::setprecision, std::fixed
-#include &lt;locale&gt;    // std::locale
-
-void save_students_csv_prec(const std::vector&lt;Studente&gt;& v, const std::string&amp; path){
-    // 1) Forzo la locale "classica" C: separatore decimale = '.'
-    std::locale::global(std::locale::classic());
-
-    std::ofstream f(path);
-    if(!f) throw std::runtime_error("open write");
-    f &lt;&lt; "nome;cognome;eta;media\n";
-
-    // 2) Imposto formato e precisione: numeri in notazione fissa con 2 decimali
-    f.setf(std::ios::fixed);
-    f &lt;&lt; std::setprecision(2);
-
-    // 3) Scrivo i record con escape CSV dove serve (vedi funzione csv_escape)
-    for(const auto&amp; s : v){
-        f &lt;&lt; csv_escape(s.nome,';') &lt;&lt; ';'
-          &lt;&lt; csv_escape(s.cognome,';') &lt;&lt; ';'
-          &lt;&lt; s.eta &lt;&lt; ';' &lt;&lt; s.media &lt;&lt; "\n";
-    }
-}
-</code></pre>
-
-      <div class="mini">
-        <p><strong>Cosa fanno le chiamate usate</strong>:</p>
-        <ul>
-          <li><code>std::locale::classic()</code>: locale “C”/neutra (decimale = <code>.</code>), indipendente dalla lingua del sistema.</li>
-          <li><code>std::locale::global(...)</code>: imposta la locale globale del processo; gli stream creati dopo la chiamata ne ereditano le regole.</li>
-          <li><code>std::ios::fixed</code>: stampa i floating-point in notazione fissa (non scientifica).</li>
-          <li><code>std::setprecision(2)</code>: fissa il numero di cifre dopo la virgola in modalità <em>fixed</em>.</li>
-        </ul>
-      </div>
-
-      <p class="ok">Risultato: valori come <code>9.40</code>, <code>7.75</code> sono scritti in modo coerente e facilmente rileggibili ovunque.</p>
-      <p class="warn">Se leggi con <code>std::stod</code> ma la tua locale usa la virgola, <code>"3.14"</code> può fallire. Forzare la locale a “C” prima di leggere/scrivere evita questo problema.</p>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Esempio completo (round-trip)</h2>
-<pre><code class="language-cpp">#include &lt;iostream&gt;
-
-int main(){
-    std::vector&lt;Studente&gt; classe {
-        {"Ada","Lovelace",17,9.40},
-        {"Alan","Turing",18,10.00},
-        {"Edsger","Dijkstra",19,9.10}
-    };
-    save_students_csv_prec(classe, "classe.csv");  // scrivo CSV robusto
-    auto r = load_students_csv("classe.csv");      // rileggo lo stesso file
-    std::cout &lt;&lt; "Caricati " &lt;&lt; r.size() &lt;&lt; " record\n";
-}
-</code></pre>
-      <p class="ok"><strong>Round-trip</strong> = scrivo → rileggo → confronto: verifica rapida che il formato sia coerente.</p>
-    </div>
-
-    <div class="inner-box">
-      <h2>Pitfall comuni (e rimedi pratici)</h2>
-      <ul>
-        <li><strong>Usare <code>&gt;&gt;</code> invece di <code>getline</code></strong> → tronca ai primi spazi. <br/><br/><span class="ok">Per righe usa sempre <code>getline</code>.</span></li>
-        <li><strong>Non gestire virgolette/sep</strong> → parsing fallisce. <br/><br/><span class="ok">Escapa in scrittura e usa un parser con virgolette.</span></li>
-        <li><strong>CR finale</strong> su Windows → ultimo campo con <code>\r</code>. <br/><br/><span class="ok">Togli il <code>\r</code> come mostrato.</span></li>
-        <li><strong>Locale diversa</strong> (virgola decimale) → <code>stod("3.14")</code> fallisce. <br/><br/><span class="ok">Forza <code>std::locale::classic()</code> o normalizza.</span></li>
-        <li><strong>Righe malformate</strong> → crash/dati sporchi. <br/><br/><span class="ok">Controlla <code>cols.size()</code>, usa <code>try/catch</code>, logga e salta.</span></li>
+        <li>si puo aprire con un editor e capire il contenuto a occhio;</li>
+        <li>si presta bene a log, configurazioni, CSV e scambio con altri strumenti;</li>
+        <li>richiede parsing: leggere i byte non basta, bisogna anche interpretarli.</li>
       </ul>
     </div>
 
-    <div class="inner-box">
-      <h2>Esercizi (con soluzione a comparsa)</h2>
-      <ol>
-        <li><strong>E1 — CSV → TSV</strong><br/>
-          <div class="spec"><b>Richiesta:</b> leggi <code>input.csv</code> (sep <code>;</code>, con header) e scrivi <code>output.tsv</code> mantenendo i valori dei campi.</div>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra soluzione ▼</button></div>
-          <div id="box-e1" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">void csv_to_tsv(const std::string&amp; inPath, const std::string&amp; outPath){
-    std::ifstream in(inPath); if(!in) throw std::runtime_error("open read");
-    std::ofstream out(outPath); if(!out) throw std::runtime_error("open write");
-    std::string line;
-    while(std::getline(in,line)){
-        auto cols = split_csv_line(line,';');
-        for(std::size_t i=0;i&lt;cols.size();++i){ if(i) out &lt;&lt; '\t'; out &lt;&lt; cols[i]; }
-        out &lt;&lt; '\n';
-    }
-}
-</code></pre>
-          </div>
-        </li>
-        <li><strong>E2 — Statistiche</strong><br/>
-          <div class="spec"><b>Richiesta:</b> carica <code>classe.csv</code> e stampa: numero studenti, media, min e max della colonna <em>media</em>.</div>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra soluzione ▼</button></div>
-          <div id="box-e2" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">#include &lt;limits&gt;
-void stats_csv(const std::string&amp; path){
-    auto v = load_students_csv(path);
-    if(v.empty()){ std::cout &lt;&lt; "Vuoto\n"; return; }
-    double sum=0, mn=std::numeric_limits&lt;double&gt;::infinity(), mx=-mn;
-    for(const auto&amp; s : v){ sum+=s.media; mn=std::min(mn,s.media); mx=std::max(mx,s.media); }
-    std::cout &lt;&lt; "n=" &lt;&lt; v.size() &lt;&lt; " media=" &lt;&lt; (sum/v.size())
-              &lt;&lt; " min=" &lt;&lt; mn &lt;&lt; " max=" &lt;&lt; mx &lt;&lt; "\n";
-}
-</code></pre>
-          </div>
-        </li>
-        <li><strong>E3 — Import robusto con log</strong><br/>
-          <div class="spec"><b>Richiesta:</b> modifica la lettura per contare e loggare le righe scartate (malformate o conversioni fallite) e stampa il totale.</div>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra soluzione ▼</button></div>
-          <div id="box-e3" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">std::vector&lt;Studente&gt; load_students_csv_log(const std::string&amp; path, char sep=';'){
-    std::ifstream f(path); if(!f) throw std::runtime_error("open read");
-    std::vector&lt;Studente&gt; v; std::string line; std::size_t lineNo=0, err=0;
-    if(!std::getline(f,line)) return v; // header
-    while(std::getline(f,line)){
-        ++lineNo; if(line.empty() || line[0]=='#') continue;
-        auto cols = split_csv_line(line,sep);
-        if(cols.size() &lt; 4){ ++err; std::cerr &lt;&lt; "Colonne insufficienti a linea " &lt;&lt; lineNo &lt;&lt; "\n"; continue; }
-        Studente s;
-        try{ s.nome=cols[0]; s.cognome=cols[1]; s.eta=std::stoi(cols[2]); s.media=std::stod(cols[3]); }
-        catch(...){ ++err; std::cerr &lt;&lt; "Conversione fallita a linea " &lt;&lt; lineNo &lt;&lt; "\n"; continue; }
-        v.push_back(s);
-    }
-    if(err) std::cerr &lt;&lt; "Righe scartate: " &lt;&lt; err &lt;&lt; "\n";
-    return v;
-}
-</code></pre>
-          </div>
-        </li>
-      </ol>
-    </div>
-
-    <div class="inner-box">
-      <h2>Takeaways</h2>
+    <div class="inner-box box">
+      <h2>Che cos'e un file binario</h2>
+      <p>In un file binario i byte vengono organizzati dal programma in un formato piu vicino alla struttura dei dati.</p>
       <ul>
-        <li><strong><code>getline</code> + parser</strong> per il testo; evita <code>&gt;&gt;</code> per campi con spazi.</li>
-        <li>Gestisci <strong>virgolette/separatori</strong> (escape) e <strong>CR/LF</strong> su Windows.</li>
-        <li>Fissa la <strong>locale</strong> (punto decimale) e la <strong>precisione</strong> per numeri coerenti.</li>
-        <li>Valida righe e conversioni; in caso di errore, logga e salta.</li>
+        <li>non e pensato per essere letto a occhio;</li>
+        <li>puo essere piu piccolo e piu veloce da leggere o scrivere;</li>
+        <li>si presta meglio ad accesso casuale, record fissi e indici.</li>
       </ul>
     </div>
 
+    <div class="inner-box box">
+      <h2>Confronto rapido</h2>
+      <table>
+        <tr><th>Criterio</th><th>Testo</th><th>Binario</th></tr>
+        <tr><td>Leggibilita umana</td><td>Alta</td><td>Bassa</td></tr>
+        <tr><td>Compattezza</td><td>Media o bassa</td><td>Alta</td></tr>
+        <tr><td>Parsing</td><td>Necessario</td><td>Spesso piu diretto</td></tr>
+        <tr><td>Accesso casuale</td><td>Scomodo</td><td>Molto naturale</td></tr>
+        <tr><td>Scambio con tool esterni</td><td>Ottimo</td><td>Dipende dal formato</td></tr>
+      </table>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Regola pratica di scelta</h2>
+      <ul>
+        <li>usa <b>testo</b> quando vuoi file ispezionabili, semplici da esportare e comodi per debug;</li>
+        <li>usa <b>binario</b> quando ti servono prestazioni, dimensioni ridotte o accesso diretto a record e offset;</li>
+        <li>se il file deve vivere a lungo, pensa al formato prima del codice.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box warn">
+      <b>Errore tipico:</b> scegliere il binario solo perche "sembra piu professionale". Se poi non definisci il formato con cura, hai solo spostato il problema.
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L3.3</strong> vediamo il ciclo generale di lavoro con i file: aprire, controllare errori, leggere o scrivere, chiudere e scegliere le modalita corrette.
+    </div>
   </div>
 
   <div class="nav-buttons">
@@ -459,8 +111,5 @@ void stats_csv(const std::string&amp; path){
     <button onclick="nextSlide()">Avanti &#8594;</button>
   </div>
 </div>
-
-<script>
-</script>
 </body>
 </html>

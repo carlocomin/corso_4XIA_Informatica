@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L4.3 · Anatomia minima di una classe</title>
+  <title>4BIA - L4.12 · Move semantics, Rule of Five e RVO</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
   <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez4_2.html"; }
-    function nextSlide(){ window.location.href = "lez4_4.html"; }
+    function prevSlide(){ window.location.href = "lez4_11.html"; }
+    function nextSlide(){ window.location.href = "lez4_13.html"; }
     function toggleBox(btnId, boxId){
       const box = document.getElementById(boxId);
       const btn = document.getElementById(btnId);
@@ -29,7 +29,7 @@
   <ul>
     <li><a href="lez4_1.html">L4.1 - Perche OOP</a></li>
     <li><a href="lez4_2.html">L4.2 - Astrazione e incapsulamento</a></li>
-    <li><a href="lez4_3.html" class="active">L4.3 - Anatomia minima di una classe</a></li>
+    <li><a href="lez4_3.html">L4.3 - Anatomia minima di una classe</a></li>
     <li><a href="lez4_4.html">L4.4 - Costruttori e invarianti</a></li>
     <li><a href="lez4_5.html">L4.5 - Distruttore, ordine, default e delete</a></li>
     <li><a href="lez4_6.html">L4.6 - Incapsulamento forte e metodi const</a></li>
@@ -38,7 +38,7 @@
     <li><a href="lez4_9.html">L4.9 - Header, sorgenti e translation unit</a></li>
     <li><a href="lez4_10.html">L4.10 - Build, linking, ODR e dipendenze</a></li>
     <li><a href="lez4_11.html">L4.11 - Copy semantics e Rule of Three/Zero</a></li>
-    <li><a href="lez4_12.html">L4.12 - Move semantics, Rule of Five e RVO</a></li>
+    <li><a href="lez4_12.html" class="active">L4.12 - Move semantics, Rule of Five e RVO</a></li>
     <li><a href="lez4_13.html">L4.13 - Esercizi base</a></li>
     <li><a href="lez4_14.html">L4.14 - Esercizi intermedi</a></li>
     <li><a href="lez4_15.html">L4.15 - Esercizi avanzati e ponte</a></li>
@@ -47,68 +47,54 @@
 <!-- END MENU -->
 
 <div class="slide">
-  <h1>Anatomia minima di una classe</h1>
-
+  <h1>Move semantics, Rule of Five e RVO</h1>
   <div class="nav-buttons" style="margin-bottom:10px">
     <button onclick="prevSlide()">&#8592; Indietro</button>
     <button onclick="nextSlide()">Avanti &#8594;</button>
   </div>
-
   <div class="content-box">
     <div class="inner-box box">
       <h2>Obiettivo della pagina</h2>
-      <p>Vedere la struttura minima di una classe C++ e capire il ruolo dei suoi pezzi principali.</p>
-      <p class="ok"><b>Idea chiave:</b> una classe minima mette in chiaro tre cose: stato interno, operazioni pubbliche e confine tra i due.</p>
+      <p>Capire quando non vuoi duplicare una risorsa, ma trasferirla da un oggetto a un altro.</p>
+      <p class="ok"><b>Idea chiave:</b> il move evita copie inutili trasferendo il possesso della risorsa e lasciando l'oggetto sorgente in uno stato vuoto ma valido.</p>
     </div>
-
     <div class="inner-box box">
-      <h2>Struttura base</h2>
-<pre><code class="language-cpp">class Punto {
-private:
-    double x_;
-    double y_;
-public:
-    double x() const { return x_; }
-    double y() const { return y_; }
-    void sposta(double dx, double dy){
-        x_ += dx;
-        y_ += dy;
-    }
-};</code></pre>
+      <h2>Copiare non e sempre la scelta giusta</h2>
+      <p>Per oggetti grandi o per risorse uniche, duplicare tutto puo essere costoso oppure concettualmente sbagliato.</p>
       <ul>
-        <li><b>membri dati:</b> descrivono lo stato dell'oggetto;</li>
-        <li><b>metodi:</b> descrivono le azioni o le osservazioni possibili;</li>
-        <li><b>sezioni di accesso:</b> stabiliscono chi puo usare cosa.</li>
+        <li>copiare un buffer grande costa tempo e memoria;</li>
+        <li>copiare un handle esclusivo puo essere vietato;</li>
+        <li>spostare significa dire: "da ora questa risorsa appartiene al nuovo oggetto".</li>
       </ul>
     </div>
-
     <div class="inner-box box">
-      <h2>Classe e oggetto non sono la stessa cosa</h2>
-      <p>La classe e il modello. L'oggetto e un'istanza concreta di quel modello.</p>
-<pre><code class="language-cpp">Punto p;
-Punto q;</code></pre>
-      <p><code>p</code> e <code>q</code> hanno lo stesso tipo, ma non necessariamente lo stesso stato.</p>
+      <h2>Che cosa fa davvero std::move</h2>
+      <p><code>std::move</code> non sposta da solo. Dice al compilatore che puo trattare un oggetto come sorgente sacrificabile.</p>
+      <p>Lo spostamento vero avviene solo se il tipo definisce correttamente costruttore e assegnazione di move.</p>
     </div>
-
     <div class="inner-box box">
-      <h2>struct o class?</h2>
-      <p>In C++ hanno quasi le stesse capacita. La differenza pratica di base e il default di accesso:</p>
+      <h2>Rule of Five</h2>
+      <p>Se una classe gestisce manualmente una risorsa e decidi di progettare anche il move, le funzioni speciali rilevanti diventano cinque:</p>
       <ul>
-        <li><code>struct</code> ha membri pubblici di default;</li>
-        <li><code>class</code> ha membri privati di default.</li>
+        <li>distruttore;</li>
+        <li>costruttore di copia;</li>
+        <li>assegnazione per copia;</li>
+        <li>costruttore di move;</li>
+        <li>assegnazione di move.</li>
       </ul>
-      <p class="note">Regola didattica utile: usa <code>struct</code> per record molto semplici; usa <code>class</code> quando vuoi difendere invarianti e progettare un'interfaccia.</p>
     </div>
-
+    <div class="inner-box box">
+      <h2>RVO e copy elision</h2>
+      <p>Il compilatore spesso elimina copie e move inutili quando ritorni oggetti per valore.</p>
+      <p class="note">Non introdurre complessita prematura "per evitare una copia" senza avere capito cosa fa gia il linguaggio.</p>
+    </div>
     <div class="inner-box warn">
-      <b>Errore tipico:</b> pensare che una classe sia "solo una struct con metodi". In realta il punto non e aggiungere metodi, ma progettare un confine corretto tra uso esterno e stato interno.
+      <b>Errore tipico:</b> usare un oggetto dopo averlo mosso come se contenesse ancora il vecchio valore. Dopo il move deve restare valido, ma non devi assumere che il contenuto sia ancora quello di prima.
     </div>
-
     <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L4.4</strong> vediamo il primo momento decisivo della vita di un oggetto: come nasce e come viene garantito uno stato valido fin dall'inizio.
+      <b>Passo successivo.</b> Nelle prossime tre slide verifichiamo tutto con esercizi guidati: prima le basi della classe, poi copia e organizzazione su file, infine ownership e move.
     </div>
   </div>
-
   <div class="nav-buttons">
     <button onclick="prevSlide()">&#8592; Indietro</button>
     <button onclick="nextSlide()">Avanti &#8594;</button>

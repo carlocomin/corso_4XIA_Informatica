@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - L4.14 · Esercizi intermedi</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez4_13.html"; }
+    function nextSlide(){ window.location.href = "lez4_15.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra soluzione ▼' : 'Nascondi soluzione ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 4 - OOP in C++ (ripasso guidato)</h2>
+  <ul>
+    <li><a href="lez4_1.html">L4.1 - Perche OOP</a></li>
+    <li><a href="lez4_2.html">L4.2 - Astrazione e incapsulamento</a></li>
+    <li><a href="lez4_3.html">L4.3 - Anatomia minima di una classe</a></li>
+    <li><a href="lez4_4.html">L4.4 - Costruttori e invarianti</a></li>
+    <li><a href="lez4_5.html">L4.5 - Distruttore, ordine, default e delete</a></li>
+    <li><a href="lez4_6.html">L4.6 - Incapsulamento forte e metodi const</a></li>
+    <li><a href="lez4_7.html">L4.7 - Overload e overload const/non-const</a></li>
+    <li><a href="lez4_8.html">L4.8 - Rendere leggibile un oggetto e contratti d'uso</a></li>
+    <li><a href="lez4_9.html">L4.9 - Header, sorgenti e translation unit</a></li>
+    <li><a href="lez4_10.html">L4.10 - Build, linking, ODR e dipendenze</a></li>
+    <li><a href="lez4_11.html">L4.11 - Copy semantics e Rule of Three/Zero</a></li>
+    <li><a href="lez4_12.html">L4.12 - Move semantics, Rule of Five e RVO</a></li>
+    <li><a href="lez4_13.html">L4.13 - Esercizi base</a></li>
+    <li><a href="lez4_14.html" class="active">L4.14 - Esercizi intermedi</a></li>
+    <li><a href="lez4_15.html">L4.15 - Esercizi avanzati e ponte</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Esercizi intermedi</h1>
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+  <div class="content-box">
+    <div class="inner-box box">
+      <h2>Obiettivo di questa pagina</h2>
+      <p>Verificare se sai collegare progettazione della classe, separazione su file e semantica di copia.</p>
+      <p class="ok"><b>Metodo di lavoro:</b> per ogni caso chiediti prima chi possiede cosa, poi decidi dove va il codice e solo infine scegli le funzioni speciali necessarie.</p>
+    </div>
+    <div class="inner-box box">
+      <h2>E1 - Header o sorgente?</h2>
+      <p><b>Scenario:</b> hai una classe <code>Punto</code> con un metodo piccolo <code>x() const</code> e un metodo piu lungo <code>to_string()</code>.</p>
+      <p><b>Domanda:</b> cosa conviene lasciare nel file header e cosa spostare nel <code>.cpp</code>?</p>
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-l44" onclick="toggleBox('btn-l44','box-l44')">Mostra soluzione ▼</button></div>
+      <div id="box-l44" style="display:none;margin-top:8px">
+        <div class="ok">
+          <p><b>Soluzione:</b> gli osservatori piccolissimi possono stare nell'header; una funzione piu corposa come <code>to_string()</code> conviene metterla nel <code>.cpp</code> per tenere leggero il contratto pubblico.</p>
+          <p><b>Che cosa verificava davvero:</b> non la regola "breve vs lungo" in astratto, ma l'idea di ridurre il peso degli header e separare interfaccia da implementazione.</p>
+        </div>
+      </div>
+    </div>
+    <div class="inner-box box">
+      <h2>E2 - Copia implicita: bene o male?</h2>
+      <p><b>Scenario:</b> confronta due classi: una contiene solo <code>std::string</code> e <code>int</code>; l'altra contiene <code>char*</code> allocato con <code>new[]</code>.</p>
+      <p><b>Domanda:</b> in quale delle due la copia implicita del compilatore e ragionevole?</p>
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-l45" onclick="toggleBox('btn-l45','box-l45')">Mostra soluzione ▼</button></div>
+      <div id="box-l45" style="display:none;margin-top:8px">
+        <div class="ok">
+          <p><b>Soluzione:</b> nella classe con <code>std::string</code> e <code>int</code> la copia implicita e in genere corretta; nella classe con <code>char*</code> che possiede memoria, no, perche rischi shallow copy e doppia delete.</p>
+          <p><b>Errore tipico:</b> trattare tutti i puntatori come se fossero solo "un dato in piu". In realta spesso sono un segnale di ownership da progettare con attenzione.</p>
+        </div>
+      </div>
+    </div>
+    <div class="inner-box box">
+      <h2>E3 - Rule of Three o Rule of Zero?</h2>
+      <p><b>Scenario:</b> devi implementare una classe che contiene una collezione di interi ridimensionabile.</p>
+      <p><b>Domanda:</b> e meglio usare <code>int*</code> gestito a mano o <code>std::vector&lt;int&gt;</code> se il tuo obiettivo non e studiare la gestione manuale della memoria?</p>
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-l46" onclick="toggleBox('btn-l46','box-l46')">Mostra soluzione ▼</button></div>
+      <div id="box-l46" style="display:none;margin-top:8px">
+        <div class="ok">
+          <p><b>Soluzione:</b> se lo scopo non e didatticamente studiare la gestione manuale, <code>std::vector&lt;int&gt;</code> e la scelta migliore. Ti porta verso la Rule of Zero e riduce la superficie degli errori.</p>
+          <p><b>Che cosa verificava davvero:</b> la capacita di scegliere il livello giusto di complessita, non di mostrare piu codice possibile.</p>
+        </div>
+      </div>
+    </div>
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L4.15</strong> affrontiamo ownership esclusiva, move e il passaggio verso la lezione successiva su gerarchie e polimorfismo.
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+</body>
+</html>

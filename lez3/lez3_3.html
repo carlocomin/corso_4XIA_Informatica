@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA – Lez3_3 · File binari (base) in C++ e C</title>
+  <title>4BIA - L3.3 · File: modello d'I/O e scelte pratiche</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -12,34 +12,37 @@
   <script>
     function prevSlide(){ window.location.href = "lez3_2.html"; }
     function nextSlide(){ window.location.href = "lez3_4.html"; }
-function toggleBox(btnId, boxId){
-      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
-      const open = box.style.display==='block';
-      box.style.display = open ? 'none':'block';
-      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
     }
   </script>
-
 </head>
 <body>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 3 - File I/O</h2>
+  <h2>Lezione 3 - File I/O (ripasso guidato)</h2>
   <ul>
-    <li><a href="lez3_1.html">Lez3_1: File, concetti e modelli</a></li>
-    <li><a href="lez3_2.html">Lez3_2: I/O su file testuali (C++)</a></li>
-    <li><a href="lez3_3.html" class="active">Lez3_3: File binari (base) in C++ e C</a></li>
-    <li><a href="lez3_4.html">Lez3_4: Spostamento del cursore nei file binari</a></li>
-    <li><a href="lez3_5.html">Lez3_5: Perche non scrivere struct raw</a></li>
-    <li><a href="lez3_6.html">Lez3_6: fseek/ftell e seekg/tellg (text mode)</a></li>
-    <li><a href="lez3_7.html">Lez3_7: Indici per file binari</a></li>
+    <li><a href="lez3_1.html">L3.1 - Che cos'e un file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo vs binario</a></li>
+    <li><a href="lez3_3.html" class="active">L3.3 - Modello d'I/O e scelte pratiche</a></li>
+    <li><a href="lez3_4.html">L3.4 - CSV e TSV: scrivere e leggere</a></li>
+    <li><a href="lez3_5.html">L3.5 - Robustezza: escape, locale, round-trip</a></li>
+    <li><a href="lez3_6.html">L3.6 - Binario: modello base</a></li>
+    <li><a href="lez3_7.html">L3.7 - Read e write in C++ e C</a></li>
+    <li><a href="lez3_8.html">L3.8 - Seek e cursore nei file binari</a></li>
+    <li><a href="lez3_9.html">L3.9 - Perche i seek arbitrari in text mode non sono portabili</a></li>
+    <li><a href="lez3_10.html">L3.10 - Indici per file binari</a></li>
   </ul>
 </div>
 <!-- END MENU -->
 
 <div class="slide">
-  <h1>Lez3_3 — File <em>binari</em> (base) in C++ e C</h1>
+  <h1>Modello d'I/O e scelte pratiche</h1>
 
   <div class="nav-buttons" style="margin-bottom:10px">
     <button onclick="prevSlide()">&#8592; Indietro</button>
@@ -47,399 +50,62 @@ function toggleBox(btnId, boxId){
   </div>
 
   <div class="content-box">
-
-    <div class="inner-box">
-      <h2>Obiettivo (versione base, stessa macchina)</h2>
-      <ul>
-        <li>Aprire file in <strong>modalità binaria</strong> e usare <code>write/read</code> (C++) o <code>fwrite/fread</code> (C).</li>
-        <li>Serializzare/deserializzare:
-          <ul>
-            <li><strong>primitivi</strong> (es. <code>int</code>, <code>double</code>)</li>
-            <li><strong>array 1D</strong> di primitivi</li>
-            <li><strong>matrici 2D</strong> di primitivi (row-major)</li>
-            <li><strong>array di struct</strong> con campi POD (<code>char[]</code>, numeri)</li>
-          </ul>
-        </li>
-      </ul>
-      <p class="note">Non trattiamo qui endianness/versioning generale; per portabilità cross-platform vedi Lez3_4.</p>
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Costruire una procedura mentale unica da riusare ogni volta che lavoriamo con un file, sia in C++ sia in C.</p>
+      <p class="ok"><b>Idea chiave:</b> quasi ogni problema di I/O si riduce a una sequenza stabile: apri, controlla, leggi o scrivi, verifica, chiudi.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>Cosa significa “binario” e perché <code>binary</code>?</h2>
-      <ul>
-        <li><strong>File binario</strong>: leggi/scrivi direttamente i <em>byte</em> degli oggetti, senza conversione in testo.</li>
-        <li>C++: aggiungi <code>std::ios::binary</code>. C: usa <code>"rb"</code>/<code>"wb"</code>. <span class="ok">Eviti traduzioni di newline.</span></li>
-        <li><strong>Formato</strong>: non c’è “magia” — decidi tu l’ordine dei dati nel file; per questo è utile un <em>header</em>.</li>
-      </ul>
-      <p class="tip">Per collezioni salva sempre prima la <strong>dimensione</strong> (es. <code>n</code>), poi gli <strong>n</strong> elementi contigui.</p>
-    </div>
-
-    <!-- NEW: Contratto di formato minimale -->
-    <div class="inner-box box">
-      <h2>Contratto di formato <em>minimale</em> (consigliato anche nel “base”)</h2>
-      <ul>
-        <li><strong>Magic</strong> (es. 3 byte + <code>\0</code>) per riconoscere il file, es. <code>"B1\0"</code>.</li>
-        <li><strong>Versione</strong> (<code>uint32_t</code>) per evoluzioni future.</li>
-        <li><strong>Dimensioni</strong> (<code>n</code> elementi / <code>R</code>,<code>C</code> per matrici).</li>
-      </ul>
-      <p class="ok">Anche su “stessa macchina”, questa intestazione ti evita inconsistenti e facilita debug.</p>
+      <h2>La sequenza generale</h2>
+      <ol>
+        <li>scegli il path e la modalita di apertura;</li>
+        <li>apri il file e controlla se l'apertura e riuscita;</li>
+        <li>leggi o scrivi con il metodo adatto al formato;</li>
+        <li>controlla eventuali errori o fine file;</li>
+        <li>chiudi, o lascia che RAII lo faccia in C++.</li>
+      </ol>
+      <p>Questa sequenza non cambia. Cambiano solo il formato e le primitive usate.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>Cos’è un <em>POD</em> (Plain Old Data) — perché lo usiamo qui</h2>
+      <h2>C++ e C: stessa logica, strumenti diversi</h2>
+      <table>
+        <tr><th>Compito</th><th>C++</th><th>C</th></tr>
+        <tr><td>Aprire in lettura</td><td><code>std::ifstream</code></td><td><code>fopen(...,"r")</code> o <code>"rb"</code></td></tr>
+        <tr><td>Aprire in scrittura</td><td><code>std::ofstream</code></td><td><code>fopen(...,"w")</code> o <code>"wb"</code></td></tr>
+        <tr><td>Lettura testo</td><td><code>std::getline</code></td><td><code>fgets</code></td></tr>
+        <tr><td>Lettura binaria</td><td><code>read</code></td><td><code>fread</code></td></tr>
+        <tr><td>Scrittura binaria</td><td><code>write</code></td><td><code>fwrite</code></td></tr>
+      </table>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Le modalita di apertura contano</h2>
       <ul>
-        <li><strong>POD</strong>: tipo con layout semplice e copiabile byte-a-byte, senza puntatori nascosti o invarianti.</li>
-        <li><strong>Esempi</strong>: primitivi (<code>int</code>, <code>double</code>), array di primitivi, struct di soli <code>char[]</code> e numeri.</li>
+        <li><code>r</code> o <code>ifstream</code>: apri per leggere senza modificare;</li>
+        <li><code>w</code> o <code>ofstream</code>: crei o tronchi il file;</li>
+        <li><code>a</code>: aggiungi in fondo;</li>
+        <li><code>b</code> o <code>std::ios::binary</code>: lavori sui byte senza traduzione di newline.</li>
       </ul>
-      <h3>Controesempi (non-POD) & come serializzarli</h3>
+      <p class="note">Su Windows la distinzione tra testo e binario si vede di piu, perche il text mode puo tradurre <code>\n</code> in <code>\r\n</code>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Due domande da farsi prima di iniziare</h2>
       <ul>
-        <li><code>std::string</code> → contiene puntatori. <span class="ok">Salva come <code>uint32_t len</code> + <em>len</em> byte UTF-8.</span></li>
-        <li><code>std::vector&lt;T&gt;</code> → l’oggetto non è un blob contiguo. <span class="ok">Salva <code>n</code> + buffer <code>data()</code> (se <code>T</code> è POD).</span></li>
-        <li><strong>Puntatori</strong> → un indirizzo non ha senso su disco. <span class="ok">Salva il contenuto o un ID.</span></li>
-      </ul>
-      <p class="warn">Evita bit-field e <code>bool</code> “raw” (size implementation-defined) nei file base.</p>
-    </div>
-
-    <!-- ===================== C++ ===================== -->
-    <div class="inner-box">
-      <h2>Sezione C++ — esempi in modalità binaria</h2>
-
-      <div class="inner-box box">
-        <h3>1) Primitivi (con header minimale)</h3>
-        <p class="mini"><strong>Algoritmo in parole</strong> — Scrittura: apri file in binario → scrivi <em>magic</em>, <em>versione</em>, <em>count</em> → scrivi i due valori (<code>int</code>, <code>double</code>) usando <code>write</code> che prende un puntatore ai byte e la dimensione. Lettura: apri in binario → leggi header → leggi i due valori con <code>read</code> negli indirizzi delle variabili.</p>
-        <p class="mini"><strong>Cosa fanno le chiamate</strong> — <code>out.write((const char*)&x, sizeof x)</code> copia su file i <em>sizeof(x)</em> byte attualmente in memoria per <code>x</code>. <code>in.read((char*)&x, sizeof x)</code> fa l’inverso. 
-		<br/><br/>
-		<span class="warn">Portabilità:</span> così scrivi il layout “nativo” (endianness, padding): bene per “stessa macchina”, non cross-platform (vedi Lez3_4).</p>
-<pre><code class="language-cpp">#include &lt;fstream&gt;
-#include &lt;cstdint&gt;
-#include &lt;iostream&gt;
-
-int main(){
-    // SCRITTURA
-    {
-        std::ofstream out("prim.bin", std::ios::binary);
-        if(!out){ std::cerr &lt;&lt; "open write\n"; return 1; }
-        const char magic[3] = {'B','1','\0'};
-        std::uint32_t ver = 1, count = 2;
-        out.write((const char*)magic, sizeof magic);
-        out.write((const char*)&ver, sizeof ver);
-        out.write((const char*)&count, sizeof count);
-
-        int    a = 42;
-        double b = 3.14159;
-        out.write((const char*)&a, sizeof a);
-        out.write((const char*)&b, sizeof b);
-    }
-    // LETTURA
-    {
-        std::ifstream in("prim.bin", std::ios::binary);
-        if(!in){ std::cerr &lt;&lt; "open read\n"; return 1; }
-        char magic[3]; std::uint32_t ver=0,count=0;
-        in.read((char*)magic, 3);
-        in.read((char*)&ver, sizeof ver);
-        in.read((char*)&count, sizeof count);
-        int a; double b;
-        in.read((char*)&a, sizeof a);
-        in.read((char*)&b, sizeof b);
-        std::cout &lt;&lt; "magic=" &lt;&lt; magic &lt;&lt; " ver=" &lt;&lt; ver
-                  &lt;&lt; " a=" &lt;&lt; a &lt;&lt; " b=" &lt;&lt; b &lt;&lt; "\n";
-    }
-}
-</code></pre>
-      </div>
-
-      <div class="inner-box box">
-        <h3>2) Array 1D di primitivi</h3>
-        <p class="mini"><strong>Algoritmo</strong> — Scrivi: header, poi <code>n=vector.size()</code>, poi i <em>n</em> elementi contigui dal buffer <code>v.data()</code>. Leggi: header → <code>n</code> → ridimensiona <code>vector</code> → leggi in blocco nel suo buffer.</p>
-        <p class="mini"><strong>Perché funziona</strong> — <code>std::vector</code> garantisce che gli elementi siano contigui in memoria; <code>data()</code> restituisce un puntatore al primo elemento, utilizzabile da <code>read/write</code>.</p>
-<pre><code class="language-cpp">#include &lt;vector&gt;
-#include &lt;cstdint&gt;
-#include &lt;fstream&gt;
-
-int main(){
-    // SCRITTURA
-    {
-        std::vector&lt;int&gt; v = {1,2,3,4,5};
-        std::ofstream out("array.bin", std::ios::binary);
-        if(!out) return 1;
-        const char magic[3]={'B','1','\0'}; std::uint32_t ver=1;
-        std::uint32_t n = (std::uint32_t)v.size();
-        out.write((const char*)magic,3);
-        out.write((const char*)&ver,sizeof ver);
-        out.write((const char*)&n,  sizeof n);
-        out.write((const char*)v.data(), n*sizeof(int));
-    }
-    // LETTURA
-    {
-        std::ifstream in("array.bin", std::ios::binary);
-        if(!in) return 1;
-        char magic[3]; std::uint32_t ver=0,n=0;
-        in.read((char*)magic,3); in.read((char*)&ver,sizeof ver); in.read((char*)&n,sizeof n);
-        std::vector&lt;int&gt; v(n);
-        in.read((char*)v.data(), n*sizeof(int));
-        // ... usa v ...
-    }
-}
-</code></pre>
-      </div>
-
-      <div class="inner-box box">
-        <h3>3) Matrice 2D di primitivi (row-major)</h3>
-        <p class="mini"><strong>Algoritmo</strong> — Rappresentiamo la matrice come unico vettore di lunghezza <code>R*C</code> in <em>row-major</em> (prima riga, poi la seconda, ...). Scriviamo header + <code>R</code>, <code>C</code> + blocco <code>R*C</code> elementi. In lettura, ricostruiamo un vettore di pari dimensione e usiamo l’indice <code>r*C + c</code>.</p>
-        <p class="mini"><strong>Perché</strong> — Usare un buffer lineare evita complicazioni con array di puntatori e rende la scrittura/lettura un’unica operazione di blocco.</p>
-<pre><code class="language-cpp">#include &lt;vector&gt;
-#include &lt;cstdint&gt;
-#include &lt;fstream&gt;
-
-int main(){
-    const std::uint32_t R=2, C=3;
-    std::vector&lt;double&gt; m = {1,2,3, 4,5,6};
-
-    // SCRITTURA
-    {
-        std::ofstream out("mat.bin", std::ios::binary);
-        if(!out) return 1;
-        const char magic[3]={'B','1','\0'}; std::uint32_t ver=1;
-        out.write((const char*)magic,3);
-        out.write((const char*)&ver,sizeof ver);
-        out.write((const char*)&R,  sizeof R);
-        out.write((const char*)&C,  sizeof C);
-        out.write((const char*)m.data(), R*C*sizeof(double));
-    }
-    // LETTURA
-    {
-        std::ifstream in("mat.bin", std::ios::binary);
-        if(!in) return 1;
-        char magic[3]; std::uint32_t ver=0,R2=0,C2=0;
-        in.read((char*)magic,3); in.read((char*)&ver,sizeof ver);
-        in.read((char*)&R2,sizeof R2); in.read((char*)&C2,sizeof C2);
-        std::vector&lt;double&gt; m2(R2*C2);
-        in.read((char*)m2.data(), R2*C2*sizeof(double));
-        // ... usa m2[r*C2 + c] ...
-    }
-}
-</code></pre>
-      </div>
-
-      <div class="inner-box box">
-        <h3>4) Array di <em>struct</em> (solo campi POD)</h3>
-        <p class="mini"><strong>Algoritmo</strong> — Dichiarare una struct “POD-style” (solo <code>char[]</code>, numeri). Scrivere: header + <code>n</code> + blocco <code>n*sizeof(Studente)</code> prelevato dal buffer contiguo del <code>vector</code>. Leggere: header + <code>n</code> → ridimensiona → <code>read</code> in blocco.</p>
-        <p class="mini"><strong>Perché <code>char[32]</code> e non <code>std::string</code></strong> — <code>std::string</code> ha puntatori/capacità interni: il dump “grezzo” non rappresenta il testo. Con <code>char[]</code> i byte del nome sono <em>davvero</em> nel record.</p>
-<pre><code class="language-cpp">#include &lt;vector&gt;
-#include &lt;cstdint&gt;
-#include &lt;cstring&gt;
-#include &lt;fstream&gt;
-
-struct Studente {
-    char   nome[32];
-    char   cognome[32];
-    int    eta;
-    double media;
-};
-
-int main(){
-    std::vector&lt;Studente&gt; cls(2);
-    std::strncpy(cls[0].nome,"Ada",31); cls[0].nome[31]='\0';
-    std::strncpy(cls[0].cognome,"Lovelace",31); cls[0].cognome[31]='\0';
-    cls[0].eta=17; cls[0].media=9.4;
-
-    std::strncpy(cls[1].nome,"Alan",31); cls[1].nome[31]='\0';
-    std::strncpy(cls[1].cognome,"Turing",31); cls[1].cognome[31]='\0';
-    cls[1].eta=18; cls[1].media=10.0;
-
-    // SCRITTURA
-    {
-        std::ofstream out("studenti.bin", std::ios::binary);
-        if(!out) return 1;
-        const char magic[3]={'B','1','\0'}; std::uint32_t ver=1, n=(std::uint32_t)cls.size();
-        out.write((const char*)magic,3);
-        out.write((const char*)&ver,sizeof ver);
-        out.write((const char*)&n,  sizeof n);
-        out.write((const char*)cls.data(), n*sizeof(Studente));
-    }
-    // LETTURA
-    {
-        std::ifstream in("studenti.bin", std::ios::binary);
-        if(!in) return 1;
-        char magic[3]; std::uint32_t ver=0,n=0;
-        in.read((char*)magic,3); in.read((char*)&ver,sizeof ver); in.read((char*)&n,sizeof n);
-        std::vector&lt;Studente&gt; v(n);
-        in.read((char*)v.data(), n*sizeof(Studente));
-        // ... usa v ...
-    }
-}
-</code></pre>
-      </div>
-    </div>
-
-    <!-- ===================== C ===================== -->
-    <div class="inner-box">
-      <h2>Sezione C — esempi in modalità binaria</h2>
-
-      <div class="inner-box box">
-        <h3>1) Primitivi (con header minimale)</h3>
-        <p class="mini"><strong>Algoritmo</strong> — Scrivi: header + valori con <code>fwrite</code>. Leggi: header + valori con <code>fread</code>. <strong>Semantica</strong>: <code>fwrite(ptr, size, count, f)</code> prova a scrivere <em>count</em> oggetti da <em>size</em> byte presi da <em>ptr</em>; restituisce quanti ne ha scritti. <code>fread</code> fa l’opposto. Nel codice didattico omettiamo i check sul valore di ritorno, ma in produzione vanno controllati.</p>
-<pre><code class="language-c">#include &lt;stdio.h&gt;
-#include &lt;stdint.h&gt;
-
-int main(void){
-    // SCRITTURA
-    {
-        FILE* f = fopen("prim_c.bin","wb"); if(!f) return 1;
-        const char magic[3] = {'B','1','\0'};
-        uint32_t ver=1, count=2;
-        fwrite(magic, 1, 3, f);
-        fwrite(&ver,  1, sizeof ver, f);
-        fwrite(&count,1, sizeof count, f);
-
-        int a=42; double b=3.14159;
-        fwrite(&a, 1, sizeof a, f);
-        fwrite(&b, 1, sizeof b, f);
-        fclose(f);
-    }
-    // LETTURA
-    {
-        FILE* f = fopen("prim_c.bin","rb"); if(!f) return 1;
-        char magic[3]; uint32_t ver=0,count=0;
-        fread(magic,1,3,f); fread(&ver,1,sizeof ver,f); fread(&count,1,sizeof count,f);
-        int a; double b;
-        fread(&a,1,sizeof a,f); fread(&b,1,sizeof b,f);
-        fclose(f);
-        return 0;
-    }
-}
-</code></pre>
-      </div>
-
-      <div class="inner-box box">
-        <h3>2) Array 1D di primitivi</h3>
-        <p class="mini"><strong>Algoritmo</strong> — Scrivi: header + <code>n</code> + blocco <code>n</code> interi con un’unica <code>fwrite</code>. Leggi: header → <code>n</code> → <code>malloc</code> di <code>n*sizeof(int)</code> → <code>fread</code> del blocco.</p>
-<pre><code class="language-c">#include &lt;stdio.h&gt;
-#include &lt;stdint.h&gt;
-#include &lt;stdlib.h&gt;
-
-int main(void){
-    // SCRITTURA
-    {
-        int v[] = {1,2,3,4,5};
-        uint32_t n = (uint32_t)(sizeof v / sizeof v[0]);
-        FILE* f = fopen("array_c.bin","wb"); if(!f) return 1;
-        const char magic[3]={'B','1','\0'}; uint32_t ver=1;
-        fwrite(magic,1,3,f); fwrite(&ver,1,sizeof ver,f); fwrite(&n,1,sizeof n,f);
-        fwrite(v, sizeof(int), n, f);
-        fclose(f);
-    }
-    // LETTURA
-    {
-        FILE* f = fopen("array_c.bin","rb"); if(!f) return 1;
-        char magic[3]; uint32_t ver=0,n=0;
-        fread(magic,1,3,f); fread(&ver,1,sizeof ver,f); fread(&n,1,sizeof n,f);
-        int* v = (int*)malloc(n*sizeof(int)); if(!v){ fclose(f); return 1; }
-        fread(v, sizeof(int), n, f);
-        // ... usa v ...
-        free(v); fclose(f); return 0;
-    }
-}
-</code></pre>
-      </div>
-
-      <div class="inner-box box">
-        <h3>3) Matrice 2D di primitivi (row-major)</h3>
-        <p class="mini"><strong>Algoritmo</strong> — Scrivi: header + <code>R</code>, <code>C</code> + blocco lineare di <code>R*C</code> double. Leggi: header → <code>R</code>, <code>C</code> → <code>malloc</code> di <code>R*C</code> elementi → <code>fread</code> del blocco. Accedi con <code>m[r*C + c]</code>.</p>
-<pre><code class="language-c">#include &lt;stdio.h&gt;
-#include &lt;stdint.h&gt;
-#include &lt;stdlib.h&gt;
-
-int main(void){
-    uint32_t R=2, C=3;
-    double m[6] = {1,2,3, 4,5,6};
-
-    // SCRITTURA
-    {
-        FILE* f = fopen("mat_c.bin","wb"); if(!f) return 1;
-        const char magic[3]={'B','1','\0'}; uint32_t ver=1;
-        fwrite(magic,1,3,f); fwrite(&ver,1,sizeof ver,f);
-        fwrite(&R,1,sizeof R,f); fwrite(&C,1,sizeof C,f);
-        fwrite(m, sizeof(double), R*C, f);
-        fclose(f);
-    }
-    // LETTURA
-    {
-        FILE* f = fopen("mat_c.bin","rb"); if(!f) return 1;
-        char magic[3]; uint32_t ver=0,R2=0,C2=0;
-        fread(magic,1,3,f); fread(&ver,1,sizeof ver,f);
-        fread(&R2,1,sizeof R2,f); fread(&C2,1,sizeof C2,f);
-        double* m2 = (double*)malloc(R2*C2*sizeof(double)); if(!m2){ fclose(f); return 1; }
-        fread(m2, sizeof(double), R2*C2, f);
-        // ... usa m2[r*C2 + c] ...
-        free(m2); fclose(f); return 0;
-    }
-}
-</code></pre>
-      </div>
-
-      <div class="inner-box box">
-        <h3>4) Array di <em>struct</em> (C) — solo campi POD</h3>
-        <p class="mini"><strong>Algoritmo</strong> — Scrivi: header + <code>n</code> + blocco <code>n*sizeof(Studente)</code>. Leggi: header → <code>n</code> → buffer statico o dinamico → <code>fread</code> del blocco.</p>
-<pre><code class="language-c">#include &lt;stdio.h&gt;
-#include &lt;stdint.h&gt;
-#include &lt;string.h&gt;
-
-typedef struct {
-    char   nome[32];
-    char   cognome[32];
-    int    eta;
-    double media;
-} Studente;
-
-int main(void){
-    Studente cls[2]; memset(&cls,0,sizeof cls);
-    strncpy(cls[0].nome,"Ada",31); strncpy(cls[0].cognome,"Lovelace",31); cls[0].eta=17; cls[0].media=9.4;
-    strncpy(cls[1].nome,"Alan",31); strncpy(cls[1].cognome,"Turing",31);   cls[1].eta=18; cls[1].media=10.0;
-
-    // SCRITTURA
-    {
-        FILE* f = fopen("studenti_c.bin","wb"); if(!f) return 1;
-        const char magic[3]={'B','1','\0'}; uint32_t ver=1, n=2;
-        fwrite(magic,1,3,f); fwrite(&ver,1,sizeof ver,f); fwrite(&n,1,sizeof n,f);
-        fwrite(cls, sizeof(Studente), n, f);
-        fclose(f);
-    }
-    // LETTURA
-    {
-        FILE* f = fopen("studenti_c.bin","rb"); if(!f) return 1;
-        char magic[3]; uint32_t ver=0, n=0;
-        fread(magic,1,3,f); fread(&ver,1,sizeof ver,f); fread(&n,1,sizeof n,f);
-        Studente v[10]; if(n>10) n=10;
-        fread(v, sizeof(Studente), n, f);
-        fclose(f); return 0;
-    }
-}
-</code></pre>
-      </div>
-    </div>
-
-    <div class="inner-box">
-      <h2>Pitfall (base) & accortezze</h2>
-      <ul>
-        <li><strong>Dimenticare la modalità binaria</strong> (<code>std::ios::binary</code>, <code>"wb"/"rb"</code>). <br/><br/><span class="ok">Apri sempre i file binari in modalità binaria.</span></li>
-        <li><strong>Non salvare le dimensioni</strong> prima di array/matrici. <br/><br/><span class="ok">Scrivi prima <code>n</code> (o <code>R</code>, <code>C</code>), poi i dati.</span></li>
-        <li><strong>Struct con campi non banali</strong> (<code>std::string</code>, puntatori). <br/><br/><span class="ok">Nel “base” usa solo campi POD, oppure serializza i contenuti (len+bytes).</span></li>
-        <li><strong>Ignorare i risultati I/O</strong> (letture parziali). <br/><br/><span class="ok">In C verifica il valore di ritorno di <code>fread/fwrite</code>; in C++ verifica <code>!stream.fail()</code> o <code>gcount()</code> se leggi parziale.</span></li>
-      </ul>
-      <p class="note">Per formati portabili (endianness/versioni) → Lez3_4; per “perché non raw struct” → Lez3_5.</p>
-    </div>
-
-    <div class="inner-box">
-      <h2>Takeaways</h2>
-      <ul>
-        <li>Binario (base) = scrivere/leggere <strong>byte</strong> di primitivi e POD in blocchi contigui.</li>
-        <li>Inserisci un <strong>header minimale</strong> (magic+versione+dimensioni) anche negli esempi base.</li>
-        <li>Per matrici: layout row-major e indice <code>r*C + c</code>.</li>
-        <li>La portabilità generale è nella prossima lezione; qui consolidiamo le tecniche fondamentali.</li>
+        <li><b>Sto leggendo per righe o per byte?</b> Questa risposta separa subito testo e binario.</li>
+        <li><b>Mi serve accesso sequenziale o casuale?</b> Se ti servono offset e salti diretti, stai gia ragionando da file binario.</li>
       </ul>
     </div>
 
+    <div class="inner-box warn">
+      <b>Regola pratica:</b> non scegliere le funzioni dal nome che "sembra giusto". Prima decidi il modello: testo o binario, sequenziale o casuale, lettura o aggiornamento.
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L3.4</strong> entriamo nel primo caso concreto: file testuali CSV e TSV, cioe righe e campi separati.
+    </div>
   </div>
 
   <div class="nav-buttons">
@@ -447,8 +113,5 @@ int main(void){
     <button onclick="nextSlide()">Avanti &#8594;</button>
   </div>
 </div>
-
-<script>
-</script>
 </body>
 </html>

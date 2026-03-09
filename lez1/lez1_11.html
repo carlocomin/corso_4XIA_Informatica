@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - L1.11 · Matrici 2D: operazioni classiche e chiusura</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez1_10.html"; }
+    function nextSlide(){ window.location.href = "../lez2/lez2_1.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+  <ul>
+    <li><a href="lez1_1.html">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
+    <li><a href="lez1_2.html">L1.2 - Definizioni e indici</a></li>
+    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
+    <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
+    <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
+    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
+    <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
+    <li><a href="lez1_8.html">L1.8 - Perche la firma conta</a></li>
+    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
+    <li><a href="lez1_10.html">L1.10 - Matrici dinamiche</a></li>
+    <li><a href="lez1_11.html" class="active">L1.11 - Operazioni classiche e chiusura</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Operazioni classiche e chiusura</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Chiudere il ripasso applicando il modello della matrice a problemi tipici: somme, diagonali, simmetria e triangolarita.</p>
+      <p class="ok"><b>Idea chiave:</b> questi esercizi non sono "trucchetti da ricordare", ma casi in cui si vede se hai davvero interiorizzato indici, cicli annidati e struttura della matrice.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Somme per riga e per colonna</h2>
+      <p>Il pattern corretto e semplice: inizializzi i vettori delle somme a zero e poi aggiorni tutto durante una sola scansione completa.</p>
+<pre><code class="language-cpp">for (int r = 0; r &lt; R; ++r)
+  sr[r] = 0;
+for (int c = 0; c &lt; C; ++c)
+  sc[c] = 0;
+
+for (int r = 0; r &lt; R; ++r)
+  for (int c = 0; c &lt; C; ++c){
+    sr[r] += a[r][c];
+    sc[c] += a[r][c];
+  }
+</code></pre>
+      <p class="warn"><b>Errore tipico:</b> dimenticare l'azzeramento iniziale e accumulare su valori gia presenti.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Diagonali e traccia</h2>
+      <p>Quando la matrice e quadrata, la diagonale principale usa gli indici <code>(i,i)</code>. La diagonale secondaria usa <code>(i, N-1-i)</code>. La <b>traccia</b> e la somma degli elementi della diagonale principale.</p>
+      <p>Il punto concettuale e che qui non serve piu una scansione completa: basta una sola variabile di indice.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Simmetria e triangolarita</h2>
+      <p>Per verificare se una matrice quadrata e simmetrica, non serve confrontare tutto con tutto. Basta lavorare su mezza matrice, per esempio sopra la diagonale principale.</p>
+      <p>Lo stesso vale per triangolare superiore e inferiore: il test si concentra sulla zona che <i>dovrebbe</i> essere tutta zero.</p>
+      <p class="note"><b>Messaggio importante:</b> capire il problema strutturalmente permette spesso di evitare lavoro inutile.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Sintesi finale della lezione</h2>
+      <ul>
+        <li>una matrice e una struttura con due indici e un layout di memoria preciso;</li>
+        <li>in C e C++ la rappresentazione statica segue il modello row-major;</li>
+        <li>ordine dei cicli, firme delle funzioni e rappresentazioni dinamiche dipendono da questo modello;</li>
+        <li>gli esercizi classici su matrici servono a verificare se il modello e diventato operativo.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>Lezione 2</strong> cambiamo oggetto ma non metodo: passeremo alle <strong>struct</strong>, ancora con l'obiettivo di capire bene prima il modello mentale e poi la sintassi utile.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

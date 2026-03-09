@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - L2.8 · Struct: collezioni di struct in C++</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez2_7.html"; }
+    function nextSlide(){ window.location.href = "lez2_9.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
+  <ul>
+    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
+    <li><a href="lez2_2.html">L2.2 - Sintassi minima e accesso ai membri</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
+    <li><a href="lez2_4.html">L2.4 - Inizializzare in C</a></li>
+    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
+    <li><a href="lez2_8.html" class="active">L2.8 - Collezioni di struct in C++</a></li>
+    <li><a href="lez2_9.html">L2.9 - Lambda, ordinamento e filtro</a></li>
+    <li><a href="lez2_10.html">L2.10 - Layout, padding e serializzazione raw</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Collezioni di struct in C++</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Passare dal singolo record a un insieme di record, senza perdere chiarezza sui costi e sulle operazioni piu comuni.</p>
+      <p class="ok"><b>Idea chiave:</b> quando lavori con molte <code>struct</code> omogenee, <code>std::vector&lt;T&gt;</code> diventa il contenitore naturale: memoria contigua, crescita dinamica e buon supporto algoritmico.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perche <code>std::vector&lt;Studente&gt;</code></h2>
+      <ul>
+        <li>rappresenta in modo naturale una classe, una lista, un archivio temporaneo;</li>
+        <li>ti evita di fissare subito una dimensione massima;</li>
+        <li>lavora bene con gli algoritmi standard del C++;</li>
+        <li>mantiene gli elementi contigui in memoria.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio minimo</h2>
+<pre><code class="language-cpp">std::vector&lt;Studente&gt; classe{
+    {"Ada","Lovelace",17,9.4},
+    {"Alan","Turing",18,10.0},
+    {"Grace","Hopper",19,9.8}
+};
+
+classe.push_back({"Barbara","Liskov",20,9.2});
+</code></pre>
+      <p>Il punto didattico importante e che ora puoi trattare la collezione come un unico oggetto su cui iterare, cercare, contare, ordinare e filtrare.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Lettura e modifica senza copie inutili</h2>
+<pre><code class="language-cpp">for (const auto& s : classe) {
+    // sola lettura
+}
+
+for (auto& s : classe) {
+    // modifica in-place
+}
+</code></pre>
+      <p>Questo dettaglio e importante: se dimentichi il riferimento, rischi di copiare ogni record durante il ciclo.</p>
+    </div>
+
+    <div class="inner-box warn">
+      <b>Regola pratica:</b> per scorrere una collezione di record usa quasi sempre <code>const auto&</code> in lettura e <code>auto&</code> in modifica. La copia dovrebbe essere una scelta consapevole, non un incidente.
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L2.9</strong> aggiungiamo gli strumenti che rendono davvero potenti queste collezioni: lambda, ordinamenti, ricerche e filtri.
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+</body>
+</html>

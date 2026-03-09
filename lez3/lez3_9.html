@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - L3.9 · Text mode: limiti di portabilita dei seek</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez3_8.html"; }
+    function nextSlide(){ window.location.href = "lez3_10.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 3 - File I/O (ripasso guidato)</h2>
+  <ul>
+    <li><a href="lez3_1.html">L3.1 - Che cos'e un file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo vs binario</a></li>
+    <li><a href="lez3_3.html">L3.3 - Modello d'I/O e scelte pratiche</a></li>
+    <li><a href="lez3_4.html">L3.4 - CSV e TSV: scrivere e leggere</a></li>
+    <li><a href="lez3_5.html">L3.5 - Robustezza: escape, locale, round-trip</a></li>
+    <li><a href="lez3_6.html">L3.6 - Binario: modello base</a></li>
+    <li><a href="lez3_7.html">L3.7 - Read e write in C++ e C</a></li>
+    <li><a href="lez3_8.html">L3.8 - Seek e cursore nei file binari</a></li>
+    <li><a href="lez3_9.html" class="active">L3.9 - Perche i seek arbitrari in text mode non sono portabili</a></li>
+    <li><a href="lez3_10.html">L3.10 - Indici per file binari</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Perche i seek arbitrari in text mode non sono portabili</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Capire perche il modello degli offset funziona benissimo in binario ma va usato con molta piu prudenza sui file di testo.</p>
+      <p class="ok"><b>Idea chiave:</b> in text mode la libreria puo tradurre newline e gestire stati interni, quindi "spostarsi di N byte" non equivale sempre a "raggiungere il carattere giusto".</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Da dove nasce il problema</h2>
+      <ul>
+        <li>su alcune piattaforme <code>\n</code> e memorizzato come <code>\r\n</code>;</li>
+        <li>la codifica puo usare un numero variabile di byte per carattere;</li>
+        <li>la posizione riportata da <code>ftell</code> o <code>tellg</code> in text mode non va trattata come un offset libero su cui fare aritmetica.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa e portabile</h2>
+      <ul>
+        <li>tornare all'inizio del file;</li>
+        <li>tornare a una posizione precedentemente ottenuta dallo stesso stream;</li>
+        <li>usare seek arbitrari solo quando lavori in binario.</li>
+      </ul>
+      <p>Questo e il confine didattico importante: in testo ragioni su righe e parsing; in binario ragioni su byte e offset.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>La conseguenza pratica</h2>
+      <p>Se vuoi riaprire un punto noto di un file di testo, salva una posizione restituita dall'API e usala per tornare indietro.</p>
+      <p>Se invece vuoi accesso casuale reale a posizioni calcolate, e piu corretto lavorare in modalita binaria e definire un formato adatto.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Messaggio didattico da portare via</h2>
+      <p>Nei file testuali l'unita concettuale e spesso la riga o il campo. Nei file binari l'unita concettuale puo essere il byte, il record o l'offset.</p>
+      <p>Confondere questi due piani porta a codice fragile e non portabile.</p>
+    </div>
+
+    <div class="inner-box warn">
+      <b>Errore tipico:</b> provare a trattare un file di testo come se fosse una tabella di record fissi. Finche il file e piccolo sembra funzionare, ma il modello e sbagliato.
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L3.10</strong> chiudiamo la lezione con l'applicazione piu naturale di tutto questo discorso: costruire un indice per saltare direttamente al record giusto in un file binario.
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - L2.7 · Struct: intento dell'API, const e lifetime</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez2_6.html"; }
+    function nextSlide(){ window.location.href = "lez2_8.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
+  <ul>
+    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
+    <li><a href="lez2_2.html">L2.2 - Sintassi minima e accesso ai membri</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
+    <li><a href="lez2_4.html">L2.4 - Inizializzare in C</a></li>
+    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
+    <li><a href="lez2_7.html" class="active">L2.7 - Intento dell'API, const e lifetime</a></li>
+    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
+    <li><a href="lez2_9.html">L2.9 - Lambda, ordinamento e filtro</a></li>
+    <li><a href="lez2_10.html">L2.10 - Layout, padding e serializzazione raw</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Intento dell'API, const e lifetime</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Passare dalla scelta meccanica della firma al suo significato progettuale.</p>
+      <p class="ok"><b>Idea chiave:</b> una buona firma non dice solo "come passa il dato", ma anche che cosa la funzione promette di fare o di non fare con quell'oggetto.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2><code>const</code> come contratto</h2>
+      <p>Quando scrivi <code>const Studente&</code>, non stai solo evitando copie. Stai dichiarando che la funzione usa lo studente in sola lettura. Questo rende il codice piu sicuro e piu leggibile.</p>
+      <p>Il compilatore, qui, diventa un alleato: se provi a modificare il parametro, ti ferma.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Quando il puntatore comunica qualcosa in piu</h2>
+      <p>Un riferimento in C++ implica che l'oggetto esiste e deve esserci. Un puntatore, invece, puo comunicare anche il caso "nessun oggetto". Per questo non sono intercambiabili dal punto di vista del significato.</p>
+      <p class="note"><b>Esempio mentale:</b> se il parametro e opzionale, il puntatore ha un senso progettuale; se non lo e, il riferimento e spesso piu chiaro.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Lifetime: che cosa puoi restituire</h2>
+      <p>Qui nasce un errore tipico importante: restituire riferimenti o puntatori a oggetti locali costruiti dentro la funzione.</p>
+<pre><code class="language-cpp">const Studente& creaBad(){
+    Studente tmp{"Ada", "Lovelace", 17, 9.4};
+    return tmp; // riferimento dangling
+}
+</code></pre>
+      <p>Se l'oggetto viene creato dentro la funzione, di solito la scelta corretta e restituire per valore.</p>
+    </div>
+
+    <div class="inner-box warn">
+      <b>Regola pratica:</b> se una funzione crea un nuovo record, preferisci restituirlo per valore. Se invece si limita a osservare o modificare un record gia esistente, ragiona su <code>const&</code>, <code>&</code> o puntatore in base all'intento.
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L2.8</strong> allarghiamo il quadro: una volta definita bene una <code>struct</code>, il passo naturale e gestire molte istanze insieme, quindi passiamo alle collezioni di record.
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+</body>
+</html>

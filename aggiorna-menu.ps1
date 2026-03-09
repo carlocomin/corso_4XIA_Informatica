@@ -121,50 +121,97 @@ $rootItems = @(
     @{ Path = "lez1/lez1_1.html"; Label = "Lezione 1: Matrici 2D in C/C++" },
     @{ Path = "lez2/lez2_1.html"; Label = "Lezione 2: Struct in C/C++" },
     @{ Path = "lez3/lez3_1.html"; Label = "Lezione 3: File I/O in C/C++" },
-    @{ Path = "lez4/lez4_1.html"; Label = "Lezione 4: OOP in C++" }
+    @{ Path = "lez4/lez4_1.html"; Label = "Lezione 4: OOP in C++" },
+    @{ Path = "lez5/lez5_1.html"; Label = "Lezione 5: Ereditarietà e polimorfismo in C++" },
+    @{ Path = "lez6/lez6_1.html"; Label = "Lezione 6: Alberi e BST in C/C++" }
 )
 
 $lez1Items = @(
-    @{ Path = "lez1_1.html"; Label = "L1.1 - Introduzione e obiettivi" },
-    @{ Path = "lez1_2.html"; Label = "L1.2 - Definizioni, indici, row-major" },
-    @{ Path = "lez1_3.html"; Label = "L1.3 - Dichiarazione e attraversamento" },
-    @{ Path = "lez1_4.html"; Label = "L1.4 - I/O e utility" },
-    @{ Path = "lez1_5.html"; Label = "L1.5 - Passare matrici a funzione" },
-    @{ Path = "lez1_6.html"; Label = "L1.6 - Matrici dinamiche" },
-    @{ Path = "lez1_7.html"; Label = "L1.7 - Operazioni base" }
+    @{ Path = "lez1_1.html"; Label = "L1.1 - Introduzione, obiettivi, convenzioni" },
+    @{ Path = "lez1_2.html"; Label = "L1.2 - Definizioni e indici" },
+    @{ Path = "lez1_3.html"; Label = "L1.3 - Row-major e modello di memoria" },
+    @{ Path = "lez1_4.html"; Label = "L1.4 - Dichiarazione e inizializzazione" },
+    @{ Path = "lez1_5.html"; Label = "L1.5 - Attraversamento per riga/colonna" },
+    @{ Path = "lez1_6.html"; Label = "L1.6 - I/O di base su matrici" },
+    @{ Path = "lez1_7.html"; Label = "L1.7 - Utility e input robusto" },
+    @{ Path = "lez1_8.html"; Label = "L1.8 - Perche la firma conta" },
+    @{ Path = "lez1_9.html"; Label = "L1.9 - Firme corrette in C++ e C" },
+    @{ Path = "lez1_10.html"; Label = "L1.10 - Matrici dinamiche" },
+    @{ Path = "lez1_11.html"; Label = "L1.11 - Operazioni classiche e chiusura" }
 )
 
 $lez2Items = @(
-    @{ Path = "lez2_1.html"; Label = "Lez2.1: Motivazione e sintassi base" },
-    @{ Path = "lez2_2.html"; Label = "Lez2.2: Inizializzazioni in C/C++" },
-    @{ Path = "lez2_3.html"; Label = "Lez2.3: Passaggio a funzione" },
-    @{ Path = "lez2_4.html"; Label = "Lez2.4: Collezioni di struct e lambda" },
-    @{ Path = "lez2_5.html"; Label = "Lez2.5: Layout, sizeof, padding e align" },
-    @{ Path = "lez2_6.html"; Label = "Lez2.6: Serializzare le struct in modo sicuro" }
+    @{ Path = "lez2_1.html"; Label = "L2.1 - Perche esistono le struct" },
+    @{ Path = "lez2_2.html"; Label = "L2.2 - Sintassi minima e accesso ai membri" },
+    @{ Path = "lez2_3.html"; Label = "L2.3 - Inizializzare bene in C++" },
+    @{ Path = "lez2_4.html"; Label = "L2.4 - Inizializzare in C" },
+    @{ Path = "lez2_5.html"; Label = "L2.5 - Errori tipici e checklist" },
+    @{ Path = "lez2_6.html"; Label = "L2.6 - Passaggio per valore, riferimento e puntatore" },
+    @{ Path = "lez2_7.html"; Label = "L2.7 - Intento dell'API, const e lifetime" },
+    @{ Path = "lez2_8.html"; Label = "L2.8 - Collezioni di struct in C++" },
+    @{ Path = "lez2_9.html"; Label = "L2.9 - Lambda, ordinamento e filtro" },
+    @{ Path = "lez2_10.html"; Label = "L2.10 - Layout, padding e serializzazione raw" }
 )
 
 $lez3Items = @(
-    @{ Path = "lez3_1.html"; Label = "Lez3_1: File, concetti e modelli" },
-    @{ Path = "lez3_2.html"; Label = "Lez3_2: I/O su file testuali (C++)" },
-    @{ Path = "lez3_3.html"; Label = "Lez3_3: File binari (base) in C++ e C" },
-    @{ Path = "lez3_4.html"; Label = "Lez3_4: Spostamento del cursore nei file binari" },
-    @{ Path = "lez3_5.html"; Label = "Lez3_5: Perche non scrivere struct raw" },
-    @{ Path = "lez3_6.html"; Label = "Lez3_6: fseek/ftell e seekg/tellg (text mode)" },
-    @{ Path = "lez3_7.html"; Label = "Lez3_7: Indici per file binari" }
+    @{ Path = "lez3_1.html"; Label = "L3.1 - Che cos'e un file" },
+    @{ Path = "lez3_2.html"; Label = "L3.2 - Testo vs binario" },
+    @{ Path = "lez3_3.html"; Label = "L3.3 - Modello d'I/O e scelte pratiche" },
+    @{ Path = "lez3_4.html"; Label = "L3.4 - CSV e TSV: scrivere e leggere" },
+    @{ Path = "lez3_5.html"; Label = "L3.5 - Robustezza: escape, locale, round-trip" },
+    @{ Path = "lez3_6.html"; Label = "L3.6 - Binario: modello base" },
+    @{ Path = "lez3_7.html"; Label = "L3.7 - Read e write in C++ e C" },
+    @{ Path = "lez3_8.html"; Label = "L3.8 - Seek e cursore nei file binari" },
+    @{ Path = "lez3_9.html"; Label = "L3.9 - Perche i seek arbitrari in text mode non sono portabili" },
+    @{ Path = "lez3_10.html"; Label = "L3.10 - Indici per file binari" }
 )
 
 $lez4Items = @(
-    @{ Path = "lez4_1.html"; Label = "Lez4_1: Perche OOP? Concetti di base" },
-    @{ Path = "lez4_2.html"; Label = "Lez4_2: Definire una classe (sintassi minima)" },
-    @{ Path = "lez4_3.html"; Label = "Lez4_3: Costruttori, distruttore, lista d'iniz." },
-    @{ Path = "lez4_4.html"; Label = "Lez4_4: Incapsulamento, metodi const, overload" },
-    @{ Path = "lez4_5.html"; Label = "Lez4_5: to_string(), operator<<, pre/postcondiz." },
-    @{ Path = "lez4_6.html"; Label = "Lez4_6: Header/Sorgenti, include-guard, build" },
-    @{ Path = "lez4_7.html"; Label = "Lez4_7: Costruttore di copia e semantica di copia" },
-    @{ Path = "lez4_8.html"; Label = "Lez4_8: Move constructor e move assignment" },
-    @{ Path = "lez4_9.html"; Label = "Lez4_9: Esercizi svolti - livello base" },
-    @{ Path = "lez4_10.html"; Label = "Lez4_10: Esercizi svolti - livello intermedio" },
-    @{ Path = "lez4_11.html"; Label = "Lez4_11: Esercizi svolti - livello avanzato" }
+    @{ Path = "lez4_1.html"; Label = "L4.1 - Perche OOP" },
+    @{ Path = "lez4_2.html"; Label = "L4.2 - Astrazione e incapsulamento" },
+    @{ Path = "lez4_3.html"; Label = "L4.3 - Anatomia minima di una classe" },
+    @{ Path = "lez4_4.html"; Label = "L4.4 - Costruttori e invarianti" },
+    @{ Path = "lez4_5.html"; Label = "L4.5 - Distruttore, ordine, default e delete" },
+    @{ Path = "lez4_6.html"; Label = "L4.6 - Incapsulamento forte e metodi const" },
+    @{ Path = "lez4_7.html"; Label = "L4.7 - Overload e overload const/non-const" },
+    @{ Path = "lez4_8.html"; Label = "L4.8 - Rendere leggibile un oggetto e contratti d'uso" },
+    @{ Path = "lez4_9.html"; Label = "L4.9 - Header, sorgenti e translation unit" },
+    @{ Path = "lez4_10.html"; Label = "L4.10 - Build, linking, ODR e dipendenze" },
+    @{ Path = "lez4_11.html"; Label = "L4.11 - Copy semantics e Rule of Three/Zero" },
+    @{ Path = "lez4_12.html"; Label = "L4.12 - Move semantics, Rule of Five e RVO" },
+    @{ Path = "lez4_13.html"; Label = "L4.13 - Esercizi base" },
+    @{ Path = "lez4_14.html"; Label = "L4.14 - Esercizi intermedi" },
+    @{ Path = "lez4_15.html"; Label = "L4.15 - Esercizi avanzati e ponte" }
+)
+
+$lez5Items = @(
+    @{ Path = "lez5_1.html"; Label = "Lez5_1: Ereditarietà: significato" },
+    @{ Path = "lez5_2.html"; Label = "Lez5_2: Sintassi della derivazione e accessi" },
+    @{ Path = "lez5_3.html"; Label = "Lez5_3: Costruttori, distruttori, ordine" },
+    @{ Path = "lez5_4.html"; Label = "Lez5_4: Object slicing" },
+    @{ Path = "lez5_5.html"; Label = "Lez5_5: Polimorfismo e virtual" },
+    @{ Path = "lez5_6.html"; Label = "Lez5_6: override, classi astratte, distruttore virtuale" },
+    @{ Path = "lez5_7.html"; Label = "Lez5_7: Casting tra base e derivata" },
+    @{ Path = "lez5_8.html"; Label = "Lez5_8: Multipla, diamond problem, buone pratiche" },
+    @{ Path = "lez5_9.html"; Label = "Lez5_9: Esercizi guidati - base" },
+    @{ Path = "lez5_10.html"; Label = "Lez5_10: Esercizi guidati - concetti e progettazione" },
+    @{ Path = "lez5_11.html"; Label = "Lez5_11: Esercizio pratico finale" }
+)
+
+$lez6Items = @(
+    @{ Path = "lez6_1.html"; Label = "Lez6_1: Alberi: significato, lessico, importanza" },
+    @{ Path = "lez6_2.html"; Label = "Lez6_2: Rappresentazione in C/C++" },
+    @{ Path = "lez6_3.html"; Label = "Lez6_3: Visite ordinate - pre, in, post" },
+    @{ Path = "lez6_4.html"; Label = "Lez6_4: DFS e BFS" },
+    @{ Path = "lez6_5.html"; Label = "Lez6_5: Le visite nel problem solving" },
+    @{ Path = "lez6_6.html"; Label = "Lez6_6: BST - proprietà e ricerca" },
+    @{ Path = "lez6_7.html"; Label = "Lez6_7: Inserimento in un BST" },
+    @{ Path = "lez6_8.html"; Label = "Lez6_8: Cancellazione in un BST" },
+    @{ Path = "lez6_9.html"; Label = "Lez6_9: Applicazioni algoritmiche dei BST" },
+    @{ Path = "lez6_10.html"; Label = "Lez6_10: Altezza, costo, degenerazione" },
+    @{ Path = "lez6_11.html"; Label = "Lez6_11: Alberi bilanciati e rotazioni" },
+    @{ Path = "lez6_12.html"; Label = "Lez6_12: Esercizi guidati" },
+    @{ Path = "lez6_13.html"; Label = "Lez6_13: Esercizio pratico finale" }
 )
 
 $targets = @(
@@ -173,19 +220,27 @@ $targets = @(
 )
 
 $targets += @($lez1Items | ForEach-Object {
-    @{ Path = "lez1/$($_.Path)"; Heading = "Lezione 1 - Matrici 2D (4BIA)"; Items = $lez1Items; Active = $_.Path; ScriptSrc = "../menu.js" }
+    @{ Path = "lez1/$($_.Path)"; Heading = "Lezione 1 - Matrici 2D (ripasso guidato)"; Items = $lez1Items; Active = $_.Path; ScriptSrc = "../menu.js" }
 })
 
 $targets += @($lez2Items | ForEach-Object {
-    @{ Path = "lez2/$($_.Path)"; Heading = "Lezione 2 - Struct (ripasso mirato)"; Items = $lez2Items; Active = $_.Path; ScriptSrc = "../menu.js" }
+    @{ Path = "lez2/$($_.Path)"; Heading = "Lezione 2 - Struct (ripasso guidato)"; Items = $lez2Items; Active = $_.Path; ScriptSrc = "../menu.js" }
 })
 
 $targets += @($lez3Items | ForEach-Object {
-    @{ Path = "lez3/$($_.Path)"; Heading = "Lezione 3 - File I/O"; Items = $lez3Items; Active = $_.Path; ScriptSrc = "../menu.js" }
+    @{ Path = "lez3/$($_.Path)"; Heading = "Lezione 3 - File I/O (ripasso guidato)"; Items = $lez3Items; Active = $_.Path; ScriptSrc = "../menu.js" }
 })
 
 $targets += @($lez4Items | ForEach-Object {
-    @{ Path = "lez4/$($_.Path)"; Heading = "Lezione 4 - OOP in C++"; Items = $lez4Items; Active = $_.Path; ScriptSrc = "../menu.js" }
+    @{ Path = "lez4/$($_.Path)"; Heading = "Lezione 4 - OOP in C++ (ripasso guidato)"; Items = $lez4Items; Active = $_.Path; ScriptSrc = "../menu.js" }
+})
+
+$targets += @($lez5Items | ForEach-Object {
+    @{ Path = "lez5/$($_.Path)"; Heading = "Lezione 5 - Ereditarietà e polimorfismo"; Items = $lez5Items; Active = $_.Path; ScriptSrc = "../menu.js" }
+})
+
+$targets += @($lez6Items | ForEach-Object {
+    @{ Path = "lez6/$($_.Path)"; Heading = "Lezione 6 - Alberi e BST"; Items = $lez6Items; Active = $_.Path; ScriptSrc = "../menu.js" }
 })
 
 foreach ($target in $targets) {

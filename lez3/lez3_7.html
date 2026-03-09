@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA – Lez3_7 · Indici per file binari (indice primario ordinato)</title>
+  <title>4BIA - L3.7 · Binario: read e write in C++ e C</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -11,35 +11,38 @@
   <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
     function prevSlide(){ window.location.href = "lez3_6.html"; }
-    function nextSlide(){ window.location.href = "../lez4/lez4_1.html"; }
-function toggleBox(btnId, boxId){
-      const box=document.getElementById(boxId), btn=document.getElementById(btnId);
-      const open = box.style.display==='block';
-      box.style.display = open ? 'none':'block';
-      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    function nextSlide(){ window.location.href = "lez3_8.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
     }
   </script>
-
 </head>
 <body>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 3 - File I/O</h2>
+  <h2>Lezione 3 - File I/O (ripasso guidato)</h2>
   <ul>
-    <li><a href="lez3_1.html">Lez3_1: File, concetti e modelli</a></li>
-    <li><a href="lez3_2.html">Lez3_2: I/O su file testuali (C++)</a></li>
-    <li><a href="lez3_3.html">Lez3_3: File binari (base) in C++ e C</a></li>
-    <li><a href="lez3_4.html">Lez3_4: Spostamento del cursore nei file binari</a></li>
-    <li><a href="lez3_5.html">Lez3_5: Perche non scrivere struct raw</a></li>
-    <li><a href="lez3_6.html">Lez3_6: fseek/ftell e seekg/tellg (text mode)</a></li>
-    <li><a href="lez3_7.html" class="active">Lez3_7: Indici per file binari</a></li>
+    <li><a href="lez3_1.html">L3.1 - Che cos'e un file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo vs binario</a></li>
+    <li><a href="lez3_3.html">L3.3 - Modello d'I/O e scelte pratiche</a></li>
+    <li><a href="lez3_4.html">L3.4 - CSV e TSV: scrivere e leggere</a></li>
+    <li><a href="lez3_5.html">L3.5 - Robustezza: escape, locale, round-trip</a></li>
+    <li><a href="lez3_6.html">L3.6 - Binario: modello base</a></li>
+    <li><a href="lez3_7.html" class="active">L3.7 - Read e write in C++ e C</a></li>
+    <li><a href="lez3_8.html">L3.8 - Seek e cursore nei file binari</a></li>
+    <li><a href="lez3_9.html">L3.9 - Perche i seek arbitrari in text mode non sono portabili</a></li>
+    <li><a href="lez3_10.html">L3.10 - Indici per file binari</a></li>
   </ul>
 </div>
 <!-- END MENU -->
 
 <div class="slide">
-  <h1>Lez3_7 — Indici per file binari (indice primario ordinato)</h1>
+  <h1>Read e write in C++ e C</h1>
 
   <div class="nav-buttons" style="margin-bottom:10px">
     <button onclick="prevSlide()">&#8592; Indietro</button>
@@ -47,221 +50,77 @@ function toggleBox(btnId, boxId){
   </div>
 
   <div class="content-box">
-
-    <div class="inner-box">
-      <h2>Perché un indice</h2>
-      <p class="note"><strong>Problema:</strong> cercare un record per chiave scorrendo tutto <code>data.bin</code> costa <strong>O(n)</strong> per ogni query.</p>
-      <p class="ok"><strong>Idea:</strong> mantieni un <em>indice primario ordinato</em> di coppie <code>{chiave, offset}</code> → ricerca con <strong>binary search</strong> in <strong>O(log n)</strong>, poi <code>seek</code> diretto nel file dati.</p>
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Vedere come le primitive di lettura e scrittura binaria implementano il modello visto nella slide precedente.</p>
+      <p class="ok"><b>Idea chiave:</b> <code>read</code>/<code>write</code> in C++ e <code>fread</code>/<code>fwrite</code> in C non "capiscono" i dati: copiano byte tra file e memoria.</p>
     </div>
 
-    <div class="inner-box">
-      <h2>Layout dei file (semplice &amp; robusto)</h2>
-      <div class="ascii mini">
-data.bin   : [HEADER][RECORD][RECORD]...[RECORD] <br/>
-index.bin  : [HEADER][ (key:u32, offset:u64) ordinati per key ]
-      </div>
-      <ul class="mini">
-        <li><strong>Header</strong>: magic, version, endianness, <code>record_size</code> (se fisso), <code>n_records</code>.</li>
-        <li><strong>Tipi fissi</strong>: <code>uint32_t</code> per chiave (esempio), <code>uint64_t</code> per offset (file &gt; 2GB).</li>
-        <li><strong>Endianness</strong> di formato definita (consigliato LE). I/O in <em>modalità binaria</em>.</li>
-      </ul>
-    </div>
-
-    <div class="inner-box">
-      <h2>Operazioni essenziali</h2>
-      <ul>
-        <li><strong>Build iniziale</strong>: scorri <code>data.bin</code>, raccogli <code>{key, offset}</code>, ordina, scrivi <code>index.bin</code>.</li>
-        <li><strong>Search</strong> (puntuale): binary search su <code>index.bin</code> → ottieni <code>offset</code> → <code>seek</code> in <code>data.bin</code>.</li>
-        <li><strong>Insert</strong> (record fisso): append in <code>data.bin</code>, poi aggiorna l’indice (in RAM) e riscrivi <code>index.bin</code> (per molte insert: <em>batch</em> o <em>rebuild</em>).</li>
-        <li><strong>Update in-place</strong> (campo non-chiave): sovrascrivi a <code>offset</code>. Se cambia la chiave → rimuovi/riinserisci nell’indice.</li>
-        <li><strong>Delete</strong>: cancellazione logica (tombstone/flag); compattazione periodica e rebuild dell’indice.</li>
-      </ul>
-    </div>
-
-    <div class="inner-box">
-      <h2>Pseudocodice — ricerca con indice ordinato</h2>
-<pre><code>// INPUT: key cercata    OUTPUT: record logico o "non trovato"
-idx = apri("index.bin", binario)   // carica in RAM o mappa l'array {key,offset}
-(lo, hi) = (0, idx.n - 1)
-while lo ≤ hi do
-    mid = (lo + hi) // 2
-    if key == idx[mid].key then
-        off = idx[mid].offset
-        dati = apri("data.bin", binario)
-        seek(dati, off)          // posizionamento O(1)
-        rec = leggi_record(dati)
-        return rec
-    else if key &lt; idx[mid].key then
-        hi = mid - 1
-    else
-        lo = mid + 1
-fine while
-return "non trovato"
-</code></pre>
-      <p class="ok mini">Memoria indice ≈ <code>n * (sizeof(key) + sizeof(offset))</code> → ~12 B/record con <code>u32 + u64</code>.</p>
-    </div>
-
-    <!-- NEW: esempio numerico end-to-end -->
-    <div class="inner-box">
-      <h2>Esempio numerico end-to-end</h2>
-      <p>Sia <code>index.bin</code> con 6 coppie ordinate per chiave:</p>
-      <table class="mini">
-        <tr><th>i</th><th>key</th><th>offset</th></tr>
-        <tr><td>0</td><td>10</td><td>128</td></tr>
-        <tr><td>1</td><td>14</td><td>256</td></tr>
-        <tr><td>2</td><td>21</td><td>384</td></tr>
-        <tr><td>3</td><td>37</td><td>512</td></tr>
-        <tr><td>4</td><td>40</td><td>640</td></tr>
-        <tr><td>5</td><td>55</td><td>768</td></tr>
-      </table>
-      <div class="ascii mini" style="margin-top:.5rem">
-Ricerca di key=37:<br/>
-lo=0, hi=5 → mid=2 (key=21)  → 37 &gt; 21 → lo=3<br/>
-lo=3, hi=5 → mid=4 (key=40)  → 37 &lt; 40 → hi=3<br/>
-lo=3, hi=3 → mid=3 (key=37)  → trovato! offset=512 → seek(data.bin, 512)
-      </div>
-      <p class="ok mini">Salto diretto nel file dati: lettura del record senza scorrere tutto il file.</p>
-    </div>
-
-    <!-- NEW: C++ mini-esempi build & lookup -->
-    <div class="inner-box">
-      <h2>Mini-esempi C++: build e lookup</h2>
-      <div class="note mini">Formato didattico: little-endian, tipi fissi; header <code>"IDX\0"</code>, ver=1, n.</div>
-
-      <h3>Build dell’indice (da <code>data.bin</code> a record fissi)</h3>
+    <div class="inner-box box">
+      <h2>Esempio base in C++</h2>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;cstdint&gt;
-#include &lt;vector&gt;
-#include &lt;algorithm&gt;
 
-struct Pair { uint32_t key; uint64_t off; };
+int main(){
+    std::ofstream out("dati.bin", std::ios::binary);
+    if(!out) return 1;
 
-uint32_t read_key_from_record(std::ifstream&amp; data){
-    // supponiamo che la chiave sia nei primi 4 byte del record
-    uint32_t k=0; data.read((char*)&k, 4); return k;
-}
+    std::uint32_t n = 3;
+    int valori[3] = {10, 20, 30};
 
-void build_index(const char* dataPath, const char* idxPath, uint64_t record_size){
-    std::ifstream data(dataPath, std::ios::binary);
-    if(!data) throw std::runtime_error("open data");
-    std::vector&lt;Pair&gt; idx;
-    uint64_t off=0;
-    while (true){
-        data.seekg(off);
-        uint32_t k=0;
-        data.read((char*)&k, 4);
-        if(!data) break;               // fine file
-        idx.push_back({k, off});
-        off += record_size;            // record fisso
-    }
-    std::sort(idx.begin(), idx.end(), [](auto&amp; a, auto&amp; b){ return a.key &lt; b.key; });
-
-    std::ofstream out(idxPath, std::ios::binary);
-    const char magic[4]={'I','D','X','\0'};
-    uint32_t ver=1, n=(uint32_t)idx.size();
-    out.write(magic,4); out.write((char*)&ver,4); out.write((char*)&n,4);
-    out.write((char*)idx.data(), idx.size()*sizeof(Pair));
+    out.write((const char*)&n, sizeof n);
+    out.write((const char*)valori, sizeof valori);
 }
 </code></pre>
-
-      <h3>Lookup (ricerca binaria in RAM + seek nel file dati)</h3>
-<pre><code class="language-cpp">#include &lt;optional&gt;
-
-std::optional&lt;uint64_t&gt; load_and_find(const char* idxPath, uint32_t key){
-    std::ifstream in(idxPath, std::ios::binary);
-    if(!in) return std::nullopt;
-    char magic[4]; uint32_t ver=0,n=0;
-    in.read(magic,4); in.read((char*)&ver,4); in.read((char*)&n,4);
-    if(std::string(magic,4)!="IDX\0" || ver!=1) return std::nullopt;
-    std::vector&lt;Pair&gt; v(n);
-    in.read((char*)v.data(), n*sizeof(Pair));
-    // binary search
-    int lo=0, hi=(int)v.size()-1;
-    while(lo&lt;=hi){
-        int mid=(lo+hi)/2;
-        if      (key==v[mid].key) return v[mid].off;
-        else if (key&lt; v[mid].key) hi=mid-1;
-        else                      lo=mid+1;
-    }
-    return std::nullopt;
-}
-
-// Uso finale:
-void retrieve_record(const char* dataPath, const char* idxPath, uint32_t key, uint64_t rec_size){
-    auto off = load_and_find(idxPath, key);
-    if(!off){ std::cout &lt;&lt; "non trovato\n"; return; }
-    std::ifstream data(dataPath, std::ios::binary);
-    data.seekg(*off);
-    std::vector&lt;char&gt; rec(rec_size);
-    data.read(rec.data(), rec_size);
-    // ... decodifica campi del record ...
-}
-</code></pre>
-      <p class="tip mini">Per indici grandi usa memory-mapping o ricerca binaria “on-disk” leggendo blocchi con <code>seekg</code> “a metà”.</p>
-      <div class="tip mini">
-        <p><strong>Micro-esercizi guidati</strong> (durata suggerita 10 minuti ciascuno):</p>
-        <ul class="mini">
-          <li><b>Fix mirato.</b> Scrivi una funzione che dato l&#8217;<code>id</code> e un nuovo valore aggiorni il record in <code>data.bin</code> usando l&#8217;indice per posizionarti; verifica il risultato con una seconda lettura diretta.
-            <div class="nav-buttons" style="justify-content:left"><button id="btn-mi1" onclick="toggleBox('btn-mi1','box-mi1')">Mostra ▼</button></div>
-            <div id="box-mi1" style="display:none;margin-top:8px">
-              <div class="ok mini">
-                <p><strong>Soluzione:</strong> carica l&#8217;indice in RAM, cerca con binary search l&#8217;offset del record, poi apri <code>data.bin</code> in <code>std::fstream</code>/<code>"rb+"</code>, <code>seek</code> a quell&#8217;offset e leggi il record. Aggiorna il campo richiesto, fai <code>seekp(offset)</code> (o <code>fseek</code>) e sovrascrivi. Riapri in sola lettura e conferma con una nuova read puntuale.</p>
-              </div>
-            </div>
-          </li>
-          <li><b>Rebuild sicuro.</b> Implementa una <code>rebuild_index()</code> che scriva l&#8217;indice in un file temporaneo, chiami <code>flush</code>/<code>fsync</code> e poi esegua <code>rename()</code> per sostituire <code>index.bin</code> senza lasciare file corrotti.
-            <div class="nav-buttons" style="justify-content:left"><button id="btn-mi2" onclick="toggleBox('btn-mi2','box-mi2')">Mostra ▼</button></div>
-            <div id="box-mi2" style="display:none;margin-top:8px">
-              <div class="ok mini">
-                <p><strong>Soluzione:</strong> crea un vettore <code>{key, offset}</code> iterando <code>data.bin</code>. Scrivilo in <code>index.tmp</code> (header + array) usando <code>std::ofstream</code>/<code>"wb"</code>, poi chiama <code>flush()</code> e <code>fsync(fileno(f))</code> (o <code>_commit</code> su Windows). Chiudi e invoca <code>std::filesystem::rename("index.tmp", "index.bin")</code> per rimpiazzare in modo atomico.</p>
-              </div>
-            </div>
-          </li>
-          <li><b>Audit dell&#8217;indice.</b> Confronta i record su disco con le coppie <code>{key, offset}</code>: scansiona <code>data.bin</code> e segnala eventuali chiavi mancanti o duplicati rispetto al vettore ordinato.
-            <div class="nav-buttons" style="justify-content:left"><button id="btn-mi3" onclick="toggleBox('btn-mi3','box-mi3')">Mostra ▼</button></div>
-            <div id="box-mi3" style="display:none;margin-top:8px">
-              <div class="ok mini">
-                <p><strong>Soluzione:</strong> percorri <code>index.bin</code> e per ogni entry esegui <code>seekg(offset)</code> su <code>data.bin</code> per leggere la chiave reale: se differisce, logga l&#8217;errore. Parallelamente, scansiona <code>data.bin</code> sequenzialmente costruendo un <code>std::unordered_set</code> di chiavi e confrontalo con quelle presenti nell&#8217;indice per individuare duplicati o assenze.</p>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
+      <p>Qui scriviamo prima il numero di elementi, poi il blocco dati. E gia una forma minima di formato esplicito.</p>
     </div>
 
-    <div class="inner-box">
-      <h2>Portabilità minima (da rispettare)</h2>
-      <ul class="mini">
-        <li><strong>Tipi a larghezza fissa</strong> (no <code>long/size_t</code> “raw” sul disco).</li>
-        <li><strong>Endianness</strong> di formato costante e documentata.</li>
-        <li><strong>Niente puntatori/bit-field</strong> nel file: solo dati logici.</li>
-        <li><strong>Aggiornamenti atomici</strong> dell’indice: scrivi <code>index.tmp</code> → flush/fsync → rename.</li>
+    <div class="inner-box box">
+      <h2>Esempio base in C</h2>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+
+int main(void){
+    FILE* f = fopen("dati.bin", "wb");
+    if(!f) return 1;
+
+    uint32_t n = 3;
+    int valori[3] = {10, 20, 30};
+
+    fwrite(&n, sizeof n, 1, f);
+    fwrite(valori, sizeof(int), 3, f);
+    fclose(f);
+}
+</code></pre>
+      <p>La logica e identica: apri in binario, scrivi header o conteggi, poi scrivi i dati.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa bisogna controllare</h2>
+      <ul>
+        <li>l'apertura del file deve riuscire;</li>
+        <li>la quantita di byte o elementi letti deve essere quella attesa;</li>
+        <li>la lettura deve seguire esattamente lo stesso ordine usato in scrittura.</li>
+      </ul>
+      <p>Se inverti l'ordine dei campi o cambi un tipo, il file non si interpreta piu nello stesso modo.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa non fare</h2>
+      <ul>
+        <li>non usare queste funzioni su oggetti con puntatori interni come <code>std::string</code>;</li>
+        <li>non mescolare testo e binario nello stesso file senza un formato chiaro;</li>
+        <li>non dimenticare <code>std::ios::binary</code> o la modalita <code>"b"</code> quando serve.</li>
       </ul>
     </div>
 
-    <div class="inner-box">
-      <h2>Complexity snapshot</h2>
-      <ul class="mini">
-        <li><strong>Ricerca</strong>: O(log n) su <code>index.bin</code> + O(1) per <code>seek</code>.</li>
-        <li><strong>Insert singola</strong>: O(n) su array ordinato (riscrittura). Per molte insert → <em>batch</em> o <em>rebuild</em>.</li>
-        <li><strong>Didattica</strong>: inizia con record a lunghezza fissa; poi passa ai variabili (length-prefix) aggiornando gli offset.</li>
-      </ul>
+    <div class="inner-box warn">
+      <b>Errore tipico:</b> pensare che se una lettura non da errore allora il formato sia corretto. Un file puo essere letto senza errori formali ma essere interpretato in modo sbagliato.
     </div>
 
-    <!-- NEW: esercizio a comparsa -->
-    <div class="inner-box">
-      <h2>Esercizio (con soluzione a comparsa)</h2>
-      <p><strong>E1 — Costruisci e usa un indice primario:</strong> dato <code>data.bin</code> con record fissi di 64 byte, chiave <code>u32</code> al byte 0, <br/>1) genera <code>index.bin</code> ordinando per chiave; 2) implementa una funzione che dato <code>key</code> stampa il record.</p>
-      <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
-      <div id="box-e1" style="display:none;margin-top:8px">
-        <div class="ok mini">
-          <p><strong>Soluzione (idea):</strong><br/>
-          <em>Build:</em> scorri <code>data.bin</code> a passi di 64, leggi i 4 byte iniziali → vettore <code>{key, offset}</code> → ordina → scrivi header + vettore.<br/>
-          <em>Lookup:</em> carica header e vettore → binary search → <code>seekg(offset)</code> in <code>data.bin</code> → leggi 64 byte → stampa campi.</p>
-        </div>
-      </div>
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L3.8</strong> aggiungiamo il pezzo che rende il binario davvero interessante: il cursore e i seek per saltare direttamente a una posizione precisa.
     </div>
-
   </div>
 
   <div class="nav-buttons">
@@ -269,8 +128,5 @@ void retrieve_record(const char* dataPath, const char* idxPath, uint32_t key, ui
     <button onclick="nextSlide()">Avanti &#8594;</button>
   </div>
 </div>
-
-<script>
-</script>
 </body>
 </html>

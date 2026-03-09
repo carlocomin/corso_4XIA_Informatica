@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA – Lez2.4 · Collezioni di struct & lambda (sort, find, filter)</title>
+  <title>4BIA - L2.4 · Struct: inizializzare in C</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -11,8 +11,8 @@
   <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
     function prevSlide(){ window.location.href = "lez2_3.html"; }
-    function nextSlide(){ window.location.href = "lez2_5.html"; } // placeholder eventuale
-function toggleBox(btnId, boxId){
+    function nextSlide(){ window.location.href = "lez2_5.html"; }
+    function toggleBox(btnId, boxId){
       const box = document.getElementById(boxId);
       const btn = document.getElementById(btnId);
       const open = box.style.display === 'block';
@@ -20,26 +20,29 @@ function toggleBox(btnId, boxId){
       if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
     }
   </script>
-
 </head>
 <body>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 2 - Struct (ripasso mirato)</h2>
+  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
   <ul>
-    <li><a href="lez2_1.html">Lez2.1: Motivazione e sintassi base</a></li>
-    <li><a href="lez2_2.html">Lez2.2: Inizializzazioni in C/C++</a></li>
-    <li><a href="lez2_3.html">Lez2.3: Passaggio a funzione</a></li>
-    <li><a href="lez2_4.html" class="active">Lez2.4: Collezioni di struct e lambda</a></li>
-    <li><a href="lez2_5.html">Lez2.5: Layout, sizeof, padding e align</a></li>
-    <li><a href="lez2_6.html">Lez2.6: Serializzare le struct in modo sicuro</a></li>
+    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
+    <li><a href="lez2_2.html">L2.2 - Sintassi minima e accesso ai membri</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
+    <li><a href="lez2_4.html" class="active">L2.4 - Inizializzare in C</a></li>
+    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
+    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
+    <li><a href="lez2_9.html">L2.9 - Lambda, ordinamento e filtro</a></li>
+    <li><a href="lez2_10.html">L2.10 - Layout, padding e serializzazione raw</a></li>
   </ul>
 </div>
 <!-- END MENU -->
 
 <div class="slide">
-  <h1>Lez2.4 — Collezioni di struct & funzioni <em>lambda</em> (C++ → C)</h1>
+  <h1>Inizializzare in C</h1>
 
   <div class="nav-buttons" style="margin-bottom:10px">
     <button onclick="prevSlide()">&#8592; Indietro</button>
@@ -47,312 +50,58 @@ function toggleBox(btnId, boxId){
   </div>
 
   <div class="content-box">
-
-    <div class="inner-box">
-      <h2>Obiettivi</h2>
-      <ul>
-        <li>Gestire collezioni di record con <code>std::vector&lt;T&gt;</code>, leggendo e modificando gli elementi senza copie inutili.</li>
-        <li>Capire cos’è una <strong>lambda</strong>, come si dichiarano <em>capture</em>, parametri e tipo di ritorno, e quando conviene usarla.</li>
-        <li>Applicare gli algoritmi standard <code>sort</code>, <code>find_if</code>, <code>count_if</code>, <code>copy_if</code>, <code>erase_remove_if</code> insieme alle lambda.</li>
-        <li>Tradurre gli stessi problemi in C usando array di struct e <code>qsort</code> con funzioni di confronto.</li>
-      </ul>
-      <p class="note"><strong>Perché <code>std::vector</code>?</strong> Offre memoria contigua (più cache-friendly), dimensione dinamica e il pieno supporto degli algoritmi STL. Per insiemi di record è quasi sempre la scelta più robusta.</p>
-    </div>
-
-    <!-- C++: vector di struct -->
-    <div class="box">
-      <h2>C++ — Collezioni di struct con <code>std::vector</code></h2>
-      <p>Un <code>std::vector&lt;Studente&gt;</code> si comporta come un array dinamico: gli elementi stanno in memoria contigua ma possiamo aggiungerne altri in qualunque momento. Popolarlo con dati realistici aiuta a testare subito le operazioni sugli insiemi.</p>
-<pre><code class="language-cpp">#include &lt;string&gt;
-#include &lt;vector&gt;
-
-struct Studente {
-    std::string nome, cognome;
-    int eta = 0;
-    double media = 0.0;
-};
-
-int main() {
-    std::vector&lt;Studente&gt; classe{
-        {"Ada","Lovelace",17,9.4},
-        {"Alan","Turing",18,10.0},
-        {"Edsger","Dijkstra",19,9.1}
-    };
-
-    // Aggiunte
-    classe.push_back({"Grace","Hopper",20,8.8});           // aggiunta chiara per aggregate
-    classe.push_back(Studente{"Barbara","Liskov",20,9.2}); // temporaneo esplicito, poi move
-
-    // Iterazione: lettura vs modifica
-    for (const auto&amp; s : classe) { /* sola lettura, nessuna copia */ }
-    for (auto&amp; s : classe) { /* modifica in-place di s */ }
-}
-</code></pre>
-      <ul>
-        <li><strong>push_back</strong>: inserisce una copia o una move di un oggetto già costruito; con una <code>struct</code> aggregate in C++17 è spesso la forma più lineare.</li>
-        <li><strong>emplace_back</strong>: diventa particolarmente utile quando il tipo ha un costruttore vero e proprio; in quel caso può costruire l’oggetto direttamente nel <code>vector</code>.</li>
-        <li><strong>Range-based for</strong>: con <code>const auto&amp;</code> leggiamo senza copiare; senza <code>const</code> possiamo modificare in-place.</li>
-      </ul>
-    </div>
-
-    <!-- Lambda: spiegazione -->
-    <div class="box">
-      <h2>C++ — Cos’è una <em>lambda</em> e come si legge</h2>
-      <p>Una lambda è una funzione <em>anonima</em> definita in linea. Per interpretarla conviene guardare i tre blocchi fondamentali: la capture (che cosa preleva dall’esterno), l’elenco dei parametri e il valore di ritorno.</p>
-<pre><code class="language-cpp">// Forma generale (schema mentale):
-[capture] (parametri) -&gt; tipo_ritorno {
-    // corpo
-}
-
-// Esempi minimi:
-auto somma   = [](int a, int b) { return a + b; };   // ritorno dedotto
-int soglia = 9;
-auto sopraS = [soglia](double m){ return m &gt;= soglia; }; // cattura by value (copia)
-auto incS   = [&soglia](){ soglia++; };                  // cattura by reference (alias)
-</code></pre>
-      <ul>
-        <li><strong>Capture</strong>: indica cosa importare dal contesto. Preferisci <code>[k]</code> o <code>[&amp;risultato]</code> rispetto ai generici <code>[=]</code>/<code>[&amp;]</code>.</li>
-        <li><strong>Parametri</strong>: sono identici a quelli di una funzione ordinaria (es. <code>(const Studente&amp; s)</code>).</li>
-        <li><strong>Ritorno</strong>: viene dedotto automaticamente; specifica <code>-&gt; bool</code> (o altro) se ci sono più rami di <code>return</code>.</li>
-        <li>Una lambda senza capture è convertibile a <em>puntatore a funzione</em>; appena compare una capture non lo è più.</li>
-      </ul>
-      <p class="ok"><strong>Intuizione didattica</strong>: pensa alla lambda come a una “funzione piccola” incollata accanto all’algoritmo che ne ha bisogno.</p>
-    </div>
-
-    <!-- Ordinamenti -->
-    <div class="box">
-      <h2>C++ — Ordinare con <code>std::sort</code> / <code>stable_sort</code> e lambda</h2>
-<pre><code class="language-cpp">#include &lt;algorithm&gt; // sort, stable_sort
-
-// 1) Cognome crescente
-std::sort(classe.begin(), classe.end(),
-          [](const Studente&amp; a, const Studente&amp; b){
-              return a.cognome &lt; b.cognome;
-          });
-
-// 2) Cognome, poi nome (tie-break deterministico)
-std::sort(classe.begin(), classe.end(),
-          [](const Studente&amp; a, const Studente&amp; b){
-              if (a.cognome != b.cognome) return a.cognome &lt; b.cognome;
-              return a.nome &lt; b.nome;
-          });
-
-// 3) Media decrescente
-std::sort(classe.begin(), classe.end(),
-          [](const Studente&amp; a, const Studente&amp; b){
-              return a.media &gt; b.media;
-          });
-
-// 4) Ordinamento stabile per età (preserva l'ordine tra pari)
-std::stable_sort(classe.begin(), classe.end(),
-                 [](const Studente&amp; a, const Studente&amp; b){
-                     return a.eta &lt; b.eta;
-                 });
-</code></pre>
-      <p class="note"><strong>Comparatori coerenti</strong>: l’algoritmo richiede un <em>ordinamento debole stretto</em>. Costruisci i confronti a cascata (cognome, poi nome, …) e restituisci sempre un semplice <code>&lt;</code>.</p>
-    </div>
-
-    <!-- Ricerca, conteggio, filtro -->
-    <div class="box">
-      <h2>C++ — Ricerca, conteggio e filtro</h2>
-      <p>Gli algoritmi STL percorrono il vector con scopi diversi: trovare un elemento specifico, contare quante volte una proprietà è vera o filtrare rapidamente i record che non rispettano una condizione.</p>
-<pre><code class="language-cpp">#include &lt;algorithm&gt;
-
-// find_if: primo con media &gt;= soglia
-double k = 9.5;
-auto it = std::find_if(classe.begin(), classe.end(),
-                       [k](const Studente&amp; s){ return s.media &gt;= k; });
-if (it != classe.end()) {
-    // *it è lo Studente trovato
-}
-
-// count_if: quanti maggiorenni
-int quanti = std::count_if(classe.begin(), classe.end(),
-                           [](const Studente&amp; s){ return s.eta &gt;= 18; });
-
-// erase-remove_if: filtra in-place chi ha media &lt; 6
-classe.erase(std::remove_if(classe.begin(), classe.end(),
-                            [](const Studente&amp; s){ return s.media &lt; 6.0; }),
-             classe.end());
-</code></pre>
-      <p class="ok"><strong>Erase–remove idiom</strong>: <code>remove_if</code> compatta gli elementi da tenere e restituisce la nuova fine logica; <code>erase</code> taglia la coda eliminando fisicamente quelli da scartare.</p>
-    </div>
-
-    <!-- Aggregazioni -->
-    <div class="box">
-      <h2>C++ — Aggregazioni (media, massimo) con lambda</h2>
-      <p>Per calcolare metriche globali ci appoggiamo a <code>std::accumulate</code> (somma, media, conteggi personalizzati) e <code>std::max_element</code> per individuare il record “migliore”. La lambda descrive l’operazione elementare: come aggiornare l’accumulatore o come confrontare due elementi.</p>
-<pre><code class="language-cpp">#include &lt;numeric&gt;   // accumulate
-#include &lt;algorithm&gt; // max_element
-
-double somma = std::accumulate(classe.begin(), classe.end(), 0.0,
-                               [](double acc, const Studente&amp; s){
-                                   return acc + s.media;
-                               });
-double mediaClasse = classe.empty() ? 0.0 : somma / classe.size();
-
-auto itBest = std::max_element(classe.begin(), classe.end(),
-                               [](const Studente&amp; a, const Studente&amp; b){
-                                   return a.media &lt; b.media; // true se a "peggio" di b
-                               });
-</code></pre>
-      <p class="tip">Le lambda incollano la logica di confronto o di somma accanto all’algoritmo: la lettura è immediata e diminuisce il rischio di errori nascosti.</p>
-    </div>
-
-    <!-- Pitfall -->
-    <div class="inner-box">
-      <h2>Pitfall comuni (e rimedi pratici)</h2>
-      <ul>
-        <li>
-          <strong>Catture troppo ampie</strong> (<code>[=]</code> / <code>[&amp;]</code>): rende difficile capire da quali variabili dipende la lambda.
-          <div class="ok">Preferisci capture mirate come <code>[k]</code> o <code>[&amp;totale]</code>.</div>
-        </li>
-        <li>
-          <strong>Comparatori incoerenti</strong> (es. usare <code>&lt;=</code>): <code>sort</code> può diventare non deterministico.
-          <div class="ok">Costruisci il confronto con soli <code>&lt;</code> e aggiungi tie-break espliciti.</div>
-        </li>
-        <li>
-          <strong>Erase senza remove</strong> (o viceversa): il filtro non elimina davvero gli elementi indesiderati.
-          <div class="ok">Applica sempre la coppia <code>erase(remove_if(...), end)</code>.</div>
-        </li>
-        <li>
-          <strong>Copie inutili</strong> dentro gli algoritmi STL: rallentano e consumano memoria.
-          <div class="ok">Itera con <code>const auto&amp;</code> e usa <code>emplace_back</code> per costruire gli elementi.</div>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Parte C -->
-    <div class="box">
-      <h2>C — Array di struct e <code>qsort</code> con funzione di confronto</h2>
-      <p>Nel C “puro” non esistono le lambda: gli algoritmi standard lavorano con puntatori a funzioni libere. Con <code>qsort</code> dobbiamo quindi scrivere esplicitamente il confronto tra due elementi e lasciare all’algoritmo la logica di ordinamento.</p>
-<pre><code class="language-c">#include &lt;stdlib.h&gt;  // qsort
-#include &lt;string.h&gt;  // strcmp
-
-typedef struct {
-    char nome[32], cognome[32];
-    int eta;
-    double media;
-} Studente;
-
-int cmp_cognome_nome(const void* pa, const void* pb) {
-    const Studente* a = (const Studente*)pa;
-    const Studente* b = (const Studente*)pb;
-    int r = strcmp(a-&gt;cognome, b-&gt;cognome);
-    if (r != 0) return r;                  // negativo: a&lt;b; positivo: a&gt;b
-    return strcmp(a-&gt;nome, b-&gt;nome);
-}
-
-int cmp_media_desc(const void* pa, const void* pb) {
-    const Studente* a = (const Studente*)pa;
-    const Studente* b = (const Studente*)pb;
-    if (a-&gt;media &lt; b-&gt;media) return  1;   // b prima di a
-    if (a-&gt;media &gt; b-&gt;media) return -1;   // a prima di b
-    return 0;
-}
-
-int main(void) {
-    Studente v[] = {
-        {"Ada","Lovelace",17,9.4},
-        {"Alan","Turing",18,10.0},
-        {"Edsger","Dijkstra",19,9.1}
-    };
-    size_t n = sizeof v / sizeof *v;
-    qsort(v, n, sizeof *v, cmp_cognome_nome);
-    // qsort(v, n, sizeof *v, cmp_media_desc);
-    return 0;
-}
-</code></pre>
-      <p class="note">In C non esistono le lambda: <code>qsort</code> richiede un <strong>puntatore a funzione</strong> che sappia confrontare due elementi generici (cast da <code>void*</code>).</p>
-    </div>
-
-    <!-- Esercizi -->
-    <div class="inner-box">
-      <h2>Esercizi (testi completi + soluzioni a comparsa)</h2>
-      <ol>
-        <li>
-          <strong>E1 — Ordinamento multi-chiave (C++)</strong>
-          <p><em>Input:</em> <code>std::vector&lt;Studente&gt;</code>.</p>
-          <p><em>Obiettivo:</em> ordinare per <u>cognome crescente</u>, poi <u>nome crescente</u>, infine <u>media decrescente</u> per rendere deterministico l’ordinamento.</p>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
-          <div id="box-e1" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">std::sort(classe.begin(), classe.end(),
-          [](const Studente&amp; a, const Studente&amp; b){
-              if (a.cognome != b.cognome) return a.cognome &lt; b.cognome;
-              if (a.nome    != b.nome   ) return a.nome    &lt; b.nome;
-              return a.media &gt; b.media; // decrescente
-          });
-</code></pre>
-          </div>
-        </li>
-
-        <li>
-          <strong>E2 — Filtra promossi (C++)</strong>
-          <p><em>Input:</em> <code>std::vector&lt;Studente&gt;</code> e soglia di promozione <code>k</code> (double).</p>
-          <p><em>Obiettivo:</em> creare un nuovo vector con chi ha <code>media ≥ k</code> e <code>eta ≥ 14</code>, lasciando intatto l’originale.</p>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
-          <div id="box-e2" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">double k = 6.0;
-std::vector&lt;Studente&gt; promossi;
-promossi.reserve(classe.size());
-std::copy_if(classe.begin(), classe.end(), std::back_inserter(promossi),
-             [k](const Studente&amp; s){ return s.media &gt;= k &amp;&amp; s.eta &gt;= 14; });
-</code></pre>
-          </div>
-        </li>
-
-        <li>
-          <strong>E3 — Primo insufficiente (C++)</strong>
-          <p><em>Input:</em> un vector e la soglia <code>t</code>.</p>
-          <p><em>Obiettivo:</em> usare <code>find_if</code> per ottenere il primo studente con <code>media &lt; t</code> e gestire il caso “nessuno trovato”.</p>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e3" onclick="toggleBox('btn-e3','box-e3')">Mostra ▼</button></div>
-          <div id="box-e3" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">double t = 6.0;
-auto it = std::find_if(classe.begin(), classe.end(),
-                       [t](const Studente&amp; s){ return s.media &lt; t; });
-if (it == classe.end()) {
-    // nessuno sotto soglia
-} else {
-    // *it è il primo sotto soglia
-}
-</code></pre>
-          </div>
-        </li>
-
-        <li>
-          <strong>E4 — <code>qsort</code> per media decrescente (C)</strong>
-          <p><em>Input:</em> array C di <code>Studente</code> e lunghezza.</p>
-          <p><em>Obiettivo:</em> implementare il comparatore per la media decrescente e usarlo con <code>qsort</code>.</p>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e4" onclick="toggleBox('btn-e4','box-e4')">Mostra ▼</button></div>
-          <div id="box-e4" style="display:none;margin-top:8px">
-<pre><code class="language-c">int cmp_media_desc(const void* pa, const void* pb) {
-    const Studente* a = (const Studente*)pa;
-    const Studente* b = (const Studente*)pb;
-    if (a-&gt;media &lt; b-&gt;media) return 1;   // b prima di a
-    if (a-&gt;media &gt; b-&gt;media) return -1;  // a prima di b
-    return 0;
-}
-// qsort(v, n, sizeof *v, cmp_media_desc);
-</code></pre>
-          </div>
-        </li>
-      </ol>
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Capire come inizializzare bene una <code>struct</code> in C, senza trasferire in modo automatico abitudini del C++ che qui non esistono.</p>
+      <p class="ok"><b>Idea chiave:</b> in C le <code>struct</code> si inizializzano bene, ma bisogna essere piu espliciti, soprattutto quando compaiono array di <code>char</code> e designated initializers.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>Takeaways</h2>
-      <ul>
-        <li><code>std::vector&lt;T&gt;</code> è la struttura base per collezioni di record in C++: dinamico, contiguo, ben supportato dagli algoritmi STL.</li>
-        <li>Le <b>lambda</b> sono “funzioni inline” con catture: predicati e comparatori diventano chiari e locali.</li>
-        <li><code>std::sort</code>/<code>stable_sort</code> + lambda per ordinare; <code>find_if</code>/<code>count_if</code>/<code>copy_if</code> per leggere; <code>erase_remove_if</code> per filtrare in-place.</li>
-        <li>In C si usa <code>qsort</code> con un <b>puntatore a funzione</b> di confronto (niente lambda standard).</li>
-      </ul>
+      <h2>Struct d'esempio</h2>
+<pre><code class="language-c">typedef struct {
+    char nome[32];
+    char cognome[32];
+    int eta;
+    double media;
+} Studente;
+</code></pre>
+      <p>Qui non hai <code>std::string</code>, quindi le stringhe sono buffer di caratteri con terminatore <code>'\0'</code>. Questo cambia il modo in cui ragioni su capienza e inizializzazione.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Lista in ordine dei campi</h2>
+<pre><code class="language-c">Studente s = { "Ada", "Lovelace", 17, 9.4 };
+</code></pre>
+      <p>Come in C++, l'ordine conta. Ma qui il messaggio didattico importante e un altro: le stringhe vengono copiate dentro gli array della <code>struct</code>, non gestite da un oggetto dinamico.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Designated initializers</h2>
+<pre><code class="language-c">Studente s = {
+    .cognome = "Lovelace",
+    .nome = "Ada",
+    .media = 9.4,
+    .eta = 17
+};
+</code></pre>
+      <p>Questa forma e didatticamente molto utile in C, perche rende il codice meno fragile rispetto all'ordine dei campi.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Inizializzazione parziale e azzeramento</h2>
+<pre><code class="language-c">Studente s1 = { "Grace" };
+Studente s2 = {0};
+</code></pre>
+      <p><code>{0}</code> e una scorciatoia importante: ti permette di partire da una struct completamente azzerata. In C, per le variabili automatiche, questo e spesso il modo piu sicuro per evitare valori spazzatura.</p>
+    </div>
+
+    <div class="inner-box warn">
+      <b>Errore tipico:</b> trattare le stringhe C come se fossero oggetti elastiche come <code>std::string</code>. Qui serve sempre attenzione alla capienza del buffer.
     </div>
 
     <div class="inner-box note">
-      <b>Passo successivo.</b> Con <strong>Lez2.4</strong> si chiude il nucleo di ripasso più naturale sulle <code>struct</code>. Le prossime due pagine alzano il livello e funzionano come approfondimento tecnico: layout in memoria, padding e poi collegamento alla serializzazione binaria.
+      <b>Passo successivo.</b> Nella <strong>L2.5</strong> raccogliamo gli errori piu frequenti e li trasformiamo in una checklist chiara, cosi il confronto tra C++ e C non resta un elenco di casi ma diventa un criterio pratico di lavoro.
     </div>
-
   </div>
 
   <div class="nav-buttons">
@@ -360,8 +109,5 @@ if (it == classe.end()) {
     <button onclick="nextSlide()">Avanti &#8594;</button>
   </div>
 </div>
-
-<script>
-</script>
 </body>
 </html>

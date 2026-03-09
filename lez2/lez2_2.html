@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA – Lez2.2 · Inizializzazioni in C/C++ (struct) — C++ → C</title>
+  <title>4BIA - L2.2 · Struct: sintassi minima e accesso ai membri</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -12,34 +12,37 @@
   <script>
     function prevSlide(){ window.location.href = "lez2_1.html"; }
     function nextSlide(){ window.location.href = "lez2_3.html"; }
-function toggleBox(btnId, boxId){
+    function toggleBox(btnId, boxId){
       const box = document.getElementById(boxId);
       const btn = document.getElementById(btnId);
       const open = box.style.display === 'block';
       box.style.display = open ? 'none' : 'block';
-      if(btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
     }
   </script>
-
 </head>
 <body>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 2 - Struct (ripasso mirato)</h2>
+  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
   <ul>
-    <li><a href="lez2_1.html">Lez2.1: Motivazione e sintassi base</a></li>
-    <li><a href="lez2_2.html" class="active">Lez2.2: Inizializzazioni in C/C++</a></li>
-    <li><a href="lez2_3.html">Lez2.3: Passaggio a funzione</a></li>
-    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct e lambda</a></li>
-    <li><a href="lez2_5.html">Lez2.5: Layout, sizeof, padding e align</a></li>
-    <li><a href="lez2_6.html">Lez2.6: Serializzare le struct in modo sicuro</a></li>
+    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
+    <li><a href="lez2_2.html" class="active">L2.2 - Sintassi minima e accesso ai membri</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
+    <li><a href="lez2_4.html">L2.4 - Inizializzare in C</a></li>
+    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
+    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
+    <li><a href="lez2_9.html">L2.9 - Lambda, ordinamento e filtro</a></li>
+    <li><a href="lez2_10.html">L2.10 - Layout, padding e serializzazione raw</a></li>
   </ul>
 </div>
 <!-- END MENU -->
 
 <div class="slide">
-  <h1>Lez2.2 — Inizializzazioni in C/C++ (struct)</h1>
+  <h1>Sintassi minima e accesso ai membri</h1>
 
   <div class="nav-buttons" style="margin-bottom:10px">
     <button onclick="prevSlide()">&#8592; Indietro</button>
@@ -47,111 +50,47 @@ function toggleBox(btnId, boxId){
   </div>
 
   <div class="content-box">
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Vedere la forma minima di una <code>struct</code> e chiarire bene come si leggono e si modificano i suoi campi.</p>
+      <p class="ok"><b>Idea chiave:</b> una <code>struct</code> definisce un nuovo tipo; da quel momento l'accesso ai campi deve essere coerente con il modo in cui stai usando l'oggetto: istanza, riferimento o puntatore.</p>
+    </div>
 
     <div class="inner-box box">
-      <h2>Prima di iniziare: lessico essenziale</h2>
-      <ul>
-        <li><b>Inizializzazione</b>: dare un valore ai campi <em>al momento della creazione</em> dell’oggetto/variabile.</li>
-        <li><b>Assegnazione</b>: cambiare un valore <em>dopo</em> che l’oggetto esiste già.</li>
-        <li><b>Fondamentali</b>: tipi “semplici” (es. <code>int</code>, <code>double</code>): se non inizializzati, contengono valori
-          <b>indeterminati</b> (spazzatura) → bug difficili.</li>
-        <li><b>Stringa C++</b> (<code>std::string</code>): si costruisce “vuota” da sola (non è spazzatura).</li>
-        <li><b>Stringa C</b>: è un <em>array di char</em> terminato da <code>'\0'</code>; serve spazio sufficiente.</li>
-      </ul>
-      <p class="ok">Regola d’oro: <b>inizializza sempre</b> le struct; evita “riempirle dopo” pezzo per pezzo.</p>
-    </div>
-
-    <!-- C++ PRIMA -->
-    <div class="box">
-      <h2>C++ — Forme pratiche di inizializzazione</h2>
-
-      <h3>Struct d’esempio</h3>
+      <h2>C++: definizione minima</h2>
 <pre><code class="language-cpp">struct Studente {
-    std::string nome, cognome;  // stringhe C++: nascono "vuote"
-    int eta;                     // fondamentale: NON ha un valore automatico
-    double media;                // idem
-};
-</code></pre>
-      <p><b>Perché è importante?</b> Se scrivo <code>Studente s;</code> e poi uso <code>s.eta</code> senza averlo impostato, sto leggendo un valore
-      casuale. Questo genera comportamenti incoerenti e difficili da debuggare.</p>
-
-      <h3>1) Default-initialization vs Value-initialization</h3>
-<pre><code class="language-cpp">// A) Default-initialization: fondamentali indeterminati
-Studente a;          // a.eta / a.media INDETERMINATI (rischioso)
-
-// B) Value-initialization (brace vuote): zero-init + default-init membri
-Studente b{};        // b.eta=0, b.media=0.0; stringhe vuote
-</code></pre>
-      <p><b>Come ragionare.</b> <code>Studente a;</code> crea l’oggetto ma non tocca i fondamentali; <code>Studente b{}</code> invece
-      dice “crea e <em>azzera</em> i fondamentali, lascia le stringhe vuote”. Per cominciare in modo sicuro, usa <code>{}</code>.</p>
-      <p class="note"><b>Evita</b> la forma <code>Studente a()</code>: è (storicamente) ambigua e può essere interpretata come dichiarazione di funzione.</p>
-
-      <h3>2) Aggregate initialization (lista in ordine dei membri)</h3>
-<pre><code class="language-cpp">struct Studente {
-    std::string nome, cognome;
+    std::string nome;
+    std::string cognome;
     int eta;
     double media;
-};
-
-Studente s1{"Ada", "Lovelace", 17, 9.4};   // ordine = ordine dei campi
+};  // il punto e virgola finale e obbligatorio
 </code></pre>
-      <p><b>Idea chiave.</b> Gli <em>aggregate</em> non hanno costruttori personalizzati: fornisco i valori in
-      <b>ordine</b>. Se sbaglio l’ordine, assegno il valore al campo sbagliato (bug silenzioso!).</p>
-
-      <h3>3) Inizializzatori in-class (valori di default dei campi)</h3>
-<pre><code class="language-cpp">struct Studente {
-    std::string nome = "Anon";
-    std::string cognome = "N/A";
-    int    eta   = 0;
-    double media = 0.0;
-};
-
-Studente s2;                       // usa i default
-Studente s3{"Ada","Lovelace"};     // eta=0, media=0.0 (dai default)
-</code></pre>
-      <p><b>Perché utile?</b> Se non specifico alcuni campi, i <em>default</em> garantiscono valori sensati e sicuri.</p>
-
-      <h3>4) Campi <code>const</code> e <code>reference</code> (vanno inizializzati subito)</h3>
-<pre><code class="language-cpp">struct Box {
-    const int id;   // serve un valore alla creazione
-    int& ref;       // serve un riferimento valido alla creazione
-    int v;
-};
-
-int x = 10;
-Box b{42, x, 5};    // OK
-// b.id = 7;        // ERRORE: const non riassegnabile
-</code></pre>
-      <p class="warn">Non posso “mettere a posto dopo” un <code>const</code> o un <code>reference</code>: devo fornirli nella lista di init.</p>
-
-      <h3>5) Struct annidate e array nei campi</h3>
-<pre><code class="language-cpp">struct Punto { int x, y; };
-struct Triangolo { Punto v[3]; };
-Triangolo t{{ {0,0}, {1,0}, {0,1} }};   // brace annidate per l'array
-</code></pre>
-      <p><b>Perché tante parentesi?</b> Ogni livello (struct → array → struct) ha la sua coppia di <code>{ }</code> per chiarire cosa appartiene a cosa.</p>
-
-      <h3>6) Braces vs parentesi: evitare il “narrowing”</h3>
-<pre><code class="language-cpp">int x(3.7);    // ammesso: conversione implicita, x diventa 3
-int y{3.7};    // ERRORE di “narrowing”: le { } bloccano perdite pericolose
-
-struct S { int a; double b; };
-S ok{3, 2.0};  // per aggregate/simple struct il corso usa questa forma
-</code></pre>
-      <p class="note"><b>Nota di corso:</b> assumiamo <b>C++17</b> come base. Per le <code>struct</code> aggregate preferiamo le <b>{braces}</b>, che restano chiare e compatibili anche senza feature C++20.</p>
-      <p class="ok"><b>Consiglio pratico</b>: usa sempre le <b>{braces}</b> quando possibile: il compilatore ti protegge da conversioni “zoppe”.</p>
-
-      <h3>7) Oggetti statici/globali</h3>
-<pre><code class="language-cpp">static Studente g;   // storage statico ⇒ zero-initialization garantita
-</code></pre>
-      <p class="tip">Anche se “si azzera da solo”, è meglio preferire inizializzazioni esplicite e oggetti locali quando possibile.</p>
+      <p>In C++ <code>struct</code> e <code>class</code> hanno quasi le stesse capacita. La differenza principale, qui, e solo il default di accesso: in una <code>struct</code> i membri sono <code>public</code> per default.</p>
     </div>
 
-    <!-- POI C -->
-    <div class="box">
-      <h2>C — Inizializzazione di struct (C99)</h2>
+    <div class="inner-box box">
+      <h2>Dichiarazione e accesso</h2>
+<pre><code class="language-cpp">Studente s;
+s.nome = "Ada";
+s.cognome = "Lovelace";
+s.eta = 17;
+s.media = 9.4;
+</code></pre>
+      <p>Quando hai un oggetto vero e proprio, accedi ai campi con l'operatore punto <code>.</code>.</p>
+    </div>
 
-      <h3>Struct d’esempio</h3>
+    <div class="inner-box box">
+      <h2>Puntatore e operatore freccia</h2>
+<pre><code class="language-cpp">Studente s{"Ada", "Lovelace", 17, 9.4};
+Studente* p = &s;
+
+p-&gt;eta = 18;
+</code></pre>
+      <p>Se invece lavori tramite puntatore, usi <code>-&gt;</code>. Non sono due sintassi arbitrarie: segnalano due modi diversi di accedere allo stesso oggetto.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Confronto minimo con il C</h2>
 <pre><code class="language-c">typedef struct {
     char nome[32];
     char cognome[32];
@@ -159,134 +98,16 @@ S ok{3, 2.0};  // per aggregate/simple struct il corso usa questa forma
     double media;
 } Studente;
 </code></pre>
-      <p><b>Attenzione</b>: qui le “stringhe” sono <em>array di char</em>. Se il testo supera 31 caratteri,
-      viene troncato (l’ultimo carattere è il terminatore <code>'\0'</code>).</p>
-
-      <h3>1) Lista in ordine (aggregate initializer)</h3>
-<pre><code class="language-c">Studente s1 = { "Ada", "Lovelace", 17, 9.4 }; // ordine preciso
-</code></pre>
-      <p><b>Cosa capire</b>: i valori sono copiati <em>nell’ordine dei campi</em>. Qui “Ada” viene copiato dentro <code>nome[32]</code> (con <code>'\0'</code>), ecc.</p>
-
-      <h3>2) “Designated initializers” (solo C)</h3>
-<pre><code class="language-c">Studente s2 = {
-    .cognome = "Lovelace",
-    .nome    = "Ada",
-    .media   = 9.4,
-    .eta     = 17
-};
-</code></pre>
-      <p class="note">Sono molto comodi perché <b>non dipendono dall’ordine</b>. In C++ questa forma non è portabile didatticamente: <b>evitala</b> in C++.</p>
-
-      <h3>3) Array e stringhe</h3>
-<pre><code class="language-c">Studente s3 = { "Alan", "Turing", 18, 10.0 };
-// "Alan" e "Turing" vengono COPIATI dentro gli array nome/cognome.
-// Se la sorgente è più lunga di 31 caratteri, verrà troncata.
-</code></pre>
-
-      <h3>4) Inizializzazione parziale &amp; azzeramento</h3>
-<pre><code class="language-c">Studente s4 = { "Grace" };   // solo nome → il resto è azzerato (cognome="", eta=0, media=0.0)
-Studente zero = {0};         // azzera TUTTI i campi (scorciatoia utile)
-</code></pre>
-      <p><b>Perché utile?</b> In C le variabili automatiche NON sono azzerate. <code>{0}</code> è un modo semplice per partire puliti.</p>
-
-      <h3>5) Annidamento e array di struct</h3>
-<pre><code class="language-c">typedef struct { int x, y; } Punto;
-typedef struct { Punto v[3]; } Triangolo;
-
-Triangolo t = { { {0,0}, {1,0}, {0,1} } };
-
-Studente classe[3] = {
-    { "Ada",  "Lovelace", 17, 9.4 },
-    { "Alan", "Turing",   18, 10.0 },
-    { "Grace","Hopper",   19, 9.8 }
-};
-</code></pre>
-
-      <h3>6) Campi <code>const</code> in C</h3>
-<pre><code class="language-c">typedef struct {
-    const int id;     // inizializza nell'aggregate initializer
-    int v;
-} Box;
-
-Box b = { .id = 42, .v = 5 };
-// b.id = 7;  // ERRORE: const
-</code></pre>
-
-      <h3>7) Oggetti con storage statico</h3>
-<pre><code class="language-c">static Studente G;   // storage statico ⇒ azzerato automaticamente
-</code></pre>
-      <p class="tip">Anche qui: per chiarezza didattica, preferisci inizializzare esplicitamente ciò che usi.</p>
+      <p>Nel C il punto importante non e la differenza di "potenza", ma la rappresentazione delle stringhe: qui non hai <code>std::string</code>, ma array di <code>char</code>.</p>
     </div>
 
-    <div class="inner-box box">
-      <h2>FAQ (domande tipiche)</h2>
-      <ul>
-        <li><b>Perché <code>Studente s{}</code> è più sicuro di <code>Studente s;</code>?</b> Perché azzera i fondamentali e lascia “vuote” le stringhe → nessun valore spazzatura.</li>
-        <li><b>Se sbaglio l’ordine negli initializer in C/C++?</b> Compila ma mette i valori nei campi sbagliati → <em>bug silenzioso</em>. In C puoi usare i <em>designated</em> per evitare l’errore.</li>
-        <li><b>Perché le { } sono preferibili in C++?</b> Impediscono conversioni pericolose (narrowing), segnalando l’errore in compilazione.</li>
-        <li><b>Le stringhe in C sono “magiche”?</b> No: sono array di <code>char</code> con <code>'\0'</code> finale. Serve capienza sufficiente; altrimenti si troncano.</li>
-      </ul>
+    <div class="inner-box warn">
+      <b>Errore tipico:</b> trattare i campi come variabili scollegate. Il loro senso dipende dalla <code>struct</code> a cui appartengono. Per questo conviene dare nomi parlanti sia al tipo sia ai membri.
     </div>
 
-    <div class="inner-box">
-      <h2>Confronto rapido C++ → C (mappa mentale)</h2>
-      <ul>
-        <li><b>Zero-initialization</b>: C++ usa <code>Type obj{}</code>; C usa <code>Type obj = {0}</code>.</li>
-        <li><b>Default dei campi</b> (in-class, C++): in C non esistono → usa initializer completi o helper.</li>
-        <li><b>Designated</b>: comodi in C; in C++ evita per portabilità didattica.</li>
-        <li><b>Stringhe</b>: in C sono array di char; in C++ preferisci <code>std::string</code> (gestione automatica).</li>
-      </ul>
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L2.3</strong> affrontiamo un punto molto piu importante di quanto sembri: l'inizializzazione. Una <code>struct</code> ben definita ma inizializzata male resta comunque una fonte di bug.
     </div>
-
-    <div class="inner-box">
-      <h2>Pitfall comuni (e rimedi)</h2>
-      <ul>
-        <li><strong>Usare oggetti non inizializzati</strong> (fondamentali indeterminati). <br/><br/><span class="ok">C++: usa <code>{}</code>. C: usa <code>= {0}</code> o initializer completi.</span></li>
-        <li><strong>Ordine sbagliato negli aggregate</strong>. <br/><br/><span class="ok">Segui l’ordine dei membri o, in C, usa i <em>designated</em>.</span></li>
-        <li><strong>Narrowing in C++ con <code>()</code></strong>. <br/><br/><span class="ok">Preferisci <code>{}</code> per bloccare conversioni pericolose.</span></li>
-        <li><strong>Stringhe troppo lunghe (C)</strong>. <br/><br/><span class="ok">Prevedi capienza (spazio per <code>'\0'</code>) o valida/tronca consapevolmente.</span></li>
-      </ul>
-    </div>
-
-    <div class="inner-box">
-      <h2>Esercizi (con soluzione a comparsa)</h2>
-      <ol>
-        <li><b>C++ — Inizializza correttamente</b>: definisci <code>Libro { std::string titolo; int pagine; double prezzo; }</code> e crea: <em>l1</em> azzerato; <em>l2</em> con titolo “C++”, 350 pagine, 29.90; <em>l3</em> solo titolo “Algo”.<br/>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e1" onclick="toggleBox('btn-e1','box-e1')">Mostra ▼</button></div>
-          <div id="box-e1" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">struct Libro { std::string titolo; int pagine; double prezzo; };
-Libro l1{};                             // tutto a default/zero
-Libro l2{"C++", 350, 29.90};            // aggregate in ordine
-Libro l3{"Algo"};                       // se hai in-class default per gli altri campi, li usa</code></pre>
-            <p><b>Spiegazione.</b> <code>l1{}</code> è sicuro; <code>l2{...}</code> rispetta l’ordine dei campi; <code>l3{"Algo"}</code> richiede che gli altri campi abbiano default sensati oppure vanno specificati.</p>
-          </div>
-        </li>
-
-        <li><b>C — Classe di studenti</b>: definisci <code>Studente</code> (come sopra) e inizializza un array di 2 elementi con valori a scelta; poi crea uno “zero”.<br/>
-          <div class="nav-buttons" style="justify-content:left"><button id="btn-e2" onclick="toggleBox('btn-e2','box-e2')">Mostra ▼</button></div>
-          <div id="box-e2" style="display:none;margin-top:8px">
-<pre><code class="language-c">Studente c[2] = {
-    { "Ada",  "Lovelace", 17, 9.4 },
-    { "Alan", "Turing",   18, 10.0 }
-};
-Studente z = (Studente){0}; // C99: azzera tutti i campi (compound literal)</code></pre>
-            <p><b>Spiegazione.</b> L’array viene popolato con initializer in ordine; lo “zero” è utile come sentinella o valore neutro.</p>
-          </div>
-        </li>
-      </ol>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Checklist finale</h2>
-      <ul>
-        <li>Creo una struct? ➜ <b>decido subito</b> come inizializzarla (C++ <code>{}</code>, C <code>{0}</code> o initializer completo).</li>
-        <li>Ho campi <b>const/reference</b>? ➜ <b>devono</b> essere inizializzati nella lista.</li>
-        <li>Uso aggregate? ➜ rispetto l’<b>ordine</b>; in C posso usare i <b>designated</b>.</li>
-        <li>Uso stringhe C? ➜ verifico <b>capienza</b> (incluso <code>'\0'</code>).</li>
-        <li>Preferisco le <b>{braces}</b> in C++ per evitare <em>narrowing</em>.</li>
-      </ul>
-    </div>
-
   </div>
 
   <div class="nav-buttons">
@@ -294,8 +115,5 @@ Studente z = (Studente){0}; // C99: azzera tutti i campi (compound literal)</cod
     <button onclick="nextSlide()">Avanti &#8594;</button>
   </div>
 </div>
-
-<script>
-</script>
 </body>
 </html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - L4.15 · Esercizi avanzati e ponte</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez4_14.html"; }
+    function nextSlide(){ window.location.href = "../lez5/lez5_1.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra soluzione ▼' : 'Nascondi soluzione ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 4 - OOP in C++ (ripasso guidato)</h2>
+  <ul>
+    <li><a href="lez4_1.html">L4.1 - Perche OOP</a></li>
+    <li><a href="lez4_2.html">L4.2 - Astrazione e incapsulamento</a></li>
+    <li><a href="lez4_3.html">L4.3 - Anatomia minima di una classe</a></li>
+    <li><a href="lez4_4.html">L4.4 - Costruttori e invarianti</a></li>
+    <li><a href="lez4_5.html">L4.5 - Distruttore, ordine, default e delete</a></li>
+    <li><a href="lez4_6.html">L4.6 - Incapsulamento forte e metodi const</a></li>
+    <li><a href="lez4_7.html">L4.7 - Overload e overload const/non-const</a></li>
+    <li><a href="lez4_8.html">L4.8 - Rendere leggibile un oggetto e contratti d'uso</a></li>
+    <li><a href="lez4_9.html">L4.9 - Header, sorgenti e translation unit</a></li>
+    <li><a href="lez4_10.html">L4.10 - Build, linking, ODR e dipendenze</a></li>
+    <li><a href="lez4_11.html">L4.11 - Copy semantics e Rule of Three/Zero</a></li>
+    <li><a href="lez4_12.html">L4.12 - Move semantics, Rule of Five e RVO</a></li>
+    <li><a href="lez4_13.html">L4.13 - Esercizi base</a></li>
+    <li><a href="lez4_14.html">L4.14 - Esercizi intermedi</a></li>
+    <li><a href="lez4_15.html" class="active">L4.15 - Esercizi avanzati e ponte</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Esercizi avanzati e ponte</h1>
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+  <div class="content-box">
+    <div class="inner-box box">
+      <h2>Obiettivo di questa pagina</h2>
+      <p>Verificare se sai ragionare su ownership, move e scelta tra progettazione manuale e delega ai tipi standard.</p>
+      <p class="ok"><b>Metodo di lavoro:</b> prima decidi chi possiede la risorsa, poi chiediti se il tipo deve essere copiabile, spostabile o entrambe le cose.</p>
+    </div>
+    <div class="inner-box box">
+      <h2>E1 - Tipo non copiabile ma spostabile</h2>
+      <p><b>Scenario:</b> una classe <code>FileHandle</code> rappresenta il possesso esclusivo di una risorsa.</p>
+      <p><b>Domanda:</b> perche e ragionevole vietare la copia ma permettere il move?</p>
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-l47" onclick="toggleBox('btn-l47','box-l47')">Mostra soluzione ▼</button></div>
+      <div id="box-l47" style="display:none;margin-top:8px">
+        <div class="ok">
+          <p><b>Soluzione:</b> la copia duplicherebbe un possesso che dovrebbe restare esclusivo; il move invece trasferisce quel possesso da un oggetto all'altro senza ambiguita.</p>
+          <p><b>Che cosa verificava davvero:</b> la comprensione del move come trasferimento di ownership, non come semplice ottimizzazione di performance.</p>
+        </div>
+      </div>
+    </div>
+    <div class="inner-box box">
+      <h2>E2 - Dopo std::move posso ancora usare l'oggetto?</h2>
+      <p><b>Domanda:</b> dopo <code>b = std::move(a);</code>, che cosa puoi ancora assumere su <code>a</code>?</p>
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-l48" onclick="toggleBox('btn-l48','box-l48')">Mostra soluzione ▼</button></div>
+      <div id="box-l48" style="display:none;margin-top:8px">
+        <div class="ok">
+          <p><b>Soluzione:</b> puoi assumere che <code>a</code> sia ancora distruttibile e riassegnabile. Non puoi assumere che contenga ancora il vecchio valore logico.</p>
+          <p><b>Errore tipico:</b> usare l'oggetto mosso come se fosse rimasto immutato solo perche "non ha dato errore".</p>
+        </div>
+      </div>
+    </div>
+    <div class="inner-box box">
+      <h2>E3 - Rule of Zero, Three o Five?</h2>
+      <p><b>Scenario:</b> devi progettare una classe che contiene solo <code>std::string</code>, <code>std::vector</code> e numeri.</p>
+      <p><b>Domanda:</b> quale regola e piu sensata e perche?</p>
+      <div class="nav-buttons" style="justify-content:left"><button id="btn-l49" onclick="toggleBox('btn-l49','box-l49')">Mostra soluzione ▼</button></div>
+      <div id="box-l49" style="display:none;margin-top:8px">
+        <div class="ok">
+          <p><b>Soluzione:</b> la Rule of Zero e la scelta naturale, perche le risorse sono gia gestite bene dai membri standard. Aggiungere copie o move manuali senza motivo alza il rischio di errori.</p>
+          <p><b>Che cosa verificava davvero:</b> la maturita progettuale di scegliere meno codice quando meno codice e meglio.</p>
+        </div>
+      </div>
+    </div>
+    <div class="inner-box box">
+      <h2>Sintesi finale della lezione</h2>
+      <ul>
+        <li>una classe vale se protegge il proprio stato e offre un'interfaccia chiara;</li>
+        <li>copia e move non sono dettagli tecnici, ma scelte di possesso e responsabilita;</li>
+        <li>header, sorgenti e ODR servono a mantenere puliti gli stessi confini che abbiamo chiesto agli oggetti.</li>
+      </ul>
+    </div>
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>Lezione 5</strong> il discorso si allarga: da singole classi passiamo a relazioni tra classi, gerarchie, ereditarieta e polimorfismo.
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+</body>
+</html>

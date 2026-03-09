@@ -3,36 +3,46 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA – Lez2.1 · Struct: motivazione, definizione, sintassi base (C++ → C)</title>
+  <title>4BIA - L2.1 · Struct: perche esistono</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
   <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "../programma.html"; }
+    function prevSlide(){ window.location.href = "../lez1/lez1_11.html"; }
     function nextSlide(){ window.location.href = "lez2_2.html"; }
-</script>
-
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
 </head>
 <body>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
 <div class="sidebar" id="menu">
-  <h2>Lezione 2 - Struct (ripasso mirato)</h2>
+  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
   <ul>
-    <li><a href="lez2_1.html" class="active">Lez2.1: Motivazione e sintassi base</a></li>
-    <li><a href="lez2_2.html">Lez2.2: Inizializzazioni in C/C++</a></li>
-    <li><a href="lez2_3.html">Lez2.3: Passaggio a funzione</a></li>
-    <li><a href="lez2_4.html">Lez2.4: Collezioni di struct e lambda</a></li>
-    <li><a href="lez2_5.html">Lez2.5: Layout, sizeof, padding e align</a></li>
-    <li><a href="lez2_6.html">Lez2.6: Serializzare le struct in modo sicuro</a></li>
+    <li><a href="lez2_1.html" class="active">L2.1 - Perche esistono le struct</a></li>
+    <li><a href="lez2_2.html">L2.2 - Sintassi minima e accesso ai membri</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
+    <li><a href="lez2_4.html">L2.4 - Inizializzare in C</a></li>
+    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
+    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
+    <li><a href="lez2_9.html">L2.9 - Lambda, ordinamento e filtro</a></li>
+    <li><a href="lez2_10.html">L2.10 - Layout, padding e serializzazione raw</a></li>
   </ul>
 </div>
 <!-- END MENU -->
 
 <div class="slide">
-  <h1>Lez2.1 — <em>Struct</em>: motivazione, definizione e sintassi base</h1>
+  <h1>Perche esistono le struct</h1>
 
   <div class="nav-buttons" style="margin-bottom:10px">
     <button onclick="prevSlide()">&#8592; Indietro</button>
@@ -40,107 +50,54 @@
   </div>
 
   <div class="content-box">
-
-    <div class="inner-box">
-      <h2>Perché le <code>struct</code>?</h2>
-      <p>
-        Una <strong>struct</strong> modella un <em>dato composto</em>: un’unica entità che aggrega campi tra loro coerenti.
-        Senza struct, useremmo variabili sciolte non sincronizzate (es. tre array separati per nome, età, media).
-        Con la struct racchiudiamo i campi in un <em>tipo orientato al dominio</em> (es. <code>Studente</code>), rendendo più chiaro cosa
-        rappresenta ogni record, facilitando passaggio a funzione, riuso e test.
-      </p>
-      <ul>
-        <li><strong>Leggibilità & coesione</strong>: i campi stanno insieme e “viaggiano” insieme.</li>
-        <li><strong>Sicurezza dei tipi</strong>: evitiamo parametri sfalsati e mix-up tra campi.</li>
-        <li><strong>Base per collezioni</strong>: vettori/array di struct, ordinamento per chiavi, filtri, ecc.</li>
-      </ul>
-      <p class="note"><strong>Idea chiave:</strong> la struct è un “mini-modello” del mondo reale: definisci il <em>cosa</em> (dati),
-        poi userai funzioni che operano su quel tipo (calcoli, stampa, validazione) nelle prossime slide.</p>
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Capire perche una <code>struct</code> non e solo una comodita sintattica, ma un modo corretto di modellare dati che appartengono alla stessa entita.</p>
+      <p class="ok"><b>Idea chiave:</b> una <code>struct</code> trasforma un insieme di variabili sparse in un unico oggetto coerente, con nome, significato e responsabilita piu chiare.</p>
     </div>
 
-    <!-- C++ PRIMA -->
-    <div class="box">
-      <h2>C++: definizione e uso essenziali</h2>
-      <p>
-        In C++, <code>struct</code> e <code>class</code> differiscono solo per il <strong>default di accesso</strong>:
-        nelle struct è <code>public</code>, nelle class è <code>private</code>. Per dati “plain” e record, la struct è idiomatica.
-      </p>
-<pre><code class="language-cpp">// Definizione di un tipo composto
-struct Studente {
+    <div class="inner-box box">
+      <h2>Il problema senza struct</h2>
+      <p>Se descrivi uno studente con variabili separate come <code>nome</code>, <code>cognome</code>, <code>eta</code> e <code>media</code>, il programma non vede nessuna relazione forte tra questi dati. Sta solo vedendo variabili indipendenti.</p>
+      <p>Questo rende piu facile:</p>
+      <ul>
+        <li>scambiare parametri per errore;</li>
+        <li>dimenticare un pezzo del dato;</li>
+        <li>duplicare funzioni poco chiare;</li>
+        <li>costruire collezioni parallele fragili.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Il vantaggio di un tipo orientato al dominio</h2>
+      <p>Con una <code>struct</code> dici esplicitamente: "questi campi formano un solo record". Non stai solo raggruppando byte: stai dando al programma un tipo che rappresenta un concetto del dominio.</p>
+<pre><code class="language-cpp">struct Studente {
     std::string nome;
     std::string cognome;
     int eta;
     double media;
-}; // ← il punto e virgola è obbligatorio
-
-// Dichiarazione e accesso ai membri
-int main() {
-    Studente s{"Ada", "Lovelace", 17, 9.4}; // forma sicura: valori espliciti
-    s.media = 9.5;                          // accesso con l'operatore '.'
-}
+};
 </code></pre>
-      <p class="warn"><strong>Attenzione</strong>: per un primo contatto conviene partire da una forma <em>già inizializzata</em>, come nell'esempio sopra. Le assegnazioni campo per campo restano lecite, ma nella prossima slide vedremo in modo sistematico perché le forme con brace sono di solito più sicure e più chiare.</p>
-      <p>
-        Con i <strong>puntatori</strong> a struct si usa <code>→</code>:
-        <code>Studente* p = &s;</code> poi <code>p-&gt;eta = 18;</code>. Con un <strong>reference</strong> <code>Studente& r = s;</code> si continua a usare <code>.</code>.
-      </p>
+      <p>Da questo momento in poi puoi parlare di <code>Studente</code> come di un'unita logica: passarlo a funzione, metterlo in un vector, ordinarlo, validarlo.</p>
     </div>
 
-    <!-- POI C -->
-    <div class="box">
-      <h2>C (nota di confronto)</h2>
-      <p>
-        In C “puro”, il nome del tipo include <code>struct</code>, oppure si usa un <code>typedef</code> idiomatico per accorciare:
-      </p>
-<pre><code class="language-c">// C: definizione e typedef
-typedef struct {
-    char nome[32];
-    char cognome[32];
-    int eta;
-    double media;
-} Studente;  // ora Studente è un alias del tipo struct anonimo
-
-// Dichiarazione e uso
-Studente s;
-strcpy(s.nome, "Ada");
-strcpy(s.cognome, "Lovelace");
-s.eta = 17;
-s.media = 9.4;
-</code></pre>
-      <p class="note">
-        In C non esistono <code>std::string</code> né costrutti di alto livello del C++; le stringhe sono array di <code>char</code> terminati da <code>'\0'</code>.
-      </p>
-    </div>
-
-    <div class="inner-box">
-      <h2>Accesso ai membri e semantica dei nomi</h2>
+    <div class="inner-box box">
+      <h2>Quando una struct e la scelta naturale</h2>
       <ul>
-        <li><strong>Operatore punto</strong> <code>.</code>: accesso ai campi tramite una <em>istanza</em> (oggetto automatico o riferimento).</li>
-        <li><strong>Operatore freccia</strong> <code>-&gt;</code>: accesso ai campi tramite <em>puntatore</em> (dopo dereferenziamento implicito).</li>
-        <li><strong>Scope & nomi</strong>: la struct definisce un <em>nuovo tipo</em>; firme autoesplicative (es. <code>bool valida(const Studente& s)</code>).</li>
+        <li>quando i campi descrivono lo stesso oggetto;</li>
+        <li>quando vuoi ridurre errori di coordinamento tra variabili;</li>
+        <li>quando vuoi costruire collezioni di record omogenei;</li>
+        <li>quando una funzione deve lavorare su un'entita completa, non su molti pezzi separati.</li>
       </ul>
     </div>
 
-    <div class="inner-box">
-      <h2>Buone pratiche (fin da subito)</h2>
-      <ul>
-        <li><strong>Nomi parlanti</strong> per i campi: meglio <code>dataNascita</code> che <code>d</code>.</li>
-        <li><strong>Tipi corretti</strong>: usa <code>std::string</code> in C++ per testo; buffer “crudi” solo per interoperabilità C.</li>
-        <li><strong>Evita copie inutili</strong>: quando passeremo alle funzioni, preferiremo <code>const Studente&</code> per sola lettura.</li>
-        <li><strong>Punto e virgola</strong> dopo la definizione della struct: è parte della sintassi del linguaggio.</li>
-      </ul>
+    <div class="inner-box warn">
+      <b>Regola pratica:</b> se ti accorgi che tre o quattro variabili "viaggiano sempre insieme", probabilmente stai gia pensando a una <code>struct</code>.
     </div>
 
-    <div class="inner-box">
-      <h2>Mini-quiz (ripasso immediato)</h2>
-      <ol>
-        <li>In C++, qual è la differenza sostanziale tra <code>struct</code> e <code>class</code>?</li>
-        <li>Quando si usa <code>.</code> e quando <code>-&gt;</code> per accedere ai membri?</li>
-        <li>Perché una struct rende il codice più robusto rispetto a gestire più variabili “sciolte”?</li>
-      </ol>
-      <p class="note">Avanti con le <strong>inizializzazioni</strong> (Lez2.2) e poi il <strong>passaggio a funzione</strong>.</p>
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>L2.2</strong> passiamo dalla motivazione alla forma concreta: come si definisce una <code>struct</code>, come si dichiarano istanze e come si accede correttamente ai membri.
     </div>
-
   </div>
 
   <div class="nav-buttons">
@@ -148,8 +105,5 @@ s.media = 9.4;
     <button onclick="nextSlide()">Avanti &#8594;</button>
   </div>
 </div>
-
-<script>
-</script>
 </body>
 </html>

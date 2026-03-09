@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - L2.10 · Struct: layout, padding e perche non serializzare raw</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+  <script>
+    function prevSlide(){ window.location.href = "lez2_9.html"; }
+    function nextSlide(){ window.location.href = "../lez3/lez3_1.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId);
+      const btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
+    }
+  </script>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
+  <ul>
+    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
+    <li><a href="lez2_2.html">L2.2 - Sintassi minima e accesso ai membri</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
+    <li><a href="lez2_4.html">L2.4 - Inizializzare in C</a></li>
+    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
+    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
+    <li><a href="lez2_9.html">L2.9 - Lambda, ordinamento e filtro</a></li>
+    <li><a href="lez2_10.html" class="active">L2.10 - Layout, padding e serializzazione raw</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Layout, padding e perche non serializzare raw</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+    <div class="inner-box box">
+      <h2>Obiettivo della pagina</h2>
+      <p>Chiudere la lezione mostrando che una <code>struct</code> non e solo un concetto logico, ma anche un oggetto con un layout fisico in memoria.</p>
+      <p class="ok"><b>Idea chiave:</b> il layout reale di una <code>struct</code> dipende da padding, allineamento e ABI. Per questo "scrivere i byte cosi come sono" non equivale a definire un formato file affidabile.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa sono padding e allineamento</h2>
+      <p>Il compilatore puo inserire byte aggiuntivi tra i campi o alla fine della <code>struct</code> per rispettare i vincoli di allineamento della piattaforma.</p>
+<pre><code class="language-cpp">struct A {
+    char c;
+    int x;
+};
+</code></pre>
+      <p>La somma "visiva" dei campi non coincide necessariamente con <code>sizeof(A)</code>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perche questo conta davvero</h2>
+      <ul>
+        <li>due compilatori o due ABI diverse possono disporre i campi in modo differente;</li>
+        <li>i byte di padding possono non avere un contenuto significativo;</li>
+        <li>un confronto raw con <code>memcmp</code> puo risultare fragile;</li>
+        <li>un file salvato come dump della memoria puo diventare illeggibile o ambiguo altrove.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perche non conviene serializzare una struct raw</h2>
+      <p>Se fai qualcosa del tipo:</p>
+<pre><code class="language-c">fwrite(&s, sizeof s, 1, f);
+</code></pre>
+      <p>non stai salvando un "record ben definito". Stai salvando una fotografia della memoria in quella build, su quella piattaforma, con quei vincoli. E non e la stessa cosa.</p>
+      <p class="warn"><b>Errore tipico:</b> pensare che "funziona sul mio PC" significhi "ho definito un formato corretto". In realta hai solo verificato un caso locale.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>La scelta giusta</h2>
+      <p>Se vuoi un formato stabile, scrivi i campi in modo esplicito: ordine dei campi deciso, tipi a dimensione nota, eventuale gestione dell'endianness. In altre parole, devi definire un formato, non limitarti a versare memoria su disco.</p>
+      <p class="note"><b>Ponte verso la prossima lezione:</b> questo e esattamente il motivo per cui in <strong>Lezione 3</strong> parleremo di file come "byte + regole", non come semplice memoria salvata.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>Lezione 3</strong> allarghiamo il discorso: che cos'e davvero un file, come si distingue testo da binario e perche il formato e parte del problema, non un dettaglio secondario.
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+</body>
+</html>
