@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_11 · Alberi bilanciati e rotazioni</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez6_10.html"; }
+    function nextSlide(){ window.location.href = "lez6_12.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html" class="active">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Alberi bilanciati e rotazioni</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi della pagina</h2>
+      <p>Nella pagina precedente abbiamo visto il problema: un BST può essere corretto dal punto di vista dell'ordinamento e, nello stesso tempo, diventare poco efficiente se si deforma in una struttura troppo alta. A questo punto nasce naturalmente l'idea di <b>bilanciamento</b>.</p>
+      <p>Questa pagina non vuole trasformarsi in un corso avanzato su AVL o Red-Black Tree. Il suo scopo è più mirato: capire che cosa significa, in modo intuitivo, mantenere un BST in una forma favorevole e vedere l'algoritmo locale più importante che rende possibile questo obiettivo, cioè la <b>rotazione</b>.</p>
+      <p class="ok"><b>Idea chiave:</b> una rotazione modifica localmente la forma del BST per ridurne lo squilibrio, ma conserva l'ordinamento delle chiavi.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa intendiamo, in prima approssimazione, per albero bilanciato</h2>
+      <p>In modo intuitivo, un albero è tanto più bilanciato quanto più i suoi sottoalberi restano di altezza comparabile, senza creare rami molto lunghi da una sola parte. Non vuol dire che i due lati debbano essere identici, ma che non ci sia uno squilibrio eccessivo.</p>
+      <p>Lo scopo del bilanciamento non è rendere l'albero "bello da vedere". È mantenere contenuta l'altezza, così che ricerca, inserimento e cancellazione continuino a costare poco anche dopo molte operazioni.</p>
+      <p class="note"><b>Da fissare bene:</b> ordinamento e bilanciamento sono due proprietà diverse. Un BST può avere la prima senza avere la seconda.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché il bilanciamento serve davvero</h2>
+      <p>Considera di nuovo il caso in cui le chiavi arrivano ordinate. Il BST continua a rispettare la proprietà "sinistra minore, destra maggiore", ma la struttura si trasforma quasi in una lista. Se invece riusciamo a mantenere l'albero più basso, ogni confronto elimina più rapidamente grandi porzioni del problema.</p>
+      <p>In altre parole, il bilanciamento protegge il motivo per cui abbiamo scelto il BST. Senza questa protezione, l'albero rischia di perdere buona parte del suo vantaggio algoritmico.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Il fattore di bilanciamento: un primo criterio</h2>
+      <p>Un modo classico per misurare lo squilibrio di un nodo è confrontare l'altezza del suo sottoalbero sinistro con quella del suo sottoalbero destro. In molte strutture bilanciate si usa il cosiddetto <b>fattore di bilanciamento</b>:</p>
+<pre><code class="language-text">bf(nodo) = altezza(sinistra) - altezza(destra)</code></pre>
+      <p>Se questo valore resta piccolo, il nodo è ragionevolmente equilibrato. Se diventa troppo grande in valore assoluto, significa che una parte dell'albero sta crescendo troppo rispetto all'altra.</p>
+      <p>Qui non ci interessa ancora memorizzare il fattore in ogni nodo o sviluppare tutta la disciplina AVL. Ci interessa capire il criterio: <b>misurare lo squilibrio per poterlo correggere</b>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cos'è una rotazione</h2>
+      <p>Una rotazione è una trasformazione locale del BST. "Locale" significa che non ricostruiamo l'intero albero da zero: interveniamo su pochi nodi collegati, cambiando i puntatori in modo controllato.</p>
+      <p>La cosa sorprendente e importante è che, se la rotazione è eseguita correttamente, l'ordinamento del BST resta valido. Cambia la forma, non il contenuto logico dell'insieme ordinato.</p>
+      <p>Questa è la ragione per cui le rotazioni sono così preziose: permettono di curare l'altezza senza perdere la proprietà di ricerca.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Rotazione destra: l'idea intuitiva</h2>
+      <p>La rotazione destra si usa quando una parte sinistra è diventata troppo pesante. L'idea è far salire il figlio sinistro e far scendere il nodo squilibrato verso destra.</p>
+      <p>Prima della rotazione:</p>
+<pre><code>          30
+         /
+       20
+      /
+    10
+</code></pre>
+      <p>Dopo la rotazione destra intorno a <code>30</code>:</p>
+<pre><code>        20
+       /  \
+     10    30
+</code></pre>
+      <p>Il nodo <code>20</code> sale, <code>30</code> scende a destra, e la struttura diventa più bassa e più equilibrata. L'ordine <code>10 &lt; 20 &lt; 30</code> è rimasto intatto.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché la rotazione destra non rompe l'ordinamento</h2>
+      <p>Questo è il punto da capire davvero, più del codice. Prima della rotazione, tutti i valori del sottoalbero di <code>20</code> sono minori di <code>30</code>. Dopo la rotazione, <code>20</code> diventa la nuova radice locale e <code>30</code> resta nel suo lato destro. Quindi i confronti essenziali continuano a valere.</p>
+      <p>In generale, la rotazione non mescola arbitrariamente i nodi. Li riposiziona rispettando il fatto che un certo blocco di valori deve restare a sinistra e un altro a destra. È per questo che la struttura cambia, ma il BST resta un BST.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Rotazione sinistra: il caso simmetrico</h2>
+      <p>La rotazione sinistra è la versione speculare. Si usa quando la parte destra è diventata troppo pesante.</p>
+      <p>Prima della rotazione:</p>
+<pre><code>    10
+      \
+       20
+         \
+          30
+</code></pre>
+      <p>Dopo la rotazione sinistra intorno a <code>10</code>:</p>
+<pre><code>        20
+       /  \
+     10    30
+</code></pre>
+      <p>Di nuovo, la forma migliora ma l'ordine delle chiavi resta corretto. Questo parallelismo è importante: rotazione destra e rotazione sinistra sono due strumenti simmetrici per correggere squilibri opposti.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Implementazione essenziale di una rotazione destra</h2>
+      <p>Dal punto di vista del codice, una rotazione è un piccolo riassetto di puntatori. Ecco la forma essenziale della rotazione destra:</p>
+<pre><code class="language-cpp">Node* rotateRight(Node* y) {
+    Node* x = y-&gt;left;
+    Node* T2 = x-&gt;right;
+
+    x-&gt;right = y;
+    y-&gt;left = T2;
+
+    return x;
+}</code></pre>
+      <p>Questa funzione restituisce la nuova radice del sottoalbero ruotato. Il punto più delicato è <code>T2</code>: quel sottoalbero non va perso, ma va ricollocato nel posto corretto.</p>
+      <p class="note"><b>Idea importante:</b> una buona funzione di rotazione non crea o distrugge nodi. Si limita a riconnettere correttamente quelli esistenti.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Implementazione essenziale di una rotazione sinistra</h2>
+      <p>La rotazione sinistra si scrive in modo del tutto speculare:</p>
+<pre><code class="language-cpp">Node* rotateLeft(Node* x) {
+    Node* y = x-&gt;right;
+    Node* T2 = y-&gt;left;
+
+    y-&gt;left = x;
+    x-&gt;right = T2;
+
+    return y;
+}</code></pre>
+      <p>Anche qui la funzione restituisce la nuova radice locale del sottoalbero. Questa simmetria tra destra e sinistra è utile da cogliere subito: aiuta molto sia nella comprensione sia nel debug.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un caso un po' più ricco: il sottoalbero intermedio</h2>
+      <p>Le rotazioni diventano davvero istruttive quando c'è un sottoalbero "in mezzo", perché lì si vede se si è capita la logica dei puntatori. Considera:</p>
+<pre><code>        30
+       /
+     20
+       \
+        25
+</code></pre>
+      <p>Se facciamo una rotazione destra attorno a <code>30</code>, il nodo <code>20</code> sale, ma il sottoalbero radicato in <code>25</code> non può sparire. Deve diventare il nuovo sottoalbero sinistro di <code>30</code>:</p>
+<pre><code>        20
+       /  \
+     ...   30
+          /
+        25
+</code></pre>
+      <p>Questo esempio è importante perché mostra che la rotazione è un riordino strutturale preciso, non una semplice permuta di etichette.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Le doppie rotazioni: solo un primo cenno</h2>
+      <p>Non tutti gli squilibri si correggono con una sola rotazione semplice. Esistono situazioni "a zig-zag" in cui serve una doppia correzione locale. I due casi classici sono:</p>
+      <ul>
+        <li><b>sinistra-destra</b>: prima ruoto a sinistra il figlio sinistro, poi a destra il nodo squilibrato;</li>
+        <li><b>destra-sinistra</b>: prima ruoto a destra il figlio destro, poi a sinistra il nodo squilibrato.</li>
+      </ul>
+      <p>Non entriamo qui nel dettaglio completo, perché l'obiettivo di questa lezione è introduttivo. Ma è giusto che emerga l'idea: le rotazioni semplici sono i mattoni di una manutenzione più sofisticata dell'albero.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>AVL e Red-Black: due famiglie importanti</h2>
+      <p>Quando si studiano davvero gli alberi bilanciati, compaiono famiglie specifiche come gli <b>AVL tree</b> e i <b>Red-Black tree</b>. Entrambi usano rotazioni, ma differiscono per il modo in cui misurano e correggono lo squilibrio.</p>
+      <ul>
+        <li><b>AVL</b>: controllo più stretto dell'altezza, tramite fattore di bilanciamento;</li>
+        <li><b>Red-Black</b>: regole di colorazione che mantengono l'albero ragionevolmente equilibrato senza imporre una rigidità estrema.</li>
+      </ul>
+      <p>Per il nostro livello, l'importante non è implementare queste strutture in tutti i dettagli, ma capire perché esistono: servono a evitare che il BST si degradi troppo nel tempo.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa dobbiamo aver capito davvero</h2>
+      <p>La parte più importante di questa pagina non è ricordare a memoria i nomi delle famiglie di alberi bilanciati. È capire tre idee profonde:</p>
+      <ul>
+        <li>il problema nasce dall'altezza eccessiva;</li>
+        <li>la rotazione è una correzione locale della forma;</li>
+        <li>questa correzione conserva la proprietà d'ordine del BST.</li>
+      </ul>
+      <p>Se queste tre idee sono solide, allora in futuro sarà molto più semplice studiare versioni più avanzate e complete.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Errori tipici da evitare</h2>
+      <ul>
+        <li><b>Credere che una rotazione cambi l'insieme delle chiavi.</b> Le chiavi restano le stesse; cambia solo la forma del sottoalbero.</li>
+        <li><b>Perdere il sottoalbero intermedio.</b> Nei codici di rotazione è l'errore più frequente e più grave.</li>
+        <li><b>Confondere bilanciamento con ordinamento.</b> Un BST può essere ordinato ma non bilanciato.</li>
+        <li><b>Pensare che basti una rotazione qualunque.</b> La direzione della rotazione dipende dal tipo di squilibrio.</li>
+      </ul>
+      <p class="warn"><b>Regola pratica:</b> quando studi una rotazione, disegna sempre i nodi e i sottoalberi coinvolti prima di guardare il codice.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Punti chiave da fissare</h2>
+      <p>Se questa lezione è stata capita bene, dovresti aver fissato questi punti:</p>
+      <ul>
+        <li>il bilanciamento serve a contenere l'altezza del BST;</li>
+        <li>le rotazioni correggono localmente la forma dell'albero;</li>
+        <li>una rotazione ben fatta conserva la proprietà d'ordine;</li>
+        <li>rotazione sinistra e rotazione destra sono casi simmetrici;</li>
+        <li>AVL e Red-Black sono esempi di famiglie che sfruttano queste idee in modo sistematico.</li>
+      </ul>
+      <p>Con questo abbiamo chiuso il blocco teorico principale della lezione sugli alberi. A questo punto il passo naturale è fermarsi e verificare la comprensione con esercizi mirati.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Sintesi finale.</b> Un BST resta efficiente solo se l'altezza rimane sotto controllo; per questo nasce il tema del bilanciamento. Le rotazioni sono trasformazioni locali che cambiano la forma del sottoalbero, ma preservano l'ordine delle chiavi. Nella <strong>Lez6_12</strong> passeremo agli esercizi guidati per consolidare visite, BST e ragionamento strutturale.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

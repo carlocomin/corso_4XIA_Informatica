@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_2 · Rappresentazione degli alberi in C/C++</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez6_1.html"; }
+    function nextSlide(){ window.location.href = "lez6_3.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html" class="active">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Rappresentazione degli alberi in C/C++</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi della pagina</h2>
+      <p>Dopo aver capito che cos'è un albero dal punto di vista concettuale, ora dobbiamo tradurre quel modello in memoria. Questa è la pagina in cui l'albero smette di essere solo un disegno e diventa una struttura dati concreta, con nodi, puntatori e casi base ben definiti.</p>
+      <p>Ci concentreremo sugli <b>alberi binari</b>, perché sono il terreno naturale per introdurre visite, alberi binari di ricerca e rotazioni. L'idea però resta generale: un nodo contiene un dato e collegamenti verso altri nodi.</p>
+      <p class="ok"><b>Idea chiave:</b> un albero binario si rappresenta in modo naturale come una rete di nodi collegati da puntatori, con un puntatore speciale alla radice.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Dal disegno alla memoria</h2>
+      <p>Quando disegniamo un albero sulla lavagna vediamo cerchi e frecce. In memoria, però, non esistono "frecce": esistono indirizzi. Per questo la rappresentazione più naturale usa una struct o una class per il nodo e due puntatori per raggiungere il figlio sinistro e il figlio destro.</p>
+      <p>In altre parole, ogni nodo porta con sé due informazioni diverse:</p>
+      <ul>
+        <li>il <b>contenuto</b>, per esempio una chiave intera, una stringa o un record;</li>
+        <li>i <b>collegamenti</b> ai sottoalberi sinistro e destro.</li>
+      </ul>
+      <p>Questa scelta è molto importante: ci permette di costruire alberi di forma variabile, senza sapere in anticipo quanti nodi ci saranno né come saranno distribuiti.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>La struttura base in C++</h2>
+      <p>La forma più semplice di nodo binario in C++ è questa:</p>
+<pre><code class="language-cpp">struct Node {
+    int key;
+    Node* left;
+    Node* right;
+};</code></pre>
+      <p>Questa definizione va letta con calma:</p>
+      <ul>
+        <li><code>key</code> è il dato contenuto nel nodo;</li>
+        <li><code>left</code> punta alla radice del sottoalbero sinistro;</li>
+        <li><code>right</code> punta alla radice del sottoalbero destro.</li>
+      </ul>
+      <p>Se un sottoalbero non esiste, il puntatore corrispondente vale <code>nullptr</code>. Questo è il modo con cui rappresentiamo il caso "non c'è nessun figlio".</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>La struttura base in C</h2>
+      <p>In C l'idea è identica. Cambia solo la sintassi e il fatto che useremo <code>NULL</code> invece di <code>nullptr</code>.</p>
+<pre><code class="language-c">typedef struct Node {
+    int key;
+    struct Node* left;
+    struct Node* right;
+} Node;</code></pre>
+      <p>Il meccanismo è lo stesso: ogni nodo conosce i propri figli tramite puntatori. Questo significa che, dal punto di vista concettuale, C e C++ stanno modellando la stessa struttura dati; cambia il contorno del linguaggio, non l'idea.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Il puntatore alla radice</h2>
+      <p>Per rappresentare un intero albero non basta definire il tipo <code>Node</code>. Serve anche un punto di ingresso nella struttura, cioè un puntatore alla radice. Se conosco la radice, posso raggiungere tutti gli altri nodi seguendo i puntatori.</p>
+<pre><code class="language-cpp">Node* root = nullptr;   // albero vuoto</code></pre>
+      <p>Questa riga è molto più importante di quanto sembri. Dire <code>root = nullptr</code> significa che l'albero, per ora, non contiene nessun nodo. Quando inizieremo a inserire valori, <code>root</code> punterà al primo nodo e da lì si aprirà tutta la struttura.</p>
+      <p class="note"><b>Da fissare bene:</b> un albero vuoto non richiede una struct speciale. È semplicemente un puntatore nullo alla radice.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un nodo è già la radice di un sottoalbero</h2>
+      <p>Questa è forse l'idea più importante di tutta la pagina. Un puntatore a nodo non rappresenta solo "un nodo isolato": rappresenta la radice di tutto il sottoalbero che parte da quel nodo.</p>
+      <p>Se ho un puntatore <code>p</code> a un nodo, allora:</p>
+      <ul>
+        <li><code>p</code> è la radice di un certo albero;</li>
+        <li><code>p-&gt;left</code> è la radice del sottoalbero sinistro;</li>
+        <li><code>p-&gt;right</code> è la radice del sottoalbero destro.</li>
+      </ul>
+      <p>Questo modo di ragionare ci accompagnerà in tutta la lezione, perché rende naturali le visite ricorsive, la ricerca in un BST, la cancellazione e perfino la distruzione dell'albero.</p>
+      <p class="ok"><b>Idea guida:</b> molte funzioni sugli alberi ricevono un puntatore a nodo proprio perché stanno lavorando su un albero o sottoalbero.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Creazione di un nodo in C++</h2>
+      <p>Costruire un nodo significa allocare memoria, memorizzare il valore e inizializzare correttamente i puntatori ai figli. All'inizio i figli non esistono ancora, quindi vanno posti a <code>nullptr</code>.</p>
+<pre><code class="language-cpp">Node* createNode(int value) {
+    Node* p = new Node{value, nullptr, nullptr};
+    return p;
+}</code></pre>
+      <p>Questa funzione è piccola ma corretta. Restituisce l'indirizzo del nuovo nodo e garantisce una cosa importante: il nodo nasce già in uno stato coerente. Se dimenticassimo di inizializzare <code>left</code> e <code>right</code>, avremmo puntatori spazzatura e l'albero diventerebbe subito inaffidabile.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Creazione di un nodo in C</h2>
+      <p>In C il lavoro è lo stesso, ma l'allocazione avviene con <code>malloc</code> e va controllato il puntatore restituito.</p>
+<pre><code class="language-c">#include &lt;stdlib.h&gt;
+
+Node* createNode(int value) {
+    Node* p = malloc(sizeof(Node));
+    if (p == NULL) return NULL;
+
+    p-&gt;key = value;
+    p-&gt;left = NULL;
+    p-&gt;right = NULL;
+    return p;
+}</code></pre>
+      <p>Dal punto di vista didattico è utile confrontare le due versioni. In C++ l'inizializzazione può essere più compatta; in C è più esplicita. In entrambi i casi, però, resta identica la responsabilità centrale: creare un nodo valido e con figli assenti inizializzati correttamente.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Costruzione manuale di un piccolo albero</h2>
+      <p>Prima di automatizzare ricerca e inserimento, conviene vedere come nasce un piccolo albero collegando i nodi a mano. Questo aiuta molto a capire che cosa significhi davvero "sinistro" e "destro" dal punto di vista dei puntatori.</p>
+<pre><code class="language-cpp">Node* root = createNode(10);
+root-&gt;left = createNode(5);
+root-&gt;right = createNode(18);
+root-&gt;left-&gt;left = createNode(2);
+root-&gt;left-&gt;right = createNode(7);</code></pre>
+      <p>Il risultato è questo:</p>
+<pre><code>        10
+       /  \
+      5    18
+     / \
+    2   7
+</code></pre>
+      <p>Questa corrispondenza tra codice e disegno va vista bene: ogni assegnazione a un puntatore crea un collegamento strutturale. Quando in futuro visiteremo l'albero, seguiremo esattamente questi riferimenti.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché usare nodi collegati e non un array semplice?</h2>
+      <p>Uno studente potrebbe chiedersi: perché non usare semplicemente un array? La risposta è che un albero ha una forma dinamica e irregolare. Alcuni nodi hanno due figli, altri uno, altri nessuno; inoltre la struttura cresce e si modifica nel tempo.</p>
+      <p>Con i nodi collegati otteniamo due vantaggi:</p>
+      <ul>
+        <li>possiamo creare solo i nodi che servono davvero;</li>
+        <li>non dobbiamo fissare in anticipo una dimensione massima rigida.</li>
+      </ul>
+      <p>Esistono casi particolari in cui gli alberi si rappresentano anche in array, per esempio alcuni heap completi, ma non è la rappresentazione naturale per gli alberi binari generici e per i BST che vedremo in questa unità.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Attenzione alla memoria dinamica</h2>
+      <p>Il fatto che i nodi vengano creati dinamicamente implica una responsabilità precisa: prima o poi devono essere liberati. In C++ con puntatori grezzi useremo <code>delete</code>; in C useremo <code>free</code>. Questo tema non va banalizzato, perché un albero non si distrugge "tutto insieme" da solo.</p>
+      <p>Quando arriveremo alle visite, vedremo che la distruzione corretta dell'albero si esprime naturalmente con una visita in postordine: prima libero i sottoalberi, poi libero il nodo corrente. È un ottimo esempio di come struttura dati e algoritmo siano strettamente collegati.</p>
+      <p class="warn"><b>Nota progettuale:</b> in C++ moderno si possono usare anche smart pointer come <code>std::unique_ptr</code>, ma in questa fase è utile vedere prima il meccanismo nudo con i puntatori, così da capire davvero che cosa succede in memoria.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa bisogna aver capito prima di andare avanti</h2>
+      <p>Se questa pagina è chiara, dovresti ormai avere in testa questi passaggi:</p>
+      <ul>
+        <li>un albero binario è formato da nodi con un dato e due puntatori ai figli;</li>
+        <li>l'intero albero è identificato dal puntatore alla radice;</li>
+        <li>un puntatore nullo rappresenta un albero vuoto o un figlio assente;</li>
+        <li>ogni nodo è anche la radice di un sottoalbero;</li>
+        <li>creare e collegare nodi significa costruire esplicitamente la struttura dell'albero.</li>
+      </ul>
+      <p>Questi punti sembrano elementari, ma sono la base di tutto il resto. Se qui c'è chiarezza, le visite ricorsive diventano molto più naturali.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Sintesi finale.</b> In C e C++ un albero binario si rappresenta come un insieme di nodi dinamici collegati da puntatori, più un puntatore alla radice che identifica l'intera struttura. Ogni nodo è già la radice di un sottoalbero, e questa osservazione rende naturali visite e algoritmi ricorsivi. Nella <strong>Lez6_3</strong> useremo proprio questa idea per introdurre preordine, inordine e postordine.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_8 · Cancellazione in un BST</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez6_7.html"; }
+    function nextSlide(){ window.location.href = "lez6_9.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html" class="active">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Cancellazione in un BST</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi della pagina</h2>
+      <p>La cancellazione è l'operazione più delicata dell'implementazione base di un BST. Cercare e inserire seguono un solo cammino e aggiungono informazione senza sconvolgere la struttura; cancellare, invece, richiede di togliere un nodo e al tempo stesso mantenere corretto l'ordinamento di tutto l'albero.</p>
+      <p>Per questo non basta "staccare" il nodo trovato. Bisogna distinguere con precisione i casi possibili e capire quale trasformazione preserva la proprietà del BST. Se questo passaggio viene assimilato bene, si capisce davvero la struttura.</p>
+      <p class="ok"><b>Idea chiave:</b> la cancellazione in un BST si divide in tre casi classici, e solo il terzo, quello con due figli, richiede un ragionamento più sottile.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Prima fase: trovare il nodo da cancellare</h2>
+      <p>Anche la cancellazione, come la ricerca e l'inserimento, inizia seguendo i confronti dell'ordinamento. Se la chiave cercata è minore del nodo corrente si scende a sinistra; se è maggiore si scende a destra; se coincide, il nodo da cancellare è stato trovato.</p>
+      <p>La vera difficoltà comincia dopo il ritrovamento. A quel punto non bisogna più solo scegliere un ramo: bisogna decidere come ricucire correttamente l'albero.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>I tre casi della cancellazione</h2>
+      <p>Quando il nodo da eliminare è stato trovato, esistono tre situazioni fondamentali:</p>
+      <ul>
+        <li><b>caso 1</b>: il nodo è una foglia;</li>
+        <li><b>caso 2</b>: il nodo ha un solo figlio;</li>
+        <li><b>caso 3</b>: il nodo ha due figli.</li>
+      </ul>
+      <p>Questa distinzione è centrale. Se uno studente prova a imparare direttamente la funzione completa senza aver fissato bene questi tre casi, la cancellazione resta opaca. Se invece i casi sono chiari, il codice diventa leggibile.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Caso 1: cancellare una foglia</h2>
+      <p>Il caso più semplice è quello in cui il nodo non ha figli. In questo scenario la cancellazione consiste semplicemente nel liberare quel nodo e sostituirlo con <code>nullptr</code>.</p>
+<pre><code>        10
+       /  \
+      5    18
+     /
+    2
+</code></pre>
+      <p>Se cancelliamo <code>2</code>, il risultato è:</p>
+<pre><code>        10
+       /  \
+      5    18
+</code></pre>
+      <p>Qui il motivo della semplicità è evidente: il nodo eliminato non sostiene nessun sottoalbero, quindi non c'è nulla da ricollocare.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Caso 2: nodo con un solo figlio</h2>
+      <p>Se il nodo da cancellare ha un solo figlio, l'idea corretta è far salire quel figlio al posto del nodo eliminato. In pratica il padre del nodo cancellato viene ricollegato direttamente al suo unico figlio.</p>
+<pre><code>        10
+       /  \
+      5    18
+           /
+          12
+</code></pre>
+      <p>Se cancelliamo <code>18</code>, il nodo <code>12</code> prende il suo posto:</p>
+<pre><code>        10
+       /  \
+      5    12
+</code></pre>
+      <p>Questa trasformazione funziona perché tutto il sottoalbero dell'unico figlio era già coerente con la posizione occupata dal nodo eliminato.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Caso 3: nodo con due figli</h2>
+      <p>Qui la cancellazione diventa davvero interessante. Se elimino un nodo con due figli, non posso semplicemente sostituirlo con uno dei due sottoalberi, perché rischierei di perdere la proprietà d'ordine.</p>
+      <p>La strategia classica è questa:</p>
+      <ul>
+        <li>trovo il <b>successore inorder</b>, cioè il minimo del sottoalbero destro;</li>
+        <li>copio quella chiave nel nodo da cancellare;</li>
+        <li>cancello poi il nodo che conteneva originariamente il successore.</li>
+      </ul>
+      <p>In alternativa si può usare il predecessore inorder, cioè il massimo del sottoalbero sinistro. Noi useremo il successore perché è molto comune e didatticamente pulito.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché proprio il successore inorder?</h2>
+      <p>Il successore inorder di un nodo è il valore più piccolo che sia comunque maggiore del nodo stesso. Questo lo rende un candidato perfetto per sostituire il nodo da cancellare: resta maggiore di tutto il sottoalbero sinistro e, allo stesso tempo, è il più "vicino possibile" tra i valori del lato destro.</p>
+      <p>In modo equivalente, si potrebbe usare il predecessore inorder, che è il massimo valore minore del nodo. Le due scelte sono simmetriche. La cosa importante è capire il criterio: serve un valore che possa occupare quel posto senza violare l'ordinamento del BST.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esempio guidato del caso con due figli</h2>
+      <p>Considera questo BST:</p>
+<pre><code>            10
+          /    \
+         5      18
+        / \    /  \
+       2   7  12  25
+             \
+              15
+</code></pre>
+      <p>Vogliamo cancellare <code>10</code>, che ha due figli.</p>
+      <ol>
+        <li>cerco il successore inorder di <code>10</code>;</li>
+        <li>mi sposto nel sottoalbero destro e prendo il minimo: è <code>12</code>;</li>
+        <li>copio <code>12</code> al posto di <code>10</code>;</li>
+        <li>ora devo cancellare il vecchio nodo <code>12</code> dal sottoalbero destro.</li>
+      </ol>
+      <p>Dopo la sostituzione logica otteniamo:</p>
+<pre><code>            12
+          /    \
+         5      18
+        / \    /  \
+       2   7  12  25
+             \
+              15
+</code></pre>
+      <p>Naturalmente non possiamo lasciare due volte <code>12</code>. Il secondo <code>12</code> va cancellato dalla sua posizione originaria. In questo esempio quel nodo ha un solo figlio destro, quindi il problema ricade nel caso 2.</p>
+      <p>Il risultato finale è:</p>
+<pre><code>            12
+          /    \
+         5      18
+        / \    /  \
+       2   7  15  25
+</code></pre>
+      <p>Questo esempio è fondamentale perché mostra che il caso con due figli non richiede una magia nuova: richiede di ridurre il problema a un caso più semplice dopo aver scelto bene il sostituto.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Implementazione ricorsiva in C++</h2>
+      <p>La versione ricorsiva più classica della cancellazione segue esattamente la logica dei tre casi:</p>
+<pre><code class="language-cpp">Node* findMin(Node* p) {
+    while (p != nullptr &amp;&amp; p-&gt;left != nullptr) p = p-&gt;left;
+    return p;
+}
+
+Node* removeNode(Node* p, int x) {
+    if (p == nullptr) return nullptr;
+
+    if (x &lt; p-&gt;key) {
+        p-&gt;left = removeNode(p-&gt;left, x);
+    } else if (x &gt; p-&gt;key) {
+        p-&gt;right = removeNode(p-&gt;right, x);
+    } else {
+        if (p-&gt;left == nullptr &amp;&amp; p-&gt;right == nullptr) {
+            delete p;
+            return nullptr;
+        }
+        if (p-&gt;left == nullptr) {
+            Node* tmp = p-&gt;right;
+            delete p;
+            return tmp;
+        }
+        if (p-&gt;right == nullptr) {
+            Node* tmp = p-&gt;left;
+            delete p;
+            return tmp;
+        }
+
+        Node* succ = findMin(p-&gt;right);
+        p-&gt;key = succ-&gt;key;
+        p-&gt;right = removeNode(p-&gt;right, succ-&gt;key);
+    }
+
+    return p;
+}</code></pre>
+      <p>Il codice è più lungo rispetto a ricerca e inserimento, ma il suo scheletro è chiaro se si leggono bene i tre casi.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Come leggere bene la funzione</h2>
+      <p>La funzione <code>removeNode</code> va letta in due grandi blocchi:</p>
+      <ul>
+        <li>prima scende nell'albero per trovare la chiave da eliminare;</li>
+        <li>poi, nel punto in cui la trova, sceglie uno dei tre casi strutturali.</li>
+      </ul>
+      <p>Le righe più importanti, dal punto di vista didattico, sono quelle in cui il risultato della chiamata ricorsiva viene ricollegato al sottoalbero:</p>
+<pre><code class="language-cpp">p-&gt;left = removeNode(p-&gt;left, x);
+p-&gt;right = removeNode(p-&gt;right, x);</code></pre>
+      <p>Come già accadeva per l'inserimento, la funzione restituisce la nuova radice del sottoalbero dopo la modifica. Questo rende uniforme il trattamento di radice, figli e sottoalberi interni.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Il legame con il predecessore e il successore</h2>
+      <p>Il caso con due figli è anche il punto in cui i concetti di minimo, massimo, predecessore e successore smettono di essere nozioni teoriche isolate e diventano strumenti operativi. Non li stiamo citando per completezza astratta: li stiamo usando per mantenere corretto il BST durante una modifica strutturale.</p>
+      <p>Questo è un ottimo esempio di buona didattica delle strutture dati: un concetto teorico acquista valore quando si vede dove serve davvero.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché la cancellazione è più difficile dell'inserimento</h2>
+      <p>Nell'inserimento bastava trovare un posto nullo e creare una nuova foglia. Nella cancellazione, invece, togliamo un nodo che potrebbe avere un ruolo importante nella struttura. Se non ricostruiamo bene i collegamenti, possiamo:</p>
+      <ul>
+        <li>perdere un intero sottoalbero;</li>
+        <li>violare la proprietà d'ordine;</li>
+        <li>lasciare puntatori errati o memoria non gestita correttamente.</li>
+      </ul>
+      <p>Per questo la cancellazione è spesso il momento in cui si verifica se la struttura del BST è stata capita davvero oppure no.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Complessità intuitiva</h2>
+      <p>Anche la cancellazione segue un cammino guidato dall'ordinamento e quindi, in prima approssimazione, dipende dall'altezza dell'albero. Nel caso con due figli c'è un lavoro aggiuntivo per cercare successore o predecessore, ma anche questa ricerca si muove lungo un cammino interno a un sottoalbero.</p>
+      <p>L'idea da fissare è la stessa delle operazioni precedenti: se l'albero è basso, la cancellazione tende a essere rapida; se è molto alto e sbilanciato, può diventare molto più costosa.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Errori tipici da evitare</h2>
+      <ul>
+        <li><b>Confondere i tre casi.</b> Se non si riconosce bene la struttura del nodo, il codice diventa fragile.</li>
+        <li><b>Cancellare il nodo con due figli senza sostituzione corretta.</b> Non si può semplicemente scegliere a caso un figlio.</li>
+        <li><b>Dimenticare di liberare la memoria del nodo eliminato.</b> La correttezza logica non basta: serve anche correttezza di gestione dinamica.</li>
+        <li><b>Non ricollegare i puntatori restituiti dalle chiamate ricorsive.</b> Questo può troncare parti dell'albero.</li>
+      </ul>
+      <p class="warn"><b>Regola pratica:</b> quando fai debug della cancellazione, prova sempre separatamente i tre casi su alberi molto piccoli prima di passare a test più grandi.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Punti chiave da fissare</h2>
+      <p>Se questa lezione è stata capita bene, dovresti aver fissato questi punti:</p>
+      <ul>
+        <li>la cancellazione in un BST si divide in tre casi classici;</li>
+        <li>foglia e nodo con un figlio si risolvono con trasformazioni relativamente semplici;</li>
+        <li>il nodo con due figli si gestisce usando successore o predecessore inorder;</li>
+        <li>la funzione ricorsiva restituisce sempre la nuova radice del sottoalbero modificato;</li>
+        <li>cancellazione corretta significa preservare sia l'ordine sia i collegamenti strutturali.</li>
+      </ul>
+      <p>Con questo passaggio il nucleo implementativo del BST di base è completo: sappiamo cercare, inserire e cancellare. Ora possiamo finalmente fermarci a riflettere sulle applicazioni algoritmiche per cui vale la pena usare davvero questa struttura.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Sintesi finale.</b> La cancellazione in un BST è l'operazione più delicata perché deve rimuovere un nodo senza rompere l'ordinamento della struttura. I casi con zero o un figlio si gestiscono direttamente; il caso con due figli si risolve sostituendo il nodo con il suo successore o predecessore inorder e riducendo il problema a un caso più semplice. Nella <strong>Lez6_9</strong> vedremo in quali problemi algoritmici il BST diventa davvero una scelta naturale.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

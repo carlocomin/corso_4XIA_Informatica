@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_9 · Applicazioni algoritmiche dei BST</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez6_8.html"; }
+    function nextSlide(){ window.location.href = "lez6_10.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html" class="active">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Applicazioni algoritmiche dei BST</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi della pagina</h2>
+      <p>Fin qui abbiamo costruito gli strumenti: proprietà del BST, ricerca, inserimento, cancellazione. Ora bisogna rispondere alla domanda più importante dal punto di vista algoritmico: <b>quando vale davvero la pena usare un BST?</b></p>
+      <p>Questa pagina serve proprio a questo. Non introduce nuove primitive strutturali, ma mostra come un BST diventi utile quando dobbiamo mantenere un insieme dinamico di dati su cui eseguire più operazioni contemporaneamente: cercare, inserire, cancellare, estrarre ordine, trovare vicini in ordine crescente o decrescente.</p>
+      <p class="ok"><b>Idea chiave:</b> il BST è interessante quando i dati cambiano nel tempo e abbiamo bisogno insieme di ricerca, aggiornamento e ordinamento.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Il problema di fondo: i dati arrivano e cambiano</h2>
+      <p>Molti problemi reali non consistono nel ricevere tutti i dati una volta sola, ordinarli e basta. Spesso i dati arrivano uno dopo l'altro: nuovi valori vengono aggiunti, alcuni vanno rimossi, altri devono essere cercati al volo. In questo scenario una struttura statica come un array ordinato può non essere la scelta più naturale.</p>
+      <p>Il BST nasce proprio per questo tipo di contesto: rappresentare un insieme dinamico di chiavi in modo da rendere naturali operazioni come:</p>
+      <ul>
+        <li>verificare rapidamente se un valore è già presente;</li>
+        <li>inserire un nuovo valore mantenendo l'ordinamento;</li>
+        <li>rimuovere un valore quando non serve più;</li>
+        <li>ottenere i dati in ordine quando necessario.</li>
+      </ul>
+      <p>Questa combinazione di esigenze è il vero terreno del BST.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Applicazione 1: insieme dinamico con test di appartenenza</h2>
+      <p>Una prima applicazione naturale è mantenere un insieme di valori distinti su cui vogliamo fare spesso test di appartenenza. Immagina di leggere una sequenza di numeri e voler sapere, ogni volta, se un numero è già comparso oppure no.</p>
+      <p>Con un BST il flusso è naturale:</p>
+      <ul>
+        <li>cerco il valore;</li>
+        <li>se non c'è, lo inserisco;</li>
+        <li>se c'è già, segnalo che è un duplicato oppure incremento un contatore esterno.</li>
+      </ul>
+<pre><code class="language-cpp">Node* root = nullptr;
+
+for (int x : input) {
+    if (search(root, x) == nullptr) {
+        root = insert(root, x);
+    } else {
+        std::cout &lt;&lt; x &lt;&lt; " già presente\n";
+    }
+}</code></pre>
+      <p>Qui il BST funziona come una struttura dati per la <b>membership</b>, cioè per rispondere alla domanda "questo valore appartiene già all'insieme?".</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Applicazione 2: mantenere i dati ordinati mentre arrivano</h2>
+      <p>Se i dati arrivano nel tempo, ordinare da capo dopo ogni inserimento sarebbe spesso scomodo o costoso. Il BST offre una strada più elegante: ogni nuova chiave viene inserita in una posizione coerente con l'ordine globale, e quando serve una visualizzazione ordinata basta usare l'inordine.</p>
+      <p>Per esempio, se leggiamo i valori:</p>
+<pre><code class="language-text">18 5 12 7 25 2 10</code></pre>
+      <p>non abbiamo bisogno di riordinare ogni volta l'intera sequenza. Li inseriamo nel BST e, quando vogliamo stamparli in ordine crescente, usiamo una visita inordine:</p>
+<pre><code class="language-cpp">void printSorted(const Node* root) {
+    inorder(root);   // stampa in ordine crescente se root è un BST
+}</code></pre>
+      <p>Questa è una proprietà molto preziosa: il BST separa il momento in cui i dati arrivano dal momento in cui vogliamo interrogarli in ordine.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Applicazione 3: deduplicazione con ordinamento</h2>
+      <p>Un problema tipico è rimuovere i duplicati da una sequenza e, al tempo stesso, ottenere il risultato ordinato. Il BST risolve naturalmente entrambe le esigenze se adottiamo la politica "non inserire chiavi già presenti".</p>
+      <p>Supponiamo di leggere:</p>
+<pre><code class="language-text">7 4 9 4 2 9 1 7 3</code></pre>
+      <p>Inserendo ogni chiave nel BST solo se non è già presente, alla fine l'inordine restituirà:</p>
+<pre><code class="language-text">1 2 3 4 7 9</code></pre>
+      <p>Questo è un esempio didatticamente molto forte, perché mostra che il BST non serve solo a "conservare" i dati: serve anche a trasformarli in una forma utile al problema.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Applicazione 4: minimo, massimo, predecessore, successore</h2>
+      <p>In molti problemi non basta sapere se una chiave esiste. Può servire anche trovare il valore immediatamente più piccolo o più grande di una certa soglia. Qui il BST diventa particolarmente interessante, perché il suo ordinamento rende significativi concetti come:</p>
+      <ul>
+        <li><b>minimo</b> e <b>massimo</b> dell'insieme;</li>
+        <li><b>predecessore</b> di una chiave;</li>
+        <li><b>successore</b> di una chiave.</li>
+      </ul>
+      <p>Queste operazioni sono molto utili, per esempio, quando vogliamo trovare il valore "più vicino da sotto" o "più vicino da sopra" rispetto a una chiave data. Sono problemi frequenti ogni volta che i dati hanno una natura ordinabile.</p>
+      <p class="note"><b>Esempio intuitivo:</b> dato un insieme di punteggi, qual è il punteggio immediatamente superiore a 73? Qual è quello immediatamente inferiore?</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Applicazione 5: classifica dinamica di punteggi</h2>
+      <p>Immagina un sistema che riceve progressivamente punteggi, risultati o valori numerici. Le operazioni richieste potrebbero essere:</p>
+      <ul>
+        <li>inserire un nuovo punteggio;</li>
+        <li>verificare se un punteggio è già stato registrato;</li>
+        <li>stampare la classifica in ordine crescente o decrescente;</li>
+        <li>trovare il punteggio minimo, massimo o il più vicino a una certa soglia.</li>
+      </ul>
+      <p>Il BST è una scelta molto naturale per questo scenario, perché tutte queste operazioni si appoggiano direttamente alle primitive che abbiamo già studiato. Non è necessario reinventare ogni volta la logica dell'ordinamento: la struttura dati la incorpora già.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Applicazione 6: insiemi dinamici in problemi offline e online</h2>
+      <p>Un'altra distinzione importante in algoritmica è quella tra problemi <b>offline</b> e <b>online</b>. In un problema offline possiedo tutti i dati dall'inizio; in un problema online i dati arrivano progressivamente e devo reagire man mano.</p>
+      <p>Il BST è particolarmente sensato in contesti online, perché consente di:</p>
+      <ul>
+        <li>aggiungere dati in corsa;</li>
+        <li>interrogarli subito dopo l'inserimento;</li>
+        <li>mantenere una struttura già pronta a rispondere a nuove domande.</li>
+      </ul>
+      <p>Questo lo rende un buon modello mentale per tanti problemi in cui non si può aspettare la fine dell'input per fare tutte le elaborazioni.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un esempio guidato: "è già comparso?"</h2>
+      <p>Supponiamo di voler leggere una sequenza e stampare, per ogni valore, se si tratta della prima comparsa oppure di una ripetizione:</p>
+<pre><code class="language-text">input: 8 3 10 3 6 8 12</code></pre>
+      <p>Una strategia con BST può essere:</p>
+      <ol>
+        <li>parto con albero vuoto;</li>
+        <li>leggo <code>8</code>: non c'è, lo inserisco;</li>
+        <li>leggo <code>3</code>: non c'è, lo inserisco;</li>
+        <li>leggo <code>10</code>: non c'è, lo inserisco;</li>
+        <li>leggo il secondo <code>3</code>: la ricerca lo trova, quindi segnalo duplicato;</li>
+        <li>e così via.</li>
+      </ol>
+      <p>Questo schema è interessante perché usa il BST non per una sola interrogazione finale, ma come memoria strutturata che evolve insieme all'input.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Confronto concettuale con altre strutture</h2>
+      <p>Per capire bene il ruolo del BST, conviene confrontarlo in modo qualitativo con altre strutture note.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Struttura</th>
+            <th>Punto forte</th>
+            <th>Limite tipico</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Array non ordinato</td>
+            <td>Inserimento semplice</td>
+            <td>Ricerca lenta, nessun ordine naturale</td>
+          </tr>
+          <tr>
+            <td>Array ordinato</td>
+            <td>Dati già ordinati</td>
+            <td>Inserimenti e cancellazioni scomodi</td>
+          </tr>
+          <tr>
+            <td>BST</td>
+            <td>Ricerca, inserimento e ordine convivono</td>
+            <td>Se si sbilancia, le prestazioni peggiorano</td>
+          </tr>
+          <tr>
+            <td>Hash table</td>
+            <td>Membership molto rapida</td>
+            <td>Ordine naturale assente</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Questa tabella è importante perché mostra che il BST non è "la struttura migliore in assoluto". È una scelta sensata quando conta insieme ricerca dinamica e ordine.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Quando il BST è una scelta naturale</h2>
+      <p>Il BST è particolarmente adatto quando si verificano contemporaneamente alcune condizioni:</p>
+      <ul>
+        <li>i dati arrivano o cambiano nel tempo;</li>
+        <li>serve cercare spesso una chiave;</li>
+        <li>serve anche mantenere l'ordine o produrlo su richiesta;</li>
+        <li>può essere utile trovare minimi, massimi, predecessori o successori.</li>
+      </ul>
+      <p>Se manca del tutto la componente di ordinamento, allora altre strutture possono risultare più convenienti. Se invece l'ordine è centrale, il BST acquista subito molto senso.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Quando il BST non è la scelta migliore</h2>
+      <p>Dal punto di vista didattico è importante anche saper dire <b>quando non usarlo</b>. Se il problema chiede solo test di appartenenza molto rapidi e non interessa affatto l'ordine, una hash table può essere più naturale. Se invece i dati sono tutti noti in anticipo e non cambiano, un array ordinato può bastare benissimo.</p>
+      <p>Questo punto conta molto nel problem solving: conoscere una struttura dati non significa doverla usare sempre. Significa sapere riconoscere quando il suo mix di vantaggi è davvero adatto al problema.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Il limite nascosto: la forma dell'albero</h2>
+      <p>Tutte le applicazioni viste fin qui presuppongono implicitamente una cosa: che il BST non si degradi in una struttura troppo alta e sbilanciata. Se l'albero si deforma fino a somigliare quasi a una lista, anche ricerca, inserimento e cancellazione perdono gran parte del loro vantaggio.</p>
+      <p>Questo è il ponte naturale verso la prossima pagina. Prima di parlare di alberi bilanciati e rotazioni, bisogna rendere esplicito il problema: la bontà del BST dipende non solo dalla sua proprietà d'ordine, ma anche dalla sua <b>forma</b>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Punti chiave da fissare</h2>
+      <p>Se questa lezione è stata capita bene, dovresti aver fissato questi punti:</p>
+      <ul>
+        <li>il BST è utile quando i dati cambiano nel tempo e devono restare interrogabili in ordine;</li>
+        <li>ricerca, inserimento, cancellazione e visita inordine formano insieme un pacchetto molto potente;</li>
+        <li>deduplicazione, classifica dinamica e ricerca di vicini ordinati sono applicazioni naturali;</li>
+        <li>il BST va confrontato con array e hash table in base al problema, non per abitudine;</li>
+        <li>l'efficacia del BST dipende dalla forma dell'albero, non solo dalla proprietà d'ordine.</li>
+      </ul>
+      <p>Con questa consapevolezza possiamo affrontare il tema successivo nel modo giusto: capire perché altezza e degenerazione contano così tanto.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Sintesi finale.</b> Il BST è una struttura dati utile quando dobbiamo mantenere un insieme dinamico di valori su cui servono insieme ricerca, aggiornamento e ordine. Le sue applicazioni naturali includono membership, deduplicazione, classifica dinamica, stampa ordinata e ricerca di predecessori o successori. Nella <strong>Lez6_10</strong> renderemo esplicito il suo limite principale: se l'albero si sbilancia, le prestazioni peggiorano sensibilmente.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

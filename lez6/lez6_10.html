@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_10 · Altezza, costo, degenerazione</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez6_9.html"; }
+    function nextSlide(){ window.location.href = "lez6_11.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html" class="active">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Altezza, costo, degenerazione</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi della pagina</h2>
+      <p>Fin qui il BST è apparso come una struttura molto convincente: cerca bene, inserisce bene, mantiene l'ordine, permette cancellazioni ragionate. Ora però dobbiamo affrontare con onestà il suo limite fondamentale. Tutte queste qualità dipendono in larga misura dalla <b>forma</b> dell'albero.</p>
+      <p>Questa pagina serve a rendere esplicito il legame tra <b>altezza</b> e <b>costo delle operazioni</b>, a mostrare che cosa significa degenerazione e a preparare il terreno per la pagina successiva, in cui parleremo di alberi bilanciati e rotazioni.</p>
+      <p class="ok"><b>Idea chiave:</b> in un BST la proprietà d'ordine non basta da sola; se l'altezza cresce troppo, ricerca, inserimento e cancellazione peggiorano sensibilmente.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché l'altezza conta davvero</h2>
+      <p>Ricerca, inserimento e cancellazione in un BST hanno una caratteristica comune: seguono un <b>solo cammino</b> dalla radice verso il basso. Questo significa che il loro costo non dipende direttamente da quanti nodi ci sono in totale, ma da quanti livelli bisogna attraversare prima di arrivare al nodo cercato o al punto in cui intervenire.</p>
+      <p>In altre parole, il parametro decisivo è l'<b>altezza</b> dell'albero. Se l'albero è basso, il numero di confronti resta contenuto. Se l'albero è alto, ogni operazione deve compiere più passi.</p>
+      <p class="note"><b>Traduzione pratica:</b> il BST è efficiente quando riesce a restare "compatto" in altezza.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Due alberi con gli stessi valori, ma forma diversa</h2>
+      <p>Considera questi due BST costruiti sulle stesse chiavi:</p>
+<pre><code>BST quasi completo                 BST degenerato
+
+          10                           2
+        /    \                          \
+       5      18                         5
+      / \    /  \                         \
+     2   7  12  25                        7
+                                             \
+                                              10
+                                                \
+                                                 12
+                                                   \
+                                                    18
+                                                      \
+                                                       25
+</code></pre>
+      <p>I valori memorizzati sono gli stessi, e in entrambi i casi l'ordinamento del BST è rispettato. Ma il comportamento algoritmico non è affatto lo stesso. Nel primo caso l'albero è relativamente basso; nel secondo è quasi una lista collegata.</p>
+      <p>Questa è una lezione importante: <b>stessi dati</b> non significa <b>stessa qualità strutturale</b>.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Caso favorevole: albero basso e ben distribuito</h2>
+      <p>Quando il BST è distribuito in modo ragionevole, ogni confronto elimina una grande parte dei valori ancora possibili, un po' come accade nell'intuizione della ricerca binaria. Non è la stessa struttura di un array, ma il vantaggio mentale è simile: ogni passo restringe molto il campo.</p>
+      <p>In un albero basso:</p>
+      <ul>
+        <li>la ricerca raggiunge la chiave in pochi confronti;</li>
+        <li>l'inserimento trova presto il punto giusto;</li>
+        <li>la cancellazione si muove lungo un cammino relativamente corto.</li>
+      </ul>
+      <p>Questo è lo scenario in cui il BST "si comporta come promette".</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Caso sfavorevole: albero degenerato</h2>
+      <p>Un BST si dice <b>degenerato</b> quando la sua forma si allontana molto da quella di un albero ben distribuito e si avvicina invece a una lista. In questo caso molti nodi hanno un solo figlio e l'altezza cresce quasi quanto il numero totale dei nodi.</p>
+      <p>Nel caso estremo, cercare un valore può significare attraversare quasi tutti i nodi uno dopo l'altro. Il vantaggio del BST allora si riduce drasticamente.</p>
+      <p class="warn"><b>Punto didattico cruciale:</b> un BST può essere perfettamente corretto dal punto di vista dell'ordinamento e al tempo stesso molto scarso dal punto di vista dell'efficienza.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Come si produce la degenerazione</h2>
+      <p>Uno dei modi più semplici per produrre un BST degenerato è inserire le chiavi in ordine già crescente o già decrescente. Per esempio, se inserisco:</p>
+<pre><code class="language-text">2 5 7 10 12 18 25</code></pre>
+      <p>ogni nuova chiave cade sempre a destra della precedente, e l'albero si trasforma in una catena. Se invece inserisco:</p>
+<pre><code class="language-text">25 18 12 10 7 5 2</code></pre>
+      <p>ottengo lo stesso fenomeno sul lato sinistro.</p>
+      <p>Questo mostra che il problema non dipende dai valori in sé, ma dall'interazione tra i valori e l'ordine con cui arrivano.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Una tabella intuitiva dei costi</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Operazione</th>
+            <th>BST basso</th>
+            <th>BST degenerato</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ricerca</td>
+            <td>Pochi confronti, legati all'altezza contenuta</td>
+            <td>Molti confronti, quasi come scorrere una lista</td>
+          </tr>
+          <tr>
+            <td>Inserimento</td>
+            <td>Cammino breve fino al punto nullo</td>
+            <td>Cammino lungo lungo la catena</td>
+          </tr>
+          <tr>
+            <td>Cancellazione</td>
+            <td>Ricerca del nodo e ricucitura più rapide</td>
+            <td>Ricerca più lenta, struttura già fragile</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Non stiamo ancora formalizzando tutto con analisi asintotica dettagliata. Per ora ci interessa consolidare l'intuizione: il costo cresce con l'altezza.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Il ruolo dell'altezza nelle operazioni</h2>
+      <p>Possiamo riassumere così il legame fondamentale:</p>
+      <ul>
+        <li><b>ricerca</b>: scende di livello in livello finché trova la chiave o un <code>nullptr</code>;</li>
+        <li><b>inserimento</b>: segue lo stesso cammino fino al punto di aggancio;</li>
+        <li><b>cancellazione</b>: prima trova il nodo, poi eventualmente scende ancora per successore o predecessore.</li>
+      </ul>
+      <p>In tutti e tre i casi non si visita "tutto l'albero", ma si percorre un cammino. E la lunghezza massima di quel cammino è proprio l'altezza della struttura.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché questo è un problema di progettazione, non solo di teoria</h2>
+      <p>Potrebbe sembrare una sottigliezza teorica, ma non lo è. Se scelgo un BST per un problema in cui arrivano dati quasi ordinati, rischio di ottenere una struttura formalmente corretta ma operativamente deludente. Questo significa che non basta conoscere gli algoritmi locali di ricerca e inserimento: bisogna ragionare anche sul comportamento globale della struttura nel tempo.</p>
+      <p>Questa consapevolezza fa parte del problem solving maturo: non si valuta una struttura dati solo per le sue operazioni ideali, ma anche per i casi in cui la sua forma peggiora.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un confronto mentale con la lista</h2>
+      <p>Nel caso degenerato, il BST si comporta quasi come una lista collegata ordinata. Questo confronto è utile perché fa capire immediatamente che cosa si perde:</p>
+      <ul>
+        <li>la discesa rapida verso sottoinsiemi di valori diventa molto meno efficace;</li>
+        <li>i confronti non tagliano più grandi parti del problema;</li>
+        <li>il vantaggio dell'albero rispetto a una struttura lineare si assottiglia.</li>
+      </ul>
+      <p>Questa immagine mentale è molto forte: un BST degenerato è, dal punto di vista algoritmico, un albero che ha perso gran parte della sua forza.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Il bisogno di bilanciamento nasce qui</h2>
+      <p>A questo punto emerge in modo naturale la domanda: possiamo evitare che il BST si deformi troppo? La risposta è sì, ma serve introdurre una nuova idea: il <b>bilanciamento</b>. Non basta più rispettare l'ordine delle chiavi; bisogna anche cercare di mantenere l'albero con un'altezza ragionevole.</p>
+      <p>Questa esigenza non nasce da un vezzo teorico. Nasce direttamente dall'osservazione dei costi: se la forma peggiora, peggiorano anche le operazioni.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa significa, in modo intuitivo, "albero bilanciato"</h2>
+      <p>Per ora basta un'intuizione semplice: un albero è tanto più bilanciato quanto più i suoi sottoalberi restano di altezza comparabile, senza creare rami lunghissimi da una sola parte. Non serve ancora entrare nei dettagli tecnici di AVL o Red-Black. Qui ci basta capire il problema che quei meccanismi cercano di risolvere.</p>
+      <p class="ok"><b>Idea guida:</b> il bilanciamento non aggiunge una nuova proprietà arbitraria; protegge l'efficienza delle operazioni del BST.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un piccolo esempio finale di confronto</h2>
+      <p>Immagina di dover cercare il valore <code>25</code> nei due alberi visti all'inizio.</p>
+      <ul>
+        <li>nel BST quasi completo, il cammino può essere breve: <code>10 -&gt; 18 -&gt; 25</code>;</li>
+        <li>nel BST degenerato, devi attraversare quasi tutta la catena: <code>2 -&gt; 5 -&gt; 7 -&gt; 10 -&gt; 12 -&gt; 18 -&gt; 25</code>.</li>
+      </ul>
+      <p>La differenza non dipende dal valore cercato, ma dalla forma generale dell'albero. Questo è esattamente il motivo per cui, nella prossima pagina, introdurremo le rotazioni come strumento per controllare la forma.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Punti chiave da fissare</h2>
+      <p>Se questa lezione è stata capita bene, dovresti aver fissato questi punti:</p>
+      <ul>
+        <li>ricerca, inserimento e cancellazione in un BST dipendono dall'altezza;</li>
+        <li>la proprietà d'ordine non garantisce da sola buone prestazioni;</li>
+        <li>un BST degenerato può comportarsi quasi come una lista;</li>
+        <li>l'ordine di inserimento delle chiavi può produrre forme molto diverse;</li>
+        <li>il problema del bilanciamento nasce per proteggere l'efficienza delle operazioni.</li>
+      </ul>
+      <p>Con questa consapevolezza possiamo finalmente introdurre il passo successivo: come si mantiene un albero in una forma più favorevole tramite rotazioni.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Sintesi finale.</b> Nel BST il costo delle operazioni segue l'altezza della struttura: se l'albero resta basso, ricerca, inserimento e cancellazione sono efficienti; se si degenera in una catena, il vantaggio dell'albero si riduce drasticamente. Questa osservazione rende naturale il tema della <strong>Lez6_11</strong>: alberi bilanciati e rotazioni.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

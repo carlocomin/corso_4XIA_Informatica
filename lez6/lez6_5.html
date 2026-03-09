@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_5 · Le visite nel problem solving algoritmico</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez6_4.html"; }
+    function nextSlide(){ window.location.href = "lez6_6.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html" class="active">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Le visite nel problem solving algoritmico</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi della pagina</h2>
+      <p>Fin qui abbiamo studiato le visite come meccanismi di attraversamento: preordine, inordine, postordine, DFS e BFS. Ora dobbiamo compiere il salto davvero importante: capire che una visita non è un esercizio formale, ma un <b>modo sistematico di risolvere problemi</b> su una struttura gerarchica.</p>
+      <p>Questa è la pagina in cui le visite smettono di essere "ordini di stampa" e diventano tecniche per contare, cercare, copiare, valutare, distruggere, misurare e prendere decisioni algoritmiche. È anche la pagina che prepara bene l'arrivo dei BST: prima ancora di specializzare gli alberi, vogliamo saperli usare.</p>
+      <p class="ok"><b>Idea chiave:</b> scegliere una visita significa scegliere un modo di scomporre il problema in sottoproblemi più piccoli e di combinare i risultati in modo coerente.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>La domanda giusta non è "come visito?", ma "che cosa devo ottenere?"</h2>
+      <p>Quando uno studente incontra le visite per la prima volta, spesso pensa così: "dimmi se devo usare preordine, inordine o postordine". In realtà questo modo di ragionare è troppo meccanico. La domanda corretta è un'altra: <b>qual è la natura del risultato che voglio ottenere?</b></p>
+      <p>Per esempio:</p>
+      <ul>
+        <li>se voglio elaborare il nodo prima dei figli, il preordine è naturale;</li>
+        <li>se il nodo dipende dai risultati dei figli, il postordine è spesso la scelta giusta;</li>
+        <li>se mi interessa l'ordine sinistra-nodo-destra, l'inordine è il candidato naturale;</li>
+        <li>se conta la distanza dalla radice, BFS diventa molto interessante.</li>
+      </ul>
+      <p>In altre parole, la visita non si sceglie a memoria. Si sceglie perché è coerente con la forma del problema.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Primo schema mentale: problema locale + sottoproblemi</h2>
+      <p>Molti algoritmi sugli alberi hanno una struttura ricorrente:</p>
+      <ol>
+        <li>risolvo il caso base dell'albero vuoto;</li>
+        <li>ricavo informazioni dal sottoalbero sinistro;</li>
+        <li>ricavo informazioni dal sottoalbero destro;</li>
+        <li>combino questi risultati con il nodo corrente.</li>
+      </ol>
+      <p>Questo schema è uno dei motivi per cui gli alberi sono didatticamente così importanti. Rendono concreta l'idea di decomporre un problema in sottoproblemi simili, trattarli ricorsivamente e poi ricombinare il tutto.</p>
+      <p class="note"><b>Osservazione utile:</b> anche quando il codice finale sembra molto diverso, sotto spesso resta questo stesso schema logico.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Problema 1: contare nodi e foglie</h2>
+      <p>Un primo esempio molto naturale è il conteggio. Se voglio sapere quanti nodi ha un albero, il ragionamento è semplice: il numero totale è dato da 1 per il nodo corrente, più i nodi del sottoalbero sinistro, più i nodi del sottoalbero destro.</p>
+<pre><code class="language-cpp">int countNodes(const Node* p) {
+    if (p == nullptr) return 0;
+    return 1 + countNodes(p-&gt;left) + countNodes(p-&gt;right);
+}</code></pre>
+      <p>Per contare le foglie cambia solo il criterio locale: un nodo è una foglia se non ha né figlio sinistro né figlio destro.</p>
+<pre><code class="language-cpp">int countLeaves(const Node* p) {
+    if (p == nullptr) return 0;
+    if (p-&gt;left == nullptr &amp;&amp; p-&gt;right == nullptr) return 1;
+    return countLeaves(p-&gt;left) + countLeaves(p-&gt;right);
+}</code></pre>
+      <p>Qui non stiamo semplicemente "scorrendo" l'albero. Stiamo usando la sua struttura per costruire una formula ricorsiva naturale.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Problema 2: calcolare l'altezza</h2>
+      <p>L'altezza è un altro esempio didatticamente perfetto, perché costringe a combinare i risultati dei due sottoalberi. L'idea è: l'altezza di un nodo è 1 più il massimo tra l'altezza del sottoalbero sinistro e quella del sottoalbero destro.</p>
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+
+int height(const Node* p) {
+    if (p == nullptr) return 0;
+    int hs = height(p-&gt;left);
+    int hd = height(p-&gt;right);
+    return 1 + std::max(hs, hd);
+}</code></pre>
+      <p>Questo è un tipico caso in cui il nodo corrente <b>dipende</b> dai risultati ottenuti dai figli. Per questo il ragionamento è concettualmente vicino al postordine: prima ricavo le informazioni dei sottoalberi, poi costruisco il risultato del nodo corrente.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Problema 3: cercare un valore in un albero generico</h2>
+      <p>Prima di arrivare ai BST, immaginiamo un albero binario generico, cioè senza nessuna proprietà di ordinamento. In questo caso, cercare un valore significa esplorare la struttura finché il valore non viene trovato oppure finché l'albero finisce.</p>
+<pre><code class="language-cpp">bool contains(const Node* p, int x) {
+    if (p == nullptr) return false;
+    if (p-&gt;key == x) return true;
+    return contains(p-&gt;left, x) || contains(p-&gt;right, x);
+}</code></pre>
+      <p>Questa funzione è molto istruttiva: mostra che, in assenza di una proprietà speciale, l'albero va comunque esplorato in modo sistematico. Solo più avanti, con i BST, vedremo che l'ordinamento permette di evitare rami inutili e quindi di cercare in modo più efficiente.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Problema 4: copiare l'albero</h2>
+      <p>Copiare un albero non significa copiare solo il valore della radice. Significa ricostruire tutta la struttura con nuovi nodi, mantenendo la stessa forma e gli stessi dati. Questo è un caso in cui il preordine è molto intuitivo: creo prima il nodo corrente, poi gli collego le copie dei due sottoalberi.</p>
+<pre><code class="language-cpp">Node* cloneTree(const Node* p) {
+    if (p == nullptr) return nullptr;
+
+    Node* q = new Node{p-&gt;key, nullptr, nullptr};
+    q-&gt;left = cloneTree(p-&gt;left);
+    q-&gt;right = cloneTree(p-&gt;right);
+    return q;
+}</code></pre>
+      <p>Questa funzione è un ottimo esempio di problem solving su alberi: l'algoritmo è compatto, ma dietro c'è un'idea forte di corrispondenza struttura per struttura.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Problema 5: distruggere correttamente l'albero</h2>
+      <p>Con strutture dinamiche non basta "smettere di usarle": bisogna liberare la memoria. Qui il postordine è il modello più naturale. Prima elimino i sottoalberi, poi elimino il nodo corrente. Se facessi il contrario, perderei i collegamenti ai figli e quindi non potrei più liberarli correttamente.</p>
+<pre><code class="language-cpp">void destroyTree(Node* p) {
+    if (p == nullptr) return;
+    destroyTree(p-&gt;left);
+    destroyTree(p-&gt;right);
+    delete p;
+}</code></pre>
+      <p>Questo è uno degli esempi più belli perché fa vedere che il significato della visita non è affatto arbitrario. Il postordine qui non è "una delle tre visite possibili": è quella coerente con la dipendenza logica del problema.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Problema 6: valutare un albero di espressione</h2>
+      <p>Negli alberi di espressione, i nodi interni contengono operatori e le foglie contengono valori o simboli. Se voglio valutare l'espressione, devo prima conoscere il valore dei due sottoalberi e solo dopo applicare l'operatore del nodo corrente. Anche qui il modello naturale è quello del postordine.</p>
+<pre><code>        *
+      /   \
+     +     5
+    / \
+   2   3
+</code></pre>
+      <p>La logica è:</p>
+      <ul>
+        <li>valuto il sottoalbero sinistro: <code>2 + 3 = 5</code>;</li>
+        <li>valuto il sottoalbero destro: <code>5</code>;</li>
+        <li>applico l'operatore in radice: <code>5 * 5 = 25</code>.</li>
+      </ul>
+      <p>Questo esempio è molto formativo perché fa vedere come l'ordine della visita rifletta l'ordine logico della dipendenza tra operazioni.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Problema 7: stampare o ricostruire un ordine significativo</h2>
+      <p>Le visite servono anche a produrre rappresentazioni diverse della stessa struttura. In un albero di espressione:</p>
+      <ul>
+        <li>il <b>preordine</b> si lega naturalmente alla forma prefissa;</li>
+        <li>l'<b>inordine</b> alla forma infissa;</li>
+        <li>il <b>postordine</b> alla forma postfissa.</li>
+      </ul>
+      <p>Questo è un punto importante: una visita può essere usata per "estrarre" da una struttura un ordine utile, leggibile o computazionalmente significativo. Più avanti, nei BST, vedremo che l'inordine produce addirittura i dati già ordinati.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Problema 8: BFS quando conta la vicinanza alla radice</h2>
+      <p>Non tutti i problemi si risolvono bene con una DFS. Se voglio trovare il primo nodo che soddisfa una proprietà al livello minimo possibile, BFS diventa molto più naturale. Supponi, per esempio, di voler cercare il primo valore pari il più vicino possibile alla radice. Una DFS potrebbe scendere troppo in profondità in un ramo e trovare una soluzione "lontana" prima di controllare nodi più vicini in altri rami.</p>
+      <p>Con una BFS, invece, esamino prima tutti i nodi del livello 0, poi quelli del livello 1, poi quelli del livello 2. Questo garantisce che la prima soluzione trovata sia tra le più vicine alla radice.</p>
+      <p class="ok"><b>Regola pratica:</b> quando il problema parla di livelli, distanza minima o nodo più vicino alla radice, la BFS è spesso la prima strategia da prendere in considerazione.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Una mappa ragionata: quale visita per quale problema?</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Problema</th>
+            <th>Visita o strategia naturale</th>
+            <th>Perché</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Copiare l'albero</td>
+            <td>Preordine</td>
+            <td>Creo il nodo prima di costruire i figli</td>
+          </tr>
+          <tr>
+            <td>Valutare un'espressione</td>
+            <td>Postordine</td>
+            <td>Il nodo dipende dai risultati dei figli</td>
+          </tr>
+          <tr>
+            <td>Distruggere l'albero</td>
+            <td>Postordine</td>
+            <td>Prima libero i figli, poi il nodo</td>
+          </tr>
+          <tr>
+            <td>Produrre forma infissa</td>
+            <td>Inordine</td>
+            <td>La posizione sinistra-nodo-destra è significativa</td>
+          </tr>
+          <tr>
+            <td>Trovare il nodo più vicino alla radice con una proprietà</td>
+            <td>BFS</td>
+            <td>La visita procede per livelli</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Questa tabella non va letta come un formulario rigido, ma come una guida al ragionamento. Il punto è sempre capire la relazione tra il nodo corrente e i suoi sottoalberi.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Importanza didattica: le visite insegnano un metodo</h2>
+      <p>Uno degli aspetti più forti degli alberi, dal punto di vista formativo, è che costringono a ragionare in termini di struttura, caso base, sottoproblemi e combinazione dei risultati. Questo è molto più importante della singola sintassi del linguaggio.</p>
+      <p>Se uno studente impara davvero a usare le visite, impara anche un modo di affrontare i problemi algoritmici:</p>
+      <ul>
+        <li>identificare la struttura del problema;</li>
+        <li>trovare il caso base;</li>
+        <li>scomporre in sottoproblemi omogenei;</li>
+        <li>scegliere l'ordine di elaborazione più coerente;</li>
+        <li>ricombinare i risultati in modo corretto.</li>
+      </ul>
+      <p>Per questo gli alberi non sono solo una struttura dati del programma di C/C++. Sono anche un ottimo laboratorio di pensiero algoritmico.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Punti chiave da fissare</h2>
+      <p>Se questa lezione è stata capita bene, dovresti avere chiaro che:</p>
+      <ul>
+        <li>le visite servono a risolvere problemi, non solo a stampare nodi;</li>
+        <li>la scelta della visita dipende dal tipo di risultato cercato;</li>
+        <li>molti problemi sugli alberi si esprimono come combinazione dei risultati dei sottoalberi;</li>
+        <li>DFS e BFS diventano strumenti diversi per obiettivi diversi;</li>
+        <li>gli alberi allenano a pensare in termini di decomposizione ricorsiva del problema.</li>
+      </ul>
+      <p>Questo è il punto in cui le visite diventano davvero utili. Adesso siamo pronti a specializzare il discorso sugli <b>alberi binari di ricerca</b>, che aggiungono una proprietà di ordinamento e aprono la strada a ricerca, inserimento e cancellazione efficienti.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Sintesi finale.</b> Le visite sono strumenti di problem solving perché permettono di trasformare un problema su un albero in una sequenza ordinata di sottoproblemi sui suoi sottoalberi. Preordine, inordine, postordine e BFS non sono formule da ricordare a memoria: sono scelte algoritmiche motivate dal tipo di risultato che vogliamo ottenere. Nella <strong>Lez6_6</strong> vedremo come questa idea si potenzia ulteriormente negli alberi binari di ricerca.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_12 · Esercizi guidati su alberi e BST</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez6_11.html"; }
+    function nextSlide(){ window.location.href = "lez6_13.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra soluzione' : 'Nascondi soluzione';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html" class="active">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Esercizi guidati su alberi e BST<br><small>Tracing, scelta della visita, ragionamento strutturale</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivo di questa pagina</h2>
+      <p>Questa esercitazione serve a verificare se i concetti della lezione sono davvero diventati operativi. Non basta riconoscere le definizioni: bisogna saper leggere un albero, prevedere l'effetto di una visita, capire se una struttura è un BST, ragionare su inserimento, cancellazione e squilibrio.</p>
+      <p>Le domande sono organizzate in modo progressivo. Le prime chiedono un riconoscimento rapido ma ragionato; quelle successive richiedono tracing, spiegazione breve e scelta della strategia corretta. L'idea non è "indovinare la risposta", ma controllare se il modello mentale è solido.</p>
+      <p class="note"><b>Metodo di lavoro:</b> prova prima a rispondere senza aprire la soluzione. Poi apri il riquadro e leggi soprattutto il commento, perché è lì che si chiarisce l'errore tipico o la scelta giusta.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esercizio 1 · Riconoscere preorder, inorder, postorder</h2>
+      <p>Considera l'albero:</p>
+<pre><code>          A
+        /   \
+       B     C
+      / \     \
+     D   E     F
+</code></pre>
+      <p><b>Domanda.</b> Quale delle seguenti sequenze corrisponde alla visita <b>inorder</b>?</p>
+      <ul>
+        <li>A. <code>A B D E C F</code></li>
+        <li>B. <code>D B E A C F</code></li>
+        <li>C. <code>D E B F C A</code></li>
+        <li>D. <code>A C F B D E</code></li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q1" onclick="toggleBox('btn-q1','sol-q1')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q1" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: B.</b> Inorder significa <code>sinistra - nodo - destra</code>. Sul sottoalbero sinistro di <code>A</code> otteniamo <code>D B E</code>, poi visitiamo <code>A</code>, poi il lato destro <code>C F</code>.</p>
+        <p class="note"><b>Che cosa controlla davvero questa domanda:</b> se hai capito il significato dell'ordine, non solo se ricordi i nomi delle visite.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esercizio 2 · Quale problema suggerisce BFS?</h2>
+      <p><b>Domanda.</b> In quale delle seguenti situazioni la scelta più naturale è una visita in ampiezza, cioè BFS?</p>
+      <ul>
+        <li>A. Distruggere correttamente tutti i nodi di un albero dinamico</li>
+        <li>B. Trovare il primo nodo che soddisfa una proprietà al livello minimo possibile</li>
+        <li>C. Stampare la forma postfissa di un albero di espressione</li>
+        <li>D. Copiare ricorsivamente un albero nodo per nodo</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q2" onclick="toggleBox('btn-q2','sol-q2')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q2" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: B.</b> La BFS visita per livelli, quindi è particolarmente adatta quando conta la distanza dalla radice o il primo livello in cui compare una certa proprietà.</p>
+        <p class="note"><b>Diagnosi rapida:</b> A e C richiamano naturalmente il postordine; D è più vicino a una DFS ricorsiva di tipo preordine.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esercizio 3 · È davvero un BST?</h2>
+      <p>Considera la struttura seguente:</p>
+<pre><code>            10
+          /    \
+         5      18
+        / \
+       2  14
+</code></pre>
+      <p><b>Domanda.</b> Questo albero è un BST corretto?</p>
+      <ul>
+        <li>A. Sì, perché ogni figlio sinistro è minore del padre</li>
+        <li>B. Sì, perché ogni figlio destro è maggiore del padre</li>
+        <li>C. No, perché il nodo <code>14</code> viola il vincolo globale imposto dal nodo <code>10</code></li>
+        <li>D. No, perché un BST non può avere due figli a sinistra</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q3" onclick="toggleBox('btn-q3','sol-q3')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q3" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: C.</b> Il nodo <code>14</code> si trova nel sottoalbero sinistro di <code>10</code>, quindi dovrebbe essere minore di <code>10</code>. Non lo è, dunque l'albero non è un BST.</p>
+        <p class="note"><b>Errore tipico:</b> controllare solo il confronto locale con il padre immediato e dimenticare il vincolo globale degli antenati.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esercizio 4 · Tracing della ricerca in un BST</h2>
+      <p>Considera il BST:</p>
+<pre><code>            10
+          /    \
+         5      18
+        / \    /  \
+       2   7  12  25
+</code></pre>
+      <p><b>Domanda.</b> Quale cammino segue la ricerca della chiave <code>12</code>?</p>
+      <ul>
+        <li>A. <code>10 -&gt; 5 -&gt; 7</code></li>
+        <li>B. <code>10 -&gt; 18 -&gt; 12</code></li>
+        <li>C. <code>10 -&gt; 5 -&gt; 2</code></li>
+        <li>D. <code>10 -&gt; 18 -&gt; 25</code></li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q4" onclick="toggleBox('btn-q4','sol-q4')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q4" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: B.</b> Da <code>10</code> si va a destra perché <code>12 &gt; 10</code>; da <code>18</code> si va a sinistra perché <code>12 &lt; 18</code>; poi si trova <code>12</code>.</p>
+        <p class="note"><b>Questo esercizio misura</b> se stai davvero usando l'ordinamento del BST come guida alla ricerca.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esercizio 5 · Inserimento ragionato</h2>
+      <p>Partendo dallo stesso BST dell'esercizio precedente, vogliamo inserire la chiave <code>15</code>.</p>
+      <p><b>Domanda.</b> Dove verrà collocata?</p>
+      <ul>
+        <li>A. Come figlio destro di <code>12</code></li>
+        <li>B. Come figlio sinistro di <code>12</code></li>
+        <li>C. Come figlio sinistro di <code>18</code></li>
+        <li>D. Come nuova radice</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q5" onclick="toggleBox('btn-q5','sol-q5')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q5" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: A.</b> Il percorso è <code>10 -&gt; 18 -&gt; 12</code>, e poiché <code>15 &gt; 12</code> la nuova chiave va nel primo puntatore nullo coerente, cioè come figlio destro di <code>12</code>.</p>
+        <p class="note"><b>Da fissare bene:</b> il nuovo nodo nasce come foglia. Non si riorganizza l'albero, si trova il posto giusto in base ai confronti.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esercizio 6 · Cancellazione: riconoscere il caso</h2>
+      <p><b>Domanda.</b> Nel BST precedente, se cancelliamo il nodo <code>18</code> e il suo unico figlio sinistro è <code>12</code>, in quale caso classico della cancellazione ci troviamo?</p>
+      <ul>
+        <li>A. Nodo foglia</li>
+        <li>B. Nodo con un solo figlio</li>
+        <li>C. Nodo con due figli</li>
+        <li>D. Nodo non cancellabile in un BST</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q6" onclick="toggleBox('btn-q6','sol-q6')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q6" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: B.</b> Il nodo da eliminare ha un solo figlio, quindi il sottoalbero del figlio sale al suo posto.</p>
+        <p class="note"><b>Che cosa controlla la domanda:</b> se distingui bene i tre casi strutturali della cancellazione prima ancora di guardare il codice.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esercizio 7 · Perché il caso con due figli è diverso?</h2>
+      <p><b>Domanda aperta breve.</b> Spiega in 5-7 righe perché non possiamo cancellare un nodo con due figli "scegliendo a caso" uno dei due figli come sostituto. Nella risposta nomina il ruolo del successore o del predecessore inorder.</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q7" onclick="toggleBox('btn-q7','sol-q7')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q7" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta modello.</b> Se un nodo ha due figli, non posso sostituirlo arbitrariamente con uno dei due, perché rischierei di violare l'ordine del BST. Il sostituto deve essere una chiave che possa stare in quella posizione restando maggiore di tutto il sottoalbero sinistro e minore di tutto il sottoalbero destro. Per questo si usa il successore inorder, cioè il minimo del sottoalbero destro, oppure il predecessore inorder, cioè il massimo del sottoalbero sinistro. In questo modo la struttura resta ordinata e il problema si riduce poi a un caso più semplice.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esercizio 8 · Quando il BST è una buona scelta?</h2>
+      <p><b>Domanda.</b> In quale scenario il BST è particolarmente naturale?</p>
+      <ul>
+        <li>A. Quando vogliamo solo sapere molto in fretta se un elemento esiste, senza alcun interesse per l'ordine</li>
+        <li>B. Quando i dati sono tutti noti in anticipo, non cambiano mai e vogliamo solo stamparli una volta</li>
+        <li>C. Quando i dati arrivano progressivamente e vogliamo cercarli, aggiornarli e ottenerli in ordine</li>
+        <li>D. Quando non abbiamo bisogno di confrontare i valori tra loro</li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q8" onclick="toggleBox('btn-q8','sol-q8')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q8" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: C.</b> Il BST è forte quando ricerca, inserimento, cancellazione e ordine devono convivere in un contesto dinamico.</p>
+        <p class="note"><b>Perché non A?</b> Se conta solo membership molto rapida e l'ordine non interessa, spesso una hash table è più naturale.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esercizio 9 · Degenerazione</h2>
+      <p><b>Domanda.</b> Quale sequenza di inserimento tende più facilmente a produrre un BST degenerato?</p>
+      <ul>
+        <li>A. <code>10 5 18 2 7 12 25</code></li>
+        <li>B. <code>2 5 7 10 12 18 25</code></li>
+        <li>C. <code>10 18 5 12 2 25 7</code></li>
+        <li>D. <code>10 7 18 5 12 25 2</code></li>
+      </ul>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q9" onclick="toggleBox('btn-q9','sol-q9')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q9" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta corretta: B.</b> L'inserimento già ordinato in senso crescente tende a costruire una lunga catena sul lato destro, cioè un BST molto sbilanciato.</p>
+        <p class="note"><b>Idea da ricordare:</b> stessa proprietà BST non significa stessa qualità della forma dell'albero.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Esercizio 10 · Rotazione e ordine</h2>
+      <p><b>Domanda aperta breve.</b> Spiega con parole tue perché una rotazione ben eseguita non rompe la proprietà di ordinamento del BST. Non serve dimostrazione formale completa, ma il ragionamento deve essere chiaro.</p>
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-q10" onclick="toggleBox('btn-q10','sol-q10')">Mostra soluzione</button>
+      </div>
+      <div id="sol-q10" style="display:none;margin-top:8px">
+        <p class="ok"><b>Risposta modello.</b> Una rotazione non mescola casualmente i valori del BST. Sposta localmente alcuni nodi cambiando i collegamenti, ma mantiene il fatto che un certo blocco di chiavi debba restare a sinistra e un altro a destra. Per esempio, nella rotazione destra il figlio sinistro sale e il nodo ruotato scende a destra, ma tutti i valori che erano minori restano nel lato sinistro e tutti quelli maggiori restano nel lato destro. Quindi cambia la forma del sottoalbero, non l'ordine logico delle chiavi.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Vero/Falso mirato</h2>
+      <ul>
+        <li><b>11)</b> In un BST la visita inorder produce una sequenza ordinata. <b>Vero</b></li>
+        <li><b>12)</b> In un albero binario generico la ricerca di un valore può richiedere l'esplorazione di entrambi i sottoalberi. <b>Vero</b></li>
+        <li><b>13)</b> Un BST può essere corretto come ordinamento ma molto inefficiente se è degenerato. <b>Vero</b></li>
+        <li><b>14)</b> Una rotazione crea nuovi nodi per riequilibrare il BST. <b>Falso</b></li>
+        <li><b>15)</b> Il nuovo nodo inserito in un BST base viene normalmente aggiunto come foglia. <b>Vero</b></li>
+      </ul>
+      <p class="note"><b>Queste cinque affermazioni riassumono</b> i concetti più importanti dell'unità: visita, proprietà BST, degenerazione, rotazioni e inserimento.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa rende buona una risposta in questi esercizi</h2>
+      <ul>
+        <li>distinguere chiaramente albero generico e BST;</li>
+        <li>usare il lessico giusto: radice, sottoalbero, inorder, successore, degenerazione, rotazione;</li>
+        <li>spiegare il perché della scelta, non solo l'esito finale;</li>
+        <li>tenere separati ordinamento, altezza e bilanciamento, che non sono la stessa cosa.</li>
+      </ul>
+      <p class="note"><b>Errore tipico:</b> rispondere con parole corrette ma senza mostrare il legame tra struttura dell'albero e algoritmo applicato.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Passo successivo.</b> Nella <strong>Lez6_13</strong> chiudiamo con il laboratorio finale: un mini-progetto su BST in cui mettere insieme costruzione, visite, ricerca, inserimento, cancellazione e ragionamento sul bilanciamento.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

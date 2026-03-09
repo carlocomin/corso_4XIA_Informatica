@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_1 · Alberi: significato, lessico, importanza</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "../programma.html"; }
+    function nextSlide(){ window.location.href = "lez6_2.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html" class="active">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Alberi: significato, lessico, importanza</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi della pagina</h2>
+      <p>In questa prima pagina non ci interessa ancora programmare un albero completo. Ci interessa costruire il modello mentale giusto: capire che cos'è un albero come struttura dati, perché compare così spesso in informatica e quale lessico minimo bisogna dominare prima di passare a visite, ricerca, inserimento e bilanciamento.</p>
+      <p>Il punto didattico importante è questo: un albero non è "un grafo fatto in un certo modo" da imparare come definizione astratta e basta. È una struttura che nasce quando il problema ha una forma gerarchica, oppure quando vogliamo organizzare dati e decisioni in modo efficiente.</p>
+      <p class="ok"><b>Idea chiave:</b> gli alberi sono utili perché permettono di rappresentare gerarchie, scelte e decomposizioni ricorsive del problema.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché gli alberi contano in informatica</h2>
+      <p>Molti problemi non hanno una struttura lineare. Un array o una lista descrivono bene sequenze, ma non descrivono bene situazioni in cui un elemento genera più diramazioni o in cui esiste una relazione padre-figlio tra oggetti. In questi casi la struttura ad albero è molto più naturale.</p>
+      <p>Gli alberi compaiono in moltissimi contesti:</p>
+      <ul>
+        <li><b>file system</b>: cartelle che contengono sottocartelle e file;</li>
+        <li><b>DOM HTML</b>: ogni elemento contiene altri elementi annidati;</li>
+        <li><b>espressioni aritmetiche</b>: operatori e operandi formano alberi di espressione;</li>
+        <li><b>alberi di decisione</b>: a ogni scelta seguono possibili sviluppi diversi;</li>
+        <li><b>indici e dizionari ordinati</b>: gli alberi binari di ricerca e le loro varianti servono per cercare, inserire e mantenere ordine nei dati.</li>
+      </ul>
+      <p>Quando una struttura compare in tanti ambiti diversi, di solito non è un caso: significa che cattura un'idea profonda e riutilizzabile. Gli alberi fanno esattamente questo.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un'immagine intuitiva</h2>
+      <p>Dal punto di vista concettuale, un albero è un insieme di nodi collegati da archi. C'è un nodo speciale in alto, chiamato <b>radice</b>, e da lì si diramano gli altri nodi. Ogni nodo può avere zero, uno o più figli, a seconda del tipo di albero che stiamo considerando.</p>
+      <p>In un albero ben formato non ci sono cicli: se parto da un nodo e seguo i collegamenti verso il basso, non devo poter tornare al punto di partenza. Inoltre, a parte la radice, ogni nodo ha esattamente un padre.</p>
+<pre><code>            Radice
+           /      \
+      Figlio A   Figlio B
+       /    \         \
+   Nodo C  Nodo D    Nodo E
+</code></pre>
+      <p>Questa rappresentazione grafica è semplice, ma è già sufficiente per introdurre quasi tutto il lessico di base che useremo nel resto della lezione.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Lessico fondamentale</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Termine</th>
+            <th>Significato</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Radice</b></td>
+            <td>Il nodo iniziale dell'albero, quello che non ha padre.</td>
+          </tr>
+          <tr>
+            <td><b>Nodo</b></td>
+            <td>Un elemento della struttura, che contiene un valore e collegamenti ad altri nodi.</td>
+          </tr>
+          <tr>
+            <td><b>Arco</b></td>
+            <td>Il collegamento tra un nodo padre e un nodo figlio.</td>
+          </tr>
+          <tr>
+            <td><b>Foglia</b></td>
+            <td>Un nodo che non ha figli.</td>
+          </tr>
+          <tr>
+            <td><b>Padre / Figlio</b></td>
+            <td>Relazione gerarchica immediata tra due nodi collegati.</td>
+          </tr>
+          <tr>
+            <td><b>Fratelli</b></td>
+            <td>Nodi diversi che condividono lo stesso padre.</td>
+          </tr>
+          <tr>
+            <td><b>Sottoalbero</b></td>
+            <td>Il pezzo di albero che ha come radice un certo nodo e comprende tutti i suoi discendenti.</td>
+          </tr>
+          <tr>
+            <td><b>Profondità</b></td>
+            <td>Quanti archi separano un nodo dalla radice.</td>
+          </tr>
+          <tr>
+            <td><b>Altezza</b></td>
+            <td>La lunghezza del cammino più lungo da un nodo verso una foglia.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">Questo lessico non va studiato come glossario astratto: serve davvero per descrivere algoritmi, casi base e ragionamenti corretti.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Albero vuoto, foglie e sottoalberi</h2>
+      <p>Tre idee vanno fissate subito perché torneranno ovunque.</p>
+      <ul>
+        <li><b>Albero vuoto</b>: è il caso in cui non c'è nessun nodo. In implementazione corrisponde spesso a un puntatore nullo.</li>
+        <li><b>Foglia</b>: è un nodo senza figli. Molti casi base degli algoritmi terminano qui.</li>
+        <li><b>Sottoalbero</b>: ogni nodo può essere visto come la radice di un albero più piccolo.</li>
+      </ul>
+      <p>Quest'ultima osservazione è la più importante. Dire che "ogni nodo genera un sottoalbero" significa che molti problemi sugli alberi si possono risolvere ragionando sempre nello stesso modo su pezzi più piccoli della stessa struttura. È il motivo per cui la ricorsione sugli alberi è così naturale.</p>
+      <p class="ok"><b>Idea guida:</b> un albero è una struttura ricorsiva, perché contiene al suo interno altri alberi più piccoli.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Albero generale e albero binario</h2>
+      <p>Non tutti gli alberi sono uguali. In un <b>albero generale</b> un nodo può avere un numero arbitrario di figli. In un <b>albero binario</b>, invece, ogni nodo ha al massimo due figli, che di solito chiamiamo <code>left</code> e <code>right</code>.</p>
+      <p>L'albero binario non è "più vero" dell'albero generale: è semplicemente un caso particolare molto importante, perché si presta bene sia alla teoria sia all'implementazione. Le visite classiche, gli alberi binari di ricerca e le rotazioni che vedremo più avanti si basano proprio su questa forma.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Numero di figli</th>
+            <th>Contesti tipici</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Albero generale</td>
+            <td>Qualsiasi numero</td>
+            <td>File system, DOM, gerarchie organizzative</td>
+          </tr>
+          <tr>
+            <td>Albero binario</td>
+            <td>Al massimo 2</td>
+            <td>BST, alberi di espressione, molte visite classiche</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un esempio concreto: file system e DOM</h2>
+      <p>Se osservi un file system, la struttura ad albero è quasi inevitabile. Una cartella può contenere file e sottocartelle; ciascuna sottocartella può contenerne altre; ogni oggetto ha una posizione determinata rispetto a una radice, per esempio il disco o una cartella principale del progetto.</p>
+<pre><code>progetto/
+├── img/
+├── lez1/
+├── lez2/
+└── index.html
+</code></pre>
+      <p>Il DOM HTML ha la stessa natura gerarchica. Un tag <code>&lt;body&gt;</code> contiene altri elementi, ciascun elemento può contenerne altri ancora, e così via. Anche qui pensare in termini di sottoalberi è naturale: un <code>&lt;div&gt;</code> con tutto il suo contenuto è già, a tutti gli effetti, un sottoalbero del documento.</p>
+      <p>Questi esempi sono importanti perché mostrano che gli alberi non nascono solo "per fare algoritmi". Nascono perché certi oggetti del mondo informatico sono gerarchici per natura.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché gli alberi aiutano nel problem solving algoritmico</h2>
+      <p>Dal punto di vista algoritmico, gli alberi sono preziosi per almeno tre motivi. Primo: permettono di organizzare dati in modo non lineare, quindi spesso più vicino al problema reale. Secondo: molte operazioni possono essere descritte con una visita sistematica della struttura. Terzo: alcune varianti, come gli alberi binari di ricerca, permettono di cercare e aggiornare dati in modo efficiente.</p>
+      <p>Per esempio:</p>
+      <ul>
+        <li>se vuoi valutare un'espressione aritmetica, puoi leggere l'albero degli operatori e degli operandi;</li>
+        <li>se vuoi stampare i dati in un certo ordine, puoi scegliere una visita opportuna;</li>
+        <li>se vuoi mantenere un insieme di valori ordinati mentre arrivano nuovi dati, un BST è una scelta molto naturale.</li>
+      </ul>
+      <p>Vedremo quindi gli alberi non solo come "struttura dati", ma come tecnica generale per scomporre un problema in sottoproblemi più piccoli e omogenei.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un primo sguardo all'implementazione</h2>
+      <p>In questa pagina non sviluppiamo ancora tutte le operazioni, ma è utile vedere subito come appare l'idea in C++. Un nodo di albero binario contiene tipicamente un valore e due puntatori ai figli.</p>
+<pre><code class="language-cpp">struct Node {
+    int key;
+    Node* left;
+    Node* right;
+};
+</code></pre>
+      <p>Questa struttura è piccola ma molto ricca di significato. Ogni nodo può essere la radice di un sottoalbero sinistro e di un sottoalbero destro. Se un figlio non esiste, il puntatore corrispondente vale <code>nullptr</code>.</p>
+      <p>Nella prossima pagina prenderemo proprio questo schema e lo renderemo operativo: costruzione dei nodi, collegamenti, albero vuoto e primi esempi concreti in C e C++.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Sintesi finale.</b> Un albero è una struttura gerarchica formata da nodi collegati, con una radice e con sottoalberi che ripetono la stessa forma del tutto. È importante perché modella bene file system, DOM, espressioni e molte altre situazioni reali; inoltre prepara il terreno a visite, BST e algoritmi efficienti. Nella <strong>Lez6_2</strong> passeremo dal concetto alla rappresentazione concreta in memoria.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

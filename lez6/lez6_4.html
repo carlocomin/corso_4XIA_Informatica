@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_4 · DFS e BFS: profondità e ampiezza</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez6_3.html"; }
+    function nextSlide(){ window.location.href = "lez6_5.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html" class="active">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>DFS e BFS: profondità e ampiezza</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi della pagina</h2>
+      <p>Nella pagina precedente abbiamo studiato tre visite classiche degli alberi binari: preordine, inordine e postordine. Ora facciamo un passo indietro e allarghiamo il quadro. Vogliamo capire che cosa significa esplorare un albero <b>in profondità</b> oppure <b>in ampiezza</b>.</p>
+      <p>Questo passaggio è importante perché mette ordine nelle idee. Le tre visite viste finora non sono tre mondi separati: sono tre modi diversi di stare dentro una stessa famiglia, quella della <b>Depth-First Search</b>, cioè dell'esplorazione in profondità. Accanto a essa esiste un'altra strategia fondamentale: la <b>Breadth-First Search</b>, cioè l'esplorazione in ampiezza o per livelli.</p>
+      <p class="ok"><b>Idea chiave:</b> DFS e BFS non sono solo due ordini diversi di stampa; sono due modi diversi di ragionare sull'esplorazione di una struttura gerarchica.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Prima distinzione: famiglia delle DFS e visita per livelli</h2>
+      <p>Quando si parla di DFS, l'idea di fondo è questa: appena posso, scendo in profondità lungo un ramo dell'albero, continuando finché non arrivo a un caso base. Solo allora risalgo e provo altri rami. Questo comportamento è perfettamente coerente con la ricorsione.</p>
+      <p>Quando si parla di BFS, invece, il criterio è opposto: prima esploro tutti i nodi a distanza 0 dalla radice, poi tutti quelli a distanza 1, poi quelli a distanza 2, e così via. Non seguo subito un ramo fino in fondo; procedo per <b>livelli</b>.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Strategia</th>
+            <th>Idea di fondo</th>
+            <th>Strumento naturale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>DFS</b></td>
+            <td>Scendo lungo un ramo finché posso, poi risalgo</td>
+            <td>Ricorsione o stack</td>
+          </tr>
+          <tr>
+            <td><b>BFS</b></td>
+            <td>Esploro l'albero livello per livello</td>
+            <td>Coda (<code>queue</code>)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un albero campione per il confronto</h2>
+      <p>Useremo ancora un albero piccolo e leggibile, così il confronto resta trasparente:</p>
+<pre><code>            A
+         /     \
+        B       C
+      /   \    / \
+     D     E  F   G
+</code></pre>
+      <p>Su questo albero vedremo come si comportano DFS e BFS. Il vantaggio di un esempio così semplice è che la differenza di strategia emerge subito, senza nascondersi dietro dettagli inutili.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>DFS: profondità prima di tutto</h2>
+      <p>In una visita in profondità, il percorso "si infila" in un ramo dell'albero prima di passare agli altri. Se l'azione locale è stampare il nodo in preordine, sull'albero campione otteniamo per esempio:</p>
+<pre><code class="language-text">A B D E C F G</code></pre>
+      <p>Ma la cosa importante non è soltanto la sequenza finale. È la logica del movimento:</p>
+      <ul>
+        <li>parto dalla radice;</li>
+        <li>scendo verso sinistra finché posso;</li>
+        <li>quando non posso più scendere, risalgo;</li>
+        <li>solo allora passo agli altri rami.</li>
+      </ul>
+      <p>Preordine, inordine e postordine sono tutte visite in profondità, perché tutte seguono questo schema generale di discesa lungo i rami e risalita ricorsiva.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>BFS: ampiezza, cioè livello per livello</h2>
+      <p>In una visita in ampiezza non mi interessa scendere subito al massimo della profondità. Mi interessa visitare prima tutti i nodi "vicini" alla radice, poi quelli del livello successivo, poi quelli ancora più in basso.</p>
+      <p>Sull'albero campione, la sequenza BFS è:</p>
+<pre><code class="language-text">A B C D E F G</code></pre>
+      <p>Questa sequenza si legge molto bene se pensi ai livelli:</p>
+      <ul>
+        <li>livello 0: <code>A</code>;</li>
+        <li>livello 1: <code>B C</code>;</li>
+        <li>livello 2: <code>D E F G</code>.</li>
+      </ul>
+      <p>È per questo che BFS viene anche chiamata <b>visita per livelli</b>. Quando un problema dipende dalla distanza dalla radice o richiede una scansione graduale, questa strategia è spesso la più naturale.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché la DFS si sposa bene con la ricorsione</h2>
+      <p>La DFS è quasi una traduzione diretta della struttura ricorsiva dell'albero. Ogni volta che una funzione riceve un puntatore a nodo, può:</p>
+      <ul>
+        <li>gestire il caso base <code>nullptr</code>;</li>
+        <li>eseguire un'azione sul nodo corrente prima, in mezzo o dopo;</li>
+        <li>richiamare se stessa sul sottoalbero sinistro e su quello destro.</li>
+      </ul>
+      <p>Per questo le visite DFS possono essere scritte in modo molto compatto e leggibile.</p>
+<pre><code class="language-cpp">void preorder(const Node* p) {
+    if (p == nullptr) return;
+    std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+    preorder(p-&gt;left);
+    preorder(p-&gt;right);
+}</code></pre>
+      <p>Dietro questa funzione non c'è magia: c'è un normale stack di chiamate. Quando la funzione scende nei sottoalberi, il linguaggio conserva automaticamente le chiamate in sospeso e poi le riprende quando la ricorsione risale.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché la BFS si sposa bene con una coda</h2>
+      <p>La BFS, invece, non segue il meccanismo naturale della ricorsione. Per visitare per livelli bisogna ricordare quali nodi sono stati scoperti ma non ancora elaborati, mantenendoli nell'ordine corretto. Lo strumento ideale per questo è una <b>coda</b>.</p>
+      <p>L'idea operativa è semplice:</p>
+      <ol>
+        <li>inserisco la radice nella coda;</li>
+        <li>estraggo il primo nodo;</li>
+        <li>lo elaboro;</li>
+        <li>inserisco in coda i suoi figli, se esistono;</li>
+        <li>ripeto finché la coda non è vuota.</li>
+      </ol>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;queue&gt;
+
+void bfs(const Node* root) {
+    if (root == nullptr) return;
+
+    std::queue&lt;const Node*&gt; q;
+    q.push(root);
+
+    while (!q.empty()) {
+        const Node* p = q.front();
+        q.pop();
+
+        std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+
+        if (p-&gt;left  != nullptr) q.push(p-&gt;left);
+        if (p-&gt;right != nullptr) q.push(p-&gt;right);
+    }
+}</code></pre>
+      <p>Questa funzione è importante perché mostra bene il cambio di paradigma: qui non "scendo" ricorsivamente, ma mantengo una frontiera di nodi da processare.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Confronto visivo tra le due idee</h2>
+      <p>Possiamo leggere il comportamento delle due strategie così:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>DFS</th>
+            <th>BFS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Segue un ramo finché può</td>
+            <td>Esplora tutti i nodi del livello corrente</td>
+          </tr>
+          <tr>
+            <td>Risalita naturale via ricorsione o stack</td>
+            <td>Avanzamento naturale via coda</td>
+          </tr>
+          <tr>
+            <td>Molto adatta a problemi ricorsivi sui sottoalberi</td>
+            <td>Molto adatta a problemi di distanza o livelli</td>
+          </tr>
+          <tr>
+            <td>Famiglia che include pre/in/post ordine</td>
+            <td>Visita per livelli</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Questo confronto va capito bene perché ritornerà spesso, anche fuori dagli alberi, quando si studiano grafi e algoritmi di esplorazione più generali.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Quando una DFS è la scelta più naturale</h2>
+      <p>La DFS tende a essere la scelta giusta quando il problema dipende dalla struttura ricorsiva dell'albero o quando vogliamo elaborare i sottoalberi come unità autonome. Alcuni esempi tipici sono:</p>
+      <ul>
+        <li>contare nodi o foglie;</li>
+        <li>calcolare l'altezza;</li>
+        <li>copiare un albero;</li>
+        <li>distruggere correttamente tutta la struttura;</li>
+        <li>valutare un albero di espressione.</li>
+      </ul>
+      <p>In tutti questi casi il ragionamento "risolvo prima i sottoalberi e poi combino" è molto naturale. Per questo le DFS sono uno strumento centrale nel problem solving su strutture gerarchiche.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Quando una BFS è la scelta più naturale</h2>
+      <p>La BFS diventa particolarmente utile quando conta la distanza dalla radice o quando vogliamo una fotografia dell'albero livello per livello. Esempi tipici:</p>
+      <ul>
+        <li>stampare i nodi per livelli;</li>
+        <li>trovare il primo nodo che soddisfa una proprietà al livello minimo possibile;</li>
+        <li>ragionare sulla profondità minima a cui compare una certa configurazione;</li>
+        <li>costruire algoritmi che avanzano "a ondate" dalla radice verso il basso.</li>
+      </ul>
+      <p>Detta in modo molto pratico: se la domanda contiene parole come "livello", "distanza minima", "più vicino alla radice", la BFS è spesso da considerare subito.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Attenzione a una possibile confusione</h2>
+      <p>È facile confondere il preordine con "la DFS" in assoluto, ma sarebbe riduttivo. Il preordine è solo <b>una</b> visita DFS. Anche inordine e postordine sono DFS, perché visitano comunque l'albero approfondendo i rami prima di passare ad altri rami.</p>
+      <p>Allo stesso modo, BFS non è semplicemente "un altro nome" per una visita ordinata degli alberi binari. È una strategia diversa, basata sui livelli e supportata da una coda.</p>
+      <p class="warn"><b>Regola mentale utile:</b> prima chiediti <i>che famiglia di esplorazione mi serve?</i> Solo dopo chiediti <i>quale visita concreta mi conviene usare?</i></p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un piccolo esempio di scelta algoritmica</h2>
+      <p>Supponiamo di voler trovare il primo nodo che contiene un certo valore e che sia il più vicino possibile alla radice. Se uso una DFS, potrei scendere molto in profondità in un ramo e trovare una soluzione lontana prima di accorgermi che esisteva una soluzione più superficiale in un altro ramo.</p>
+      <p>Con una BFS, invece, visito prima tutti i nodi di profondità 0, poi 1, poi 2. Quindi il primo nodo che soddisfa la proprietà è automaticamente uno dei più vicini alla radice. Questo è un ottimo esempio di come la strategia di visita non sia un dettaglio estetico, ma una scelta algoritmica vera.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa bisogna aver capito prima di andare avanti</h2>
+      <ul>
+        <li><b>DFS</b> significa esplorare in profondità: scendo lungo i rami e risalgo;</li>
+        <li><b>BFS</b> significa esplorare in ampiezza: procedo per livelli;</li>
+        <li>preordine, inordine e postordine sono visite della famiglia DFS;</li>
+        <li>DFS è naturalmente associata a ricorsione o stack;</li>
+        <li>BFS è naturalmente associata a una coda.</li>
+      </ul>
+      <p>Se questa distinzione è chiara, allora le visite non appaiono più come un elenco da studiare a memoria, ma come strumenti diversi per problemi diversi.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Sintesi finale.</b> DFS e BFS sono due grandi strategie di esplorazione degli alberi. La DFS approfondisce i rami e comprende preordine, inordine e postordine; la BFS procede invece per livelli usando una coda. La scelta tra le due non dipende dal gusto, ma dal tipo di domanda che il problema pone. Nella <strong>Lez6_5</strong> vedremo proprio come le visite diventano strumenti concreti di problem solving algoritmico.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

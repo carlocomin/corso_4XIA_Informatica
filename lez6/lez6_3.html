@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_3 · Visite ordinate: preordine, inordine, postordine</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez6_2.html"; }
+    function nextSlide(){ window.location.href = "lez6_4.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html" class="active">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Visite ordinate: preordine, inordine, postordine</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi della pagina</h2>
+      <p>Ora che sappiamo come un albero è rappresentato in memoria, possiamo affrontare una domanda decisiva: <b>come si percorre un albero in modo sistematico?</b> Le visite servono esattamente a questo. Sono il ponte tra la struttura dati e gli algoritmi che vogliamo eseguire su di essa.</p>
+      <p>In questa pagina ci concentriamo sulle tre visite classiche degli alberi binari: <b>preordine</b>, <b>inordine</b> e <b>postordine</b>. A prima vista sembrano tre formule simili; in realtà, cambiare il momento in cui elaboriamo il nodo produce risultati molto diversi.</p>
+      <p class="ok"><b>Idea chiave:</b> nelle tre visite classiche cambia solo la posizione dell'azione sul nodo rispetto alle chiamate ricorsive sui due sottoalberi, ma questa piccola differenza cambia il significato dell'algoritmo.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa significa "visitare" un albero?</h2>
+      <p>Visitare un albero significa attraversarne i nodi seguendo una regola precisa, eseguendo su ciascuno di essi una certa operazione. L'operazione può essere molto semplice, per esempio stampare il valore del nodo, oppure più ricca: contarlo, copiarlo, valutarlo, distruggerlo, cercarlo.</p>
+      <p>Per non confondere il <i>come</i> con il <i>che cosa</i>, conviene separare due idee:</p>
+      <ul>
+        <li>la <b>strategia di visita</b>, cioè l'ordine in cui raggiungo i nodi;</li>
+        <li>l'<b>azione locale</b>, cioè ciò che faccio quando sono su un certo nodo.</li>
+      </ul>
+      <p>In questa pagina, per semplicità, useremo quasi sempre come azione locale la stampa del contenuto del nodo. Ma il vero concetto non è "stampare": è capire l'ordine con cui i nodi vengono elaborati.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché la ricorsione è così naturale sugli alberi</h2>
+      <p>Le visite classiche si capiscono bene perché un albero è una struttura ricorsiva. Se guardo un nodo, vedo tre parti:</p>
+      <ul>
+        <li>il nodo corrente;</li>
+        <li>il sottoalbero sinistro;</li>
+        <li>il sottoalbero destro.</li>
+      </ul>
+      <p>Questo suggerisce una strategia molto pulita: risolvere il problema sul nodo corrente e poi ripetere lo stesso ragionamento sui due sottoalberi, che sono alberi più piccoli della stessa natura.</p>
+      <p>Il caso base è semplice: se il puntatore è nullo, l'albero è vuoto e non c'è nulla da visitare.</p>
+<pre><code class="language-cpp">void visitaQualunque(const Node* p) {
+    if (p == nullptr) return;   // caso base
+    // azione sul nodo corrente
+    // chiamata sul sottoalbero sinistro
+    // chiamata sul sottoalbero destro
+}</code></pre>
+      <p>Le tre visite classiche nascono proprio da qui: cambiamo solo la posizione dell'azione sul nodo corrente.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un unico albero campione</h2>
+      <p>Per evitare confusione, useremo lo stesso albero per tutte e tre le visite. È importante riusare un solo esempio, così si vede bene che la differenza sta nell'algoritmo, non nel disegno.</p>
+<pre><code>          A
+        /   \
+       B     C
+      / \     \
+     D   E     F
+</code></pre>
+      <p>Con questo albero confronteremo passo passo preordine, inordine e postordine. Il vantaggio di usare lettere è che l'ordine di uscita si legge subito senza introdurre altre difficoltà.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Preordine: prima il nodo, poi i sottoalberi</h2>
+      <p>Nella visita in <b>preordine</b> elaboriamo subito il nodo corrente, poi visitiamo il sottoalbero sinistro e infine quello destro. In forma compatta:</p>
+<pre><code>nodo -> sinistra -> destra</code></pre>
+      <p>Questa visita è utile quando vogliamo "vedere" il nodo prima di scendere nei suoi figli. Per esempio, è naturale per copiare la struttura di un albero o per produrre una rappresentazione prefissa di un'espressione.</p>
+<pre><code class="language-cpp">void preorder(const Node* p) {
+    if (p == nullptr) return;
+    std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+    preorder(p-&gt;left);
+    preorder(p-&gt;right);
+}</code></pre>
+      <p>Applicata all'albero campione, la sequenza è:</p>
+<pre><code class="language-text">A B D E C F</code></pre>
+      <p>Si parte da <code>A</code>, poi si scende nel sottoalbero sinistro di <code>A</code>, lo si esaurisce, e solo dopo si passa al destro.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Inordine: sinistra, nodo, destra</h2>
+      <p>Nella visita in <b>inordine</b> prima si visita il sottoalbero sinistro, poi si elabora il nodo corrente, poi si visita il sottoalbero destro. In forma compatta:</p>
+<pre><code>sinistra -> nodo -> destra</code></pre>
+      <p>Questa visita è particolarmente importante negli <b>alberi binari</b>, perché usa in modo esplicito la distinzione tra figlio sinistro e figlio destro. In un albero generale l'idea di "inordine" non è più così naturale.</p>
+<pre><code class="language-cpp">void inorder(const Node* p) {
+    if (p == nullptr) return;
+    inorder(p-&gt;left);
+    std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+    inorder(p-&gt;right);
+}</code></pre>
+      <p>Applicata all'albero campione, la sequenza è:</p>
+<pre><code class="language-text">D B E A C F</code></pre>
+      <p>Più avanti vedremo una proprietà fondamentale: se l'albero è un <b>BST</b>, la visita inordine produce le chiavi in ordine crescente.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Postordine: prima i sottoalberi, poi il nodo</h2>
+      <p>Nella visita in <b>postordine</b> il nodo viene elaborato solo dopo aver visitato entrambi i sottoalberi. In forma compatta:</p>
+<pre><code>sinistra -> destra -> nodo</code></pre>
+      <p>Questa visita è naturale quando il nodo dipende dai risultati dei figli. È il caso, per esempio, della valutazione di un albero di espressione o della distruzione corretta di un albero dinamico: prima tratto i figli, poi il nodo che li collega.</p>
+<pre><code class="language-cpp">void postorder(const Node* p) {
+    if (p == nullptr) return;
+    postorder(p-&gt;left);
+    postorder(p-&gt;right);
+    std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+}</code></pre>
+      <p>Applicata all'albero campione, la sequenza è:</p>
+<pre><code class="language-text">D E B F C A</code></pre>
+      <p>Qui si vede bene che la radice <code>A</code> appare per ultima, perché l'algoritmo aspetta di aver finito entrambi i sottoalberi prima di elaborarla.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Confronto diretto delle tre visite</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Visita</th>
+            <th>Schema</th>
+            <th>Sequenza sull'albero campione</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Preordine</b></td>
+            <td>nodo, sinistra, destra</td>
+            <td><code>A B D E C F</code></td>
+          </tr>
+          <tr>
+            <td><b>Inordine</b></td>
+            <td>sinistra, nodo, destra</td>
+            <td><code>D B E A C F</code></td>
+          </tr>
+          <tr>
+            <td><b>Postordine</b></td>
+            <td>sinistra, destra, nodo</td>
+            <td><code>D E B F C A</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Questa tabella va letta come una mappa mentale. Non bisogna memorizzare tre righe in modo meccanico: bisogna capire <b>quando</b> il nodo viene trattato rispetto ai due sottoalberi.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa cambia davvero tra le tre visite?</h2>
+      <p>A livello di codice, le tre funzioni sono quasi identiche. Hanno lo stesso caso base, visitano gli stessi sottoalberi e usano la stessa struttura ricorsiva. Cambia soltanto la posizione della riga che elabora il nodo corrente.</p>
+      <p>È proprio questo il punto didattico più importante della pagina: un cambiamento sintatticamente minimo produce comportamenti algoritmici molto diversi. Se elaboro il nodo prima dei figli, "vedo prima il contenitore". Se lo elaboro in mezzo, ottengo un ordine legato alla posizione sinistra/destra. Se lo elaboro alla fine, ottengo una logica di dipendenza dai figli.</p>
+      <p class="ok"><b>Osservazione chiave:</b> capire le visite significa capire il significato dell'ordine, non solo il codice.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un esempio notevole: albero di espressione</h2>
+      <p>Le visite diventano molto più chiare quando si vede che cosa producono su un problema concreto. Considera l'espressione <code>(a + b) * c</code>. Può essere rappresentata come un albero in cui gli operatori stanno nei nodi interni e gli operandi nelle foglie.</p>
+<pre><code>        *
+      /   \
+     +     c
+    / \
+   a   b
+</code></pre>
+      <ul>
+        <li><b>preordine</b>: <code>* + a b c</code> → forma prefissa;</li>
+        <li><b>inordine</b>: <code>a + b * c</code> → forma infissa, da leggere con attenzione e parentesi;</li>
+        <li><b>postordine</b>: <code>a b + c *</code> → forma postfissa.</li>
+      </ul>
+      <p>Questo è un ottimo esempio perché mostra che le visite non sono esercizi artificiali: producono davvero modi diversi di leggere e trattare la stessa struttura.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Errori tipici da evitare</h2>
+      <ul>
+        <li><b>Dimenticare il caso base.</b> Se non controllo <code>p == nullptr</code>, la ricorsione finirà per dereferenziare un puntatore nullo.</li>
+        <li><b>Confondere il significato di sinistro e destro.</b> Nell'inordine questa distinzione è essenziale.</li>
+        <li><b>Credere che le visite differiscano per i nodi visitati.</b> I nodi sono sempre gli stessi: cambia l'ordine.</li>
+        <li><b>Imparare a memoria senza tracing.</b> Se non sai simulare l'ordine dei passi su un piccolo albero, il codice resta meccanico e fragile.</li>
+      </ul>
+      <p>Per questo, prima ancora di scrivere programmi lunghi, conviene esercitarsi a prevedere a mano l'output di una visita su alberi molto piccoli.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa ci portiamo via da questa pagina</h2>
+      <p>Dopo questa lezione dovrebbe essere chiaro che visitare un albero significa applicare un'azione locale ai nodi secondo un ordine preciso. Le tre visite classiche degli alberi binari si distinguono così:</p>
+      <ul>
+        <li><b>preordine</b>: nodo, sinistra, destra;</li>
+        <li><b>inordine</b>: sinistra, nodo, destra;</li>
+        <li><b>postordine</b>: sinistra, destra, nodo.</li>
+      </ul>
+      <p>Se questo è stato capito bene, allora il passo successivo diventa naturale: allargare lo sguardo dalla famiglia delle visite ricorsive classiche alla distinzione più generale tra esplorazione in profondità e in ampiezza.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Sintesi finale.</b> Preordine, inordine e postordine sono tre visite ricorsive degli alberi binari che differiscono solo per il momento in cui il nodo corrente viene elaborato rispetto ai due sottoalberi. Questa differenza minima cambia il risultato e il senso dell'algoritmo: copiare una struttura, ottenere un ordine, valutare o distruggere un albero. Nella <strong>Lez6_4</strong> allargheremo il quadro distinguendo profondità e ampiezza, cioè DFS e BFS.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

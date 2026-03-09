@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_7 · Inserimento in un BST</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez6_6.html"; }
+    function nextSlide(){ window.location.href = "lez6_8.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html" class="active">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Inserimento in un BST</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi della pagina</h2>
+      <p>Dopo aver visto come si cerca in un BST, il passo naturale è capire come si inserisce una nuova chiave senza rompere la proprietà d'ordine. Questa è una pagina importante, perché mostra bene come un vincolo strutturale diventi un algoritmo costruttivo.</p>
+      <p>L'idea di fondo è semplice: per inserire un valore non si esplora l'albero liberamente, ma si segue lo stesso percorso logico della ricerca finché non si trova il punto in cui la nuova chiave può essere collocata come foglia. La difficoltà reale non è la sintassi: è capire bene <b>perché</b> quella posizione è l'unica coerente con la regola del BST.</p>
+      <p class="ok"><b>Idea chiave:</b> inserire in un BST significa scendere lungo confronti successivi fino a trovare il puntatore nullo che rappresenta il posto giusto per la nuova chiave.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>La logica dell'inserimento</h2>
+      <p>Supponiamo di voler inserire una chiave <code>x</code>. Il ragionamento è quasi identico a quello della ricerca:</p>
+      <ul>
+        <li>se l'albero è vuoto, il nuovo nodo diventa la radice;</li>
+        <li>se <code>x &lt; key</code>, bisogna scendere nel sottoalbero sinistro;</li>
+        <li>se <code>x &gt; key</code>, bisogna scendere nel sottoalbero destro;</li>
+        <li>quando si incontra un puntatore nullo, quello è il posto in cui creare il nuovo nodo.</li>
+      </ul>
+      <p>Questo criterio non è arbitrario. È l'unico che garantisce di preservare la proprietà del BST, perché la nuova chiave viene collocata in una posizione coerente con tutti i confronti accumulati lungo il cammino dalla radice.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un inserimento guidato passo per passo</h2>
+      <p>Partiamo da questo BST:</p>
+<pre><code>            10
+          /    \
+         5      18
+        / \    /
+       2   7  12
+</code></pre>
+      <p>Vogliamo inserire <code>15</code>.</p>
+      <ol>
+        <li>confronto con <code>10</code>: poiché <code>15 &gt; 10</code>, scendo a destra;</li>
+        <li>confronto con <code>18</code>: poiché <code>15 &lt; 18</code>, scendo a sinistra;</li>
+        <li>confronto con <code>12</code>: poiché <code>15 &gt; 12</code>, dovrei scendere a destra;</li>
+        <li>il figlio destro di <code>12</code> è nullo: inserisco lì il nuovo nodo.</li>
+      </ol>
+      <p>Il risultato finale è:</p>
+<pre><code>            10
+          /    \
+         5      18
+        / \    /
+       2   7  12
+                \
+                 15
+</code></pre>
+      <p>Questo esempio va letto bene: il percorso di inserimento coincide con il percorso che avremmo seguito per cercare <code>15</code> nell'albero. La differenza è che, non trovandolo, usiamo il primo <code>nullptr</code> coerente come punto di creazione.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché il nuovo nodo nasce come foglia</h2>
+      <p>Nell'inserimento base di un BST, il nuovo nodo viene sempre aggiunto come <b>foglia</b>. Questo fatto non è un dettaglio secondario: è il motivo per cui l'operazione è relativamente semplice.</p>
+      <p>Infatti, durante la discesa non spostiamo nodi esistenti e non riorganizziamo sottoalberi. Ci limitiamo a cercare il puntatore nullo in cui la nuova chiave può essere agganciata. In questo modo:</p>
+      <ul>
+        <li>i nodi già presenti mantengono i propri sottoalberi;</li>
+        <li>la nuova chiave non rompe l'ordine esistente;</li>
+        <li>la proprietà BST resta vera in tutto l'albero.</li>
+      </ul>
+      <p>Più avanti vedremo che la cancellazione è più delicata proprio perché, lì, non basta aggiungere una foglia: bisogna ricucire la struttura.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Implementazione ricorsiva in C++</h2>
+      <p>La versione ricorsiva è molto espressiva perché segue in modo quasi letterale la definizione del BST.</p>
+<pre><code class="language-cpp">Node* insert(Node* p, int x) {
+    if (p == nullptr) {
+        return new Node{x, nullptr, nullptr};
+    }
+
+    if (x &lt; p-&gt;key) {
+        p-&gt;left = insert(p-&gt;left, x);
+    } else if (x &gt; p-&gt;key) {
+        p-&gt;right = insert(p-&gt;right, x);
+    }
+
+    return p;
+}</code></pre>
+      <p>Qui ci sono due idee molto importanti:</p>
+      <ul>
+        <li>il caso base crea il nodo quando si raggiunge il posto giusto;</li>
+        <li>ogni chiamata restituisce la radice del sottoalbero aggiornato.</li>
+      </ul>
+      <p>Questa seconda osservazione è fondamentale. Quando scrivo <code>p-&gt;left = insert(p-&gt;left, x)</code>, sto dicendo: "reinserisci nel sottoalbero sinistro e dammi la sua nuova radice".</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Come leggere bene la funzione ricorsiva</h2>
+      <p>La riga più istruttiva è proprio questa:</p>
+<pre><code class="language-cpp">p-&gt;left = insert(p-&gt;left, x);</code></pre>
+      <p>Per molti studenti all'inizio sembra strana, ma in realtà è molto elegante. La funzione <code>insert</code> lavora su un sottoalbero e restituisce la radice corretta di quel sottoalbero dopo l'inserimento. Se il sottoalbero era vuoto, la nuova radice sarà il nodo appena creato; se non era vuoto, sarà lo stesso nodo di prima, con eventuali aggiornamenti più in basso.</p>
+      <p>Questo modo di scrivere il codice è potente perché evita casi speciali sparsi: la stessa funzione gestisce sia l'albero completo sia qualunque suo sottoalbero.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Implementazione iterativa</h2>
+      <p>Si può scrivere l'inserimento anche in modo iterativo. La logica dei confronti è identica, ma invece di affidarsi alla ricorsione si scende nell'albero con puntatori espliciti.</p>
+<pre><code class="language-cpp">Node* insertIter(Node* root, int x) {
+    Node* parent = nullptr;
+    Node* curr = root;
+
+    while (curr != nullptr) {
+        parent = curr;
+        if (x &lt; curr-&gt;key) curr = curr-&gt;left;
+        else if (x &gt; curr-&gt;key) curr = curr-&gt;right;
+        else return root; // duplicato: non inserisco
+    }
+
+    Node* n = new Node{x, nullptr, nullptr};
+
+    if (parent == nullptr) return n; // albero inizialmente vuoto
+    if (x &lt; parent-&gt;key) parent-&gt;left = n;
+    else                 parent-&gt;right = n;
+
+    return root;
+}</code></pre>
+      <p>Questa versione fa vedere con molta chiarezza il ruolo del padre del nodo da inserire. È meno "matematica" della ricorsiva, ma molto utile per capire bene i collegamenti tra nodi.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa facciamo con i duplicati?</h2>
+      <p>La gestione dei duplicati non è imposta dal linguaggio: è una scelta progettuale. Nella nostra trattazione di base adottiamo la politica più semplice: <b>se la chiave è già presente, non inseriamo nulla</b>.</p>
+      <p>Questa decisione ha un vantaggio didattico forte: mantiene il BST come insieme di chiavi distinte e rende più trasparenti ricerca, inserimento e cancellazione. In contesti reali si possono anche usare altre politiche, per esempio:</p>
+      <ul>
+        <li>inserire sempre i duplicati a destra;</li>
+        <li>inserirli sempre a sinistra;</li>
+        <li>memorizzare un contatore di occorrenze nel nodo.</li>
+      </ul>
+      <p class="note"><b>Regola di metodo:</b> qualunque policy si scelga, va resa esplicita e mantenuta coerente in tutte le operazioni del BST.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>La forma finale dipende dall'ordine di inserimento</h2>
+      <p>Qui emerge un fatto molto importante: un BST non è determinato soltanto dall'insieme delle chiavi, ma anche dall'<b>ordine</b> con cui vengono inserite.</p>
+      <p>Per esempio, se inserisco le chiavi <code>10, 5, 18, 2, 7, 12</code>, ottengo:</p>
+<pre><code>            10
+          /    \
+         5      18
+        / \    /
+       2   7  12
+</code></pre>
+      <p>Se invece inserisco le stesse chiavi già ordinate <code>2, 5, 7, 10, 12, 18</code>, ottengo una struttura molto più sbilanciata:</p>
+<pre><code>2
+ \
+  5
+   \
+    7
+     \
+      10
+        \
+         12
+           \
+            18
+</code></pre>
+      <p>Questo confronto è cruciale, perché anticipa il tema dell'altezza e del bilanciamento. L'algoritmo di inserimento è corretto in entrambi i casi, ma la qualità della forma finale può essere molto diversa.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Complessità intuitiva dell'inserimento</h2>
+      <p>L'inserimento segue un unico cammino dalla radice fino a una foglia o a un puntatore nullo. Per questo il suo costo è legato, ancora una volta, all'<b>altezza</b> del BST.</p>
+      <p>Se l'albero è ben distribuito, il numero di confronti resta contenuto. Se l'albero è molto sbilanciato, il cammino può diventare lungo e l'operazione peggiora sensibilmente. Questo non mette in crisi la correttezza dell'algoritmo, ma ne indebolisce l'efficienza.</p>
+      <p class="ok"><b>Intuizione da fissare:</b> ricerca e inserimento in un BST si assomigliano molto anche nel costo, perché percorrono entrambi un solo cammino nell'albero.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Errori tipici da evitare</h2>
+      <ul>
+        <li><b>Inserire senza aggiornare il puntatore restituito.</b> Nella versione ricorsiva, dimenticare assegnazioni come <code>p-&gt;left = insert(...)</code> rompe il collegamento al sottoalbero aggiornato.</li>
+        <li><b>Dimenticare il caso dell'albero vuoto.</b> Se la radice è nulla, il primo nodo inserito deve diventare la radice.</li>
+        <li><b>Gestire i duplicati in modo incoerente.</b> Se una policy non è chiara, il BST diventa ambiguo.</li>
+        <li><b>Pensare che l'inserimento mantenga automaticamente l'albero bilanciato.</b> Mantiene la proprietà BST, non il bilanciamento.</li>
+      </ul>
+      <p>Questo ultimo punto è essenziale: correttezza dell'ordinamento e buona forma dell'albero non sono la stessa cosa.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Punti chiave da fissare</h2>
+      <p>Se questa lezione è stata capita bene, dovresti aver fissato questi punti:</p>
+      <ul>
+        <li>l'inserimento segue gli stessi confronti della ricerca;</li>
+        <li>il nuovo nodo viene creato nel primo puntatore nullo coerente con la proprietà BST;</li>
+        <li>nell'inserimento base il nuovo nodo nasce come foglia;</li>
+        <li>la forma finale del BST dipende dall'ordine di inserimento delle chiavi;</li>
+        <li>correttezza del BST e bilanciamento sono due questioni diverse.</li>
+      </ul>
+      <p>Con queste idee siamo pronti ad affrontare l'operazione più delicata della gestione di un BST: la cancellazione di un nodo.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Sintesi finale.</b> Inserire in un BST significa seguire il cammino guidato dai confronti fino al punto nullo in cui la nuova chiave può essere aggiunta come foglia senza violare l'ordine. L'algoritmo è strettamente parente della ricerca, ma mostra anche un fatto importante: l'ordine di arrivo delle chiavi influenza profondamente la forma finale dell'albero. Nella <strong>Lez6_8</strong> vedremo la cancellazione, che richiede un ragionamento più sottile.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

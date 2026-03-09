@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_13 · Esercizio pratico finale: mini BST completo</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez6_12.html"; }
+    function nextSlide(){ window.location.href = "../programma.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra soluzione' : 'Nascondi soluzione';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html" class="active">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Esercizio pratico finale<br><small>Mini BST completo: costruzione, visite, ricerca, cancellazione</small></h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivo dell'esercizio pratico</h2>
+      <p>Qui la teoria sugli alberi deve diventare una struttura dati completa e realmente usabile. Non basta più conoscere definizioni e casi classici: bisogna progettare un piccolo BST che sappia gestire memoria, inserimento, ricerca, cancellazione, visite e alcune interrogazioni utili come altezza e numero di nodi.</p>
+      <p>Questo laboratorio è molto formativo perché costringe a tenere insieme quasi tutto il percorso della lezione: rappresentazione del nodo, ricorsione sui sottoalberi, visite, proprietà del BST, casi della cancellazione, dipendenza del costo dall'altezza e attenzione alla memoria dinamica.</p>
+      <p class="ok"><b>Idea chiave:</b> un buon laboratorio finale non mostra solo che sai scrivere funzioni separate, ma che sai farle convivere in un piccolo progetto coerente.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Testo dell'esercizio</h2>
+      <p>Implementa un mini <b>albero binario di ricerca di interi</b> in C++ con le seguenti funzionalità:</p>
+      <ol>
+        <li>struttura del nodo con chiave intera e puntatori ai figli;</li>
+        <li>creazione e distruzione corretta dell'albero;</li>
+        <li>inserimento di una chiave;</li>
+        <li>ricerca di una chiave;</li>
+        <li>visite <code>preorder</code>, <code>inorder</code> e <code>postorder</code>;</li>
+        <li>stampa per livelli con BFS;</li>
+        <li>cancellazione di una chiave;</li>
+        <li>calcolo di altezza e numero totale dei nodi.</li>
+      </ol>
+      <p><b>Vincoli consigliati:</b></p>
+      <ul>
+        <li>evita variabili globali;</li>
+        <li>usa nomi chiari e funzioni corte;</li>
+        <li>gestisci in modo ordinato la memoria dinamica;</li>
+        <li>scegli e documenta una policy per i duplicati. In questa soluzione useremo: <b>duplicati ignorati</b>.</li>
+      </ul>
+      <p><b>Bonus:</b></p>
+      <ul>
+        <li>funzione che segnala se l'albero è fortemente sbilanciato;</li>
+        <li>bozza di <code>rotateLeft</code> e <code>rotateRight</code> con spiegazione;</li>
+        <li>piccolo menu testuale nel <code>main()</code> oppure dataset iniziale di prova.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Strategia progettuale prima del codice</h2>
+      <p>La scelta più pulita, a questo livello, è racchiudere l'ownership dell'albero in una piccola classe <code>BST</code> che possiede un solo puntatore membro: la radice. In questo modo il resto del programma non deve conoscere tutti i dettagli della memoria dinamica.</p>
+      <p>Le funzioni ricorsive più comode possono restare private e lavorare su un <code>Node*</code> o <code>const Node*</code>. L'interfaccia pubblica, invece, espone operazioni semplici come <code>insert</code>, <code>contains</code>, <code>remove</code>, <code>printInorder</code>, <code>height</code> e <code>countNodes</code>.</p>
+      <p class="note"><b>Messaggio metodologico:</b> il laboratorio non richiede per forza C++ "super moderno" con template e astrazioni sofisticate. Qui conta soprattutto una struttura chiara, una buona separazione tra interfaccia pubblica e supporto ricorsivo privato, e una gestione corretta dei nodi.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Che cosa osservare nella soluzione</h2>
+      <ul>
+        <li><b>Ownership centralizzata:</b> il <code>BST</code> possiede la radice e distrugge tutto nell'apposito distruttore.</li>
+        <li><b>Ricorsione mirata:</b> le funzioni private lavorano sui sottoalberi come unità autonome.</li>
+        <li><b>Cancellazione completa:</b> i tre casi classici sono trattati in modo distinto.</li>
+        <li><b>Visite diverse, problemi diversi:</b> inorder per l'ordine, postorder per la distruzione, BFS per i livelli.</li>
+        <li><b>Bonus coerente:</b> lo squilibrio viene trattato come estensione naturale del tema dell'altezza.</li>
+      </ul>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Soluzione guidata</h2>
+      <p>Prova prima a progettare da solo la struttura della classe e le firme dei metodi. Poi apri la soluzione e controlla soprattutto se la logica dei sottoalberi è chiara e se i casi della cancellazione sono leggibili.</p>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-sol1" onclick="toggleBox('btn-sol1','sol1')">Mostra soluzione</button>
+      </div>
+
+      <div id="sol1" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+#include &lt;iostream&gt;
+#include &lt;queue&gt;
+#include &lt;vector&gt;
+
+class BST {
+private:
+    struct Node {
+        int key;
+        Node* left;
+        Node* right;
+    };
+
+    Node* root_ = nullptr;
+
+    static Node* createNode(int key) {
+        return new Node{key, nullptr, nullptr};
+    }
+
+    static void destroy(Node* p) {
+        if (p == nullptr) return;
+        destroy(p-&gt;left);
+        destroy(p-&gt;right);
+        delete p;
+    }
+
+    static Node* insertRec(Node* p, int key) {
+        if (p == nullptr) return createNode(key);
+
+        if (key &lt; p-&gt;key) {
+            p-&gt;left = insertRec(p-&gt;left, key);
+        } else if (key &gt; p-&gt;key) {
+            p-&gt;right = insertRec(p-&gt;right, key);
+        }
+        return p; // duplicato ignorato
+    }
+
+    static bool containsRec(const Node* p, int key) {
+        if (p == nullptr) return false;
+        if (key == p-&gt;key) return true;
+        if (key &lt; p-&gt;key) return containsRec(p-&gt;left, key);
+        return containsRec(p-&gt;right, key);
+    }
+
+    static Node* findMin(Node* p) {
+        while (p != nullptr &amp;&amp; p-&gt;left != nullptr) p = p-&gt;left;
+        return p;
+    }
+
+    static Node* removeRec(Node* p, int key) {
+        if (p == nullptr) return nullptr;
+
+        if (key &lt; p-&gt;key) {
+            p-&gt;left = removeRec(p-&gt;left, key);
+        } else if (key &gt; p-&gt;key) {
+            p-&gt;right = removeRec(p-&gt;right, key);
+        } else {
+            if (p-&gt;left == nullptr &amp;&amp; p-&gt;right == nullptr) {
+                delete p;
+                return nullptr;
+            }
+
+            if (p-&gt;left == nullptr) {
+                Node* tmp = p-&gt;right;
+                delete p;
+                return tmp;
+            }
+
+            if (p-&gt;right == nullptr) {
+                Node* tmp = p-&gt;left;
+                delete p;
+                return tmp;
+            }
+
+            Node* succ = findMin(p-&gt;right);
+            p-&gt;key = succ-&gt;key;
+            p-&gt;right = removeRec(p-&gt;right, succ-&gt;key);
+        }
+
+        return p;
+    }
+
+    static void preorderRec(const Node* p) {
+        if (p == nullptr) return;
+        std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+        preorderRec(p-&gt;left);
+        preorderRec(p-&gt;right);
+    }
+
+    static void inorderRec(const Node* p) {
+        if (p == nullptr) return;
+        inorderRec(p-&gt;left);
+        std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+        inorderRec(p-&gt;right);
+    }
+
+    static void postorderRec(const Node* p) {
+        if (p == nullptr) return;
+        postorderRec(p-&gt;left);
+        postorderRec(p-&gt;right);
+        std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+    }
+
+    static int heightRec(const Node* p) {
+        if (p == nullptr) return 0;
+        return 1 + std::max(heightRec(p-&gt;left), heightRec(p-&gt;right));
+    }
+
+    static int countRec(const Node* p) {
+        if (p == nullptr) return 0;
+        return 1 + countRec(p-&gt;left) + countRec(p-&gt;right);
+    }
+
+public:
+    ~BST() {
+        destroy(root_);
+    }
+
+    void insert(int key) {
+        root_ = insertRec(root_, key);
+    }
+
+    bool contains(int key) const {
+        return containsRec(root_, key);
+    }
+
+    void remove(int key) {
+        root_ = removeRec(root_, key);
+    }
+
+    void printPreorder() const {
+        preorderRec(root_);
+        std::cout &lt;&lt; '\n';
+    }
+
+    void printInorder() const {
+        inorderRec(root_);
+        std::cout &lt;&lt; '\n';
+    }
+
+    void printPostorder() const {
+        postorderRec(root_);
+        std::cout &lt;&lt; '\n';
+    }
+
+    void printLevelOrder() const {
+        if (root_ == nullptr) {
+            std::cout &lt;&lt; "(albero vuoto)\n";
+            return;
+        }
+
+        std::queue&lt;const Node*&gt; q;
+        q.push(root_);
+
+        while (!q.empty()) {
+            const Node* p = q.front();
+            q.pop();
+
+            std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+
+            if (p-&gt;left != nullptr) q.push(p-&gt;left);
+            if (p-&gt;right != nullptr) q.push(p-&gt;right);
+        }
+        std::cout &lt;&lt; '\n';
+    }
+
+    int height() const {
+        return heightRec(root_);
+    }
+
+    int countNodes() const {
+        return countRec(root_);
+    }
+};
+
+int main() {
+    BST t;
+
+    std::vector&lt;int&gt; valori{10, 5, 18, 2, 7, 12, 25, 15};
+    for (int x : valori) t.insert(x);
+
+    std::cout &lt;&lt; "Inorder:    ";
+    t.printInorder();
+
+    std::cout &lt;&lt; "Preorder:   ";
+    t.printPreorder();
+
+    std::cout &lt;&lt; "Postorder:  ";
+    t.printPostorder();
+
+    std::cout &lt;&lt; "Per livelli:";
+    t.printLevelOrder();
+
+    std::cout &lt;&lt; "Contiene 12? " &lt;&lt; (t.contains(12) ? "si" : "no") &lt;&lt; '\n';
+    std::cout &lt;&lt; "Contiene 99? " &lt;&lt; (t.contains(99) ? "si" : "no") &lt;&lt; '\n';
+
+    std::cout &lt;&lt; "Altezza = " &lt;&lt; t.height() &lt;&lt; '\n';
+    std::cout &lt;&lt; "Numero nodi = " &lt;&lt; t.countNodes() &lt;&lt; '\n';
+
+    t.remove(10); // caso con due figli
+    std::cout &lt;&lt; "\nDopo remove(10), inorder: ";
+    t.printInorder();
+}</code></pre>
+
+        <p class="ok"><b>Perché questa soluzione è buona:</b> l'ownership dei nodi è concentrata dentro la classe <code>BST</code>, le operazioni pubbliche sono pulite, e le funzioni ricorsive private lavorano in modo uniforme su qualunque sottoalbero.</p>
+
+        <p class="note"><b>Osserva bene:</b> distruzione, altezza, conteggio, visite, inserimento e cancellazione sono tutti esempi diversi della stessa idea di fondo: lavorare ricorsivamente su un nodo come radice di un sottoalbero.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Commento ragionato alla soluzione</h2>
+      <p>La scelta di usare una classe <code>BST</code> con una struct <code>Node</code> interna è molto istruttiva. Permette di vedere chiaramente due livelli: da una parte l'interfaccia pubblica del contenitore, dall'altra le funzioni ricorsive che manipolano i dettagli strutturali.</p>
+      <p>Il distruttore chiama <code>destroy(root_)</code>, quindi la memoria viene liberata in modo centralizzato e coerente. Questo è importante: anche se usiamo puntatori grezzi per i nodi, non stiamo lasciando la gestione della memoria "sparsa" nel programma.</p>
+      <p>La funzione <code>removeRec</code> è il cuore più delicato del progetto. Proprio per questo conviene leggerla separando la discesa nell'albero dai tre casi classici: foglia, un figlio, due figli. Se questa funzione è capita davvero, la struttura del BST è capita davvero.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Bonus 1 · Segnalare uno squilibrio forte</h2>
+      <p>Come estensione coerente con la teoria finale, possiamo aggiungere una funzione che segnali se in qualche nodo la differenza tra altezza sinistra e destra supera una soglia. Non stiamo implementando un AVL completo, ma stiamo misurando il problema che motiva il bilanciamento.</p>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-sol2" onclick="toggleBox('btn-sol2','sol2')">Mostra soluzione</button>
+      </div>
+
+      <div id="sol2" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">static bool isVeryUnbalancedRec(const Node* p, int soglia = 2) {
+    if (p == nullptr) return false;
+
+    int hs = heightRec(p-&gt;left);
+    int hd = heightRec(p-&gt;right);
+    int diff = (hs &gt; hd) ? (hs - hd) : (hd - hs);
+
+    if (diff &gt; soglia) return true;
+
+    return isVeryUnbalancedRec(p-&gt;left, soglia) ||
+           isVeryUnbalancedRec(p-&gt;right, soglia);
+}</code></pre>
+
+        <p class="note"><b>Messaggio didattico:</b> non basta sapere che l'albero "può sbilanciarsi". Qui stiamo trasformando quell'idea in una proprietà controllabile dal programma.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Bonus 2 · Rotazioni locali</h2>
+      <p>Come ulteriore estensione, si possono implementare le rotazioni locali già introdotte nella teoria. Non serve integrarle in un AVL completo: basta capire che una rotazione restituisce una nuova radice locale del sottoalbero e riconnette i puntatori senza perdere i sottoalberi intermedi.</p>
+
+      <div class="nav-buttons" style="justify-content:left">
+        <button id="btn-sol3" onclick="toggleBox('btn-sol3','sol3')">Mostra soluzione</button>
+      </div>
+
+      <div id="sol3" style="display:none;margin-top:8px">
+<pre><code class="language-cpp">static Node* rotateRight(Node* y) {
+    if (y == nullptr || y-&gt;left == nullptr) return y;
+
+    Node* x = y-&gt;left;
+    Node* T2 = x-&gt;right;
+
+    x-&gt;right = y;
+    y-&gt;left = T2;
+
+    return x;
+}
+
+static Node* rotateLeft(Node* x) {
+    if (x == nullptr || x-&gt;right == nullptr) return x;
+
+    Node* y = x-&gt;right;
+    Node* T2 = y-&gt;left;
+
+    y-&gt;left = x;
+    x-&gt;right = T2;
+
+    return y;
+}</code></pre>
+
+        <p class="ok"><b>Che cosa c'è di importante qui:</b> la rotazione non crea o distrugge nodi. Modifica soltanto la forma locale del sottoalbero, mantenendo però l'ordine del BST.</p>
+      </div>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Riflessione finale: perché questa è una buona consegna</h2>
+      <p>Questo laboratorio è didatticamente molto ricco perché costringe a tenere insieme aspetti spesso studiati separatamente: puntatori, ricorsione, strutture dati dinamiche, visite, scelta degli algoritmi e gestione della memoria. Non è solo "esercizio sugli alberi": è un piccolo progetto in cui le idee devono collaborare.</p>
+      <p>In più, il BST è una struttura ottima per imparare una lezione di metodo: conoscere la teoria di una struttura dati significa capire anche quando e perché le sue operazioni funzionano bene, e quando invece la forma dell'albero rischia di tradirne le promesse.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Checklist finale della lezione 6</h2>
+      <ul>
+        <li>sai rappresentare un albero binario con nodi e puntatori;</li>
+        <li>sai distinguere preorder, inorder, postorder, DFS e BFS;</li>
+        <li>sai spiegare perché l'inorder di un BST produce una sequenza ordinata;</li>
+        <li>sai implementare ricerca, inserimento e cancellazione di base;</li>
+        <li>sai motivare perché altezza e bilanciamento contano;</li>
+        <li>riconosci il ruolo delle rotazioni come correzioni locali della forma.</li>
+      </ul>
+      <p>Se tutti questi punti sono chiari, allora la lezione sugli alberi non è stata solo letta: è stata assimilata in modo operativo.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Chiusura del modulo.</b> Con questo laboratorio si chiude la sequenza su alberi, visite, BST, degenerazione e bilanciamento. Il passo successivo, fuori da questa unità, potrebbe essere approfondire alberi bilanciati completi oppure confrontare i BST con altre strutture dati dinamiche per insiemi ordinati.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

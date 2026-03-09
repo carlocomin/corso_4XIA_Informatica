@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>4BIA - Lez6_6 · BST: proprietà e ricerca</title>
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>try{hljs.highlightAll();}catch(e){}</script>
+
+  <script>
+    function prevSlide(){ window.location.href = "lez6_5.html"; }
+    function nextSlide(){ window.location.href = "lez6_7.html"; }
+    function toggleBox(btnId, boxId){
+      const box = document.getElementById(boxId), btn = document.getElementById(btnId);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      if(btn) btn.textContent = open ? 'Mostra v' : 'Nascondi ^';
+    }
+  </script>
+</head>
+<body>
+
+<!-- BEGIN MENU -->
+<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
+<div class="sidebar" id="menu">
+  <h2>Lezione 6 - Alberi e BST</h2>
+  <ul>
+    <li><a href="lez6_1.html">Lez6_1: Alberi: significato, lessico, importanza</a></li>
+    <li><a href="lez6_2.html">Lez6_2: Rappresentazione in C/C++</a></li>
+    <li><a href="lez6_3.html">Lez6_3: Visite ordinate - pre, in, post</a></li>
+    <li><a href="lez6_4.html">Lez6_4: DFS e BFS</a></li>
+    <li><a href="lez6_5.html">Lez6_5: Le visite nel problem solving</a></li>
+    <li><a href="lez6_6.html" class="active">Lez6_6: BST - proprietà e ricerca</a></li>
+    <li><a href="lez6_7.html">Lez6_7: Inserimento in un BST</a></li>
+    <li><a href="lez6_8.html">Lez6_8: Cancellazione in un BST</a></li>
+    <li><a href="lez6_9.html">Lez6_9: Applicazioni algoritmiche dei BST</a></li>
+    <li><a href="lez6_10.html">Lez6_10: Altezza, costo, degenerazione</a></li>
+    <li><a href="lez6_11.html">Lez6_11: Alberi bilanciati e rotazioni</a></li>
+    <li><a href="lez6_12.html">Lez6_12: Esercizi guidati</a></li>
+    <li><a href="lez6_13.html">Lez6_13: Esercizio pratico finale</a></li>
+  </ul>
+</div>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>BST: proprietà e ricerca</h1>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <div class="content-box">
+
+    <div class="inner-box box">
+      <h2>Obiettivi della pagina</h2>
+      <p>Fino a qui abbiamo lavorato su alberi binari generici. Da questo momento introduciamo una struttura più specializzata e molto importante: il <b>Binary Search Tree</b>, o <b>albero binario di ricerca</b>. Il punto centrale non è più soltanto la forma dell'albero, ma la presenza di una <b>regola d'ordine</b> che rende alcune operazioni molto più intelligenti.</p>
+      <p>Questa pagina ha due scopi precisi: capire bene la proprietà che definisce un BST e vedere come tale proprietà permetta di cercare un valore senza esplorare rami inutili. Se questo passaggio è chiaro, allora inserimento e cancellazione delle pagine successive diventeranno molto più naturali.</p>
+      <p class="ok"><b>Idea chiave:</b> in un BST l'albero non è organizzato "a caso": la posizione di ogni chiave rispetta una regola che guida direttamente gli algoritmi di ricerca.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Definizione di BST</h2>
+      <p>Un albero binario di ricerca è un albero binario in cui, per ogni nodo, vale la seguente proprietà:</p>
+      <ul>
+        <li>tutte le chiavi del sottoalbero sinistro sono <b>minori</b> della chiave del nodo;</li>
+        <li>tutte le chiavi del sottoalbero destro sono <b>maggiori</b> della chiave del nodo.</li>
+      </ul>
+      <p>Questa regola non vale solo per i figli immediati: vale per <b>tutti</b> i nodi contenuti nei due sottoalberi. È questo il punto che bisogna fissare bene. Non basta controllare il confronto con il figlio sinistro e il figlio destro; bisogna ragionare sull'intero sottoalbero.</p>
+      <p class="note"><b>Assunzione didattica di questa lezione:</b> per semplicità consideriamo chiavi tutte distinte. La gestione dei duplicati è una scelta progettuale possibile, ma la tratteremo come variante successiva.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Un esempio valido e un controesempio</h2>
+      <p>Considera questo primo albero:</p>
+<pre><code>            10
+          /    \
+         5      18
+        / \    /  \
+       2   7  12  25
+</code></pre>
+      <p>Questo è un BST corretto. Ogni chiave del sottoalbero sinistro di <code>10</code> è minore di <code>10</code>, e ogni chiave del sottoalbero destro è maggiore. Lo stesso vale ricorsivamente per i nodi <code>5</code>, <code>18</code> e così via.</p>
+      <p>Ora considera invece questo albero:</p>
+<pre><code>            10
+          /    \
+         5      18
+        / \
+       2  14
+</code></pre>
+      <p>A prima vista potrebbe sembrare quasi corretto, perché <code>14</code> è maggiore di <code>5</code>. Ma il nodo <code>14</code> si trova nel sottoalbero sinistro di <code>10</code>, e quindi dovrebbe essere minore di <code>10</code>. Non lo è, dunque l'albero <b>non</b> è un BST.</p>
+      <p class="warn"><b>Errore tipico:</b> controllare solo i confronti locali con il padre e dimenticare il vincolo globale imposto dagli antenati.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Perché questa proprietà è così potente</h2>
+      <p>Negli alberi binari generici, per cercare un valore potevamo essere costretti a esplorare quasi tutta la struttura. In un BST, invece, ogni confronto con il nodo corrente ci dà informazione utile su quale ramo ha senso seguire.</p>
+      <p>Se sto cercando <code>x</code> e mi trovo su un nodo con chiave <code>k</code>:</p>
+      <ul>
+        <li>se <code>x == k</code>, ho trovato il valore;</li>
+        <li>se <code>x &lt; k</code>, ha senso cercare solo nel sottoalbero sinistro;</li>
+        <li>se <code>x &gt; k</code>, ha senso cercare solo nel sottoalbero destro.</li>
+      </ul>
+      <p>Questo è il vero guadagno concettuale del BST: l'albero non va più esplorato alla cieca, ma interrogato seguendo la logica dell'ordinamento.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>L'inordine produce una sequenza ordinata</h2>
+      <p>Una proprietà fondamentale del BST è questa: se visito il BST in <b>inordine</b>, ottengo le chiavi in ordine crescente. Questo fatto collega direttamente la struttura dati alla visita studiata nelle pagine precedenti.</p>
+      <p>Prendiamo l'esempio valido di prima:</p>
+<pre><code>            10
+          /    \
+         5      18
+        / \    /  \
+       2   7  12  25
+</code></pre>
+      <p>La visita inordine produce:</p>
+<pre><code class="language-text">2 5 7 10 12 18 25</code></pre>
+      <p>Questo è un risultato molto importante. Significa che il BST non serve solo a cercare: serve anche a mantenere dati <b>ordinati</b> pur lasciandoli in una struttura dinamica.</p>
+      <p class="ok"><b>Da ricordare bene:</b> albero binario di ricerca + visita inordine = sequenza ordinata.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Ricerca ricorsiva: la forma più naturale</h2>
+      <p>La versione ricorsiva della ricerca in un BST è molto elegante, perché traduce direttamente la definizione della struttura.</p>
+<pre><code class="language-cpp">Node* search(Node* p, int x) {
+    if (p == nullptr) return nullptr;
+
+    if (x == p-&gt;key) return p;
+    if (x &lt; p-&gt;key) return search(p-&gt;left, x);
+    return search(p-&gt;right, x);
+}</code></pre>
+      <p>Questa funzione va letta come un piccolo dialogo logico con l'albero:</p>
+      <ul>
+        <li>se l'albero è vuoto, la chiave non c'è;</li>
+        <li>se la chiave coincide con quella del nodo corrente, la ricerca finisce;</li>
+        <li>se la chiave cercata è più piccola, tutto il sottoalbero destro diventa irrilevante;</li>
+        <li>se è più grande, tutto il sottoalbero sinistro diventa irrilevante.</li>
+      </ul>
+      <p>Questo taglio netto dei rami è ciò che rende il BST concettualmente più efficiente di un albero binario generico.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Tracing della ricerca su un esempio</h2>
+      <p>Usiamo ancora questo BST:</p>
+<pre><code>            10
+          /    \
+         5      18
+        / \    /  \
+       2   7  12  25
+</code></pre>
+      <p>Supponiamo di cercare il valore <code>12</code>.</p>
+      <ol>
+        <li>parto da <code>10</code>: poiché <code>12 &gt; 10</code>, vado a destra;</li>
+        <li>arrivo a <code>18</code>: poiché <code>12 &lt; 18</code>, vado a sinistra;</li>
+        <li>arrivo a <code>12</code>: trovato.</li>
+      </ol>
+      <p>Il punto importante non è solo che il valore viene trovato. È che <b>non</b> ho dovuto visitare i nodi <code>5</code>, <code>2</code>, <code>7</code>, <code>25</code>. L'ordinamento dell'albero mi ha permesso di escludere interi sottoalberi con un semplice confronto.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Ricerca iterativa: stessa logica, senza ricorsione</h2>
+      <p>La stessa idea può essere scritta anche in forma iterativa. Dal punto di vista concettuale non cambia nulla: cambia solo il fatto che il movimento nell'albero è espresso con un ciclo anziché con chiamate ricorsive.</p>
+<pre><code class="language-cpp">Node* searchIter(Node* p, int x) {
+    while (p != nullptr) {
+        if (x == p-&gt;key) return p;
+        if (x &lt; p-&gt;key) p = p-&gt;left;
+        else            p = p-&gt;right;
+    }
+    return nullptr;
+}</code></pre>
+      <p>Questa versione è utile perché mostra che il cuore dell'algoritmo non è la ricorsione in sé, ma la decisione "sinistra o destra?" guidata dal confronto. La ricorsione resta però molto espressiva e didatticamente limpida.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Ricerca in un BST contro ricerca in un albero generico</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Struttura</th>
+            <th>Idea di ricerca</th>
+            <th>Conseguenza</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Albero binario generico</td>
+            <td>Posso essere costretto a esplorare entrambi i sottoalberi</td>
+            <td>Ricerca "cieca"</td>
+          </tr>
+          <tr>
+            <td>BST</td>
+            <td>Ogni confronto elimina subito un ramo</td>
+            <td>Ricerca guidata dall'ordine</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Questa tabella riassume il salto di qualità. Il BST non è semplicemente "un altro albero": è un albero in cui l'ordine delle chiavi fornisce struttura all'algoritmo.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Minimo e massimo in un BST</h2>
+      <p>La proprietà d'ordine del BST rende semplici anche altre operazioni fondamentali. Per trovare il <b>minimo</b> basta seguire sempre il figlio sinistro finché possibile; per trovare il <b>massimo</b> basta seguire sempre il figlio destro.</p>
+<pre><code class="language-cpp">Node* findMin(Node* p) {
+    if (p == nullptr) return nullptr;
+    while (p-&gt;left != nullptr) p = p-&gt;left;
+    return p;
+}
+
+Node* findMax(Node* p) {
+    if (p == nullptr) return nullptr;
+    while (p-&gt;right != nullptr) p = p-&gt;right;
+    return p;
+}</code></pre>
+      <p>Queste funzioni sono importanti anche per la cancellazione, perché il minimo del sottoalbero destro e il massimo del sottoalbero sinistro giocano un ruolo chiave nei casi con due figli.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Predecessore e successore: un primo cenno</h2>
+      <p>In un BST ha senso parlare di <b>predecessore</b> e <b>successore</b> di una chiave, cioè del valore immediatamente precedente o immediatamente successivo nell'ordinamento. Non sviluppiamo ancora l'algoritmo completo in tutti i dettagli, ma è importante capire l'idea:</p>
+      <ul>
+        <li>il <b>successore</b> di un nodo è il più piccolo valore maggiore di quel nodo;</li>
+        <li>il <b>predecessore</b> è il più grande valore minore di quel nodo.</li>
+      </ul>
+      <p>Questi concetti contano perché ci aiutano a ragionare sull'ordine e saranno utili, soprattutto, nella cancellazione di un nodo con due figli.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Complessità intuitiva: dipende dall'altezza</h2>
+      <p>La ricerca in un BST non dipende tanto dal numero totale dei nodi, quanto dall'<b>altezza</b> dell'albero. Ogni confronto fa scendere di un livello, quindi il numero di passi è legato a quanti livelli devo percorrere prima di trovare la chiave o arrivare a un puntatore nullo.</p>
+      <p>Se l'albero è "ben distribuito", la ricerca tende a essere rapida. Se invece l'albero è molto sbilanciato, la ricerca può degradare parecchio. Questo è un punto decisivo, che riprenderemo più avanti quando parleremo di degenerazione e alberi bilanciati.</p>
+      <p class="note"><b>Per ora basta l'intuizione:</b> più l'albero è alto, più strada devo fare per cercare.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Errori tipici da evitare</h2>
+      <ul>
+        <li><b>Controllare solo i figli immediati.</b> La proprietà BST riguarda tutti i nodi dei sottoalberi, non solo i figli.</li>
+        <li><b>Confondere albero binario con BST.</b> Ogni BST è un albero binario, ma non ogni albero binario è un BST.</li>
+        <li><b>Dimenticare il caso base.</b> Se arrivo a <code>nullptr</code>, la chiave non è presente.</li>
+        <li><b>Usare una DFS generica quando non serve.</b> In un BST la ricerca deve sfruttare l'ordine, non visitare entrambi i rami alla cieca.</li>
+      </ul>
+      <p>Questi errori sembrano semplici, ma sono proprio quelli che confondono di più quando si inizia a implementare davvero la struttura.</p>
+    </div>
+
+    <div class="inner-box box">
+      <h2>Punti chiave da fissare</h2>
+      <p>Se questa lezione è stata capita bene, dovresti aver fissato questi punti:</p>
+      <ul>
+        <li>un BST è un albero binario con una proprietà d'ordine globale sui sottoalberi;</li>
+        <li>la visita inordine di un BST produce i valori già ordinati;</li>
+        <li>la ricerca non esplora l'albero alla cieca, ma sceglie il ramo coerente con il confronto;</li>
+        <li>minimo e massimo si ottengono seguendo sempre, rispettivamente, sinistra e destra;</li>
+        <li>l'efficienza delle operazioni dipende dall'altezza dell'albero.</li>
+      </ul>
+      <p>Con queste idee in mano, siamo pronti a fare il passo successivo: vedere come si inserisce una nuova chiave mantenendo corretta la proprietà del BST.</p>
+    </div>
+
+    <div class="inner-box note">
+      <b>Sintesi finale.</b> Un BST è un albero binario ordinato: ogni nodo separa il sottoalbero sinistro da quello destro in base al valore della chiave. Questa proprietà trasforma la ricerca in una discesa guidata, permette all'inordine di produrre una sequenza ordinata e rende naturali operazioni come minimo e massimo. Nella <strong>Lez6_7</strong> useremo la stessa logica per costruire l'inserimento.
+    </div>
+
+  </div>
+
+  <div class="nav-buttons">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>
