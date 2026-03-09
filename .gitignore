@@ -1,0 +1,33 @@
+# Generated visual test artifacts
+_visual_test/
+tools/
+PIANO_VERIFICA_CORSO_SLIDE.md
+REPORT_VERIFICA.md
+
+# Node / JavaScript dependencies and logs
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+
+# Editor / IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS-generated files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary / backup files
+*.tmp
+*.temp
+*.bak
+*.orig
+*~
