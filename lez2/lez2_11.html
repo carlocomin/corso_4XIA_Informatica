@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.11 · Collezioni di record</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:73.33%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
+  <ul>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html" class="active" aria-current="page">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html">L2.15 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 11/15</p>
+    <h1>Collezioni di record</h1>
+    <p class="lead">Un array o un vector di struct rappresenta un archivio omogeneo: ogni elemento è un record completo.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_10.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_12.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Se <code>classe</code> è una collezione di studenti, <code>classe[i]</code> è uno <code>Studente</code> e <code>classe[i].media</code> seleziona un suo campo.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Array di struct</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · dimensione fissa</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+struct Studente {
+    int matricola;
+    std::string nome;
+    double media;
+};
+
+int main() {
+    Studente classe[3] = {
+        {1001, "Ada", 9.4},
+        {1002, "Alan", 8.1},
+        {1003, "Grace", 9.7}
+    };
+
+    classe[1].media = 8.5;
+
+    for (const Studente&amp; s : classe) {
+        std::cout &lt;&lt; s.nome &lt;&lt; ": " &lt;&lt; s.media &lt;&lt; '\n';
+    }
+}</code></pre>
+      </figure>
+      <p>Nel ciclo range-based, <code>s</code> è un riferimento costante al record corrente: non copiamo gli studenti e non possiamo modificarli.</p>
+    </section>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Indice</h2>
+        <p>Usa <code>classe[i]</code> quando ti serve la posizione, devi confrontare elementi o devi restituire un indice.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Range-based for</h2>
+        <p>Usa <code>for (const Studente&amp; s : classe)</code> quando vuoi leggere tutti gli elementi senza occuparti dell’indice.</p>
+      </article>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Estensione C++ · Numero di record variabile</summary>
+      <div class="answer">
+        <figure class="code-example">
+          <figcaption>C++17 · std::vector</figcaption>
+<pre><code class="language-cpp">#include &lt;vector&gt;
+
+int main() {
+    std::vector&lt;Studente&gt; classe{
+        {1001, "Ada", 9.4},
+        {1002, "Alan", 8.5}
+    };
+
+    classe.push_back({1003, "Grace", 9.7});
+}</code></pre>
+        </figure>
+        <p><code>vector</code> può crescere durante l’esecuzione e mantiene gli oggetti in una sequenza contigua. L’accesso <code>classe[i].campo</code> resta invariato.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 10 · 12 minuti</span>
+      <h2>Media della classe</h2>
+      <p>Calcola la media delle medie dei tre studenti. Ripeti usando prima un ciclo con indice e poi un range-based <code>for</code>.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> attraversiamo una collezione per cercare, contare e scegliere record.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_10.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_12.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

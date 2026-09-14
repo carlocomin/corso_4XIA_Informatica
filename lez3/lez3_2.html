@@ -1,115 +1,120 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L3.2 · File: testo vs binario</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L3.2 · Testo o binario?</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez3_1.html"; }
-    function nextSlide(){ window.location.href = "lez3_3.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:12.50%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 3 - File I/O (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+  <h2>Lezione 3 - File I/O</h2>
   <ul>
-    <li><a href="lez3_1.html">L3.1 - Che cos'e un file</a></li>
-    <li><a href="lez3_2.html" class="active">L3.2 - Testo vs binario</a></li>
-    <li><a href="lez3_3.html">L3.3 - Modello d'I/O e scelte pratiche</a></li>
-    <li><a href="lez3_4.html">L3.4 - CSV e TSV: scrivere e leggere</a></li>
-    <li><a href="lez3_5.html">L3.5 - Robustezza: escape, locale, round-trip</a></li>
-    <li><a href="lez3_6.html">L3.6 - Binario: modello base</a></li>
-    <li><a href="lez3_7.html">L3.7 - Read e write in C++ e C</a></li>
-    <li><a href="lez3_8.html">L3.8 - Seek e cursore nei file binari</a></li>
-    <li><a href="lez3_9.html">L3.9 - Perche i seek arbitrari in text mode non sono portabili</a></li>
-    <li><a href="lez3_10.html">L3.10 - Indici per file binari</a></li>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html" class="active" aria-current="page">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
+    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
+    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
+    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
+    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Testo vs binario</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · File I/O · 2/16</p>
+    <h1>Testo o binario?</h1>
+    <p class="lead">La scelta non dipende dall’estensione del nome: dipende dal modo in cui decidiamo di interpretare i byte.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_1.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_3.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Capire che la scelta tra file testuale e file binario non e una preferenza estetica, ma una decisione progettuale.</p>
-      <p class="ok"><b>Idea chiave:</b> il testo privilegia leggibilita e interoperabilita; il binario privilegia compattezza, velocita e accesso casuale.</p>
-    </div>
 
-    <div class="inner-box box">
-      <h2>Che cos'e un file testuale</h2>
-      <p>In un file testuale i byte rappresentano caratteri secondo una codifica, per esempio UTF-8.</p>
-      <ul>
-        <li>si puo aprire con un editor e capire il contenuto a occhio;</li>
-        <li>si presta bene a log, configurazioni, CSV e scambio con altri strumenti;</li>
-        <li>richiede parsing: leggere i byte non basta, bisogna anche interpretarli.</li>
-      </ul>
-    </div>
+    <section class="concept-card">
+      <h2>Due rappresentazioni, due priorità</h2>
+      <p>Un file testuale codifica caratteri; un file binario segue un formato di byte definito dal programma o da uno standard.</p>
+      <p><strong>Idea chiave:</strong> il testo favorisce leggibilità e scambio; il binario può favorire compattezza e accesso diretto, ma richiede un contratto più preciso.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Che cos'e un file binario</h2>
-      <p>In un file binario i byte vengono organizzati dal programma in un formato piu vicino alla struttura dei dati.</p>
-      <ul>
-        <li>non e pensato per essere letto a occhio;</li>
-        <li>puo essere piu piccolo e piu veloce da leggere o scrivere;</li>
-        <li>si presta meglio ad accesso casuale, record fissi e indici.</li>
-      </ul>
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <span class="badge">Testo</span>
+        <h2><code>studenti.txt</code></h2>
+        <ol class="file-sheet compact" aria-label="Esempio testuale">
+          <li><code>1001;Ada;8.5</code></li>
+          <li><code>1002;Alan;7.0</code></li>
+        </ol>
+        <p>È ispezionabile con un editor e richiede parsing per ricostruire numeri e record.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge extra">Binario</span>
+        <h2><code>studenti.bin</code></h2>
+        <div class="byte-strip" aria-label="Esempio concettuale di byte">
+          <span>53</span><span>54</span><span>55</span><span>31</span><span>02</span><span>00</span>
+        </div>
+        <p>Non è pensato per la lettura a occhio; struttura e significato dipendono dal formato.</p>
+      </article>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Confronto rapido</h2>
-      <table>
-        <tr><th>Criterio</th><th>Testo</th><th>Binario</th></tr>
-        <tr><td>Leggibilita umana</td><td>Alta</td><td>Bassa</td></tr>
-        <tr><td>Compattezza</td><td>Media o bassa</td><td>Alta</td></tr>
-        <tr><td>Parsing</td><td>Necessario</td><td>Spesso piu diretto</td></tr>
-        <tr><td>Accesso casuale</td><td>Scomodo</td><td>Molto naturale</td></tr>
-        <tr><td>Scambio con tool esterni</td><td>Ottimo</td><td>Dipende dal formato</td></tr>
-      </table>
-    </div>
+    <section class="topic-card">
+      <h2>Confronto ragionato</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Criterio</th><th>Testo</th><th>Binario</th></tr></thead>
+          <tbody>
+            <tr><td>Leggibilità umana</td><td>Alta</td><td>Bassa</td></tr>
+            <tr><td>Scambio con altri strumenti</td><td>Spesso semplice</td><td>Serve conoscere il formato</td></tr>
+            <tr><td>Conversione dei numeri</td><td>Necessaria</td><td>Dipende dal formato</td></tr>
+            <tr><td>Accesso a posizioni calcolate</td><td>Scomodo</td><td>Naturale con record fissi</td></tr>
+            <tr><td>Portabilità</td><td>Buona con regole chiare</td><td>Va progettata esplicitamente</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout warning"><strong>Attenzione:</strong> “binario” non significa automaticamente più piccolo o più veloce. Il risultato dipende dal formato e dall’uso.</div>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Regola pratica di scelta</h2>
-      <ul>
-        <li>usa <b>testo</b> quando vuoi file ispezionabili, semplici da esportare e comodi per debug;</li>
-        <li>usa <b>binario</b> quando ti servono prestazioni, dimensioni ridotte o accesso diretto a record e offset;</li>
-        <li>se il file deve vivere a lungo, pensa al formato prima del codice.</li>
-      </ul>
-    </div>
+    <details class="checkpoint">
+      <summary>Checkpoint · Quale formato sceglieresti?</summary>
+      <div class="answer">
+        <p>Configurazione modificabile a mano: testo. Immagine PNG: binario standard. Registro scolastico da importare in un foglio elettronico: testo tabellare, per esempio CSV.</p>
+      </div>
+    </details>
 
-    <div class="inner-box warn">
-      <b>Errore tipico:</b> scegliere il binario solo perche "sembra piu professionale". Se poi non definisci il formato con cura, hai solo spostato il problema.
-    </div>
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 2</span>
+      <h2>Motiva la scelta</h2>
+      <p>Scegli testo o binario per un log, un salvataggio di gioco e un elenco di contatti. Per ogni caso indica il criterio decisivo, non soltanto il formato scelto.</p>
+    </section>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L3.3</strong> vediamo il ciclo generale di lavoro con i file: aprire, controllare errori, leggere o scrivere, chiudere e scegliere le modalita corrette.
-    </div>
+    <aside class="next-step"><strong>Prossimo passo.</strong> Indipendentemente dal formato, il lavoro con un file segue sempre lo stesso ciclo.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_1.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_3.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

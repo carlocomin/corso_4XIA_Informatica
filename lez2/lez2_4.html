@@ -1,113 +1,132 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L2.4 · Struct: inizializzare in C</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.4 · Leggere e modificare i campi</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez2_3.html"; }
-    function nextSlide(){ window.location.href = "lez2_5.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:26.67%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
   <ul>
-    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
-    <li><a href="lez2_2.html">L2.2 - Sintassi minima e accesso ai membri</a></li>
-    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
-    <li><a href="lez2_4.html" class="active">L2.4 - Inizializzare in C</a></li>
-    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
-    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
-    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
-    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
-    <li><a href="lez2_9.html">L2.9 - Lambda, ordinamento e filtro</a></li>
-    <li><a href="lez2_10.html">L2.10 - Layout, padding e serializzazione raw</a></li>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html" class="active" aria-current="page">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html">L2.15 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Inizializzare in C</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 4/15</p>
+    <h1>Leggere e modificare i campi</h1>
+    <p class="lead">L’input di un record deve rispettare il tipo dei singoli campi e lasciare l’oggetto in uno stato valido.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_3.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_5.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Capire come inizializzare bene una <code>struct</code> in C, senza trasferire in modo automatico abitudini del C++ che qui non esistono.</p>
-      <p class="ok"><b>Idea chiave:</b> in C le <code>struct</code> si inizializzano bene, ma bisogna essere piu espliciti, soprattutto quando compaiono array di <code>char</code> e designated initializers.</p>
-    </div>
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Leggere una <code>struct</code> significa leggere i suoi campi uno alla volta. Dopo l’input, il record va controllato come un’unica entità.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Struct d'esempio</h2>
-<pre><code class="language-c">typedef struct {
-    char nome[32];
-    char cognome[32];
-    int eta;
+    <section class="topic-card">
+      <h2>Input completo in C++</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · nome con spazi e controllo della media</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;limits&gt;
+#include &lt;string&gt;
+
+struct Studente {
+    int matricola;
+    std::string nome;
     double media;
-} Studente;
-</code></pre>
-      <p>Qui non hai <code>std::string</code>, quindi le stringhe sono buffer di caratteri con terminatore <code>'\0'</code>. Questo cambia il modo in cui ragioni su capienza e inizializzazione.</p>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Lista in ordine dei campi</h2>
-<pre><code class="language-c">Studente s = { "Ada", "Lovelace", 17, 9.4 };
-</code></pre>
-      <p>Come in C++, l'ordine conta. Ma qui il messaggio didattico importante e un altro: le stringhe vengono copiate dentro gli array della <code>struct</code>, non gestite da un oggetto dinamico.</p>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Designated initializers</h2>
-<pre><code class="language-c">Studente s = {
-    .cognome = "Lovelace",
-    .nome = "Ada",
-    .media = 9.4,
-    .eta = 17
 };
-</code></pre>
-      <p>Questa forma e didatticamente molto utile in C, perche rende il codice meno fragile rispetto all'ordine dei campi.</p>
-    </div>
 
-    <div class="inner-box box">
-      <h2>Inizializzazione parziale e azzeramento</h2>
-<pre><code class="language-c">Studente s1 = { "Grace" };
-Studente s2 = {0};
-</code></pre>
-      <p><code>{0}</code> e una scorciatoia importante: ti permette di partire da una struct completamente azzerata. In C, per le variabili automatiche, questo e spesso il modo piu sicuro per evitare valori spazzatura.</p>
-    </div>
+int main() {
+    Studente s{};
 
-    <div class="inner-box warn">
-      <b>Errore tipico:</b> trattare le stringhe C come se fossero oggetti elastiche come <code>std::string</code>. Qui serve sempre attenzione alla capienza del buffer.
-    </div>
+    if (!(std::cin &gt;&gt; s.matricola)) {
+        std::cerr &lt;&lt; "Matricola non valida\n";
+        return 1;
+    }
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L2.5</strong> raccogliamo gli errori piu frequenti e li trasformiamo in una checklist chiara, cosi il confronto tra C++ e C non resta un elenco di casi ma diventa un criterio pratico di lavoro.
-    </div>
+    std::cin.ignore(
+        std::numeric_limits&lt;std::streamsize&gt;::max(), '\n'
+    );
+    if (!std::getline(std::cin, s.nome) || s.nome.empty()) {
+        std::cerr &lt;&lt; "Nome non valido\n";
+        return 1;
+    }
+
+    if (!(std::cin &gt;&gt; s.media) || s.media &lt; 0 || s.media &gt; 10) {
+        std::cerr &lt;&lt; "Media non valida\n";
+        return 1;
+    }
+
+    std::cout &lt;&lt; s.matricola &lt;&lt; " | "
+              &lt;&lt; s.nome &lt;&lt; " | " &lt;&lt; s.media &lt;&lt; '\n';
+}</code></pre>
+      </figure>
+    </section>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2><code>&gt;&gt;</code></h2>
+        <p>È adatto ai numeri e alle parole singole. Lascia però il carattere di fine riga nello stream.</p>
+      </article>
+      <article class="topic-card">
+        <h2><code>getline</code></h2>
+        <p>Legge l’intera riga, quindi conserva gli spazi. Prima eliminiamo il fine riga lasciato dalla lettura precedente.</p>
+      </article>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Trova il problema · Perché il nome può risultare vuoto?</summary>
+      <div class="answer">
+        <p>Se chiami subito <code>getline</code> dopo <code>std::cin &gt;&gt; s.matricola</code>, <code>getline</code> consuma il <code>'\n'</code> già presente. Serve prima <code>ignore</code>, come nell’esempio.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 3 · 10 minuti</span>
+      <h2>Un prodotto valido</h2>
+      <p>Leggi codice, descrizione con spazi, quantità e prezzo di un <code>Prodotto</code>. Rifiuta quantità negative e prezzo minore o uguale a zero; stampa poi una riga riepilogativa.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> confrontiamo la stessa idea con le stringhe a capienza fissa del C.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_3.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_5.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

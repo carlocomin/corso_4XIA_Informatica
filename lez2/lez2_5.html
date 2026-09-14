@@ -1,106 +1,140 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L2.5 · Struct: errori tipici e checklist</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.5 · La stessa idea in C</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez2_4.html"; }
-    function nextSlide(){ window.location.href = "lez2_6.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:33.33%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
   <ul>
-    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
-    <li><a href="lez2_2.html">L2.2 - Sintassi minima e accesso ai membri</a></li>
-    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
-    <li><a href="lez2_4.html">L2.4 - Inizializzare in C</a></li>
-    <li><a href="lez2_5.html" class="active">L2.5 - Errori tipici e checklist</a></li>
-    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
-    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
-    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
-    <li><a href="lez2_9.html">L2.9 - Lambda, ordinamento e filtro</a></li>
-    <li><a href="lez2_10.html">L2.10 - Layout, padding e serializzazione raw</a></li>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html" class="active" aria-current="page">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html">L2.15 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Errori tipici e checklist</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 5/15</p>
+    <h1>La stessa idea in C</h1>
+    <p class="lead">Il record resta lo stesso concetto, ma le stringhe diventano array di char e richiedono operazioni esplicite.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_4.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_6.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Chiudere il blocco iniziale sulle <code>struct</code> con una diagnostica rapida: dove si sbaglia piu spesso e come evitare gli errori senza imparare regole isolate a memoria.</p>
-      <p class="ok"><b>Idea chiave:</b> quasi tutti gli errori di base sulle <code>struct</code> nascono da uno di questi tre problemi: inizializzazione poco chiara, confusione tra C e C++, oppure mancata attenzione al tipo reale dei campi.</p>
-    </div>
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>In C una stringa dentro una <code>struct</code> è normalmente un array di <code>char</code> con capienza fissa e terminatore <code>'\0'</code>. Non si comporta come <code>std::string</code>.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Errore 1: usare campi non inizializzati</h2>
-      <p>Una <code>struct</code> ben definita ma lasciata in uno stato indeterminato resta comunque pericolosa. Il caso tipico e leggere subito un <code>int</code> o un <code>double</code> senza averlo mai inizializzato.</p>
-      <p class="warn"><b>Diagnosi rapida:</b> se vedi una dichiarazione nuda seguita da accessi immediati ai campi, controlla subito se manca un'inizializzazione esplicita.</p>
-    </div>
+    <section class="topic-card">
+      <h2>Definizione e inizializzazione</h2>
+      <figure class="code-example">
+        <figcaption>C11 · designated initializer</figcaption>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
 
-    <div class="inner-box box">
-      <h2>Errore 2: sbagliare l'ordine negli aggregate</h2>
-      <p>Le inizializzazioni in lista sono potenti, ma se l'ordine dei valori non corrisponde all'ordine dei campi, il compilatore spesso non ti salva. In C questo rischio si riduce con i designated initializers; in C++ conviene essere ancora piu disciplinati.</p>
-    </div>
+typedef struct {
+    int matricola;
+    char nome[40];
+    double media;
+} Studente;
 
-    <div class="inner-box box">
-      <h2>Errore 3: confondere stringhe C e stringhe C++</h2>
-      <ul>
-        <li>in C++ <code>std::string</code> gestisce memoria e lunghezza;</li>
-        <li>in C una stringa e un array di <code>char</code> con capienza fissa.</li>
-      </ul>
-      <p>Lo stesso esempio visivo puo quindi nascondere problemi molto diversi nei due linguaggi.</p>
-    </div>
+int main(void) {
+    Studente s = {
+        .matricola = 1001,
+        .nome = "Ada Lovelace",
+        .media = 9.4
+    };
 
-    <div class="inner-box box">
-      <h2>Errore 4: pensare che il confronto C/C++ sia sempre simmetrico</h2>
-      <p>Lo scopo del confronto non e duplicare ogni tecnica in due lingue, ma capire il modello. Se una soluzione C++ e piu naturale e quella C e solo un richiamo tecnico, non serve dare loro lo stesso peso didattico.</p>
-    </div>
+    printf("%d | %s | %.1f\n",
+           s.matricola, s.nome, s.media);
+    return 0;
+}</code></pre>
+      </figure>
+      <p>I designated initializers del C99 associano ogni valore al nome del campo. L’ordine scritto non deve necessariamente coincidere con quello della definizione.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Regola pratica: checklist finale</h2>
-      <ul>
-        <li>ho dato subito alla <code>struct</code> uno stato chiaro?</li>
-        <li>sto rispettando l'ordine dei campi se uso un aggregate initializer?</li>
-        <li>so se sto lavorando con <code>std::string</code> o con <code>char[]</code>?</li>
-        <li>la differenza tra <code>.</code> e <code>-&gt;</code> mi e chiara?</li>
-        <li>sto scegliendo il linguaggio principale della spiegazione, o sto solo mettendo due versioni affiancate senza gerarchia?</li>
-      </ul>
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>All’inizializzazione</h2>
+        <figure class="code-example">
+          <figcaption>C11 · consentito</figcaption>
+<pre><code class="language-c">Studente s = {
+    1001,
+    "Ada",
+    9.4
+};</code></pre>
+        </figure>
+        <p>Il letterale inizializza direttamente l’array <code>nome</code>.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Dopo la dichiarazione</h2>
+        <figure class="code-example">
+          <figcaption>C11 · copia controllata</figcaption>
+<pre><code class="language-c">snprintf(s.nome, sizeof s.nome,
+         "%s", "Grace Hopper");</code></pre>
+        </figure>
+        <p>Un array non è assegnabile: <code>s.nome = "Grace";</code> è errato.</p>
+      </article>
+    </section>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L2.6</strong> passiamo al comportamento delle <code>struct</code> quando entrano nelle funzioni: copia, riferimento, puntatore e costo delle diverse scelte.
-    </div>
+    <div class="callout warning"><strong>Capienza:</strong> il campo può contenere al massimo 39 caratteri utili più <code>'\0'</code>. <code>snprintf</code> evita di scrivere oltre il buffer, ma un testo troppo lungo viene troncato.</div>
+
+    <details class="checkpoint">
+      <summary>Confronto rapido · C++ e C</summary>
+      <div class="answer">
+        <table>
+          <thead><tr><th>Aspetto</th><th>C++</th><th>C</th></tr></thead>
+          <tbody>
+            <tr><td>Nome del tipo</td><td><code>Studente</code></td><td><code>Studente</code> grazie a <code>typedef</code></td></tr>
+            <tr><td>Stringa</td><td><code>std::string</code></td><td><code>char nome[40]</code></td></tr>
+            <tr><td>Assegnazione successiva</td><td><code>s.nome = "Ada";</code></td><td>serve una copia controllata</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 4 · 10 minuti</span>
+      <h2>Record C per il magazzino</h2>
+      <p>Definisci <code>Prodotto</code> con codice, descrizione di 50 caratteri, quantità e prezzo. Inizializza un prodotto con nomi di campo e stampalo controllando i formati di <code>printf</code>.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> osserviamo che cosa accade quando un record viene passato per valore.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_4.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_6.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

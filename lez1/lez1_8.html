@@ -1,99 +1,131 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L1.8 · Matrici 2D: perche la firma conta</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.8 · Matrici nelle funzioni C</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez1_7.html"; }
-    function nextSlide(){ window.location.href = "lez1_9.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:57.14%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
   <ul>
-    <li><a href="lez1_1.html">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
-    <li><a href="lez1_2.html">L1.2 - Definizioni e indici</a></li>
-    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
-    <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
-    <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
-    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
-    <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
-    <li><a href="lez1_8.html" class="active">L1.8 - Perche la firma conta</a></li>
-    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
-    <li><a href="lez1_10.html">L1.10 - Matrici dinamiche</a></li>
-    <li><a href="lez1_11.html">L1.11 - Operazioni classiche e chiusura</a></li>
+    <li><a href="lez1_1.html">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html" class="active" aria-current="page">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html">L1.14 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Perche la firma conta</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 8/14</p>
+    <h1>Matrici nelle funzioni C</h1>
+    <p class="lead">In C, quando una matrice è un parametro, la funzione deve conoscere la lunghezza di ogni riga per calcolare correttamente m[r][c].</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_7.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_9.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Per una matrice statica, la forma più semplice è fissare il numero di colonne e passare separatamente il numero di righe usate.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Capire il motivo concettuale per cui passare una matrice a funzione non funziona come passare un semplice intero o un array 1D "qualsiasi".</p>
-      <p class="ok"><b>Idea chiave:</b> per accedere correttamente a <code>a[r][c]</code>, la funzione deve sapere come sono organizzate le righe in memoria. Senza questa informazione, il compilatore non sa calcolare il passo giusto.</p>
-    </div>
+    <section class="topic-card">
+      <h2>Una firma standard e leggibile</h2>
+      <figure class="code-example">
+        <figcaption>C11 · numero di colonne noto</figcaption>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
 
-    <div class="inner-box box">
-      <h2>Che cosa decade davvero</h2>
-      <p>Quando passi una matrice <code>T a[R][C]</code> a una funzione, non stai passando "l'intera tabella per magia". Dal punto di vista del tipo, la matrice decade a un puntatore al suo primo elemento. E il primo elemento non e un singolo <code>T</code>, ma una <b>riga</b> di tipo <code>T[C]</code>.</p>
-      <p>Quindi il tipo concettuale e:</p>
-<pre><code class="language-text">T (*)[C]
-</code></pre>
-      <p>Questa notazione sembra tecnica, ma racconta una cosa semplice: la funzione deve conoscere la lunghezza di una riga.</p>
-    </div>
+enum { C = 3 };
 
-    <div class="inner-box box">
-      <h2>Perche la seconda dimensione e decisiva</h2>
-      <p>Per trovare la cella <code>(r,c)</code>, il programma usa una formula del tipo <code>r*C + c</code>. Se <code>C</code> non e noto in modo coerente, il calcolo dell'indirizzo diventa ambiguo.</p>
-      <p>Non e quindi una stravaganza del linguaggio: e una conseguenza diretta del modello row-major.</p>
-    </div>
+void stampa(int righe, const int m[][C]) {
+    for (int r = 0; r &lt; righe; ++r) {
+        for (int c = 0; c &lt; C; ++c)
+            printf("%4d", m[r][c]);
+        putchar('\n');
+    }
+}
 
-    <div class="inner-box box">
-      <h2>Che cosa succede se ragioni male sul tipo</h2>
-      <ul>
-        <li>usi una firma incompatibile e il compilatore protesta;</li>
-        <li>oppure forzi il codice in una direzione sbagliata e perdi contiguita, chiarezza o sicurezza;</li>
-        <li>oppure confondi una vera matrice contigua con una struttura di puntatori a righe.</li>
-      </ul>
-      <p class="warn"><b>Errore tipico:</b> pensare che <code>int**</code> sia "la forma naturale" di una matrice. Non lo e per una matrice statica contigua.</p>
-    </div>
+int main(void) {
+    int dati[2][C] = {{1, 2, 3}, {4, 5, 6}};
+    stampa(2, dati);
+    return 0;
+}</code></pre>
+      </figure>
+      <p>La prima dimensione può essere omessa nel parametro; <code>C</code> no, perché determina il passo necessario per raggiungere la riga successiva.</p>
+    </section>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L1.9</strong> trasformiamo questo modello mentale in firme corrette: prima in C++, poi nel confronto con il C.
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Il tipo effettivo</h2>
+        <p>Nel parametro, <code>m[][C]</code> viene trattato come puntatore a una riga di <code>C</code> interi:</p>
+        <div class="formula">const int (*)[C]</div>
+      </article>
+      <article class="topic-card">
+        <h2>Non è <code>int**</code></h2>
+        <p>Una matrice <code>int dati[R][C]</code> è un unico blocco di righe contigue. <code>int**</code> descrive invece un puntatore a puntatore: è un tipo diverso e non può ricevere correttamente <code>dati</code>.</p>
+      </article>
+    </section>
 
+    <details class="checkpoint">
+      <summary>Estensione C99 · Dimensioni determinate a runtime</summary>
+      <div class="answer">
+        <figure class="code-example">
+          <figcaption>C99 · variable length array</figcaption>
+<pre><code class="language-c">void stampa(size_t R, size_t C, const int m[R][C]) {
+    for (size_t r = 0; r &lt; R; ++r)
+        for (size_t c = 0; c &lt; C; ++c)
+            printf("%d ", m[r][c]);
+}</code></pre>
+        </figure>
+        <p>I VLA appartengono al C, non al C++ standard, e il loro supporto può dipendere dalla versione e dal compilatore. Per il ripasso di base manteniamo <code>C</code> costante.</p>
+      </div>
+    </details>
+
+    <details class="checkpoint">
+      <summary>Controllo rapido · Quale firma accetta <code>int a[4][3]</code>?</summary>
+      <div class="answer">
+        <p><code>void f(int righe, const int m[][3])</code> è compatibile. <code>void f(int **m)</code> e <code>void f(int righe, const int m[][4])</code> non lo sono.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 6 · 8 minuti</span>
+      <h2>Completa la funzione C</h2>
+      <p>Scrivi <code>int conta_zeri(int righe, const int m[][C])</code>. Verificala con una matrice di 2 righe, 3 colonne e almeno due zeri.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> applichiamo la visita completa al pattern più comune, l’accumulazione.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
-
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_7.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_9.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

@@ -1,121 +1,132 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L1.7 · Matrici 2D: utility e input robusto</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.7 · Matrici nelle funzioni C++</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez1_6.html"; }
-    function nextSlide(){ window.location.href = "lez1_8.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:50.00%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
   <ul>
-    <li><a href="lez1_1.html">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
-    <li><a href="lez1_2.html">L1.2 - Definizioni e indici</a></li>
-    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
-    <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
-    <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
-    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
-    <li><a href="lez1_7.html" class="active">L1.7 - Utility e input robusto</a></li>
-    <li><a href="lez1_8.html">L1.8 - Perche la firma conta</a></li>
-    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
-    <li><a href="lez1_10.html">L1.10 - Matrici dinamiche</a></li>
-    <li><a href="lez1_11.html">L1.11 - Operazioni classiche e chiusura</a></li>
+    <li><a href="lez1_1.html">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html" class="active" aria-current="page">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html">L1.14 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Utility e input robusto</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 7/14</p>
+    <h1>Matrici nelle funzioni C++</h1>
+    <p class="lead">La firma di una funzione deve dire quante colonne contiene ogni riga e se la funzione può modificare la matrice.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_6.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_8.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>In C++ un riferimento a matrice conserva nel tipo entrambe le dimensioni. Aggiungere <code>const</code> comunica che la funzione può leggere, ma non modificare, le celle.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Passare da funzioni minime a funzioni davvero riusabili: azzerare, riempire, stampare con una forma leggibile e non bloccarsi al primo input sbagliato.</p>
-      <p class="ok"><b>Idea chiave:</b> una piccola libreria di utility semplici fa risparmiare piu tempo di quanto faccia una lunga demo nel <code>main</code>.</p>
-    </div>
+    <section class="topic-card">
+      <h2>Due funzioni, due intenzioni</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · modifica e sola lettura</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
 
-    <div class="inner-box box">
-      <h2>Tre utility che conviene avere subito</h2>
-<pre><code class="language-cpp">void azzera(int (&a)[R][C]){
-  for (int r = 0; r &lt; R; ++r)
-    for (int c = 0; c &lt; C; ++c)
-      a[r][c] = 0;
+constexpr int R = 2;
+constexpr int C = 3;
+
+void azzera(int (&amp;m)[R][C]) {
+    for (int r = 0; r &lt; R; ++r)
+        for (int c = 0; c &lt; C; ++c)
+            m[r][c] = 0;
 }
 
-void riempiCostante(int (&a)[R][C], int v){
-  for (int r = 0; r &lt; R; ++r)
-    for (int c = 0; c &lt; C; ++c)
-      a[r][c] = v;
+int somma(const int (&amp;m)[R][C]) {
+    int totale = 0;
+    for (int r = 0; r &lt; R; ++r)
+        for (int c = 0; c &lt; C; ++c)
+            totale += m[r][c];
+    return totale;
 }
-</code></pre>
-      <p>Non sembrano funzioni "importanti", ma servono continuamente in test, esercizi e debugging.</p>
-    </div>
 
-    <div class="inner-box box">
-      <h2>Rendere la stampa piu leggibile</h2>
-      <p>Una matrice stampata bene aiuta a capire subito se il programma sta facendo quello che deve fare. Se vuoi una forma un po' piu ordinata, puoi introdurre intestazioni o larghezze fisse.</p>
-<pre><code class="language-cpp">void stampaConIndici(const int (&a)[R][C]){
-  for (int r = 0; r &lt; R; ++r){
-    std::cout &lt;&lt; r &lt;&lt; ": ";
-    for (int c = 0; c &lt; C; ++c)
-      std::cout &lt;&lt; a[r][c] &lt;&lt; ' ';
-    std::cout &lt;&lt; '\n';
-  }
-}
-</code></pre>
-      <p>Questo e gia sufficiente per molti esercizi scolastici: non serve sempre una tabella perfetta, serve soprattutto una stampa coerente.</p>
-    </div>
+int main() {
+    int dati[R][C] = {{1, 2, 3}, {4, 5, 6}};
+    std::cout &lt;&lt; somma(dati) &lt;&lt; '\n';  // 21
+    azzera(dati);
+}</code></pre>
+      </figure>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Input robusto: che cosa significa davvero</h2>
-      <p>Significa non assumere che l'utente scriva sempre il dato corretto al primo colpo. In un esercizio iniziale puo bastare controllare l'esito della lettura; in un programma un po' piu serio conviene anche ripulire lo stream e ripetere la richiesta.</p>
-<pre><code class="language-cpp">while (!(std::cin &gt;&gt; a[r][c])) {
-  std::cin.clear();
-  std::cin.ignore(100000, '\n');
-  std::cout &lt;&lt; "Valore non valido, riprova: ";
-}
-</code></pre>
-    </div>
+    <section class="three-col">
+      <article class="topic-card">
+        <h2><code>&amp;m</code></h2>
+        <p>La funzione riceve la matrice originale tramite riferimento, senza trasformarla in un altro tipo.</p>
+      </article>
+      <article class="topic-card">
+        <h2><code>[R][C]</code></h2>
+        <p>Le dimensioni fanno parte del tipo accettato dalla funzione.</p>
+      </article>
+      <article class="topic-card">
+        <h2><code>const</code></h2>
+        <p>Impedisce modifiche accidentali nelle funzioni di sola lettura.</p>
+      </article>
+    </section>
 
-    <div class="inner-box warn">
-      <b>Regola pratica:</b> separa sempre la logica della matrice dalla logica di interazione con l'utente. Una funzione che "calcola" non dovrebbe anche chiedere input o stampare messaggi casuali.
-    </div>
+    <details class="checkpoint">
+      <summary>Una forma più leggibile · Alias di tipo</summary>
+      <div class="answer">
+        <figure class="code-example">
+          <figcaption>C++17</figcaption>
+<pre><code class="language-cpp">using Matrice = int[R][C];
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L1.8</strong> affrontiamo un punto in cui si sbaglia spesso: passare una matrice a funzione. Qui entra in gioco il modello di memoria, non solo la sintassi.
-    </div>
+void azzera(Matrice&amp; m);
+int somma(const Matrice&amp; m);</code></pre>
+        </figure>
+        <p><code>using</code> assegna un nome al tipo della matrice. Non crea una nuova rappresentazione e non cambia il comportamento del programma.</p>
+      </div>
+    </details>
 
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 5 · 6 minuti</span>
+      <h2>Scegli la firma</h2>
+      <p>Scrivi soltanto la firma di tre funzioni: <code>stampa</code>, <code>riempi</code> e <code>contaPositivi</code>. Quali parametri devono essere <code>const</code>? Motiva ogni scelta con “legge” oppure “modifica”.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> vediamo perché in C la seconda dimensione deve essere esplicita.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
-
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_6.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_8.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

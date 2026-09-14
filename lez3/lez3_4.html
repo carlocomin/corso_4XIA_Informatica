@@ -1,130 +1,129 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L3.4 · CSV e TSV: scrivere e leggere</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L3.4 · Scrivere testo in C++</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez3_3.html"; }
-    function nextSlide(){ window.location.href = "lez3_5.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:25.00%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 3 - File I/O (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+  <h2>Lezione 3 - File I/O</h2>
   <ul>
-    <li><a href="lez3_1.html">L3.1 - Che cos'e un file</a></li>
-    <li><a href="lez3_2.html">L3.2 - Testo vs binario</a></li>
-    <li><a href="lez3_3.html">L3.3 - Modello d'I/O e scelte pratiche</a></li>
-    <li><a href="lez3_4.html" class="active">L3.4 - CSV e TSV: scrivere e leggere</a></li>
-    <li><a href="lez3_5.html">L3.5 - Robustezza: escape, locale, round-trip</a></li>
-    <li><a href="lez3_6.html">L3.6 - Binario: modello base</a></li>
-    <li><a href="lez3_7.html">L3.7 - Read e write in C++ e C</a></li>
-    <li><a href="lez3_8.html">L3.8 - Seek e cursore nei file binari</a></li>
-    <li><a href="lez3_9.html">L3.9 - Perche i seek arbitrari in text mode non sono portabili</a></li>
-    <li><a href="lez3_10.html">L3.10 - Indici per file binari</a></li>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html" class="active" aria-current="page">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
+    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
+    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
+    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
+    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>CSV e TSV: scrivere e leggere</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · File I/O · 4/16</p>
+    <h1>Scrivere testo in C++</h1>
+    <p class="lead">Uno stream di output usa gli stessi operatori di <code>std::cout</code>, ma invia i caratteri a un file.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_3.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_5.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Vedere il flusso base del lavoro con file testuali organizzati in righe e colonne.</p>
-      <p class="ok"><b>Idea chiave:</b> con CSV e TSV non leggi "record gia pronti": leggi righe di testo e poi le trasformi in campi.</p>
-    </div>
 
-    <div class="inner-box box">
-      <h2>Che cos'e un CSV</h2>
-      <p>Un file CSV contiene righe. Ogni riga rappresenta un record e ogni campo e separato da un delimitatore.</p>
-      <ul>
-        <li>nel corso useremo spesso <code>;</code> come separatore CSV;</li>
-        <li>in un TSV il separatore e il tab;</li>
-        <li>la prima riga puo contenere l'header con i nomi delle colonne.</li>
-      </ul>
-    </div>
+    <section class="concept-card">
+      <h2>Dai valori ai caratteri</h2>
+      <p><code>std::ofstream</code> converte i valori in testo e li scrive in sequenza.</p>
+      <p><strong>Idea chiave:</strong> il programma deve decidere esplicitamente separatori e terminatori di riga, perché saranno il contratto della lettura.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Modello operativo corretto</h2>
-      <ol>
-        <li>apri il file in modalita testuale;</li>
-        <li>leggi una riga alla volta;</li>
-        <li>spezza la riga nei campi;</li>
-        <li>converti i campi nei tipi richiesti;</li>
-        <li>costruisci il record logico, per esempio una <code>struct</code>.</li>
-      </ol>
-      <p>Questo schema evita di confondere lettura fisica del file e interpretazione dei dati.</p>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Esempio minimo in C++</h2>
+    <figure class="code-example">
+      <figcaption>C++17 · programma completo</figcaption>
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;iostream&gt;
-#include &lt;string&gt;
 
-int main(){
-    std::ifstream in("studenti.csv");
-    if(!in){
-        std::cerr &lt;&lt; "Errore apertura\n";
+int main() {
+    std::ofstream out("voti.txt");
+    if (!out) {
+        std::cerr &lt;&lt; "Errore di apertura\n";
         return 1;
     }
 
-    std::string riga;
-    while(std::getline(in, riga)){
-        std::cout &lt;&lt; riga &lt;&lt; "\n";
+    out &lt;&lt; "Ada 9.0\n";
+    out &lt;&lt; "Alan 7.5\n";
+    out &lt;&lt; "Grace 10.0\n";
+
+    out.close();
+    if (!out) {
+        std::cerr &lt;&lt; "Errore di scrittura\n";
+        return 2;
     }
-}
-</code></pre>
-      <p>Qui stiamo ancora leggendo solo righe. La divisione in colonne arriva dopo.</p>
-    </div>
+}</code></pre>
+    </figure>
 
-    <div class="inner-box box">
-      <h2>Scrittura: la logica e simmetrica</h2>
-      <p>Per scrivere un CSV fai il percorso opposto:</p>
-      <ol>
-        <li>prendi il record logico;</li>
-        <li>trasformi i campi in testo;</li>
-        <li>li unisci con un separatore;</li>
-        <li>scrivi la riga nel file.</li>
-      </ol>
-      <p>Questa simmetria tra scrittura e lettura sara importante nella prossima slide, quando parleremo di <em>round-trip</em>.</p>
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Risultato: <code>voti.txt</code></h2>
+        <ol class="file-sheet compact" aria-label="Contenuto del file voti">
+          <li><code>Ada 9.0</code></li>
+          <li><code>Alan 7.5</code></li>
+          <li><code>Grace 10.0</code></li>
+        </ol>
+      </article>
+      <article class="topic-card">
+        <h2>Sovrascrivere o aggiungere?</h2>
+        <p>L’apertura precedente ricrea il contenuto. La chiamata a <code>close()</code> forza la conclusione della scrittura prima del controllo finale. Per aggiungere in fondo:</p>
+        <figure class="code-example">
+          <figcaption>C++17 · frammento contestuale</figcaption>
+<pre><code class="language-cpp">std::ofstream out(
+    "voti.txt",
+    std::ios::app
+);</code></pre>
+        </figure>
+      </article>
+    </section>
 
-    <div class="inner-box warn">
-      <b>Errore tipico:</b> usare <code>operator&gt;&gt;</code> come se il CSV fosse una semplice sequenza di valori separati da spazi. Con i file a colonne conviene ragionare per righe e parsing esplicito.
-    </div>
+    <details class="checkpoint">
+      <summary>Checkpoint · Quanti caratteri di fine riga vengono scritti?</summary>
+      <div class="answer">
+        <p>Tre: ogni istruzione termina con <code>\n</code>. Senza separatori, i record finirebbero attaccati e sarebbero più difficili da rileggere.</p>
+      </div>
+    </details>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L3.5</strong> vediamo perche il CSV reale e meno banale di quanto sembri: virgolette, separatori interni, CRLF e locale numerica.
-    </div>
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 4</span>
+      <h2>Tabella dei quadrati</h2>
+      <p>Scrivi in <code>quadrati.txt</code> i numeri da 1 a 10 e il relativo quadrato, una coppia per riga. Controlla sia apertura sia scrittura.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Rileggiamo dati semplici usando l’estrazione formattata.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_3.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_5.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

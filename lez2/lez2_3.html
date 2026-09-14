@@ -1,112 +1,137 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L2.3 · Struct: inizializzare bene in C++</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.3 · Inizializzare senza sorprese</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez2_2.html"; }
-    function nextSlide(){ window.location.href = "lez2_4.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:20.00%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
   <ul>
-    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
-    <li><a href="lez2_2.html">L2.2 - Sintassi minima e accesso ai membri</a></li>
-    <li><a href="lez2_3.html" class="active">L2.3 - Inizializzare bene in C++</a></li>
-    <li><a href="lez2_4.html">L2.4 - Inizializzare in C</a></li>
-    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
-    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
-    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
-    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
-    <li><a href="lez2_9.html">L2.9 - Lambda, ordinamento e filtro</a></li>
-    <li><a href="lez2_10.html">L2.10 - Layout, padding e serializzazione raw</a></li>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_3.html" class="active" aria-current="page">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html">L2.15 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Inizializzare bene in C++</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 3/15</p>
+    <h1>Inizializzare senza sorprese</h1>
+    <p class="lead">Una struct raccoglie più campi: basta lasciarne uno senza valore per introdurre un errore difficile da riconoscere.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_2.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_4.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Capire come far nascere una <code>struct</code> in uno stato sensato e sicuro.</p>
-      <p class="ok"><b>Idea chiave:</b> in C++ le <code>{}</code> non sono solo una convenzione elegante: sono spesso il modo piu chiaro e piu sicuro di inizializzare una <code>struct</code>.</p>
-    </div>
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Le parentesi graffe permettono di inizializzare tutti i campi in modo esplicito oppure di portarli a uno stato iniziale noto.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Valori indeterminati vs stato noto</h2>
-<pre><code class="language-cpp">struct Studente {
+    <section class="topic-card">
+      <h2>Tre dichiarazioni diverse</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · confronta gli stati iniziali</figcaption>
+<pre><code class="language-cpp">#include &lt;string&gt;
+
+struct Studente {
+    int matricola;
     std::string nome;
-    std::string cognome;
-    int eta;
     double media;
 };
 
-Studente a;   // eta e media non sono automaticamente azzerati
-Studente b{}; // eta = 0, media = 0.0, stringhe vuote
-</code></pre>
-      <p>Il punto importante non e ricordare un dettaglio sintattico, ma evitare di leggere campi fondamentali prima di aver dato loro un valore sensato.</p>
-    </div>
+int main() {
+    Studente a;                    // numeri indeterminati
+    Studente b{};                  // 0, stringa vuota, 0.0
+    Studente c{1001, "Ada", 9.4}; // tutti i campi espliciti
+}</code></pre>
+      </figure>
+      <p>Dentro <code>main</code>, in <code>a</code> il campo <code>nome</code> è una stringa vuota perché viene costruita; <code>matricola</code> e <code>media</code> hanno invece valori indeterminati e non devono essere letti.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Aggregate initialization</h2>
-<pre><code class="language-cpp">Studente s{"Ada", "Lovelace", 17, 9.4};
-</code></pre>
-      <p>Quando usi una lista di inizializzazione per una <code>struct</code> semplice, i valori seguono l'ordine dei campi. Questo e potente, ma richiede disciplina: se sbagli ordine, costruisci un bug silenzioso.</p>
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Lista completa</h2>
+        <p>I valori seguono l’ordine dei campi nella definizione:</p>
+        <div class="formula">{ matricola, nome, media }</div>
+      </article>
+      <article class="topic-card">
+        <h2>Lista parziale</h2>
+        <figure class="code-example">
+          <figcaption>C++17</figcaption>
+<pre><code class="language-cpp">Studente d{1004, "Grace"};</code></pre>
+        </figure>
+        <p>Il campo omesso <code>media</code> viene inizializzato a <code>0.0</code>.</p>
+      </article>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Default dei campi</h2>
+    <details class="checkpoint">
+      <summary>Perché preferire le graffe?</summary>
+      <div class="answer">
+        <p>Oltre a rendere visibile l’inizializzazione, le graffe rifiutano conversioni con perdita di informazione:</p>
+        <figure class="code-example">
+          <figcaption>C++17 · errore di compilazione intenzionale</figcaption>
+<pre><code class="language-cpp">Studente s{1001.7, "Ada", 9.4};
+// 1001.7 non può inizializzare int con le graffe</code></pre>
+        </figure>
+      </div>
+    </details>
+
+    <details class="checkpoint">
+      <summary>Estensione · Valori predefiniti nei campi</summary>
+      <div class="answer">
+        <figure class="code-example">
+          <figcaption>C++17</figcaption>
 <pre><code class="language-cpp">struct Studente {
-    std::string nome = "Anon";
-    std::string cognome = "N/A";
-    int eta = 0;
+    int matricola = 0;
+    std::string nome = "Senza nome";
     double media = 0.0;
-};
-</code></pre>
-      <p>Questa scelta e utile quando vuoi che la <code>struct</code> abbia un valore iniziale ragionevole anche senza specificare tutti i campi.</p>
-    </div>
+};</code></pre>
+        </figure>
+        <p>I valori predefiniti documentano uno stato iniziale valido e vengono usati quando l’inizializzatore non fornisce quel campo.</p>
+      </div>
+    </details>
 
-    <div class="inner-box box">
-      <h2>Braces e narrowing</h2>
-<pre><code class="language-cpp">int x(3.7);  // conversione implicita a 3
-int y{3.7}; // errore: narrowing
-</code></pre>
-      <p>Le <code>{}</code> rendono piu difficile introdurre conversioni pericolose senza accorgersene. Per questo, nel corso, restano la forma preferita.</p>
-    </div>
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 2 · 6 minuti</span>
+      <h2>Prevedi lo stato</h2>
+      <p>Scrivi i valori dei tre campi dopo <code>Studente x{1200};</code>. Poi costruisci uno studente con matricola 1201, nome “Alan” e media 8.5.</p>
+    </section>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L2.4</strong> facciamo il confronto con il C: stessa esigenza di inizializzare bene, ma strumenti diversi, soprattutto per stringhe e designated initializers.
-    </div>
+    <aside class="next-step"><strong>Prossimo passo:</strong> leggiamo e stampiamo un record completo senza perdere spazi nel nome.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_2.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_4.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

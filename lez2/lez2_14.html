@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.14 · Layout, padding e file</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:93.33%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
+  <ul>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html" class="active" aria-current="page">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html">L2.15 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 14/15</p>
+    <h1>Layout, padding e file</h1>
+    <p class="lead">La struct descrive un record logico, ma il compilatore decide il suo layout fisico rispettando i vincoli della piattaforma.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_13.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_15.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+    <section class="concept-card">
+      <span class="badge extra">Ponte verso i file</span>
+      <h2>Idea chiave</h2>
+      <p>La somma delle dimensioni dei campi non coincide necessariamente con <code>sizeof(struct)</code>: il compilatore può inserire byte di padding per allineare i dati.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Un possibile layout</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · la dimensione va osservata, non indovinata</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+struct Esempio {
+    char flag;
+    int codice;
+    double valore;
+};
+
+int main() {
+    std::cout &lt;&lt; sizeof(Esempio) &lt;&lt; '\n';
+}</code></pre>
+      </figure>
+      <div class="memory-strip" aria-label="Esempio di layout con padding">
+        <div class="memory-cell">flag</div>
+        <div class="memory-cell padding">padding possibile</div>
+        <div class="memory-cell">codice</div>
+        <div class="memory-cell">valore</div>
+      </div>
+      <p>Lo schema è illustrativo: quantità e posizione del padding dipendono da compilatore, architettura e ABI.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Perché il dump raw è fragile</h2>
+      <figure class="code-example">
+        <figcaption>C · fotografia della memoria, non formato stabile</figcaption>
+<pre><code class="language-c">fwrite(&amp;record, sizeof record, 1, file);</code></pre>
+      </figure>
+      <ul class="compact-list">
+        <li>il layout e il padding possono cambiare tra piattaforme;</li>
+        <li>dimensione e rappresentazione dei tipi possono cambiare;</li>
+        <li>l’ordine dei byte dei numeri può essere diverso;</li>
+        <li>un oggetto C++ come <code>std::string</code> contiene stato interno, non il testo in forma portabile.</li>
+      </ul>
+    </section>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Memoria dell’oggetto</h2>
+        <p>È una scelta del compilatore utile mentre il programma è in esecuzione.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Formato del file</h2>
+        <p>È un contratto che dobbiamo definire: campi, ordine, separatori o dimensioni, versione e controlli.</p>
+      </article>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Controllo rapido · Perché è particolarmente errato salvare raw uno Studente C++?</summary>
+      <div class="answer">
+        <p>Perché contiene <code>std::string</code>. I byte dell’oggetto descrivono la rappresentazione interna usata dalla libreria, non una sequenza portabile contenente semplicemente i caratteri del nome.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 13 · Ragionamento</span>
+      <h2>Definisci il formato, non il dump</h2>
+      <p>Proponi una riga testuale per salvare matricola, nome e media. Scegli un separatore e descrivi che cosa accade se il nome contiene proprio quel carattere.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> integriamo modellazione, funzioni e collezioni in un laboratorio finale.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_13.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_15.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

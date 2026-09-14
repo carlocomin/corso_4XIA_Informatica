@@ -1,108 +1,140 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L3.5 · CSV: robustezza, escape, locale, round-trip</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L3.5 · Leggere valori in C++</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez3_4.html"; }
-    function nextSlide(){ window.location.href = "lez3_6.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:31.25%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 3 - File I/O (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+  <h2>Lezione 3 - File I/O</h2>
   <ul>
-    <li><a href="lez3_1.html">L3.1 - Che cos'e un file</a></li>
-    <li><a href="lez3_2.html">L3.2 - Testo vs binario</a></li>
-    <li><a href="lez3_3.html">L3.3 - Modello d'I/O e scelte pratiche</a></li>
-    <li><a href="lez3_4.html">L3.4 - CSV e TSV: scrivere e leggere</a></li>
-    <li><a href="lez3_5.html" class="active">L3.5 - Robustezza: escape, locale, round-trip</a></li>
-    <li><a href="lez3_6.html">L3.6 - Binario: modello base</a></li>
-    <li><a href="lez3_7.html">L3.7 - Read e write in C++ e C</a></li>
-    <li><a href="lez3_8.html">L3.8 - Seek e cursore nei file binari</a></li>
-    <li><a href="lez3_9.html">L3.9 - Perche i seek arbitrari in text mode non sono portabili</a></li>
-    <li><a href="lez3_10.html">L3.10 - Indici per file binari</a></li>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html" class="active" aria-current="page">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
+    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
+    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
+    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
+    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Robustezza: escape, locale, round-trip</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · File I/O · 5/16</p>
+    <h1>Leggere valori in C++</h1>
+    <p class="lead">L’operatore <code>&gt;&gt;</code> separa gli elementi usando gli spazi e prova a convertirli nel tipo della variabile.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_4.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_6.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Capire perche i file testuali apparentemente semplici possono rompersi se non definiamo alcune regole minime.</p>
-      <p class="ok"><b>Idea chiave:</b> un CSV funziona bene solo se scrittura e lettura seguono la stessa convenzione su separatori, virgolette, newline e numeri.</p>
-    </div>
 
-    <div class="inner-box box">
-      <h2>Il problema dei separatori dentro i dati</h2>
-      <p>Se un campo contiene il separatore, una virgoletta o un ritorno a capo, non puo essere scritto in modo "grezzo".</p>
-      <p>Per questo si usano le regole di escape:</p>
-      <ul>
-        <li>racchiudi il campo tra virgolette;</li>
-        <li>raddoppia le virgolette interne;</li>
-        <li>mantieni lo stesso separatore in scrittura e in lettura.</li>
-      </ul>
-    </div>
+    <section class="concept-card">
+      <h2>Lettura formattata</h2>
+      <p>Come con <code>std::cin</code>, lo stream salta gli spazi iniziali, legge un token e lo converte.</p>
+      <p><strong>Idea chiave:</strong> l’operazione di lettura stessa dice se un record completo è stato acquisito.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>CRLF, LF e righe vuote</h2>
-      <p>Un file prodotto su Windows puo usare <code>\r\n</code>, mentre su Linux e macOS e tipico <code>\n</code>.</p>
-      <ul>
-        <li>se leggi per righe, spesso devi ripulire un eventuale <code>\r</code> finale;</li>
-        <li>conviene decidere se ignorare righe vuote e commenti;</li>
-        <li>queste scelte vanno rese esplicite nel parser.</li>
-      </ul>
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>File atteso</h2>
+        <ol class="file-sheet compact" aria-label="Contenuto del file voti">
+          <li><code>Ada 9.0</code></li>
+          <li><code>Alan 7.5</code></li>
+          <li><code>Grace 10.0</code></li>
+        </ol>
+        <p>In questo formato il nome è un solo token: non può contenere spazi.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Una lettura, due campi</h2>
+        <div class="stream-map" aria-label="Dal file alle variabili">
+          <span class="io-node">file</span>
+          <span class="io-arrow" aria-hidden="true">&#8594;</span>
+          <span class="io-node"><code>nome</code></span>
+          <span class="io-node"><code>voto</code></span>
+        </div>
+        <p>Se manca il voto o non è numerico, l’estrazione del record fallisce.</p>
+      </article>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Locale numerica</h2>
-      <p>Il formato dei numeri puo cambiare con la locale del sistema. Alcuni ambienti usano la virgola come separatore decimale.</p>
-      <p class="warn"><b>Regola pratica:</b> se il file deve essere condiviso, scegli una convenzione stabile e documentata, per esempio punto decimale e UTF-8.</p>
-    </div>
+    <figure class="code-example">
+      <figcaption>C++17 · media dei valori letti</figcaption>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
 
-    <div class="inner-box box">
-      <h2>Che cosa significa round-trip</h2>
-      <p>Un formato e affidabile se un record scritto dal programma puo essere riletto dallo stesso programma senza perdere informazione importante.</p>
-      <p>In altre parole: <b>scrivo - leggo - ottengo lo stesso dato logico</b>.</p>
-      <p>Questo e il test concettuale piu utile per capire se il parser e la serializzazione sono coerenti.</p>
-    </div>
+int main() {
+    std::ifstream in("voti.txt");
+    if (!in) return 1;
 
-    <div class="inner-box warn">
-      <b>Errore tipico:</b> fare test solo con dati "puliti" come nomi senza spazi, senza separatori e senza virgolette. In quel caso sembra funzionare tutto, ma non hai verificato il caso reale.
-    </div>
+    std::string nome;
+    double voto;
+    double somma = 0.0;
+    int quanti = 0;
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L3.6</strong> cambiamo prospettiva: lasciamo il parsing testuale e vediamo che cosa significa lavorare direttamente con file binari.
-    </div>
+    while (in &gt;&gt; nome &gt;&gt; voto) {
+        somma += voto;
+        ++quanti;
+    }
+
+    if (in.bad()) {
+        std::cerr &lt;&lt; "Errore durante la lettura\n";
+        return 2;
+    }
+
+    if (!in.eof()) {
+        std::cerr &lt;&lt; "Record non valido\n";
+        return 3;
+    }
+
+    if (quanti &gt; 0)
+        std::cout &lt;&lt; somma / quanti &lt;&lt; '\n';
+}</code></pre>
+    </figure>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Perché la condizione contiene entrambe le estrazioni?</summary>
+      <div class="answer">
+        <p>Il corpo deve essere eseguito soltanto quando nome e voto appartengono a un record completo. Una lettura parziale non deve essere elaborata.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 5</span>
+      <h2>Minimo e massimo</h2>
+      <p>Modifica il programma per stampare nome e voto dello studente con risultato minimo e massimo. Gestisci anche il file vuoto.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Quando gli spazi fanno parte dei dati, il token non basta: serve leggere un’intera riga.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_4.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_6.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

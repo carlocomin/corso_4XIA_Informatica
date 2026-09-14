@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.12 · Simmetria e metà matrice</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:85.71%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
+  <ul>
+    <li><a href="lez1_1.html">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html" class="active" aria-current="page">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html">L1.14 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 12/14</p>
+    <h1>Simmetria e metà matrice</h1>
+    <p class="lead">Una matrice è simmetrica se ogni cella coincide con la cella riflessa rispetto alla diagonale principale.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_11.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_13.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Per controllare la simmetria basta confrontare <code>m[r][c]</code> con <code>m[c][r]</code> sopra la diagonale. La metà inferiore contiene gli stessi confronti in ordine inverso.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Una matrice simmetrica</h2>
+      <div class="matrix-wrap">
+        <table class="matrix-table">
+          <tbody>
+            <tr><td>2</td><td class="diag-secondary">4</td><td class="focus">7</td></tr>
+            <tr><td class="diag-secondary">4</td><td>1</td><td>5</td></tr>
+            <tr><td class="focus">7</td><td>5</td><td>3</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Le coppie <code>(0,2)</code> e <code>(2,0)</code> contengono entrambe 7. Sulla diagonale ogni elemento sarebbe confrontato con sé stesso, quindi possiamo escluderla.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Algoritmo con uscita anticipata</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · visita sopra la diagonale</figcaption>
+<pre><code class="language-cpp">constexpr int N = 3;
+
+bool simmetrica(const int (&amp;m)[N][N]) {
+    for (int r = 0; r &lt; N; ++r) {
+        for (int c = r + 1; c &lt; N; ++c) {
+            if (m[r][c] != m[c][r])
+                return false;
+        }
+    }
+    return true;
+}</code></pre>
+      </figure>
+      <p>Non appena troviamo una coppia diversa, abbiamo già la risposta e possiamo terminare la funzione.</p>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Estensione · Riconoscere una matrice triangolare superiore</summary>
+      <div class="answer">
+        <p>Una matrice è triangolare superiore se tutte le celle <strong>sotto</strong> la diagonale sono zero. La zona da verificare soddisfa <code>r &gt; c</code>.</p>
+        <figure class="code-example">
+          <figcaption>Condizione essenziale</figcaption>
+<pre><code class="language-cpp">if (r &gt; c &amp;&amp; m[r][c] != 0)
+    return false;</code></pre>
+        </figure>
+      </div>
+    </details>
+
+    <details class="checkpoint">
+      <summary>Controllo rapido · Quanti confronti servono con N = 4?</summary>
+      <div class="answer">
+        <p>Servono 6 confronti: 3 nella riga 0, 2 nella riga 1, 1 nella riga 2 e nessuno nell’ultima. Una visita completa ne farebbe 16.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 10 · 15 minuti</span>
+      <h2>Completa il terzetto</h2>
+      <p>Scrivi le funzioni <code>triangolareSuperiore</code> e <code>triangolareInferiore</code>. Per ciascuna, evidenzia su carta la zona che deve essere zero prima di scrivere i cicli.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> come estensione, gestiamo dimensioni conosciute soltanto durante l’esecuzione.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_11.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_13.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

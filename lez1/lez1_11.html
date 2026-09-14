@@ -1,114 +1,129 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L1.11 · Matrici 2D: operazioni classiche e chiusura</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.11 · Diagonali e traccia</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez1_10.html"; }
-    function nextSlide(){ window.location.href = "../lez2/lez2_1.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:78.57%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
   <ul>
-    <li><a href="lez1_1.html">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
-    <li><a href="lez1_2.html">L1.2 - Definizioni e indici</a></li>
-    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
-    <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
-    <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
-    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
-    <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
-    <li><a href="lez1_8.html">L1.8 - Perche la firma conta</a></li>
-    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
-    <li><a href="lez1_10.html">L1.10 - Matrici dinamiche</a></li>
-    <li><a href="lez1_11.html" class="active">L1.11 - Operazioni classiche e chiusura</a></li>
+    <li><a href="lez1_1.html">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html" class="active" aria-current="page">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html">L1.14 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Operazioni classiche e chiusura</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 11/14</p>
+    <h1>Diagonali e traccia</h1>
+    <p class="lead">In una matrice quadrata le diagonali selezionano una cella per riga: non serve visitare l’intera matrice.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_10.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_12.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>La diagonale principale usa <code>m[i][i]</code>; la secondaria usa <code>m[i][N - 1 - i]</code>. Entrambe esistono come diagonali complete quando la matrice è <code>N × N</code>.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Chiudere il ripasso applicando il modello della matrice a problemi tipici: somme, diagonali, simmetria e triangolarita.</p>
-      <p class="ok"><b>Idea chiave:</b> questi esercizi non sono "trucchetti da ricordare", ma casi in cui si vede se hai davvero interiorizzato indici, cicli annidati e struttura della matrice.</p>
-    </div>
+    <section class="topic-card">
+      <h2>Segui gli indici</h2>
+      <div class="matrix-wrap">
+        <table class="matrix-table">
+          <thead><tr><th></th><th>c=0</th><th>c=1</th><th>c=2</th></tr></thead>
+          <tbody>
+            <tr><th>r=0</th><td class="diag-main">1</td><td>2</td><td class="diag-secondary">3</td></tr>
+            <tr><th>r=1</th><td>4</td><td class="diag-both">5</td><td>6</td></tr>
+            <tr><th>r=2</th><td class="diag-secondary">7</td><td>8</td><td class="diag-main">9</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Giallo: principale. Verde: secondaria. Il centro appartiene a entrambe perché <code>N</code> è dispari.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Somme per riga e per colonna</h2>
-      <p>Il pattern corretto e semplice: inizializzi i vettori delle somme a zero e poi aggiorni tutto durante una sola scansione completa.</p>
-<pre><code class="language-cpp">for (int r = 0; r &lt; R; ++r)
-  sr[r] = 0;
-for (int c = 0; c &lt; C; ++c)
-  sc[c] = 0;
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Traccia</h2>
+        <p>È la somma della diagonale principale.</p>
+        <figure class="code-example">
+          <figcaption>C++17</figcaption>
+<pre><code class="language-cpp">constexpr int N = 3;
 
-for (int r = 0; r &lt; R; ++r)
-  for (int c = 0; c &lt; C; ++c){
-    sr[r] += a[r][c];
-    sc[c] += a[r][c];
-  }
-</code></pre>
-      <p class="warn"><b>Errore tipico:</b> dimenticare l'azzeramento iniziale e accumulare su valori gia presenti.</p>
-    </div>
+int traccia(const int (&amp;m)[N][N]) {
+    int somma = 0;
+    for (int i = 0; i &lt; N; ++i)
+        somma += m[i][i];
+    return somma;
+}</code></pre>
+        </figure>
+      </article>
+      <article class="topic-card">
+        <h2>Secondaria</h2>
+        <p>La colonna diminuisce mentre la riga aumenta.</p>
+        <figure class="code-example">
+          <figcaption>C++17</figcaption>
+<pre><code class="language-cpp">constexpr int N = 3;
 
-    <div class="inner-box box">
-      <h2>Diagonali e traccia</h2>
-      <p>Quando la matrice e quadrata, la diagonale principale usa gli indici <code>(i,i)</code>. La diagonale secondaria usa <code>(i, N-1-i)</code>. La <b>traccia</b> e la somma degli elementi della diagonale principale.</p>
-      <p>Il punto concettuale e che qui non serve piu una scansione completa: basta una sola variabile di indice.</p>
-    </div>
+int sommaSecondaria(const int (&amp;m)[N][N]) {
+    int somma = 0;
+    for (int i = 0; i &lt; N; ++i)
+        somma += m[i][N - 1 - i];
+    return somma;
+}</code></pre>
+        </figure>
+      </article>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Simmetria e triangolarita</h2>
-      <p>Per verificare se una matrice quadrata e simmetrica, non serve confrontare tutto con tutto. Basta lavorare su mezza matrice, per esempio sopra la diagonale principale.</p>
-      <p>Lo stesso vale per triangolare superiore e inferiore: il test si concentra sulla zona che <i>dovrebbe</i> essere tutta zero.</p>
-      <p class="note"><b>Messaggio importante:</b> capire il problema strutturalmente permette spesso di evitare lavoro inutile.</p>
-    </div>
+    <div class="callout warning"><strong>Errore frequente:</strong> scrivere <code>m[i][N-i]</code>. Per <code>i = 0</code> si tenterebbe di accedere alla colonna <code>N</code>, che è fuori limite.</div>
 
-    <div class="inner-box box">
-      <h2>Sintesi finale della lezione</h2>
-      <ul>
-        <li>una matrice e una struttura con due indici e un layout di memoria preciso;</li>
-        <li>in C e C++ la rappresentazione statica segue il modello row-major;</li>
-        <li>ordine dei cicli, firme delle funzioni e rappresentazioni dinamiche dipendono da questo modello;</li>
-        <li>gli esercizi classici su matrici servono a verificare se il modello e diventato operativo.</li>
-      </ul>
-    </div>
+    <details class="checkpoint">
+      <summary>Controllo rapido · Calcola senza eseguire</summary>
+      <div class="answer">
+        <p>Nella matrice mostrata, la traccia vale <code>1 + 5 + 9 = 15</code>; la somma della secondaria vale <code>3 + 5 + 7 = 15</code>.</p>
+      </div>
+    </details>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>Lezione 2</strong> cambiamo oggetto ma non metodo: passeremo alle <strong>struct</strong>, ancora con l'obiettivo di capire bene prima il modello mentale e poi la sintassi utile.
-    </div>
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 9 · 8 minuti</span>
+      <h2>Sotto e sopra la diagonale</h2>
+      <p>Conta quanti elementi positivi si trovano strettamente sopra la diagonale principale. Quale relazione tra <code>r</code> e <code>c</code> identifica quella zona?</p>
+    </section>
 
+    <aside class="next-step"><strong>Prossimo passo:</strong> confrontiamo celle speculari visitando soltanto metà matrice.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
-
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_10.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_12.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

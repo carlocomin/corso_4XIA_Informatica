@@ -1,106 +1,130 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L2.10 · Struct: layout, padding e perche non serializzare raw</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.10 · Restituire una struct</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez2_9.html"; }
-    function nextSlide(){ window.location.href = "../lez3/lez3_1.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:66.67%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
   <ul>
-    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
-    <li><a href="lez2_2.html">L2.2 - Sintassi minima e accesso ai membri</a></li>
-    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
-    <li><a href="lez2_4.html">L2.4 - Inizializzare in C</a></li>
-    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
-    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
-    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
-    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
-    <li><a href="lez2_9.html">L2.9 - Lambda, ordinamento e filtro</a></li>
-    <li><a href="lez2_10.html" class="active">L2.10 - Layout, padding e serializzazione raw</a></li>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html" class="active" aria-current="page">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html">L2.15 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Layout, padding e perche non serializzare raw</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 10/15</p>
+    <h1>Restituire una struct</h1>
+    <p class="lead">Un record creato dentro una funzione può essere restituito per valore in modo semplice e sicuro.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_9.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_11.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Chiudere la lezione mostrando che una <code>struct</code> non e solo un concetto logico, ma anche un oggetto con un layout fisico in memoria.</p>
-      <p class="ok"><b>Idea chiave:</b> il layout reale di una <code>struct</code> dipende da padding, allineamento e ABI. Per questo "scrivere i byte cosi come sono" non equivale a definire un formato file affidabile.</p>
-    </div>
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Se la funzione costruisce un nuovo oggetto, restituiscilo per valore. Il chiamante riceve un oggetto valido con un proprio lifetime.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Che cosa sono padding e allineamento</h2>
-      <p>Il compilatore puo inserire byte aggiuntivi tra i campi o alla fine della <code>struct</code> per rispettare i vincoli di allineamento della piattaforma.</p>
-<pre><code class="language-cpp">struct A {
-    char c;
-    int x;
+    <section class="topic-card">
+      <h2>Creare e restituire un record</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · restituzione sicura per valore</figcaption>
+<pre><code class="language-cpp">#include &lt;string&gt;
+
+struct Studente {
+    int matricola;
+    std::string nome;
+    double media;
 };
-</code></pre>
-      <p>La somma "visiva" dei campi non coincide necessariamente con <code>sizeof(A)</code>.</p>
-    </div>
 
-    <div class="inner-box box">
-      <h2>Perche questo conta davvero</h2>
-      <ul>
-        <li>due compilatori o due ABI diverse possono disporre i campi in modo differente;</li>
-        <li>i byte di padding possono non avere un contenuto significativo;</li>
-        <li>un confronto raw con <code>memcmp</code> puo risultare fragile;</li>
-        <li>un file salvato come dump della memoria puo diventare illeggibile o ambiguo altrove.</li>
-      </ul>
-    </div>
+Studente creaStudente(int matricola,
+                       const std::string&amp; nome,
+                       double media) {
+    return Studente{matricola, nome, media};
+}
 
-    <div class="inner-box box">
-      <h2>Perche non conviene serializzare una struct raw</h2>
-      <p>Se fai qualcosa del tipo:</p>
-<pre><code class="language-c">fwrite(&s, sizeof s, 1, f);
-</code></pre>
-      <p>non stai salvando un "record ben definito". Stai salvando una fotografia della memoria in quella build, su quella piattaforma, con quei vincoli. E non e la stessa cosa.</p>
-      <p class="warn"><b>Errore tipico:</b> pensare che "funziona sul mio PC" significhi "ho definito un formato corretto". In realta hai solo verificato un caso locale.</p>
-    </div>
+int main() {
+    Studente ada = creaStudente(1001, "Ada", 9.4);
+}</code></pre>
+      </figure>
+      <p>I compilatori moderni possono eliminare copie superflue. Non serve restituire un riferimento per rendere questa operazione efficiente.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>La scelta giusta</h2>
-      <p>Se vuoi un formato stabile, scrivi i campi in modo esplicito: ordine dei campi deciso, tipi a dimensione nota, eventuale gestione dell'endianness. In altre parole, devi definire un formato, non limitarti a versare memoria su disco.</p>
-      <p class="note"><b>Ponte verso la prossima lezione:</b> questo e esattamente il motivo per cui in <strong>Lezione 3</strong> parleremo di file come "byte + regole", non come semplice memoria salvata.</p>
-    </div>
+    <details class="checkpoint">
+      <summary>Errore grave · Riferimento a un oggetto locale</summary>
+      <div class="answer">
+        <figure class="code-example">
+          <figcaption>C++17 · codice errato, non imitare</figcaption>
+<pre><code class="language-cpp">const Studente&amp; creaStudenteSbagliato() {
+    Studente temporaneo{1001, "Ada", 9.4};
+    return temporaneo; // riferimento dangling
+}</code></pre>
+        </figure>
+        <p><code>temporaneo</code> viene distrutto alla fine della funzione. Il riferimento restituito non indica più un oggetto esistente e usarlo produce comportamento indefinito.</p>
+      </div>
+    </details>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>Lezione 3</strong> allarghiamo il discorso: che cos'e davvero un file, come si distingue testo da binario e perche il formato e parte del problema, non un dettaglio secondario.
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Nuovo oggetto</h2>
+        <p>Restituisci per valore: <code>Studente crea(...)</code>.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Esito dell’operazione</h2>
+        <p>Se la funzione modifica un oggetto già esistente, può restituire <code>bool</code> per comunicare successo o fallimento.</p>
+      </article>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Controllo rapido · Il puntatore a una variabile locale sarebbe più sicuro?</summary>
+      <div class="answer">
+        <p>No. Anche <code>return &amp;temporaneo;</code> restituirebbe l’indirizzo di un oggetto che smette di esistere alla fine della funzione.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 9 · 10 minuti</span>
+      <h2>Funzione fabbrica per i libri</h2>
+      <p>Scrivi <code>Libro creaLibro(int codice, const std::string&amp; titolo, int pagine)</code>, assumendo come precondizione <code>pagine &gt;= 0</code>. Aggiungi poi una funzione <code>valido</code> che controlli il record restituito.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> passiamo dal singolo record a un archivio di record omogenei.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_9.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_11.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L3.13 · Binario con gli stream C++</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:81.25%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+  <h2>Lezione 3 - File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
+    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
+    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
+    <li><a href="lez3_13.html" class="active" aria-current="page">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
+    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · File I/O · 13/16</p>
+    <h1>Binario con gli stream C++</h1>
+    <p class="lead"><code>read</code> e <code>write</code> copiano byte: il programma resta responsabile del formato e di ogni controllo.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_12.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_14.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Conteggio seguito da valori</h2>
+      <p>Nel prossimo esempio il file contiene un <code>uint32_t</code> con valore 3 e poi tre <code>int32_t</code>.</p>
+      <p><strong>Idea chiave:</strong> lettura e scrittura devono usare stesso ordine, stessi tipi e stesse quantità.</p>
+    </section>
+
+    <figure class="code-example">
+      <figcaption>C++17 · round-trip binario minimo</figcaption>
+<pre><code class="language-cpp">#include &lt;cstdint&gt;
+#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+
+int main() {
+    std::uint32_t conteggio = 3;
+    std::int32_t valori[3]{10, 20, 30};
+
+    std::ofstream out("dati.bin", std::ios::binary);
+    if (!out) return 1;
+
+    out.write(reinterpret_cast&lt;const char*&gt;(&amp;conteggio),
+              sizeof conteggio);
+    out.write(reinterpret_cast&lt;const char*&gt;(valori),
+              sizeof valori);
+    out.close();
+    if (!out) return 2;
+
+    std::ifstream in("dati.bin", std::ios::binary);
+    if (!in) return 3;
+
+    std::uint32_t letti = 0;
+    std::int32_t copia[3]{};
+
+    in.read(reinterpret_cast&lt;char*&gt;(&amp;letti),
+            sizeof letti);
+    if (!in || letti != 3) return 4;
+
+    in.read(reinterpret_cast&lt;char*&gt;(copia),
+            sizeof copia);
+    if (!in) return 5;
+
+    for (std::int32_t valore : copia)
+        std::cout &lt;&lt; valore &lt;&lt; ' ';
+}</code></pre>
+    </figure>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Perché il cast?</h2>
+        <p>L’API dello stream vede una sequenza di caratteri-byte. <code>reinterpret_cast</code> fornisce quella vista senza cambiare l’oggetto originale.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Limite dell’esempio</h2>
+        <p>È adatto a un round-trip nello stesso ambiente. Un formato portabile deve fissare anche ordine dei byte e rappresentazione.</p>
+      </article>
+    </section>
+
+    <div class="callout warning"><strong>Semplificazione intenzionale:</strong> per isolare l’uso di <code>read</code> e <code>write</code>, questo esempio omette magic e versione. In un archivio destinato a durare vanno aggiunti come mostrato nella slide precedente.</div>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Perché controlliamo <code>letti != 3</code> prima del secondo blocco?</summary>
+      <div class="answer">
+        <p>L’array ha capacità tre. Fidarsi di un conteggio arbitrario letto dal file potrebbe causare una lettura oltre i limiti o interpretare un file incompatibile.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 13</span>
+      <h2>Verifica dimensione e contenuto</h2>
+      <p>Cambia i valori, esegui il round-trip e confronta la dimensione del file con <code>sizeof(conteggio) + sizeof(valori)</code>. Prova poi a troncare il file.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Ripetiamo lo stesso formato con <code>fread</code> e <code>fwrite</code>.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_12.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_14.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

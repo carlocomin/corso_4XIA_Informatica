@@ -1,132 +1,136 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L1.6 · Matrici 2D: I/O di base</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.6 · Leggere e stampare</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez1_5.html"; }
-    function nextSlide(){ window.location.href = "lez1_7.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:42.86%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
   <ul>
-    <li><a href="lez1_1.html">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
-    <li><a href="lez1_2.html">L1.2 - Definizioni e indici</a></li>
-    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
-    <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
-    <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
-    <li><a href="lez1_6.html" class="active">L1.6 - I/O di base su matrici</a></li>
-    <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
-    <li><a href="lez1_8.html">L1.8 - Perche la firma conta</a></li>
-    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
-    <li><a href="lez1_10.html">L1.10 - Matrici dinamiche</a></li>
-    <li><a href="lez1_11.html">L1.11 - Operazioni classiche e chiusura</a></li>
+    <li><a href="lez1_1.html">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html" class="active" aria-current="page">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html">L1.14 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>I/O di base su matrici</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 6/14</p>
+    <h1>Leggere e stampare</h1>
+    <p class="lead">L’I/O non introduce un nuovo algoritmo: percorriamo ancora tutte le celle e cambiamo soltanto l’operazione eseguita nel ciclo interno.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_5.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_7.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Una riga della matrice deve corrispondere a una riga dell’output. Una stampa regolare rende immediatamente visibili errori di indici e valori inattesi.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Imparare a leggere e stampare matrici in modo chiaro, senza mescolare logica e improvvisazione. Una buona funzione di I/O rende anche il debug molto piu semplice.</p>
-      <p class="ok"><b>Idea chiave:</b> l'I/O su matrici non e difficile, ma deve essere regolare: stessi cicli, stessi limiti, stessa convenzione di stampa.</p>
-    </div>
+    <section class="topic-card">
+      <h2>Programma completo in C++</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · input controllato e output allineato</figcaption>
+<pre><code class="language-cpp">#include &lt;iomanip&gt;
+#include &lt;iostream&gt;
 
-    <div class="inner-box box">
-      <h2>C++: lettura e stampa minime</h2>
-<pre><code class="language-cpp">constexpr int R = 3;
-constexpr int C = 4;
+int main() {
+    constexpr int R = 2;
+    constexpr int C = 3;
+    int m[R][C]{};
 
-void leggiMatrice(int (&a)[R][C]){
-  for (int r = 0; r &lt; R; ++r)
-    for (int c = 0; c &lt; C; ++c)
-      std::cin &gt;&gt; a[r][c];
-}
+    for (int r = 0; r &lt; R; ++r) {
+        for (int c = 0; c &lt; C; ++c) {
+            std::cout &lt;&lt; "m[" &lt;&lt; r &lt;&lt; "][" &lt;&lt; c &lt;&lt; "] = ";
+            if (!(std::cin &gt;&gt; m[r][c])) {
+                std::cerr &lt;&lt; "Input non valido\n";
+                return 1;
+            }
+        }
+    }
 
-void stampaMatrice(const int (&a)[R][C]){
-  for (int r = 0; r &lt; R; ++r){
-    for (int c = 0; c &lt; C; ++c)
-      std::cout &lt;&lt; a[r][c] &lt;&lt; ' ';
-    std::cout &lt;&lt; '\n';
-  }
-}
-</code></pre>
-      <p>Notare la simmetria: stessi limiti, stessa struttura di cicli. Cambia solo l'azione svolta dentro il corpo.</p>
-    </div>
+    for (int r = 0; r &lt; R; ++r) {
+        for (int c = 0; c &lt; C; ++c) {
+            std::cout &lt;&lt; std::setw(4) &lt;&lt; m[r][c];
+        }
+        std::cout &lt;&lt; '\n';
+    }
+}</code></pre>
+      </figure>
+      <p><code>std::setw(4)</code> riserva quattro caratteri per ogni valore. Il controllo su <code>std::cin</code> evita di proseguire con dati non letti.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>C: confronto essenziale</h2>
-<pre><code class="language-c">#define R 3
-#define C 4
+    <details class="checkpoint">
+      <summary>Confronto mirato · Versione essenziale in C</summary>
+      <div class="answer">
+        <figure class="code-example">
+          <figcaption>C11 · stessa struttura di cicli</figcaption>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
 
-void leggi_matrice(int a[R][C]){
-  for (int r = 0; r &lt; R; ++r)
-    for (int c = 0; c &lt; C; ++c)
-      scanf("%d", &a[r][c]);
-}
+int main(void) {
+    enum { R = 2, C = 3 };
+    int m[R][C] = {0};
 
-void stampa_matrice(const int a[R][C]){
-  for (int r = 0; r &lt; R; ++r){
-    for (int c = 0; c &lt; C; ++c)
-      printf("%d ", a[r][c]);
-    printf("\n");
-  }
-}
-</code></pre>
-      <p>La logica e la stessa. Cambia lo strumento di I/O, non cambia il modello.</p>
-    </div>
+    for (int r = 0; r &lt; R; ++r) {
+        for (int c = 0; c &lt; C; ++c) {
+            if (scanf("%d", &amp;m[r][c]) != 1) {
+                fprintf(stderr, "Input non valido\n");
+                return 1;
+            }
+        }
+    }
 
-    <div class="inner-box box">
-      <h2>Che cosa rende leggibile una stampa</h2>
-      <ul>
-        <li>tenere ogni riga della matrice su una riga di output;</li>
-        <li>usare spaziature coerenti;</li>
-        <li>non mischiare testo descrittivo e numeri se la funzione deve solo stampare dati;</li>
-        <li>se serve, aggiungere intestazioni di riga e colonna in una funzione piu evoluta, non in quella minima.</li>
-      </ul>
-    </div>
+    for (int r = 0; r &lt; R; ++r) {
+        for (int c = 0; c &lt; C; ++c)
+            printf("%4d", m[r][c]);
+        putchar('\n');
+    }
+    return 0;
+}</code></pre>
+        </figure>
+      </div>
+    </details>
 
-    <div class="inner-box warn">
-      <b>Errore tipico:</b> scrivere direttamente nel <code>main</code> tanti doppi cicli simili ma leggermente diversi. Meglio costruire una piccola funzione chiara e riutilizzarla.
-    </div>
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 4 · 8 minuti</span>
+      <h2>Verifica prima, esegui dopo</h2>
+      <p>Usa come input <code>1 2 3 4 5 6</code>. Disegna a mano l’output previsto per la matrice <code>2 × 3</code>, poi esegui il programma. Infine modifica la stampa aggiungendo una barra verticale tra i valori.</p>
+    </section>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L1.7</strong> passiamo dalle funzioni minime alle utility davvero utili: azzerare, riempire, formattare meglio l'output e gestire input un po' piu robusti.
-    </div>
-
+    <aside class="next-step"><strong>Prossimo passo:</strong> spostiamo le operazioni ripetute in funzioni C++ con firme corrette.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
-
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_5.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_7.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

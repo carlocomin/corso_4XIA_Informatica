@@ -1,108 +1,132 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L1.10 · Matrici 2D: matrici dinamiche e rappresentazioni</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.10 · Somme per righe e colonne</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez1_9.html"; }
-    function nextSlide(){ window.location.href = "lez1_11.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:71.43%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
   <ul>
-    <li><a href="lez1_1.html">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
-    <li><a href="lez1_2.html">L1.2 - Definizioni e indici</a></li>
-    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
-    <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
-    <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
-    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
-    <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
-    <li><a href="lez1_8.html">L1.8 - Perche la firma conta</a></li>
-    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
-    <li><a href="lez1_10.html" class="active">L1.10 - Matrici dinamiche</a></li>
-    <li><a href="lez1_11.html">L1.11 - Operazioni classiche e chiusura</a></li>
+    <li><a href="lez1_1.html">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html" class="active" aria-current="page">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html">L1.14 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Matrici dinamiche e rappresentazioni</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 10/14</p>
+    <h1>Somme per righe e colonne</h1>
+    <p class="lead">Quando il risultato riguarda una riga o una colonna, il ciclo esterno sceglie il gruppo e l’accumulatore riparte da zero per ogni gruppo.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_9.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_11.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Per ottenere una somma per riga, azzera l’accumulatore <strong>dentro il ciclo delle righe</strong> ma prima del ciclo delle colonne. Per le colonne fai il ragionamento speculare.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Capire come gestire matrici quando numero di righe e colonne sono noti solo a runtime.</p>
-      <p class="ok"><b>Idea chiave:</b> anche nel caso dinamico conviene ragionare in termini di <b>contiguita</b>. Cambiano gli strumenti, non cambia il modello mentale costruito fin qui.</p>
-    </div>
+    <div class="callout">Negli esempi seguenti <code>R</code> e <code>C</code> sono le costanti già usate per dichiarare la matrice.</div>
 
-    <div class="inner-box box">
-      <h2>C++: scelta consigliata</h2>
-      <p>La soluzione piu pulita, nel contesto di questo corso, e un buffer contiguo <code>std::vector&lt;T&gt;</code> con indicizzazione lineare.</p>
-<pre><code class="language-cpp">std::size_t R = 4, C = 6;
-std::vector&lt;int&gt; buf(R * C, 0);
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Somme delle righe</h2>
+        <figure class="code-example">
+          <figcaption>C++17</figcaption>
+<pre><code class="language-cpp">void stampaSommeRighe(const int (&amp;m)[R][C]) {
+  for (int r = 0; r &lt; R; ++r) {
+    int somma = 0;
 
-auto at = [&](std::size_t r, std::size_t c) -&gt; int& {
-  return buf[r * C + c];
-};
-</code></pre>
-      <p>Hai RAII, contiguita, nessun <code>delete[]</code> manuale e un modello perfettamente coerente con il row-major.</p>
-    </div>
+    for (int c = 0; c &lt; C; ++c)
+      somma += m[r][c];
 
-    <div class="inner-box box">
-      <h2>C: due strade corrette</h2>
-      <ul>
-        <li>buffer 1D contiguo con formula <code>r*C + c</code>;</li>
-        <li>puntatore a righe, se vuoi mantenere la sintassi <code>m[r][c]</code>.</li>
-      </ul>
-<pre><code class="language-c">int *buf = malloc(R * C * sizeof *buf);
-/* usa buf[r*C + c] */
+    std::cout &lt;&lt; somma &lt;&lt; '\n';
+  }
+}</code></pre>
+        </figure>
+        <p><code>r</code> resta fisso mentre <code>c</code> attraversa la riga.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Somme delle colonne</h2>
+        <figure class="code-example">
+          <figcaption>C++17</figcaption>
+<pre><code class="language-cpp">void stampaSommeColonne(const int (&amp;m)[R][C]) {
+  for (int c = 0; c &lt; C; ++c) {
+    int somma = 0;
 
-int (*m)[C] = malloc(R * sizeof *m);
-/* usa m[r][c] */
-</code></pre>
-      <p>Entrambe le soluzioni sono coerenti. Quella da evitare come modello base e la costruzione a <code>int**</code> con una allocazione per riga.</p>
-    </div>
+    for (int r = 0; r &lt; R; ++r)
+      somma += m[r][c];
 
-    <div class="inner-box box">
-      <h2>Perche <code>int**</code> non e il modello giusto qui</h2>
-      <p>Una struttura con un puntatore per ogni riga puo avere senso in casi particolari, ma non rappresenta la stessa cosa di una vera matrice contigua. Perdi semplicita di firma, locality e chiarezza didattica.</p>
-      <p class="warn"><b>Regola pratica:</b> se il problema e una matrice regolare, scegli una rappresentazione regolare e contigua.</p>
-    </div>
+    std::cout &lt;&lt; somma &lt;&lt; '\n';
+  }
+}</code></pre>
+        </figure>
+        <p><code>c</code> resta fisso mentre <code>r</code> attraversa la colonna.</p>
+      </article>
+    </section>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L1.11</strong> chiudiamo la lezione con i problemi classici di consolidamento: somme, diagonali, simmetria e triangolarita. Li useremo come banco di prova di tutto il percorso.
-    </div>
+    <section class="topic-card">
+      <h2>Verifica con dati semplici</h2>
+      <div class="matrix-wrap">
+        <table class="matrix-table">
+          <tbody>
+            <tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+            <tr><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+            <tr><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>Somme delle righe:</strong> 10, 26, 42. <strong>Somme delle colonne:</strong> 15, 18, 21, 24.</p>
+    </section>
 
+    <details class="checkpoint">
+      <summary>Trova l’errore · Dove deve essere inizializzata <code>somma</code>?</summary>
+      <div class="answer">
+        <p>Se la dichiari prima di entrambi i cicli, ogni risultato contiene anche le righe precedenti. Deve essere azzerata una volta per ogni nuova riga, quindi all’inizio del corpo del ciclo esterno.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 8 · 12 minuti</span>
+      <h2>La riga con somma maggiore</h2>
+      <p>Stampa l’indice della riga con somma massima. Se due righe hanno la stessa somma, conserva la prima. Prova il programma anche con soli valori negativi.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> nelle matrici quadrate alcune elaborazioni richiedono un solo indice.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
-
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_9.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_11.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

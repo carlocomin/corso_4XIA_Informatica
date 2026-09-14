@@ -1,113 +1,137 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L2.9 · Struct: lambda, ordinamento e filtro</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.9 · Puntatori e operatore -></title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez2_8.html"; }
-    function nextSlide(){ window.location.href = "lez2_10.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:60.00%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
   <ul>
-    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
-    <li><a href="lez2_2.html">L2.2 - Sintassi minima e accesso ai membri</a></li>
-    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
-    <li><a href="lez2_4.html">L2.4 - Inizializzare in C</a></li>
-    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
-    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
-    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
-    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
-    <li><a href="lez2_9.html" class="active">L2.9 - Lambda, ordinamento e filtro</a></li>
-    <li><a href="lez2_10.html">L2.10 - Layout, padding e serializzazione raw</a></li>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html" class="active" aria-current="page">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html">L2.15 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Lambda, ordinamento e filtro</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 9/15</p>
+    <h1>Puntatori e operatore -></h1>
+    <p class="lead">Un puntatore può indicare un record oppure non indicare alcun oggetto. Per accedere ai campi attraverso il puntatore usiamo ->.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_8.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_10.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Usare le collezioni di record in modo piu intelligente: ordinare, cercare, contare, filtrare.</p>
-      <p class="ok"><b>Idea chiave:</b> le lambda permettono di scrivere il criterio di confronto o di selezione accanto all'algoritmo che lo usa. Questo rende il codice piu locale e piu leggibile.</p>
-    </div>
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Il puntatore è appropriato quando il caso “nessun record” ha significato. Prima di dereferenziarlo dobbiamo verificarlo.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Che cos'e una lambda</h2>
-<pre><code class="language-cpp">auto promosso = [](const Studente& s){
-    return s.media >= 6.0;
+    <section class="topic-card">
+      <h2>Accesso sicuro tramite puntatore</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · nullptr segnala l’assenza</figcaption>
+<pre><code class="language-cpp">#include &lt;string&gt;
+
+struct Studente {
+    int matricola;
+    std::string nome;
+    double media;
 };
-</code></pre>
-      <p>Pensala come una piccola funzione anonima definita nel punto esatto in cui serve. Non sostituisce tutte le funzioni normali, ma e perfetta per criteri brevi e localizzati.</p>
-    </div>
 
-    <div class="inner-box box">
-      <h2>Ordinare una classe di studenti</h2>
-<pre><code class="language-cpp">std::sort(classe.begin(), classe.end(),
-    [](const Studente& a, const Studente& b){
-        return a.cognome < b.cognome;
-    });
-</code></pre>
-      <p>Qui la lambda descrive il criterio. L'algoritmo si occupa dell'ordinamento, la lambda si occupa del significato dell'ordine.</p>
-    </div>
+bool aggiornaMedia(Studente* p, double nuovaMedia) {
+    if (p == nullptr || nuovaMedia &lt; 0 || nuovaMedia &gt; 10)
+        return false;
 
-    <div class="inner-box box">
-      <h2>Ricerca e filtro</h2>
-<pre><code class="language-cpp">auto it = std::find_if(classe.begin(), classe.end(),
-    [](const Studente& s){
-        return s.media < 6.0;
-    });
+    p-&gt;media = nuovaMedia;
+    return true;
+}
 
-int quanti = std::count_if(classe.begin(), classe.end(),
-    [](const Studente& s){
-        return s.eta >= 18;
-    });
-</code></pre>
-      <p>La domanda didattica giusta qui non e "ricordo il nome della funzione STL?", ma "so esprimere una proprieta chiara su un record?".</p>
-    </div>
+int main() {
+    Studente ada{1001, "Ada", 8.0};
+    aggiornaMedia(&amp;ada, 9.4);
+    aggiornaMedia(nullptr, 7.0); // nessuna modifica
+}</code></pre>
+      </figure>
+      <div class="formula">p-&gt;media &nbsp; equivale a &nbsp; (*p).media</div>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Confronto minimo con il C</h2>
-      <p>Nel C puro non hai lambda standard. Lo stesso tipo di problema si affronta con funzioni di confronto esplicite, per esempio insieme a <code>qsort</code>. Il concetto pero resta lo stesso: separare l'algoritmo dal criterio.</p>
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Riferimento</h2>
+        <p><code>Studente&amp;</code> presuppone che l’oggetto esista. È normalmente la scelta più chiara per un parametro obbligatorio.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Puntatore</h2>
+        <p><code>Studente*</code> può valere <code>nullptr</code>. La funzione deve decidere come gestire esplicitamente l’assenza.</p>
+      </article>
+    </section>
 
-    <div class="inner-box warn">
-      <b>Errore tipico:</b> scrivere lambda troppo opache, con catture inutili o confronti incoerenti. Se il criterio diventa lungo o difficile da leggere, probabilmente e meglio estrarlo in una funzione dedicata.
-    </div>
+    <details class="checkpoint">
+      <summary>Confronto mirato · In C si modifica tramite puntatore</summary>
+      <div class="answer">
+        <figure class="code-example">
+          <figcaption>C11 · il controllo usa NULL</figcaption>
+<pre><code class="language-c">int aggiorna_media(Studente *s, double nuova_media) {
+    if (s == NULL || nuova_media &lt; 0 || nuova_media &gt; 10)
+        return 0;
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L2.10</strong> chiudiamo la lezione alzando il livello: guardiamo dentro la memoria delle <code>struct</code>, parliamo di layout, padding e capiamo perche salvare una struct raw su file e una scelta fragile.
-    </div>
+    s-&gt;media = nuova_media;
+    return 1;
+}</code></pre>
+        </figure>
+        <p>Il C non possiede riferimenti: passare l’indirizzo del record è il modo usuale per permettere alla funzione di modificare l’originale.</p>
+      </div>
+    </details>
+
+    <details class="checkpoint">
+      <summary>Trova l’errore · <code>Studente* p = &amp;ada; p.media = 8;</code></summary>
+      <div class="answer">
+        <p><code>p</code> è un puntatore, quindi serve <code>p-&gt;media = 8;</code>. L’operatore punto si usa con l’oggetto <code>ada.media</code>.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 8 · 8 minuti</span>
+      <h2>Azzera se presente</h2>
+      <p>Scrivi in C++ <code>bool azzeraMedia(Studente* p)</code>. Deve restituire <code>false</code> con <code>nullptr</code>, altrimenti impostare la media a zero e restituire <code>true</code>.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> una funzione che crea un nuovo record deve restituirlo senza lasciare riferimenti sospesi.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_8.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_10.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

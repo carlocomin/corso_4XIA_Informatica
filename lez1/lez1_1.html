@@ -1,111 +1,118 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L1.1 · Matrici 2D: introduzione, obiettivi, convenzioni</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.1 · Ripartiamo dalle matrici</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "../programma.html"; }
-    function nextSlide(){ window.location.href = "lez1_2.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:7.14%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
   <ul>
-    <li><a href="lez1_1.html" class="active">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
-    <li><a href="lez1_2.html">L1.2 - Definizioni e indici</a></li>
-    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
-    <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
-    <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
-    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
-    <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
-    <li><a href="lez1_8.html">L1.8 - Perche la firma conta</a></li>
-    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
-    <li><a href="lez1_10.html">L1.10 - Matrici dinamiche</a></li>
-    <li><a href="lez1_11.html">L1.11 - Operazioni classiche e chiusura</a></li>
+    <li><a href="lez1_1.html" class="active" aria-current="page">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html">L1.14 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Introduzione, obiettivi e convenzioni</h1>
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 1/14</p>
+    <h1>Ripartiamo dalle matrici</h1>
+    <p class="lead">Rimettiamo in ordine ciò che hai già incontrato in terza: due indici, cicli annidati, funzioni e semplici algoritmi su griglie di dati.</p>
+  </header>
 
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="../programma.html">&#8592; Programma</a>
+    <a class="nav-button primary" href="lez1_2.html">Successiva &#8594;</a>
+  </nav>
 
   <div class="content-box">
+    <section class="concept-card">
+      <h2>Un’idea da portare con sé</h2>
+      <p>Una matrice è un insieme omogeneo di valori organizzato in <strong>righe</strong> e <strong>colonne</strong>. Ogni elaborazione nasce da tre domande: quali celle devo visitare, in quale ordine e che cosa devo fare su ciascuna cella?</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Questa lezione serve a rimettere in ordine un argomento che spesso gli studenti hanno gia visto, ma in modo frammentario: matrici statiche, accesso con due indici, cicli annidati, passaggio a funzione, rappresentazioni dinamiche e problemi classici su diagonali e somme.</p>
-      <p>Il punto non e accumulare sintassi. Il punto e capire il modello corretto: una matrice non e solo "un array con un paio di parentesi in piu", ma una struttura con regole precise di indicizzazione, memoria e attraversamento.</p>
-      <p class="ok"><b>Idea chiave:</b> se capisci come una matrice e organizzata in memoria, quasi tutte le tecniche successive diventano naturali.</p>
-    </div>
+    <section class="topic-card">
+      <h2>Situazione iniziale</h2>
+      <p>Un sensore registra la temperatura quattro volte al giorno per tre giorni. I dodici valori appartengono allo stesso problema e la loro posizione ha significato:</p>
+      <div class="matrix-wrap">
+        <table class="matrix-table">
+          <thead><tr><th></th><th>08:00</th><th>11:00</th><th>14:00</th><th>17:00</th></tr></thead>
+          <tbody>
+            <tr><th>Giorno 0</th><td>18</td><td>20</td><td>23</td><td>21</td></tr>
+            <tr><th>Giorno 1</th><td>17</td><td>19</td><td>22</td><td>20</td></tr>
+            <tr><th>Giorno 2</th><td>16</td><td>18</td><td>21</td><td>19</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Con <code>temperature[1][2]</code> selezioniamo un solo dato: giorno 1, rilevazione 2, cioè <strong>22</strong>.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Prerequisiti minimi</h2>
-      <ul>
-        <li>array monodimensionali e cicli <code>for</code>;</li>
-        <li>funzioni con parametri e valore di ritorno;</li>
-        <li>I/O di base in C++ e, a livello di confronto, in C;</li>
-        <li>idea essenziale di stack e heap.</li>
-      </ul>
-      <p>Se qualcosa non e solidissimo, non e un problema: questa lezione e costruita proprio per riallineare il linguaggio e le pratiche corrette.</p>
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Al termine saprai</h2>
+        <ul class="compact-list">
+          <li>dichiarare e inizializzare una matrice statica;</li>
+          <li>leggere, stampare e attraversare tutte le celle;</li>
+          <li>passare una matrice a una funzione;</li>
+          <li>risolvere problemi su somme, massimi e diagonali.</li>
+        </ul>
+      </article>
+      <article class="topic-card">
+        <h2>Convenzioni</h2>
+        <ul class="compact-list">
+          <li>C++17 è il linguaggio principale;</li>
+          <li>il C compare nei confronti utili;</li>
+          <li><code>r</code> indica la riga, <code>c</code> la colonna;</li>
+          <li>gli indici partono sempre da zero.</li>
+        </ul>
+      </article>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Roadmap della sequenza</h2>
-      <ol>
-        <li>definizioni, indici e lessico minimo;</li>
-        <li>row-major e modello di memoria;</li>
-        <li>dichiarazione, inizializzazione e attraversamento;</li>
-        <li>I/O di base e utility riusabili;</li>
-        <li>passaggio a funzione e firme corrette;</li>
-        <li>matrici dinamiche e scelte di rappresentazione;</li>
-        <li>operazioni classiche di consolidamento.</li>
-      </ol>
-      <p class="note"><b>Scelta didattica:</b> in questa versione la lezione e piu guidata di prima. Ogni pagina ha un solo compito chiaro, cosi il ragionamento non si disperde tra troppe tecniche insieme.</p>
-    </div>
+    <details class="checkpoint">
+      <summary>Diagnosi iniziale · Prova a rispondere prima di aprire</summary>
+      <div class="answer">
+        <ol>
+          <li>Quali sono gli indici validi di <code>int m[3][4]</code>?</li>
+          <li>Come indichi la seconda riga e la quarta colonna?</li>
+          <li>Quante volte viene eseguito il corpo di due cicli con 3 righe e 4 colonne?</li>
+        </ol>
+        <p><strong>Risposte:</strong> righe <code>0..2</code>, colonne <code>0..3</code>; <code>m[1][3]</code>; 12 volte.</p>
+      </div>
+    </details>
 
-    <div class="inner-box box">
-      <h2>Convenzioni di corso</h2>
-      <p>Useremo <b>C++ come linguaggio principale</b>. Il C comparira quando serve per chiarire il modello o per confrontare firme e rappresentazioni. Questo significa che non vedrai sempre una doppia colonna simmetrica: quando il confronto non aggiunge molto, resteremo sul C++.</p>
-      <ul>
-        <li>indici sempre <code>0-based</code>;</li>
-        <li>notazione standard <code>a[r][c]</code> con <code>r</code> = riga e <code>c</code> = colonna;</li>
-        <li>attenzione alla contiguita della memoria e all'ordine dei cicli;</li>
-        <li>C++17 come riferimento di base.</li>
-      </ul>
-    </div>
-
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L1.2</strong> fissiamo il lessico minimo: che cosa chiamiamo riga, colonna, matrice quadrata, rettangolare e come leggere senza ambiguita un accesso del tipo <code>a[r][c]</code>.
-    </div>
-
+    <aside class="next-step"><strong>Prossimo passo:</strong> impariamo a leggere senza ambiguità dimensioni e indici.</aside>
   </div>
 
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
-
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="../programma.html">&#8592; Programma</a>
+    <a class="nav-button primary" href="lez1_2.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

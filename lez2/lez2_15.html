@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.15 · Laboratorio e autoverifica</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:100.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
+  <ul>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html" class="active" aria-current="page">L2.15 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 15/15</p>
+    <h1>Laboratorio e autoverifica</h1>
+    <p class="lead">Costruiamo un piccolo registro studenti usando un tipo coerente, funzioni con intento chiaro e algoritmi verificabili.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_14.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="../lez3/lez3_1.html">Lezione 3 &#8594;</a>
+  </nav>
+  <div class="content-box">
+    <section class="concept-card">
+      <h2>Consegna: registro della classe</h2>
+      <p>Completa un programma che gestisce quattro studenti. Ogni record contiene matricola, nome e media. Il programma deve validare, stampare, cercare e confrontare i record senza separarne i campi.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Requisiti, in ordine</h2>
+      <ol class="steps">
+        <li>verifica che matricola sia positiva, nome non vuoto e media compresa tra 0 e 10;</li>
+        <li>stampa soltanto i record validi in forma tabellare;</li>
+        <li>calcola la media della classe;</li>
+        <li>cerca uno studente per matricola;</li>
+        <li>trova l’indice dello studente con media maggiore.</li>
+      </ol>
+      <div class="callout"><strong>Vincolo:</strong> tutte le elaborazioni ignorano i record non validi. Usa <code>const Classe&amp;</code> nelle funzioni di sola lettura; se non esistono record validi, restituisci <code>0.0</code> per la media e <code>-1</code> per gli indici.</div>
+    </section>
+
+    <section class="topic-card">
+      <h2>Codice di partenza</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · completa i TODO</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+struct Studente {
+    int matricola;
+    std::string nome;
+    double media;
+};
+
+constexpr int N = 4;
+using Classe = Studente[N];
+
+bool valido(const Studente&amp; s) {
+    return s.matricola &gt; 0
+        &amp;&amp; !s.nome.empty()
+        &amp;&amp; s.media &gt;= 0.0
+        &amp;&amp; s.media &lt;= 10.0;
+}
+
+void stampa(const Classe&amp; classe) {
+    // TODO: stampa soltanto i record validi
+}
+
+double mediaClasse(const Classe&amp; classe) {
+    // TODO: considera i validi; se non ce ne sono restituisci 0.0
+    return 0.0;
+}
+
+int cercaMatricola(const Classe&amp; classe, int matricola) {
+    // TODO: cerca tra i validi; restituisci l’indice oppure -1
+    return -1;
+}
+
+int indiceMigliore(const Classe&amp; classe) {
+    // TODO: considera i validi; restituisci l’indice oppure -1
+    return -1;
+}
+
+int main() {
+    Classe classe{
+        {1001, "Ada", 8.5},
+        {1002, "Alan", 7.0},
+        {1003, "Grace", 9.5},
+        {1004, "Barbara", 6.0}
+    };
+
+    stampa(classe);
+    std::cout &lt;&lt; "Media: " &lt;&lt; mediaClasse(classe) &lt;&lt; '\n';
+}</code></pre>
+      </figure>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Dataset di collaudo · Risultati attesi</summary>
+      <div class="answer">
+        <ul>
+          <li>tutti e quattro i record sono validi;</li>
+          <li>media della classe: <code>7.75</code>;</li>
+          <li>ricerca della matricola <code>1002</code>: indice <code>1</code>;</li>
+          <li>studente migliore: indice <code>2</code>, Grace con media <code>9.5</code>;</li>
+          <li>ricerca della matricola <code>9999</code>: <code>-1</code>.</li>
+        </ul>
+      </div>
+    </details>
+
+    <section class="three-col">
+      <article class="topic-card">
+        <span class="badge">Base</span>
+        <h2>So modellare</h2>
+        <p>Distinguo tipo, oggetto e campo; inizializzo ogni record in modo sicuro.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge">Operativo</span>
+        <h2>So programmare</h2>
+        <p>Scelgo tra valore, riferimento, <code>const&amp;</code> e puntatore in base all’intento.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge">Consapevole</span>
+        <h2>So progettare</h2>
+        <p>Mantengo uniti i campi, valido gli stati e testo i casi “non trovato”.</p>
+      </article>
+    </section>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Sfida facoltativa</span>
+      <h2>Archivio dinamico e ordinato</h2>
+      <p>Trasforma l’array in <code>std::vector&lt;Studente&gt;</code>, aggiungi l’inserimento da input e ordina gli studenti per media decrescente con matricola crescente come spareggio.</p>
+    </section>
+
+    <aside class="next-step"><strong>Lezione completata.</strong> Nella Lezione 3 trasformeremo i record in dati persistenti definendo formati testuali e binari.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_14.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="../lez3/lez3_1.html">Lezione 3 &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

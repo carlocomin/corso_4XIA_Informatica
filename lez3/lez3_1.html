@@ -1,106 +1,106 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L3.1 · File: che cos'e un file</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L3.1 · Dal dato al file</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "../lez2/lez2_10.html"; }
-    function nextSlide(){ window.location.href = "lez3_2.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:6.25%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 3 - File I/O (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+  <h2>Lezione 3 - File I/O</h2>
   <ul>
-    <li><a href="lez3_1.html" class="active">L3.1 - Che cos'e un file</a></li>
-    <li><a href="lez3_2.html">L3.2 - Testo vs binario</a></li>
-    <li><a href="lez3_3.html">L3.3 - Modello d'I/O e scelte pratiche</a></li>
-    <li><a href="lez3_4.html">L3.4 - CSV e TSV: scrivere e leggere</a></li>
-    <li><a href="lez3_5.html">L3.5 - Robustezza: escape, locale, round-trip</a></li>
-    <li><a href="lez3_6.html">L3.6 - Binario: modello base</a></li>
-    <li><a href="lez3_7.html">L3.7 - Read e write in C++ e C</a></li>
-    <li><a href="lez3_8.html">L3.8 - Seek e cursore nei file binari</a></li>
-    <li><a href="lez3_9.html">L3.9 - Perche i seek arbitrari in text mode non sono portabili</a></li>
-    <li><a href="lez3_10.html">L3.10 - Indici per file binari</a></li>
+    <li><a href="lez3_1.html" class="active" aria-current="page">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
+    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
+    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
+    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
+    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Che cos'e un file</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · File I/O · 1/16</p>
+    <h1>Dal dato al file</h1>
+    <p class="lead">Un programma termina, ma alcuni dati devono restare: il file è il ponte tra memoria di lavoro e persistenza.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="../lez2/lez2_15.html">&#8592; Lezione 2</a>
+    <a class="nav-button primary" href="lez3_2.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Fissare un modello mentale corretto di file prima di parlare di codice, stream e funzioni di libreria.</p>
-      <p class="ok"><b>Idea chiave:</b> un file non e "memoria salvata", ma una sequenza di byte a cui diamo significato tramite regole di formato.</p>
-    </div>
 
-    <div class="inner-box box">
-      <h2>Tre livelli da tenere distinti</h2>
-      <table>
-        <tr><th>Livello</th><th>Domanda</th><th>Esempio</th></tr>
-        <tr><td>Logico</td><td>Che cosa rappresentano questi byte?</td><td>CSV, immagine PNG, archivio binario</td></tr>
-        <tr><td>Sistema operativo</td><td>Come apro, leggo e chiudo il file?</td><td>path, permessi, handle, stream</td></tr>
-        <tr><td>Fisico</td><td>Dove stanno davvero i dati?</td><td>blocchi su SSD o disco</td></tr>
-      </table>
-      <p>Nel corso lavoriamo quasi sempre sui primi due livelli. Il terzo ci interessa solo come idea generale.</p>
-    </div>
+    <section class="concept-card">
+      <h2>Il problema da risolvere</h2>
+      <p>Nella Lezione 2 una <code>struct Studente</code> teneva insieme matricola, nome e media. Finché il programma è in esecuzione il record vive in memoria; quando il programma termina, quei dati scompaiono se non vengono salvati.</p>
+      <p><strong>Idea chiave:</strong> un file conserva una sequenza di byte; il <em>formato</em> stabilisce come trasformare quei byte di nuovo in dati comprensibili.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Che cosa contiene davvero un file</h2>
-      <p>Dal punto di vista del sistema operativo, un file contiene byte. Il significato di quei byte dipende dal formato scelto.</p>
-      <ul>
-        <li>se il formato e testuale, i byte rappresentano caratteri;</li>
-        <li>se il formato e binario, i byte rappresentano campi, header, record o blocchi definiti dal programma;</li>
-        <li>se manca una regola chiara, il file puo esistere ma non essere interpretabile in modo affidabile.</li>
-      </ul>
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <span class="badge">In memoria</span>
+        <h2>Dati temporanei</h2>
+        <p>Variabili, array e struct sono immediatamente utilizzabili dal programma, ma normalmente esistono solo durante l’esecuzione.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge extra">Su file</span>
+        <h2>Dati persistenti</h2>
+        <p>I byte restano disponibili dopo la chiusura del programma e possono essere riletti in una nuova esecuzione.</p>
+      </article>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Path, working directory e permessi</h2>
-      <p>Per usare un file non basta che "esista". Serve anche trovarlo e avere il diritto di aprirlo.</p>
-      <ul>
-        <li><b>Percorso assoluto:</b> parte dalla radice del filesystem.</li>
-        <li><b>Percorso relativo:</b> parte dalla cartella di lavoro del programma.</li>
-        <li><b>Permessi:</b> un file puo essere leggibile ma non scrivibile, oppure bloccato da un errore di percorso.</li>
-      </ul>
-      <p class="note">Nelle esercitazioni conviene usare file nella stessa cartella del programma o in sottocartelle semplici.</p>
-    </div>
+    <section class="topic-card">
+      <h2>Byte e significato non sono la stessa cosa</h2>
+      <ol class="file-sheet" aria-label="Esempio di file testuale con tre record">
+        <li><code>1001;Ada;8.5</code></li>
+        <li><code>1002;Alan;7.0</code></li>
+        <li><code>1003;Grace;9.5</code></li>
+      </ol>
+      <p>Per noi ogni riga rappresenta uno studente perché abbiamo deciso tre campi separati da <code>;</code>. Senza questa regola vedremmo soltanto caratteri.</p>
+    </section>
 
-    <div class="inner-box warn">
-      <b>Errore tipico:</b> pensare che il file sia solo "un contenitore neutro". In realta ogni file funziona bene solo se chi scrive e chi legge condividono le stesse regole.
-    </div>
+    <details class="checkpoint">
+      <summary>Checkpoint · Che cosa deve conoscere chi legge?</summary>
+      <div class="answer">
+        <p>Deve conoscere almeno l’ordine dei campi, il separatore, il tipo di ciascun campo e il modo in cui sono rappresentate righe e caratteri.</p>
+      </div>
+    </details>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L3.2</strong> trasformiamo questa idea in una scelta concreta: quando conviene usare testo e quando conviene usare binario.
-    </div>
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 1</span>
+      <h2>Dato o formato?</h2>
+      <p>Per un registro studenti elenca i dati da salvare e scrivi separatamente tre regole necessarie per poterli rileggere senza ambiguità.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Confronteremo i due grandi modi di rappresentare i dati: testo e binario.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="../lez2/lez2_15.html">&#8592; Lezione 2</a>
+    <a class="nav-button primary" href="lez3_2.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

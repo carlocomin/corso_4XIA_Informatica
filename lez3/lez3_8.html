@@ -1,114 +1,137 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L3.8 · Binario: seek e cursore</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L3.8 · La stessa idea in C</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez3_7.html"; }
-    function nextSlide(){ window.location.href = "lez3_9.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:50.00%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 3 - File I/O (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+  <h2>Lezione 3 - File I/O</h2>
   <ul>
-    <li><a href="lez3_1.html">L3.1 - Che cos'e un file</a></li>
-    <li><a href="lez3_2.html">L3.2 - Testo vs binario</a></li>
-    <li><a href="lez3_3.html">L3.3 - Modello d'I/O e scelte pratiche</a></li>
-    <li><a href="lez3_4.html">L3.4 - CSV e TSV: scrivere e leggere</a></li>
-    <li><a href="lez3_5.html">L3.5 - Robustezza: escape, locale, round-trip</a></li>
-    <li><a href="lez3_6.html">L3.6 - Binario: modello base</a></li>
-    <li><a href="lez3_7.html">L3.7 - Read e write in C++ e C</a></li>
-    <li><a href="lez3_8.html" class="active">L3.8 - Seek e cursore nei file binari</a></li>
-    <li><a href="lez3_9.html">L3.9 - Perche i seek arbitrari in text mode non sono portabili</a></li>
-    <li><a href="lez3_10.html">L3.10 - Indici per file binari</a></li>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_8.html" class="active" aria-current="page">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
+    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
+    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
+    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
+    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Seek e cursore nei file binari</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · File I/O · 8/16</p>
+    <h1>La stessa idea in C</h1>
+    <p class="lead">Cambiano tipi e funzioni, non il metodo: aprire, controllare i valori restituiti, elaborare e chiudere.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_7.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_9.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Capire perche i file binari permettono accesso casuale naturale e come si esprime questa idea in C++ e in C.</p>
-      <p class="ok"><b>Idea chiave:</b> ogni stream mantiene una posizione corrente. Con i seek puoi spostarti direttamente all'offset che ti serve senza rileggere tutto il file.</p>
-    </div>
 
-    <div class="inner-box box">
-      <h2>Il modello del cursore</h2>
-      <p>Immagina il file come una sequenza di byte numerati da <code>0</code> in poi. Il cursore dice "dove sei adesso".</p>
-      <ul>
-        <li>con <code>tellg</code>, <code>tellp</code> o <code>ftell</code> chiedi la posizione corrente;</li>
-        <li>con <code>seekg</code>, <code>seekp</code> o <code>fseek</code> ti sposti altrove;</li>
-        <li>questo funziona bene quando il formato usa lunghezze note o offset ben definiti.</li>
-      </ul>
-    </div>
+    <section class="concept-card">
+      <h2><code>FILE*</code> rappresenta lo stream</h2>
+      <p>In C usiamo <code>fopen</code>, <code>fprintf</code>, <code>fscanf</code>, <code>fgets</code> e <code>fclose</code>.</p>
+      <p><strong>Idea chiave:</strong> ogni funzione comunica l’esito tramite il valore restituito; ignorarlo significa perdere il controllo sugli errori.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Esempio in C++</h2>
-<pre><code class="language-cpp">std::ifstream in("dati.bin", std::ios::binary);
-in.seekg(0, std::ios::end);
-auto size = in.tellg();
-in.seekg(0, std::ios::beg);
-</code></pre>
-      <p>Il pattern piu semplice e: vai in fondo, misura, torna all'inizio.</p>
-    </div>
+    <figure class="code-example">
+      <figcaption>C11 · scrittura e lettura formattata</figcaption>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
 
-    <div class="inner-box box">
-      <h2>Esempio in C</h2>
-<pre><code class="language-c">FILE* f = fopen("dati.bin", "rb");
-fseek(f, 0L, SEEK_END);
-long size = ftell(f);
-fseek(f, 0L, SEEK_SET);
-</code></pre>
-      <p>Ancora una volta la logica e identica: cambia solo la superficie dell'API.</p>
-    </div>
+int main(void) {
+    FILE* out = fopen("voti.txt", "w");
+    if (out == NULL) return 1;
 
-    <div class="inner-box box">
-      <h2>Quando il seek diventa potente</h2>
-      <ul>
-        <li>record tutti della stessa dimensione;</li>
-        <li>header iniziale che contiene offset o conteggi;</li>
-        <li>indice separato con coppie <code>chiave - offset</code>.</li>
-      </ul>
-      <p>In questi casi puoi andare quasi subito al punto giusto del file.</p>
-    </div>
+    if (fprintf(out, "Ada 9.0\nAlan 7.5\n") &lt; 0) {
+        fclose(out);
+        return 2;
+    }
+    if (fclose(out) == EOF) return 3;
 
-    <div class="inner-box warn">
-      <b>Regola pratica:</b> il seek ha senso solo se il formato ti dice dove andare. Senza un contratto preciso, l'offset e solo un numero senza significato.
-    </div>
+    FILE* in = fopen("voti.txt", "r");
+    if (in == NULL) return 4;
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L3.9</strong> mettiamo un paletto importante: questi ragionamenti sugli offset sono naturali in binario, ma in text mode non sempre sono portabili.
-    </div>
+    char nome[40];
+    double voto;
+    int letti;
+
+    while ((letti = fscanf(in, "%39s %lf", nome, &amp;voto)) == 2)
+        printf("%s: %.1f\n", nome, voto);
+
+    if (ferror(in)) {
+        fclose(in);
+        return 5;
+    }
+    if (letti != EOF) {
+        fclose(in);
+        return 6;  /* record malformato */
+    }
+
+    return fclose(in) == EOF ? 7 : 0;
+}</code></pre>
+    </figure>
+
+    <section class="three-col">
+      <article class="topic-card">
+        <h2>Aprire</h2>
+        <p><code>fopen</code> restituisce <code>NULL</code> se il file non può essere aperto.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Leggere</h2>
+        <p><code>fscanf</code> restituisce il numero di conversioni completate: qui devono essere esattamente due.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Chiudere</h2>
+        <p>In C la chiusura non è automatica: <code>fclose</code> va chiamata su ogni percorso successivo all’apertura.</p>
+      </article>
+    </section>
+
+    <div class="callout"><strong>Per leggere righe:</strong> <code>fgets(buffer, dimensione, file)</code> restituisce il buffer in caso di successo e <code>NULL</code> a fine file o in caso di errore.</div>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Perché compare <code>%39s</code>?</summary>
+      <div class="answer">
+        <p>Il limite impedisce di scrivere oltre il buffer da 40 caratteri e lascia spazio al terminatore <code>'\0'</code>. Il formato accetta comunque soltanto nomi senza spazi.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 8</span>
+      <h2>Versione C dei quadrati</h2>
+      <p>Riscrivi l’esercizio 4 usando <code>FILE*</code> e <code>fprintf</code>, poi rileggi le coppie con <code>fscanf</code> controllando il numero di conversioni.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Uniamo file e struct definendo una rappresentazione testuale semplice.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_7.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_9.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

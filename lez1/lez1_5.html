@@ -1,115 +1,124 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L1.5 · Matrici 2D: attraversamento per riga e per colonna</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.5 · Il doppio ciclo</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez1_4.html"; }
-    function nextSlide(){ window.location.href = "lez1_6.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:35.71%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
   <ul>
-    <li><a href="lez1_1.html">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
-    <li><a href="lez1_2.html">L1.2 - Definizioni e indici</a></li>
-    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
-    <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
-    <li><a href="lez1_5.html" class="active">L1.5 - Attraversamento per riga/colonna</a></li>
-    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
-    <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
-    <li><a href="lez1_8.html">L1.8 - Perche la firma conta</a></li>
-    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
-    <li><a href="lez1_10.html">L1.10 - Matrici dinamiche</a></li>
-    <li><a href="lez1_11.html">L1.11 - Operazioni classiche e chiusura</a></li>
+    <li><a href="lez1_1.html">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html" class="active" aria-current="page">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html">L1.14 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Attraversamento per riga e per colonna</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 5/14</p>
+    <h1>Il doppio ciclo</h1>
+    <p class="lead">Il ciclo esterno sceglie una riga; quello interno visita, una alla volta, tutte le colonne di quella riga.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_4.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_6.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Per visitare tutte le celle servono due cicli: <code>r</code> varia da <code>0</code> a <code>R-1</code>, mentre per ogni riga <code>c</code> riparte da zero e arriva a <code>C-1</code>.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Usare correttamente i doppi cicli e capire perche il loro ordine non e solo una questione estetica.</p>
-      <p class="ok"><b>Idea chiave:</b> se la memoria e organizzata per righe, il modo piu naturale e di solito piu efficiente di percorrere una matrice e far variare prima la colonna dentro la stessa riga.</p>
-    </div>
+    <section class="topic-card">
+      <h2>La scansione standard per righe</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · visita completa</figcaption>
+<pre><code class="language-cpp">int totale = 0;
 
-    <div class="inner-box box">
-      <h2>Scansione per riga</h2>
+for (int r = 0; r &lt; R; ++r) {
+    for (int c = 0; c &lt; C; ++c) {
+        totale += m[r][c];
+    }
+}</code></pre>
+      </figure>
+      <p>Il corpo viene eseguito <code>R * C</code> volte. Con una matrice <code>3 × 4</code>, le celle visitate sono 12.</p>
+    </section>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Ordine della visita</h2>
+        <div class="output">(0,0) (0,1) (0,2) (0,3)
+(1,0) (1,1) (1,2) (1,3)
+(2,0) (2,1) (2,2) (2,3)</div>
+        <p>Questo ordine segue le righe contigue in memoria.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Visita per colonne</h2>
+        <figure class="code-example">
+          <figcaption>C++17 · ordine alternativo</figcaption>
+<pre><code class="language-cpp">for (int c = 0; c &lt; C; ++c) {
+    for (int r = 0; r &lt; R; ++r) {
+        usa(m[r][c]);
+    }
+}</code></pre>
+        </figure>
+        <p>Non è sbagliata: si usa quando il problema richiede di elaborare una colonna alla volta.</p>
+      </article>
+    </section>
+
+    <div class="callout"><strong>Regola pratica:</strong> per leggere, stampare o elaborare l’intera matrice, parti dalla scansione per righe. Cambia ordine solo quando il problema lo richiede.</div>
+
+    <details class="checkpoint">
+      <summary>Trova l’errore · Il ciclo è corretto per una matrice R × C?</summary>
+      <div class="answer">
+        <figure class="code-example">
+          <figcaption>Codice da controllare</figcaption>
 <pre><code class="language-cpp">for (int r = 0; r &lt; R; ++r)
-  for (int c = 0; c &lt; C; ++c)
-    usa(a[r][c]);
-</code></pre>
-      <p>Questo ordine segue il layout row-major. In pratica leggi elementi contigui, quindi il processore lavora in modo piu favorevole alla cache.</p>
-    </div>
+    for (int c = 0; c &lt; R; ++c)
+        std::cout &lt;&lt; m[r][c];</code></pre>
+        </figure>
+        <p><strong>No:</strong> il secondo limite deve essere <code>c &lt; C</code>. L’errore può restare nascosto se si prova il programma soltanto con matrici quadrate.</p>
+      </div>
+    </details>
 
-    <div class="inner-box box">
-      <h2>Scansione per colonna</h2>
-<pre><code class="language-cpp">for (int c = 0; c &lt; C; ++c)
-  for (int r = 0; r &lt; R; ++r)
-    usa(a[r][c]);
-</code></pre>
-      <p>Non e sbagliata. A volte e proprio la visita giusta. Ma devi sapere che, per una matrice memorizzata row-major, stai saltando da una riga all'altra e quindi perdi contiguita.</p>
-    </div>
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 3 · 7 minuti</span>
+      <h2>Tabellina rettangolare</h2>
+      <p>Riempi una matrice <code>3 × 5</code> assegnando <code>m[r][c] = (r + 1) * (c + 1)</code>. Prima di eseguire il programma, prevedi la terza riga.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Quando scegliere un ordine o l'altro</h2>
-      <ul>
-        <li>se vuoi riempire, stampare o elaborare tutta la matrice in modo standard, pensa prima alla visita per riga;</li>
-        <li>se il problema e formulato per colonne, usa pure la visita per colonna, ma fallo consapevolmente;</li>
-        <li>se la matrice e grande, l'ordine dei cicli puo influire sensibilmente sui tempi.</li>
-      </ul>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Errori tipici</h2>
-      <ul>
-        <li>scambiare <code>r</code> e <code>c</code> nel corpo del ciclo;</li>
-        <li>usare i limiti sbagliati, per esempio <code>c &lt; R</code> invece di <code>c &lt; C</code>;</li>
-        <li>pensare che l'ordine dei due cicli sia sempre neutro;</li>
-        <li>dimenticare che una visita per colonna su una matrice non quadrata cambia anche il numero di iterazioni interne.</li>
-      </ul>
-    </div>
-
-    <div class="inner-box warn">
-      <b>Regola pratica:</b> quando non hai ancora un motivo specifico per fare altro, struttura i doppi cicli come <code>for r</code> esterno e <code>for c</code> interno.
-    </div>
-
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L1.6</strong> usiamo questi stessi doppi cicli per leggere e stampare matrici in modo pulito. Prima si impara a percorrerle bene, poi si costruiscono utility riusabili.
-    </div>
-
+    <aside class="next-step"><strong>Prossimo passo:</strong> riutilizziamo lo stesso doppio ciclo per leggere e stampare dati.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
-
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_4.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_6.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

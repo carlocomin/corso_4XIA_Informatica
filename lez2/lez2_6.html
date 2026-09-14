@@ -1,111 +1,120 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L2.6 · Struct: passaggio per valore, riferimento e puntatore</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.6 · Passaggio per valore</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez2_5.html"; }
-    function nextSlide(){ window.location.href = "lez2_7.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:40.00%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
   <ul>
-    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
-    <li><a href="lez2_2.html">L2.2 - Sintassi minima e accesso ai membri</a></li>
-    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
-    <li><a href="lez2_4.html">L2.4 - Inizializzare in C</a></li>
-    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
-    <li><a href="lez2_6.html" class="active">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
-    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
-    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
-    <li><a href="lez2_9.html">L2.9 - Lambda, ordinamento e filtro</a></li>
-    <li><a href="lez2_10.html">L2.10 - Layout, padding e serializzazione raw</a></li>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html" class="active" aria-current="page">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html">L2.15 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Passaggio per valore, riferimento e puntatore</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 6/15</p>
+    <h1>Passaggio per valore</h1>
+    <p class="lead">Quando una funzione riceve una struct per valore, lavora su una copia indipendente dell’oggetto usato nella chiamata.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_5.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_7.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Capire che cosa cambia davvero quando una <code>struct</code> entra in una funzione.</p>
-      <p class="ok"><b>Idea chiave:</b> non stai scegliendo solo una sintassi. Stai scegliendo se la funzione lavora su una copia, su un alias o su un puntatore che puo anche essere assente.</p>
-    </div>
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Modificare il parametro passato per valore non modifica l’originale. La copia protegge il chiamante, ma richiede di copiare tutti i campi del record.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Passaggio per valore</h2>
-<pre><code class="language-cpp">void aggiornaMedia(Studente s, double nuova){
-    s.media = nuova;
+    <section class="topic-card">
+      <h2>Segui i due oggetti</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · la modifica resta locale</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+struct Studente {
+    int matricola;
+    std::string nome;
+    double media;
+};
+
+void provaModifica(Studente copia) {
+    copia.media = 4.0;
+    std::cout &lt;&lt; "Dentro: " &lt;&lt; copia.media &lt;&lt; '\n';
 }
-</code></pre>
-      <p>Qui la funzione riceve una copia. L'oggetto chiamante non viene modificato. Questa scelta ha senso se vuoi isolamento o se il tipo e molto leggero.</p>
-    </div>
 
-    <div class="inner-box box">
-      <h2>Passaggio per riferimento</h2>
-<pre><code class="language-cpp">void aggiornaMedia(Studente& s, double nuova){
-    s.media = nuova;
-}
-</code></pre>
-      <p>Qui la funzione lavora sull'oggetto originale. E la scelta naturale quando la modifica e intenzionale e non vuoi costi di copia.</p>
-    </div>
+int main() {
+    Studente ada{1001, "Ada", 9.4};
 
-    <div class="inner-box box">
-      <h2>Passaggio per <code>const&</code></h2>
-<pre><code class="language-cpp">void stampa(const Studente& s){
-    std::cout &lt;&lt; s.cognome &lt;&lt; " " &lt;&lt; s.nome;
-}
-</code></pre>
-      <p>Questa e la forma piu comune per parametri di sola lettura non banali: niente copia, niente modifica, intento molto chiaro.</p>
-    </div>
+    provaModifica(ada);
+    std::cout &lt;&lt; "Fuori: " &lt;&lt; ada.media &lt;&lt; '\n';
+}</code></pre>
+      </figure>
+      <div class="output">Dentro: 4
+Fuori: 9.4</div>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Puntatore</h2>
-<pre><code class="language-cpp">void aggiornaMedia(Studente* p, double nuova){
-    if (!p) return;
-    p-&gt;media = nuova;
-}
-</code></pre>
-      <p>Il puntatore e utile quando vuoi modellare anche il caso "nessun oggetto" o quando stai interoperando con C. In C, inoltre, il puntatore e il modo standard di ottenere un effetto simile al riferimento.</p>
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Quando è utile</h2>
+        <p>Quando vuoi deliberatamente una copia locale da modificare, oppure quando il tipo è piccolo e il costo della copia è trascurabile.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Quando evitarlo</h2>
+        <p>Se devi soltanto leggere un record con stringhe o molti campi: una copia non necessaria rende meno chiaro l’intento e può costare di più.</p>
+      </article>
+    </section>
 
-    <div class="inner-box warn">
-      <b>Regola pratica:</b> se la funzione legge soltanto, pensa prima a <code>const T&</code>. Se modifica, pensa prima a <code>T&</code>. Se il parametro puo mancare, allora ha senso un puntatore.
-    </div>
+    <details class="checkpoint">
+      <summary>Controllo rapido · Quali campi vengono copiati?</summary>
+      <div class="answer">
+        <p>Tutti: <code>matricola</code>, <code>nome</code> e <code>media</code>. La nuova <code>std::string</code> gestisce il proprio contenuto; modificare <code>copia.nome</code> non cambia <code>ada.nome</code>.</p>
+      </div>
+    </details>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L2.7</strong> facciamo il salto didattico piu importante: non ci interessa solo "come si passa", ma che cosa quella scelta comunica sull'intento dell'API, sul costo e sul lifetime dei dati.
-    </div>
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 5 · 7 minuti</span>
+      <h2>Prevedi prima di eseguire</h2>
+      <p>Aggiungi a <code>provaModifica</code> l’istruzione <code>copia.nome = "Grace";</code>. Scrivi l’output previsto dentro e fuori dalla funzione, poi verifica compilando.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> se vogliamo modificare l’originale, usiamo un riferimento non costante.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_5.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_7.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

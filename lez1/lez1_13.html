@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.13 · Matrici dinamiche</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:92.86%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
+  <ul>
+    <li><a href="lez1_1.html">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html" class="active" aria-current="page">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html">L1.14 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 13/14</p>
+    <h1>Matrici dinamiche</h1>
+    <p class="lead">Estensione: se righe e colonne sono note soltanto durante l’esecuzione, possiamo conservare le celle in un contenitore dinamico ma ancora contiguo.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_12.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_14.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+    <section class="concept-card">
+      <span class="badge extra">Estensione</span>
+      <h2>Idea chiave</h2>
+      <p>Le dimensioni dinamiche cambiano lo strumento, non il modello: memorizziamo <code>R * C</code> elementi e traduciamo <code>(r,c)</code> nell’indice <code>r * C + c</code>.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>C++: un <code>vector</code> contiguo</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · dimensioni a runtime</figcaption>
+<pre><code class="language-cpp">#include &lt;cstddef&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+int main() {
+    std::size_t R = 3;
+    std::size_t C = 4;
+    std::vector&lt;int&gt; m(R * C, 0);
+
+    for (std::size_t r = 0; r &lt; R; ++r) {
+        for (std::size_t c = 0; c &lt; C; ++c) {
+            m[r * C + c] = static_cast&lt;int&gt;(r + c);
+        }
+    }
+
+    std::cout &lt;&lt; m[2 * C + 1] &lt;&lt; '\n';  // cella (2,1)
+}</code></pre>
+      </figure>
+      <p><code>std::vector</code> gestisce automaticamente la memoria. Non servono <code>new[]</code> e <code>delete[]</code>.</p>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Confronto mirato · Buffer contiguo in C</summary>
+      <div class="answer">
+        <figure class="code-example">
+          <figcaption>C11 · allocazione e rilascio</figcaption>
+<pre><code class="language-c">#include &lt;stddef.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void) {
+    size_t R = 3;
+    size_t C = 4;
+    int *m = calloc(R * C, sizeof *m);
+
+    if (m == NULL)
+        return 1;
+
+    m[2 * C + 1] = 7;
+    free(m);
+    return 0;
+}</code></pre>
+        </figure>
+        <p>In C il programmatore deve controllare l’esito dell’allocazione e chiamare <code>free</code> esattamente una volta quando il buffer non serve più.</p>
+      </div>
+    </details>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Perché contiguo</h2>
+        <p>Conserva il modello row-major, richiede una sola allocazione e rende semplice scorrere tutti i dati.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Altre rappresentazioni</h2>
+        <p><code>vector&lt;vector&lt;int&gt;&gt;</code> è leggibile e consente righe di lunghezze diverse, ma le righe sono contenitori separati. Non è un unico blocco contiguo.</p>
+      </article>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Controllo rapido · Quale cella corrisponde all’indice 14 con C = 5?</summary>
+      <div class="answer">
+        <p><code>r = 14 / 5 = 2</code> e <code>c = 14 % 5 = 4</code>. La cella è quindi <code>(2,4)</code>.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 11 · Estensione</span>
+      <h2>Dimensioni scelte dall’utente</h2>
+      <p>Leggi <code>R</code> e <code>C</code>, crea un <code>vector&lt;int&gt;</code> di <code>R * C</code> celle, riempilo per righe e stampa la matrice. Rifiuta dimensioni uguali a zero.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> integriamo il ripasso in un laboratorio completo e verificabile.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_12.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_14.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

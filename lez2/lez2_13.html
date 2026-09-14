@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.13 · Ordinare per un campo</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:86.67%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
+  <ul>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html" class="active" aria-current="page">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html">L2.15 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 13/15</p>
+    <h1>Ordinare per un campo</h1>
+    <p class="lead">Ordinare struct significa decidere quale campo ha priorità e che cosa fare quando due valori sono uguali.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_12.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_14.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>L’algoritmo di ordinamento sposta record interi; il criterio confronta i campi che definiscono l’ordine desiderato.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Selection sort per media decrescente</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · ripasso dell’algoritmo noto</figcaption>
+<pre><code class="language-cpp">#include &lt;utility&gt;
+
+void ordinaPerMedia(Studente studenti[], int n) {
+    for (int i = 0; i &lt; n - 1; ++i) {
+        int migliore = i;
+
+        for (int j = i + 1; j &lt; n; ++j) {
+            if (studenti[j].media &gt; studenti[migliore].media)
+                migliore = j;
+        }
+
+        if (migliore != i)
+            std::swap(studenti[i], studenti[migliore]);
+    }
+}</code></pre>
+      </figure>
+      <p><code>std::swap</code> scambia due oggetti <code>Studente</code> completi: matricola, nome e media restano correttamente associati.</p>
+    </section>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Criterio semplice</h2>
+        <div class="formula">a.media &gt; b.media</div>
+        <p>Ordina dalla media maggiore alla minore.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Criterio con spareggio</h2>
+        <figure class="code-example">
+          <figcaption>Condizione</figcaption>
+<pre><code class="language-cpp">if (a.media &gt; b.media ||
+    (a.media == b.media &amp;&amp;
+     a.matricola &lt; b.matricola)) {
+    // a deve precedere b
+}</code></pre>
+        </figure>
+      </article>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Estensione C++ · std::sort e lambda</summary>
+      <div class="answer">
+        <figure class="code-example">
+          <figcaption>C++17 · stesso criterio vicino all’algoritmo</figcaption>
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+
+void ordinaConStl(std::vector&lt;Studente&gt;&amp; classe) {
+    std::sort(classe.begin(), classe.end(),
+        [](const Studente&amp; a, const Studente&amp; b) {
+            return a.media &gt; b.media;
+        });
+}</code></pre>
+        </figure>
+        <p>La lambda è una piccola funzione anonima che descrive il criterio. È comoda con un <code>vector</code>, ma non sostituisce la comprensione dell’ordinamento.</p>
+      </div>
+    </details>
+
+    <details class="checkpoint">
+      <summary>Errore concettuale · Scambiare soltanto le medie</summary>
+      <div class="answer">
+        <p>Se scambi <code>studenti[i].media</code> ma non gli altri campi, rompi il record: la media finisce associata alla persona sbagliata. Va scambiato l’intero <code>Studente</code>.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 12 · 15 minuti</span>
+      <h2>Cambia il criterio</h2>
+      <p>Adatta il selection sort per ordinare per matricola crescente. Poi ordina per nome alfabetico e spiega quale sola parte dell’algoritmo cambia.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> distinguiamo il record logico dal suo layout fisico in memoria.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_12.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_14.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

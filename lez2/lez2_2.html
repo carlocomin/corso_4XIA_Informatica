@@ -1,119 +1,131 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L2.2 · Struct: sintassi minima e accesso ai membri</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.2 · Definire un nuovo tipo</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez2_1.html"; }
-    function nextSlide(){ window.location.href = "lez2_3.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:13.33%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 2 - Struct (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
   <ul>
-    <li><a href="lez2_1.html">L2.1 - Perche esistono le struct</a></li>
-    <li><a href="lez2_2.html" class="active">L2.2 - Sintassi minima e accesso ai membri</a></li>
-    <li><a href="lez2_3.html">L2.3 - Inizializzare bene in C++</a></li>
-    <li><a href="lez2_4.html">L2.4 - Inizializzare in C</a></li>
-    <li><a href="lez2_5.html">L2.5 - Errori tipici e checklist</a></li>
-    <li><a href="lez2_6.html">L2.6 - Passaggio per valore, riferimento e puntatore</a></li>
-    <li><a href="lez2_7.html">L2.7 - Intento dell'API, const e lifetime</a></li>
-    <li><a href="lez2_8.html">L2.8 - Collezioni di struct in C++</a></li>
-    <li><a href="lez2_9.html">L2.9 - Lambda, ordinamento e filtro</a></li>
-    <li><a href="lez2_10.html">L2.10 - Layout, padding e serializzazione raw</a></li>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html" class="active" aria-current="page">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html">L2.15 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Sintassi minima e accesso ai membri</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 2/15</p>
+    <h1>Definire un nuovo tipo</h1>
+    <p class="lead">La dichiarazione della struct descrive la forma di tutti gli oggetti di quel tipo; non crea ancora uno studente concreto.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_1.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_3.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Vedere la forma minima di una <code>struct</code> e chiarire bene come si leggono e si modificano i suoi campi.</p>
-      <p class="ok"><b>Idea chiave:</b> una <code>struct</code> definisce un nuovo tipo; da quel momento l'accesso ai campi deve essere coerente con il modo in cui stai usando l'oggetto: istanza, riferimento o puntatore.</p>
-    </div>
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p><code>struct Studente { ... };</code> definisce un <strong>tipo</strong>. <code>Studente s;</code> dichiara invece un <strong>oggetto</strong> di quel tipo.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>C++: definizione minima</h2>
-<pre><code class="language-cpp">struct Studente {
+    <section class="topic-card">
+      <h2>Definizione e utilizzo</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · programma completo</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+struct Studente {
+    int matricola;
     std::string nome;
-    std::string cognome;
-    int eta;
     double media;
-};  // il punto e virgola finale e obbligatorio
-</code></pre>
-      <p>In C++ <code>struct</code> e <code>class</code> hanno quasi le stesse capacita. La differenza principale, qui, e solo il default di accesso: in una <code>struct</code> i membri sono <code>public</code> per default.</p>
-    </div>
+};  // punto e virgola obbligatorio
 
-    <div class="inner-box box">
-      <h2>Dichiarazione e accesso</h2>
-<pre><code class="language-cpp">Studente s;
-s.nome = "Ada";
-s.cognome = "Lovelace";
-s.eta = 17;
-s.media = 9.4;
-</code></pre>
-      <p>Quando hai un oggetto vero e proprio, accedi ai campi con l'operatore punto <code>.</code>.</p>
-    </div>
+int main() {
+    Studente s{};
+    s.matricola = 1001;
+    s.nome = "Ada";
+    s.media = 9.4;
 
-    <div class="inner-box box">
-      <h2>Puntatore e operatore freccia</h2>
-<pre><code class="language-cpp">Studente s{"Ada", "Lovelace", 17, 9.4};
-Studente* p = &s;
+    std::cout &lt;&lt; s.nome &lt;&lt; ": " &lt;&lt; s.media &lt;&lt; '\n';
+}</code></pre>
+      </figure>
+    </section>
 
-p-&gt;eta = 18;
-</code></pre>
-      <p>Se invece lavori tramite puntatore, usi <code>-&gt;</code>. Non sono due sintassi arbitrarie: segnalano due modi diversi di accedere allo stesso oggetto.</p>
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Il tipo</h2>
+        <p>Stabilisce quali campi esistono, come si chiamano e quale tipo possiede ciascuno. La definizione termina con <code>;</code>.</p>
+      </article>
+      <article class="topic-card">
+        <h2>L’oggetto</h2>
+        <p>Occupa memoria e contiene valori concreti. Possiamo creare più oggetti indipendenti dello stesso tipo.</p>
+      </article>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Confronto minimo con il C</h2>
-<pre><code class="language-c">typedef struct {
-    char nome[32];
-    char cognome[32];
-    int eta;
-    double media;
-} Studente;
-</code></pre>
-      <p>Nel C il punto importante non e la differenza di "potenza", ma la rappresentazione delle stringhe: qui non hai <code>std::string</code>, ma array di <code>char</code>.</p>
-    </div>
+    <section class="topic-card">
+      <h2>Accesso con il punto</h2>
+      <div class="record-view">
+        <div class="record-field"><span class="field-name">s.matricola</span><strong>1001</strong></div>
+        <div class="record-field"><span class="field-name">s.nome</span><strong>Ada</strong></div>
+        <div class="record-field"><span class="field-name">s.media</span><strong>9.4</strong></div>
+      </div>
+      <p>L’operatore <code>.</code> seleziona un campo di un oggetto. Il nome prima del punto identifica l’oggetto; quello dopo il punto identifica il membro.</p>
+    </section>
 
-    <div class="inner-box warn">
-      <b>Errore tipico:</b> trattare i campi come variabili scollegate. Il loro senso dipende dalla <code>struct</code> a cui appartengono. Per questo conviene dare nomi parlanti sia al tipo sia ai membri.
-    </div>
+    <details class="checkpoint">
+      <summary>Controllo rapido · Quanti oggetti vengono creati?</summary>
+      <div class="answer">
+        <figure class="code-example">
+          <figcaption>Codice da leggere</figcaption>
+<pre><code class="language-cpp">Studente a{};
+Studente b{};
+Studente c = b;</code></pre>
+        </figure>
+        <p>Vengono creati tre oggetti. <code>c</code> nasce come copia di <code>b</code>; modificare poi <code>c</code> non modifica <code>b</code>.</p>
+      </div>
+    </details>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L2.3</strong> affrontiamo un punto molto piu importante di quanto sembri: l'inizializzazione. Una <code>struct</code> ben definita ma inizializzata male resta comunque una fonte di bug.
-    </div>
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 1 · 7 minuti</span>
+      <h2>Modella un libro</h2>
+      <p>Definisci <code>struct Libro</code> con codice numerico, titolo, numero di pagine e prezzo. Crea due oggetti, assegna i campi con <code>.</code> e stampa il titolo del libro più costoso.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> facciamo nascere ogni record in uno stato noto e utilizzabile.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_1.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_3.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

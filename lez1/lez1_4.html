@@ -1,122 +1,114 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L1.4 · Matrici 2D: dichiarazione e inizializzazione</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.4 · Righe contigue in memoria</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez1_3.html"; }
-    function nextSlide(){ window.location.href = "lez1_5.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:28.57%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
   <ul>
-    <li><a href="lez1_1.html">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
-    <li><a href="lez1_2.html">L1.2 - Definizioni e indici</a></li>
-    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
-    <li><a href="lez1_4.html" class="active">L1.4 - Dichiarazione e inizializzazione</a></li>
-    <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
-    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
-    <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
-    <li><a href="lez1_8.html">L1.8 - Perche la firma conta</a></li>
-    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
-    <li><a href="lez1_10.html">L1.10 - Matrici dinamiche</a></li>
-    <li><a href="lez1_11.html">L1.11 - Operazioni classiche e chiusura</a></li>
+    <li><a href="lez1_1.html">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html" class="active" aria-current="page">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html">L1.14 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Dichiarazione e inizializzazione</h1>
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 4/14</p>
+    <h1>Righe contigue in memoria</h1>
+    <p class="lead">La tabella è il nostro modello visivo; la memoria, invece, è lineare. C e C++ memorizzano le matrici statiche una riga dopo l’altra.</p>
+  </header>
 
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_3.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_5.html">Successiva &#8594;</a>
+  </nav>
 
   <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Una matrice statica è memorizzata in ordine <strong>row-major</strong>: prima tutta la riga 0, poi tutta la riga 1 e così via.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Vedere come si crea davvero una matrice statica e come si parte da uno stato noto. Questo passaggio e banale solo in apparenza: molte difficolta successive nascono da inizializzazioni fatte male.</p>
-      <p class="ok"><b>Idea chiave:</b> una matrice va fatta nascere in uno stato chiaro, non lasciata con valori indeterminati da "sistemare dopo".</p>
-    </div>
+    <section class="topic-card">
+      <h2>Dalla griglia alla sequenza</h2>
+      <div class="matrix-wrap">
+        <table class="matrix-table">
+          <thead><tr><th></th><th>c=0</th><th>c=1</th><th>c=2</th><th>c=3</th></tr></thead>
+          <tbody>
+            <tr><th>r=0</th><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+            <tr><th>r=1</th><td>20</td><td>21</td><td>22</td><td>23</td></tr>
+            <tr><th>r=2</th><td>30</td><td>31</td><td>32</td><td>33</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="output">10 11 12 13 20 21 22 23 30 31 32 33</div>
+    </section>
 
-    <div class="inner-box box">
-      <h2>C++: forme essenziali</h2>
-<pre><code class="language-cpp">constexpr int R = 3;
-constexpr int C = 4;
+    <section class="topic-card">
+      <h2>Indice lineare equivalente</h2>
+      <p>Se ogni riga contiene <code>C</code> elementi, prima della riga <code>r</code> ci sono <code>r * C</code> celle. Per raggiungere la colonna <code>c</code> ne aggiungiamo altre <code>c</code>.</p>
+      <div class="formula">indice = r * C + c</div>
+      <p>Esempio: in una matrice con 4 colonne, <code>m[2][1]</code> corrisponde alla posizione lineare <code>2 * 4 + 1 = 9</code>.</p>
+    </section>
 
-int a[R][C]{};   // tutte le celle inizializzate a 0
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Perché ci serve</h2>
+        <ul class="compact-list">
+          <li>spiega l’ordine naturale dei cicli;</li>
+          <li>spiega perché una funzione deve conoscere la lunghezza di una riga;</li>
+          <li>prepara le matrici dinamiche contigue.</li>
+        </ul>
+      </article>
+      <article class="topic-card">
+        <h2>Non confondere</h2>
+        <p>Il row-major descrive il <strong>layout in memoria</strong>. Righe e colonne restano comunque concetti del problema: a volte sarà corretto lavorare per colonne.</p>
+      </article>
+    </section>
 
-int b[R][C] = {
-  {1, 2, 3, 4},
-  {5, 6, 7, 8},
-  {9, 10, 11, 12}
-};
-</code></pre>
-      <p>La forma con <code>{}</code> e la piu sicura per partire da zero. Quando invece hai gia i valori, puoi usare liste annidate esplicite.</p>
-    </div>
+    <details class="checkpoint">
+      <summary>Controllo rapido · Dalla coppia all’indice e ritorno</summary>
+      <div class="answer">
+        <p>Con <code>C = 4</code>, quale indice lineare corrisponde a <code>(2, 1)</code>? E quale coppia corrisponde all’indice lineare 6?</p>
+        <p><strong>Risposte:</strong> <code>9</code>; <code>(1, 2)</code>, perché <code>6 / 4 = 1</code> con resto <code>2</code>.</p>
+      </div>
+    </details>
 
-    <div class="inner-box box">
-      <h2>C: confronto minimo utile</h2>
-<pre><code class="language-c">#define R 3
-#define C 4
-
-int a[R][C] = {0};   /* tutto a zero */
-
-int b[R][C] = {
-  {1, 2, 3, 4},
-  {5, 6, 7, 8},
-  {9, 10, 11, 12}
-};
-</code></pre>
-      <p>Il principio e lo stesso: se il dato iniziale e importante, lo dichiari in modo esplicito. Non lasci la matrice in uno stato ambiguo.</p>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Inizializzazione completa o parziale</h2>
-      <p>Se inizializzi solo alcune celle nelle liste, le altre vengono completate a zero. Questo puo essere utile, ma solo se l'intenzione e chiara.</p>
-<pre><code class="language-cpp">int c[3][4] = {
-  {1, 2},
-  {3},
-  {}
-};
-</code></pre>
-      <p>Qui non stai "dimenticando" dei valori: stai chiedendo esplicitamente una inizializzazione parziale con completamento automatico.</p>
-    </div>
-
-    <div class="inner-box warn">
-      <b>Errore tipico:</b> dichiarare una matrice automatica e leggere subito le celle senza averle inizializzate. Se non hai scritto qualcosa come <code>{}</code> o un'inizializzazione esplicita, non puoi assumere che i valori siano zero.
-    </div>
-
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L1.5</strong> passiamo dal "come nasce" al "come si percorre". E li il modello row-major tornera subito utile: l'ordine dei cicli non e indifferente.
-    </div>
-
+    <aside class="next-step"><strong>Prossimo passo:</strong> traduciamo la struttura a righe in due cicli annidati.</aside>
   </div>
 
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
-
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_3.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_5.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

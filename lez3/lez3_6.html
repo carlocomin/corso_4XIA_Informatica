@@ -1,116 +1,134 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L3.6 · Binario: modello base</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L3.6 · Leggere righe in C++</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez3_5.html"; }
-    function nextSlide(){ window.location.href = "lez3_7.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:37.50%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 3 - File I/O (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+  <h2>Lezione 3 - File I/O</h2>
   <ul>
-    <li><a href="lez3_1.html">L3.1 - Che cos'e un file</a></li>
-    <li><a href="lez3_2.html">L3.2 - Testo vs binario</a></li>
-    <li><a href="lez3_3.html">L3.3 - Modello d'I/O e scelte pratiche</a></li>
-    <li><a href="lez3_4.html">L3.4 - CSV e TSV: scrivere e leggere</a></li>
-    <li><a href="lez3_5.html">L3.5 - Robustezza: escape, locale, round-trip</a></li>
-    <li><a href="lez3_6.html" class="active">L3.6 - Binario: modello base</a></li>
-    <li><a href="lez3_7.html">L3.7 - Read e write in C++ e C</a></li>
-    <li><a href="lez3_8.html">L3.8 - Seek e cursore nei file binari</a></li>
-    <li><a href="lez3_9.html">L3.9 - Perche i seek arbitrari in text mode non sono portabili</a></li>
-    <li><a href="lez3_10.html">L3.10 - Indici per file binari</a></li>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html" class="active" aria-current="page">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
+    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
+    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
+    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
+    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Binario: modello base</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · File I/O · 6/16</p>
+    <h1>Leggere righe in C++</h1>
+    <p class="lead"><code>std::getline</code> conserva gli spazi interni e usa il fine riga come confine logico.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_5.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_7.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Costruire il modello mentale corretto per i file binari prima di usare <code>read</code>, <code>write</code>, <code>fread</code> e <code>fwrite</code>.</p>
-      <p class="ok"><b>Idea chiave:</b> in binario non stai "scrivendo testo piu velocemente", ma stai definendo un formato di byte che il programma deve conoscere con precisione.</p>
-    </div>
 
-    <div class="inner-box box">
-      <h2>Che cosa va deciso in un formato binario</h2>
-      <ul>
-        <li>ordine dei campi;</li>
-        <li>dimensione dei tipi salvati;</li>
-        <li>presenza di un header iniziale;</li>
-        <li>eventuali conteggi, lunghezze o offset.</li>
-      </ul>
-      <p>Se queste regole non sono esplicite, il file binario diventa difficile da evolvere e da leggere correttamente.</p>
-    </div>
+    <section class="concept-card">
+      <h2>La riga come unità di lavoro</h2>
+      <p>La lettura per token è ideale per valori separati da spazi; la lettura per riga è adatta a frasi, descrizioni e record che richiedono parsing successivo.</p>
+      <p><strong>Idea chiave:</strong> prima acquisisci la riga completa, poi decidi come interpretarla.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Header minimale consigliato</h2>
-      <p>Gia in quarta superiore conviene introdurre una struttura semplice:</p>
-      <ul>
-        <li><b>magic</b> per riconoscere il tipo di file;</li>
-        <li><b>versione</b> per distinguere formati diversi;</li>
-        <li><b>conteggi</b> o dimensioni per sapere quanto leggere.</li>
-      </ul>
-      <p>Questa piccola disciplina evita molta confusione dopo poche settimane.</p>
-    </div>
+    <figure class="code-example">
+      <figcaption>C++17 · stampare le righe non vuote</figcaption>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
 
-    <div class="inner-box box">
-      <h2>Cosa non bisogna confondere</h2>
-      <ul>
-        <li>un <b>record logico</b> non coincide per forza con il layout in memoria di una struct;</li>
-        <li>un <b>puntatore</b> non ha senso su disco, perche e solo un indirizzo locale;</li>
-        <li>una stringa va salvata come lunghezza piu contenuto, oppure in un formato text-based.</li>
-      </ul>
-      <p class="note">Il tema del dump raw della memoria e gia stato preparato in <strong>L2.10</strong>; qui lo diamo per acquisito e andiamo avanti sul formato file.</p>
-    </div>
+int main() {
+    std::ifstream in("note.txt");
+    if (!in) return 1;
 
-    <div class="inner-box box">
-      <h2>Quando il binario e davvero la scelta giusta</h2>
-      <ul>
-        <li>quando vuoi accesso diretto a record in posizione nota;</li>
-        <li>quando i file sono grandi e il parsing testuale costa troppo;</li>
-        <li>quando l'applicazione controlla completamente scrittura e lettura;</li>
-        <li>quando prevedi indici e seek frequenti.</li>
-      </ul>
-    </div>
+    std::string riga;
+    int numero = 0;
 
-    <div class="inner-box warn">
-      <b>Regola pratica:</b> se scegli il binario, scrivi prima il contratto del formato e solo dopo il codice.
-    </div>
+    while (std::getline(in, riga)) {
+        ++numero;
+        if (!riga.empty())
+            std::cout &lt;&lt; numero &lt;&lt; ": " &lt;&lt; riga &lt;&lt; '\n';
+    }
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L3.7</strong> traduciamo questo modello nelle primitive concrete di C++ e C per leggere e scrivere byte.
-    </div>
+    if (in.bad()) {
+        std::cerr &lt;&lt; "Errore durante la lettura\n";
+        return 2;
+    }
+}</code></pre>
+    </figure>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2><code>&gt;&gt;</code> oppure <code>getline</code>?</h2>
+        <ul class="compact-list">
+          <li><code>&gt;&gt;</code>: numeri e parole separate;</li>
+          <li><code>getline</code>: riga completa;</li>
+          <li>dopo <code>getline</code>: eventuale parsing dei campi.</li>
+        </ul>
+      </article>
+      <article class="topic-card">
+        <h2>Quando li mescoli</h2>
+        <p><code>&gt;&gt;</code> lascia il fine riga nello stream. Prima del successivo <code>getline</code> puoi scartarlo:</p>
+        <figure class="code-example">
+          <figcaption>C++17 · frammento contestuale</figcaption>
+<pre><code class="language-cpp">in.ignore(
+    std::numeric_limits&lt;std::streamsize&gt;::max(),
+    '\n'
+);
+std::getline(in, descrizione);</code></pre>
+        </figure>
+      </article>
+    </section>
+
+    <div class="callout warning"><strong>Nota:</strong> il frammento richiede <code>&lt;limits&gt;</code> e va eseguito solo dopo che la precedente estrazione con <code>&gt;&gt;</code> è riuscita.</div>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Quale funzione legge “Ada Lovelace” senza spezzarlo?</summary>
+      <div class="answer">
+        <p><code>std::getline</code>, se l’intero nome occupa la riga o se specifichiamo un delimitatore diverso per il campo.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 6</span>
+      <h2>La riga più lunga</h2>
+      <p>Leggi <code>note.txt</code> e stampa numero e contenuto della riga più lunga. Decidi esplicitamente come trattare le righe vuote.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Rendiamo esplicita la regola più importante dei cicli di lettura.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_5.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_7.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

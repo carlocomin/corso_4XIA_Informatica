@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.12 · Cercare, contare, scegliere</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:80.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
+  <ul>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html" class="active" aria-current="page">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html">L2.15 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 12/15</p>
+    <h1>Cercare, contare, scegliere</h1>
+    <p class="lead">Sugli archivi di record ritornano i pattern degli array: visita lineare, condizione su un campo e accumulatore.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_11.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_13.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>L’algoritmo percorre i record; la condizione osserva uno o più campi. Separare queste due parti rende il codice facile da adattare.</p>
+    </section>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Cercare una matricola</h2>
+        <figure class="code-example">
+          <figcaption>C++17 · restituisce l’indice o -1</figcaption>
+<pre><code class="language-cpp">int cercaMatricola(const Studente studenti[],
+                    int n, int cercata) {
+    for (int i = 0; i &lt; n; ++i) {
+        if (studenti[i].matricola == cercata)
+            return i;
+    }
+    return -1;
+}</code></pre>
+        </figure>
+        <p>Appena troviamo il record possiamo terminare: l’indice identifica la posizione nell’archivio.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Contare i promossi</h2>
+        <figure class="code-example">
+          <figcaption>C++17 · accumulatore di conteggio</figcaption>
+<pre><code class="language-cpp">int contaPromossi(const Studente studenti[], int n) {
+    int quanti = 0;
+
+    for (int i = 0; i &lt; n; ++i) {
+        if (studenti[i].media &gt;= 6.0)
+            ++quanti;
+    }
+    return quanti;
+}</code></pre>
+        </figure>
+        <p>Qui dobbiamo visitare tutti i record, perché ogni studente può aumentare il conteggio.</p>
+      </article>
+    </section>
+
+    <section class="topic-card">
+      <h2>Tre domande prima del ciclo</h2>
+      <ol class="steps">
+        <li>devo trovare il primo record oppure considerarli tutti?</li>
+        <li>quale campo esprime la condizione?</li>
+        <li>devo restituire il record, il suo indice, un conteggio o un valore?</li>
+      </ol>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Controllo rapido · Perché usare -1?</summary>
+      <div class="answer">
+        <p>Gli indici validi partono da zero; <code>-1</code> non può essere una posizione dell’array e rappresenta quindi “non trovato”. Il chiamante deve sempre controllarlo prima di accedere a <code>studenti[indice]</code>.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 11 · 15 minuti</span>
+      <h2>Seleziona il migliore</h2>
+      <p>Scrivi <code>int indiceMigliore(const Studente studenti[], int n)</code>. Per <code>n &lt;= 0</code> restituisci <code>-1</code>; altrimenti conserva l’indice della media massima. A parità, scegli la matricola minore.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> per ordinare record dobbiamo rendere esplicito il criterio di confronto.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_11.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_13.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

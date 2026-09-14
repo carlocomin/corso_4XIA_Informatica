@@ -1,114 +1,119 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L1.9 · Matrici 2D: firme corrette in C++ e C</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.9 · Pattern: accumulare</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez1_8.html"; }
-    function nextSlide(){ window.location.href = "lez1_10.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:64.29%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
   <ul>
-    <li><a href="lez1_1.html">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
-    <li><a href="lez1_2.html">L1.2 - Definizioni e indici</a></li>
-    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
-    <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
-    <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
-    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
-    <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
-    <li><a href="lez1_8.html">L1.8 - Perche la firma conta</a></li>
-    <li><a href="lez1_9.html" class="active">L1.9 - Firme corrette in C++ e C</a></li>
-    <li><a href="lez1_10.html">L1.10 - Matrici dinamiche</a></li>
-    <li><a href="lez1_11.html">L1.11 - Operazioni classiche e chiusura</a></li>
+    <li><a href="lez1_1.html">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html" class="active" aria-current="page">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html">L1.14 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Firme corrette in C++ e C</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 9/14</p>
+    <h1>Pattern: accumulare</h1>
+    <p class="lead">Somma, conteggio e massimo cambiano nel dettaglio, ma condividono lo stesso schema: inizializza, visita, aggiorna, restituisci.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_8.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_10.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>Un accumulatore conserva il risultato parziale mentre visitiamo le celle. La sua inizializzazione deve essere coerente con l’operazione.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Tradurre il modello mentale della pagina precedente in firme corrette e leggibili.</p>
-      <p class="ok"><b>Idea chiave:</b> in C++ conviene sfruttare il tipo in modo forte; in C bisogna rendere esplicita almeno la seconda dimensione o usare VLA quando il contesto lo permette.</p>
-    </div>
+    <section class="three-col">
+      <article class="topic-card">
+        <span class="badge">1</span>
+        <h2>Inizializza</h2>
+        <p><code>somma = 0</code><br><code>conteggio = 0</code><br><code>massimo = m[0][0]</code></p>
+      </article>
+      <article class="topic-card">
+        <span class="badge">2</span>
+        <h2>Aggiorna</h2>
+        <p>Per ogni cella, aggiungi, incrementa oppure confronta.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge">3</span>
+        <h2>Restituisci</h2>
+        <p>Il risultato è pronto soltanto dopo la visita delle celle necessarie.</p>
+      </article>
+    </section>
 
-    <div class="inner-box box">
-      <h2>C++: riferimento a matrice o template</h2>
+    <section class="topic-card">
+      <h2>Esempio: trovare il massimo</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · matrice non vuota</figcaption>
 <pre><code class="language-cpp">constexpr int R = 3;
 constexpr int C = 4;
 
-void stampa(const int (&m)[R][C]){
-  for (int r = 0; r &lt; R; ++r)
-    for (int c = 0; c &lt; C; ++c)
-      std::cout &lt;&lt; m[r][c] &lt;&lt; ' ';
-}
-</code></pre>
-      <p>Se vuoi piu flessibilita, puoi usare un template e lasciare al compilatore la deduzione di <code>R</code> e <code>C</code>.</p>
-    </div>
+int massimo(const int (&amp;m)[R][C]) {
+    int max = m[0][0];
 
-    <div class="inner-box box">
-      <h2>C: seconda dimensione nota o VLA</h2>
-<pre><code class="language-c">#define C 4
+    for (int r = 0; r &lt; R; ++r) {
+        for (int c = 0; c &lt; C; ++c) {
+            if (m[r][c] &gt; max)
+                max = m[r][c];
+        }
+    }
+    return max;
+}</code></pre>
+      </figure>
+      <p>Inizializziamo <code>max</code> con una cella reale. Così la funzione è corretta anche quando tutti i valori sono negativi.</p>
+    </section>
 
-void stampa(int R, const int m[][C]){
-  for (int r = 0; r &lt; R; ++r)
-    for (int c = 0; c &lt; C; ++c)
-      printf("%d ", m[r][c]);
-}
-</code></pre>
-      <p>In C99 puoi anche usare VLA e quindi passare le dimensioni a runtime:</p>
-<pre><code class="language-c">void stampa_vla(int R, int C, const int m[R][C]) { /* ... */ }
-</code></pre>
-      <p class="note">Questo e corretto in C, ma non va trattato come modello standard di C++.</p>
-    </div>
+    <details class="checkpoint">
+      <summary>Trova il caso che rompe il programma · Perché <code>int max = 0;</code> è rischioso?</summary>
+      <div class="answer">
+        <p>Con la matrice <code>{{-8, -3}, {-10, -5}}</code> il risultato sarebbe erroneamente 0, un valore che non compare nei dati. Il massimo corretto è -3.</p>
+      </div>
+    </details>
 
-    <div class="inner-box box">
-      <h2>Firme da evitare</h2>
-      <ul>
-        <li><code>void f(int **m)</code> per una matrice statica <code>int a[R][C]</code>;</li>
-        <li>firme che nascondono il significato delle dimensioni;</li>
-        <li>soluzioni "funzionano nel mio compilatore" ma non sono didatticamente pulite o portabili.</li>
-      </ul>
-      <p class="warn"><b>Regola pratica:</b> se la matrice e statica e contigua, la firma deve riflettere proprio questo fatto, non un'altra struttura dati.</p>
-    </div>
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 7 · 10 minuti</span>
+      <h2>Conta secondo una condizione</h2>
+      <p>Scrivi <code>int contaPari(const int (&amp;m)[R][C])</code>. Poi trasformala in <code>contaPositivi</code>: individua con precisione quale sola riga dell’algoritmo deve cambiare.</p>
+    </section>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L1.10</strong> usciamo dal caso statico e affrontiamo il problema vero delle dimensioni note solo a runtime: matrici dinamiche, contiguita e scelte di rappresentazione.
-    </div>
-
+    <aside class="next-step"><strong>Prossimo passo:</strong> usiamo un accumulatore separato per ogni riga o per ogni colonna.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
-
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_8.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_10.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

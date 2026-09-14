@@ -1,132 +1,124 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L3.7 · Binario: read e write in C++ e C</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L3.7 · Il ciclo di lettura corretto</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez3_6.html"; }
-    function nextSlide(){ window.location.href = "lez3_8.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:43.75%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 3 - File I/O (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+  <h2>Lezione 3 - File I/O</h2>
   <ul>
-    <li><a href="lez3_1.html">L3.1 - Che cos'e un file</a></li>
-    <li><a href="lez3_2.html">L3.2 - Testo vs binario</a></li>
-    <li><a href="lez3_3.html">L3.3 - Modello d'I/O e scelte pratiche</a></li>
-    <li><a href="lez3_4.html">L3.4 - CSV e TSV: scrivere e leggere</a></li>
-    <li><a href="lez3_5.html">L3.5 - Robustezza: escape, locale, round-trip</a></li>
-    <li><a href="lez3_6.html">L3.6 - Binario: modello base</a></li>
-    <li><a href="lez3_7.html" class="active">L3.7 - Read e write in C++ e C</a></li>
-    <li><a href="lez3_8.html">L3.8 - Seek e cursore nei file binari</a></li>
-    <li><a href="lez3_9.html">L3.9 - Perche i seek arbitrari in text mode non sono portabili</a></li>
-    <li><a href="lez3_10.html">L3.10 - Indici per file binari</a></li>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html" class="active" aria-current="page">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
+    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
+    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
+    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
+    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Read e write in C++ e C</h1>
-
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · File I/O · 7/16</p>
+    <h1>Il ciclo di lettura corretto</h1>
+    <p class="lead">La fine del file non si prevede: si tenta una lettura e si usa il dato soltanto se il tentativo riesce.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_6.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_8.html">Successiva &#8594;</a>
+  </nav>
   <div class="content-box">
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Vedere come le primitive di lettura e scrittura binaria implementano il modello visto nella slide precedente.</p>
-      <p class="ok"><b>Idea chiave:</b> <code>read</code>/<code>write</code> in C++ e <code>fread</code>/<code>fwrite</code> in C non "capiscono" i dati: copiano byte tra file e memoria.</p>
-    </div>
 
-    <div class="inner-box box">
-      <h2>Esempio base in C++</h2>
-<pre><code class="language-cpp">#include &lt;fstream&gt;
-#include &lt;cstdint&gt;
+    <section class="concept-card">
+      <h2>Prima leggi, poi elabori</h2>
+      <p><strong>Idea chiave:</strong> la condizione del ciclo deve essere l’operazione che produce il dato. <code>eof()</code> diventa vero soltanto dopo un tentativo di lettura oltre la fine.</p>
+    </section>
 
-int main(){
-    std::ofstream out("dati.bin", std::ios::binary);
-    if(!out) return 1;
+    <section class="two-col">
+      <article class="topic-card">
+        <span class="badge">Da non usare</span>
+        <h2>Controllo anticipato</h2>
+        <figure class="code-example">
+          <figcaption>C++17 · errore logico</figcaption>
+<pre><code class="language-cpp">while (!in.eof()) {
+    std::getline(in, riga);
+    elabora(riga);
+}</code></pre>
+        </figure>
+        <p>L’ultima lettura può fallire, ma <code>riga</code> viene elaborata comunque.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge extra">Corretto</span>
+        <h2>La lettura governa il ciclo</h2>
+        <figure class="code-example">
+          <figcaption>C++17 · pattern corretto</figcaption>
+<pre><code class="language-cpp">while (std::getline(in, riga)) {
+    elabora(riga);
+}</code></pre>
+        </figure>
+        <p>Il corpo vede soltanto righe acquisite con successo.</p>
+      </article>
+    </section>
 
-    std::uint32_t n = 3;
-    int valori[3] = {10, 20, 30};
+    <section class="topic-card">
+      <h2>Stati essenziali dello stream</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Controllo</th><th>Significato operativo</th></tr></thead>
+          <tbody>
+            <tr><td><code>in.good()</code></td><td>Nessun indicatore di errore è attivo.</td></tr>
+            <tr><td><code>in.eof()</code></td><td>È stata incontrata la fine del file.</td></tr>
+            <tr><td><code>in.fail()</code></td><td>Una lettura o conversione non è riuscita.</td></tr>
+            <tr><td><code>in.bad()</code></td><td>Errore grave del dispositivo o dello stream.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Dopo un ciclo formattato, <code>!in.eof()</code> segnala spesso un dato malformato; <code>in.bad()</code> segnala un errore di I/O.</p>
+    </section>
 
-    out.write((const char*)&n, sizeof n);
-    out.write((const char*)valori, sizeof valori);
-}
-</code></pre>
-      <p>Qui scriviamo prima il numero di elementi, poi il blocco dati. E gia una forma minima di formato esplicito.</p>
-    </div>
+    <details class="checkpoint">
+      <summary>Checkpoint · Perché il ciclo sbagliato può duplicare l’ultima riga?</summary>
+      <div class="answer">
+        <p>Perché dopo il fallimento di <code>getline</code> la variabile non contiene una nuova riga valida, ma il corpo del ciclo viene comunque eseguito.</p>
+      </div>
+    </details>
 
-    <div class="inner-box box">
-      <h2>Esempio base in C</h2>
-<pre><code class="language-c">#include &lt;stdio.h&gt;
-#include &lt;stdint.h&gt;
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 7</span>
+      <h2>Trova e correggi il bug</h2>
+      <p>Prendi un programma che usa <code>while (!in.eof())</code>, sostituisci il ciclo con il pattern corretto e prova file vuoto, una sola riga e ultima riga senza <code>\n</code>.</p>
+    </section>
 
-int main(void){
-    FILE* f = fopen("dati.bin", "wb");
-    if(!f) return 1;
-
-    uint32_t n = 3;
-    int valori[3] = {10, 20, 30};
-
-    fwrite(&n, sizeof n, 1, f);
-    fwrite(valori, sizeof(int), 3, f);
-    fclose(f);
-}
-</code></pre>
-      <p>La logica e identica: apri in binario, scrivi header o conteggi, poi scrivi i dati.</p>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Che cosa bisogna controllare</h2>
-      <ul>
-        <li>l'apertura del file deve riuscire;</li>
-        <li>la quantita di byte o elementi letti deve essere quella attesa;</li>
-        <li>la lettura deve seguire esattamente lo stesso ordine usato in scrittura.</li>
-      </ul>
-      <p>Se inverti l'ordine dei campi o cambi un tipo, il file non si interpreta piu nello stesso modo.</p>
-    </div>
-
-    <div class="inner-box box">
-      <h2>Che cosa non fare</h2>
-      <ul>
-        <li>non usare queste funzioni su oggetti con puntatori interni come <code>std::string</code>;</li>
-        <li>non mescolare testo e binario nello stesso file senza un formato chiaro;</li>
-        <li>non dimenticare <code>std::ios::binary</code> o la modalita <code>"b"</code> quando serve.</li>
-      </ul>
-    </div>
-
-    <div class="inner-box warn">
-      <b>Errore tipico:</b> pensare che se una lettura non da errore allora il formato sia corretto. Un file puo essere letto senza errori formali ma essere interpretato in modo sbagliato.
-    </div>
-
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L3.8</strong> aggiungiamo il pezzo che rende il binario davvero interessante: il cursore e i seek per saltare direttamente a una posizione precisa.
-    </div>
+    <aside class="next-step"><strong>Prossimo passo.</strong> Applichiamo gli stessi principi con la libreria standard del C.</aside>
   </div>
-
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_6.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_8.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

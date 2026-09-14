@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.14 · Laboratorio e autoverifica</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:100.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
+  <ul>
+    <li><a href="lez1_1.html">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html" class="active" aria-current="page">L1.14 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 14/14</p>
+    <h1>Laboratorio e autoverifica</h1>
+    <p class="lead">Un unico problema per collegare dichiarazione, I/O, funzioni, accumulazione e ragionamento per righe e colonne.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_13.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="../lez2/lez2_1.html">Lezione 2 &#8594;</a>
+  </nav>
+  <div class="content-box">
+    <section class="concept-card">
+      <h2>Consegna: vendite mensili</h2>
+      <p>Una matrice <code>vendite[3][4]</code> contiene le vendite di <strong>3 reparti</strong> durante <strong>4 settimane</strong>. Le righe rappresentano i reparti, le colonne le settimane.</p>
+      <p>Realizza un programma C++ suddiviso in funzioni. Ogni funzione deve svolgere un solo compito.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Requisiti, in ordine</h2>
+      <ol class="steps">
+        <li>leggi e stampa la matrice mantenendo la forma a righe e colonne;</li>
+        <li>calcola e stampa la somma di ogni reparto;</li>
+        <li>individua la settimana con il totale complessivo maggiore;</li>
+        <li>trova la vendita massima e le sue coordinate <code>(r,c)</code>.</li>
+      </ol>
+      <div class="callout"><strong>Vincolo:</strong> usa almeno quattro funzioni oltre a <code>main</code>. Le funzioni che non modificano la matrice devono riceverla come <code>const</code>.</div>
+    </section>
+
+    <section class="topic-card">
+      <h2>Codice di partenza</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · completa i TODO</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+constexpr int R = 3;
+constexpr int C = 4;
+using Matrice = int[R][C];
+
+bool leggi(Matrice&amp; m) {
+    for (int r = 0; r &lt; R; ++r)
+        for (int c = 0; c &lt; C; ++c)
+            if (!(std::cin &gt;&gt; m[r][c]))
+                return false;
+    return true;
+}
+
+void stampa(const Matrice&amp; m) {
+    // TODO: stampa una riga della matrice per riga
+}
+
+int sommaRiga(const Matrice&amp; m, int r) {
+    // TODO: restituisci la somma della riga r
+    return 0;
+}
+
+int main() {
+    Matrice vendite{};
+
+    if (!leggi(vendite)) {
+        std::cerr &lt;&lt; "Input non valido\n";
+        return 1;
+    }
+
+    stampa(vendite);
+    // TODO: completa i requisiti 2, 3 e 4
+}</code></pre>
+      </figure>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Dataset di collaudo · Risultati attesi</summary>
+      <div class="answer">
+        <div class="output">1  2  3  4
+5  6  7  8
+9 10 11 12</div>
+        <ul>
+          <li>somme dei reparti: <code>10, 26, 42</code>;</li>
+          <li>totali delle settimane: <code>15, 18, 21, 24</code>, quindi vince la settimana di indice <code>3</code>;</li>
+          <li>massimo: <code>12</code> nella cella <code>(2,3)</code>.</li>
+        </ul>
+      </div>
+    </details>
+
+    <section class="three-col">
+      <article class="topic-card">
+        <span class="badge">Base</span>
+        <h2>So orientarmi</h2>
+        <p>Distinguo righe e colonne, rispetto i limiti e prevedo l’ordine della visita.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge">Operativo</span>
+        <h2>So programmare</h2>
+        <p>Scrivo doppi cicli, accumulatori e funzioni con <code>const</code> corretto.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge">Consapevole</span>
+        <h2>So spiegare</h2>
+        <p>Collego row-major, ordine dei cicli e necessità di conoscere le colonne.</p>
+      </article>
+    </section>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Sfida facoltativa</span>
+      <h2>Trasposta</h2>
+      <p>Costruisci una matrice <code>trasposta[4][3]</code> tale che <code>trasposta[c][r] = vendite[r][c]</code>. Stampala e controlla che righe e colonne si siano scambiate.</p>
+    </section>
+
+    <aside class="next-step"><strong>Lezione completata.</strong> Nella Lezione 2 useremo le <code>struct</code> per raggruppare dati che descrivono la stessa entità.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_13.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="../lez2/lez2_1.html">Lezione 2 &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

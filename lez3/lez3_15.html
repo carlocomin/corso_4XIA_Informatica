@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L3.15 · Cursore, seek e record fissi</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:93.75%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+  <h2>Lezione 3 - File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
+    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
+    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
+    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
+    <li><a href="lez3_15.html" class="active" aria-current="page">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · File I/O · 15/16</p>
+    <h1>Cursore, seek e record fissi</h1>
+    <p class="lead">Quando la dimensione dei record è nota, l’indice logico può essere trasformato direttamente in un offset nel file.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_14.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_16.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Accesso casuale</h2>
+      <p>Ogni stream mantiene una posizione corrente. <code>seekg</code> sposta il cursore di lettura e <code>tellg</code> comunica la posizione.</p>
+      <p><strong>Idea chiave:</strong> il seek è utile soltanto quando il formato permette di calcolare o recuperare un offset valido.</p>
+    </section>
+
+    <div class="formula">offset(i) = sizeof(conteggio) + i × sizeof(record)</div>
+
+    <figure class="code-example">
+      <figcaption>C++17 · leggere il valore di indice i</figcaption>
+<pre><code class="language-cpp">#include &lt;cstdint&gt;
+#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+bool leggiValore(const std::string&amp; path,
+                 std::uint32_t indice,
+                 std::int32_t&amp; valore) {
+    std::ifstream in(path, std::ios::binary);
+    if (!in) return false;
+
+    std::uint32_t conteggio = 0;
+    in.read(reinterpret_cast&lt;char*&gt;(&amp;conteggio),
+            sizeof conteggio);
+    if (!in || indice &gt;= conteggio) return false;
+
+    const std::streamoff offset =
+        static_cast&lt;std::streamoff&gt;(sizeof conteggio)
+        + static_cast&lt;std::streamoff&gt;(indice)
+        * static_cast&lt;std::streamoff&gt;(sizeof valore);
+
+    in.seekg(offset, std::ios::beg);
+    return static_cast&lt;bool&gt;(
+        in.read(reinterpret_cast&lt;char*&gt;(&amp;valore),
+                sizeof valore)
+    );
+}
+
+int main() {
+    std::int32_t valore = 0;
+    if (!leggiValore("dati.bin", 2, valore))
+        return 1;
+
+    std::cout &lt;&lt; valore &lt;&lt; '\n';
+}</code></pre>
+    </figure>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>In C</h2>
+        <p>Le funzioni equivalenti sono <code>fseek</code> e <code>ftell</code>. La formula dell’offset non cambia.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge extra">Estensione</span>
+        <h2>Indice chiave-offset</h2>
+        <p>Per cercare per matricola, una tabella separata può associare ogni chiave alla posizione del record nel file.</p>
+      </article>
+    </section>
+
+    <div class="callout warning"><strong>Portabilità:</strong> nei file testuali non trattare liberamente le posizioni come numeri di byte; traduzioni di newline e codifiche variabili rendono fragile l’aritmetica sugli offset. Usa il seek calcolato sui file binari.</div>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Dove inizia il record di indice 2?</summary>
+      <div class="answer">
+        <p>Dopo l’header e due record: <code>sizeof(conteggio) + 2 * sizeof(record)</code>. Gli indici partono da zero.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 15</span>
+      <h2>Aggiornamento diretto</h2>
+      <p>Apri il file con <code>std::fstream</code> in lettura e scrittura binaria, calcola l’offset e sostituisci un valore senza riscrivere l’intero file.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Nel laboratorio useremo il testo come nucleo obbligatorio e il binario come sfida facoltativa.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_14.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_16.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

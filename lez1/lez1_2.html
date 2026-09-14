@@ -1,112 +1,114 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>4BIA - L1.2 · Matrici 2D: definizioni e indici</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L1.2 · Due indici, una cella</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
   <script src="../menu.js"></script>
-  <script>try{hljs.highlightAll();}catch(e){}</script>
   <script>
-    function prevSlide(){ window.location.href = "lez1_1.html"; }
-    function nextSlide(){ window.location.href = "lez1_3.html"; }
-    function toggleBox(btnId, boxId){
-      const box = document.getElementById(boxId);
-      const btn = document.getElementById(btnId);
-      const open = box.style.display === 'block';
-      box.style.display = open ? 'none' : 'block';
-      if (btn) btn.textContent = open ? 'Mostra ▼' : 'Nascondi ▲';
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
   </script>
 </head>
-<body>
+<body class="lesson-review lesson-matrices">
+<div class="lesson-progress" aria-hidden="true"><span style="width:14.29%"></span></div>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
-  <h2>Lezione 1 - Matrici 2D (ripasso guidato)</h2>
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 1">
+  <h2>Lezione 1 - Matrici 2D</h2>
   <ul>
-    <li><a href="lez1_1.html">L1.1 - Introduzione, obiettivi, convenzioni</a></li>
-    <li><a href="lez1_2.html" class="active">L1.2 - Definizioni e indici</a></li>
-    <li><a href="lez1_3.html">L1.3 - Row-major e modello di memoria</a></li>
-    <li><a href="lez1_4.html">L1.4 - Dichiarazione e inizializzazione</a></li>
-    <li><a href="lez1_5.html">L1.5 - Attraversamento per riga/colonna</a></li>
-    <li><a href="lez1_6.html">L1.6 - I/O di base su matrici</a></li>
-    <li><a href="lez1_7.html">L1.7 - Utility e input robusto</a></li>
-    <li><a href="lez1_8.html">L1.8 - Perche la firma conta</a></li>
-    <li><a href="lez1_9.html">L1.9 - Firme corrette in C++ e C</a></li>
-    <li><a href="lez1_10.html">L1.10 - Matrici dinamiche</a></li>
-    <li><a href="lez1_11.html">L1.11 - Operazioni classiche e chiusura</a></li>
+    <li><a href="lez1_1.html">L1.1 - Ripartiamo dalle matrici</a></li>
+    <li><a href="lez1_2.html" class="active" aria-current="page">L1.2 - Due indici, una cella</a></li>
+    <li><a href="lez1_3.html">L1.3 - Dichiarare e inizializzare</a></li>
+    <li><a href="lez1_4.html">L1.4 - Righe contigue in memoria</a></li>
+    <li><a href="lez1_5.html">L1.5 - Il doppio ciclo</a></li>
+    <li><a href="lez1_6.html">L1.6 - Leggere e stampare</a></li>
+    <li><a href="lez1_7.html">L1.7 - Matrici nelle funzioni C++</a></li>
+    <li><a href="lez1_8.html">L1.8 - Matrici nelle funzioni C</a></li>
+    <li><a href="lez1_9.html">L1.9 - Pattern: accumulare</a></li>
+    <li><a href="lez1_10.html">L1.10 - Somme per righe e colonne</a></li>
+    <li><a href="lez1_11.html">L1.11 - Diagonali e traccia</a></li>
+    <li><a href="lez1_12.html">L1.12 - Simmetria e metà matrice</a></li>
+    <li><a href="lez1_13.html">L1.13 - Matrici dinamiche (estensione)</a></li>
+    <li><a href="lez1_14.html">L1.14 - Laboratorio e autoverifica</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
-<div class="slide">
-  <h1>Definizioni e indici</h1>
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Matrici 2D · 2/14</p>
+    <h1>Due indici, una cella</h1>
+    <p class="lead">Il primo indice sceglie la riga, il secondo la colonna. Questa convenzione semplice evita gran parte degli errori sulle matrici.</p>
+  </header>
 
-  <div class="nav-buttons" style="margin-bottom:10px">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_1.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_3.html">Successiva &#8594;</a>
+  </nav>
 
   <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>In una matrice dichiarata come <code>m[R][C]</code>, una cella si indica con <code>m[r][c]</code>: prima la <strong>riga</strong>, poi la <strong>colonna</strong>.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Obiettivo della pagina</h2>
-      <p>Prima di parlare di prestazioni o di codice, bisogna chiarire bene l'oggetto di cui stiamo parlando. Se il lessico e ambiguo, anche gli errori sugli indici diventano ambigui.</p>
-      <p class="ok"><b>Idea chiave:</b> una matrice e una tabella di valori organizzata per righe e colonne, e ogni cella e identificata in modo univoco da una coppia di indici.</p>
-    </div>
+    <section class="topic-card">
+      <h2>Leggiamo una matrice 3 × 4</h2>
+      <div class="matrix-wrap">
+        <table class="matrix-table">
+          <caption><code>m</code>: 3 righe e 4 colonne</caption>
+          <thead><tr><th>r \ c</th><th>0</th><th>1</th><th>2</th><th>3</th></tr></thead>
+          <tbody>
+            <tr><th>0</th><td>5</td><td>8</td><td>1</td><td>6</td></tr>
+            <tr><th>1</th><td>7</td><td>3</td><td class="focus">42</td><td>9</td></tr>
+            <tr><th>2</th><td>4</td><td>0</td><td>2</td><td>8</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>La cella evidenziata è <code>m[1][2]</code>. Nel linguaggio comune è la <strong>seconda riga, terza colonna</strong>, perché gli indici del programma iniziano da zero.</p>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Che cos'e una matrice 2D</h2>
-      <p>Una matrice a due dimensioni contiene elementi dello stesso tipo distribuiti su <b>R righe</b> e <b>C colonne</b>. In forma intuitiva puoi pensarla come una tabella, ma dal punto di vista del programma conta soprattutto questo: ogni cella ha una posizione precisa.</p>
-<pre><code class="language-text">r\c | 0   1   2   3
-----+----------------
- 0  | .   .   .   .
- 1  | .   .   .   .
- 2  | .   .   .   .
-</code></pre>
-      <p>Dire che una matrice e <b>quadrata</b> significa che il numero di righe coincide con quello delle colonne. Se invece i due numeri sono diversi, la matrice e <b>rettangolare</b>.</p>
-    </div>
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Indici validi</h2>
+        <div class="formula">0 ≤ r &lt; R &nbsp;&nbsp; e &nbsp;&nbsp; 0 ≤ c &lt; C</div>
+        <p>Per <code>m[3][4]</code>, l’ultima cella è <code>m[2][3]</code>.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Forma della matrice</h2>
+        <p><strong>Rettangolare:</strong> <code>R != C</code>.</p>
+        <p><strong>Quadrata:</strong> <code>R == C</code>. Solo in questo caso parliamo delle due diagonali complete.</p>
+      </article>
+    </section>
 
-    <div class="inner-box box">
-      <h2>Come si legge <code>a[r][c]</code></h2>
-      <ul>
-        <li><code>r</code> indica la riga;</li>
-        <li><code>c</code> indica la colonna;</li>
-        <li>in questo corso useremo sempre indicizzazione <code>0-based</code>.</li>
-      </ul>
-      <p>Quindi, se una matrice ha <code>R</code> righe e <code>C</code> colonne, gli indici validi sono:</p>
-      <ul>
-        <li>righe: da <code>0</code> a <code>R-1</code>;</li>
-        <li>colonne: da <code>0</code> a <code>C-1</code>.</li>
-      </ul>
-      <p class="warn"><b>Errore tipico:</b> scrivere un ciclo fino a <code>&lt;= R</code> o <code>&lt;= C</code>. L'ultimo indice valido non e <code>R</code>, ma <code>R-1</code>.</p>
-    </div>
+    <div class="callout warning"><strong>Errore frequente:</strong> usare <code>&lt;= R</code> o <code>&lt;= C</code> in un ciclo. Gli indici <code>R</code> e <code>C</code> sono già fuori dalla matrice.</div>
 
-    <div class="inner-box box">
-      <h2>Esempio minimo in C++</h2>
-<pre><code class="language-cpp">constexpr int R = 3;
-constexpr int C = 4;
-int a[R][C]{};
+    <details class="checkpoint">
+      <summary>Controllo rapido · Quali accessi sono validi?</summary>
+      <div class="answer">
+        <p>Per <code>int m[3][4]</code>, valuta: <code>m[0][0]</code>, <code>m[3][1]</code>, <code>m[2][3]</code>, <code>m[1][4]</code>.</p>
+        <p><strong>Risposta:</strong> sono validi <code>m[0][0]</code> e <code>m[2][3]</code>. Negli altri due casi almeno un indice supera il limite.</p>
+      </div>
+    </details>
 
-a[1][2] = 42;   // seconda riga, terza colonna
-</code></pre>
-      <p>Non c'e ancora nulla di "misterioso": stiamo solo nominando una cella in una griglia. Il punto importante e non confondere mai l'ordine degli indici.</p>
-    </div>
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 1 · 3 minuti</span>
+      <h2>Traduci parole e indici</h2>
+      <p>Per una matrice <code>voti[5][3]</code>, scrivi l’accesso alla quarta riga e seconda colonna. Poi descrivi a parole la cella <code>voti[2][0]</code>.</p>
+    </section>
 
-    <div class="inner-box note">
-      <b>Passo successivo.</b> Nella <strong>L1.3</strong> facciamo il salto decisivo: la matrice non e solo una tabella astratta, ma una struttura con un layout di memoria preciso. Da li nasce la regola del <strong>row-major</strong>.
-    </div>
-
+    <aside class="next-step"><strong>Prossimo passo:</strong> dichiariamo una matrice e le assegniamo fin dall’inizio valori noti.</aside>
   </div>
 
-  <div class="nav-buttons">
-    <button onclick="prevSlide()">&#8592; Indietro</button>
-    <button onclick="nextSlide()">Avanti &#8594;</button>
-  </div>
-</div>
-
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez1_1.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez1_3.html">Successiva &#8594;</a>
+  </nav>
+</main>
 </body>
 </html>

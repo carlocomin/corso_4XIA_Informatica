@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L3.16 · Laboratorio e autoverifica</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:100.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+  <h2>Lezione 3 - File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
+    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
+    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
+    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
+    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_16.html" class="active" aria-current="page">L3.16 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · File I/O · 16/16</p>
+    <h1>Laboratorio e autoverifica</h1>
+    <p class="lead">Costruiamo un archivio studenti completo: formato dichiarato, controlli espliciti, parsing sicuro e risultati verificabili.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_15.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="../lez4/lez4_1.html">Lezione 4 &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Consegna: archivio della classe</h2>
+      <p>Salva e ricarica un array di studenti usando il formato testuale della lezione. La prima riga deve essere <code>STUDENTI;1</code>; seguono record <code>matricola;nome;media</code>.</p>
+      <p><strong>Vincolo:</strong> nessun record malformato deve entrare nell’array e nessun errore di apertura o scrittura deve passare inosservato.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Requisiti, in ordine</h2>
+      <ol class="steps">
+        <li>implementa <code>scriviArchivio</code> e verifica lo stream dopo la scrittura;</li>
+        <li>implementa <code>leggiArchivio</code>, controlla l’header e non superare <code>MAX</code>;</li>
+        <li>riusa un parser che modifichi il risultato soltanto in caso di successo;</li>
+        <li>stampa numero di record validi e righe scartate;</li>
+        <li>calcola media della classe e indice dello studente migliore.</li>
+      </ol>
+    </section>
+
+    <figure class="code-example">
+      <figcaption>C++17 · scheletro compilabile</figcaption>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+struct Studente {
+    int matricola;
+    std::string nome;
+    double media;
+};
+
+constexpr int MAX = 10;
+using Classe = Studente[MAX];
+
+bool valido(const Studente&amp; s) {
+    return s.matricola &gt; 0
+        &amp;&amp; !s.nome.empty()
+        &amp;&amp; s.nome.find(';') == std::string::npos
+        &amp;&amp; s.nome.find('\n') == std::string::npos
+        &amp;&amp; s.nome.find('\r') == std::string::npos
+        &amp;&amp; s.media &gt;= 0.0
+        &amp;&amp; s.media &lt;= 10.0;
+}
+
+bool scriviArchivio(const std::string&amp; path,
+                     const Classe&amp; classe,
+                     int quanti) {
+    // TODO: apri, scrivi header e record validi, controlla
+    return false;
+}
+
+bool leggiArchivio(const std::string&amp; path,
+                   Classe&amp; classe,
+                   int&amp; quanti,
+                   int&amp; scartati) {
+    // TODO: controlla header, leggi righe, usa parseStudente
+    quanti = 0;
+    scartati = 0;
+    return false;
+}
+
+double mediaClasse(const Classe&amp; classe, int quanti) {
+    // TODO: se quanti == 0 restituisci 0.0
+    return 0.0;
+}
+
+int indiceMigliore(const Classe&amp; classe, int quanti) {
+    // TODO: se quanti == 0 restituisci -1
+    return -1;
+}
+
+int main() {
+    Classe origine{
+        {1001, "Ada Lovelace", 8.5},
+        {1002, "Alan Turing", 7.0},
+        {1003, "Grace Hopper", 9.5},
+        {1004, "Barbara Liskov", 6.0}
+    };
+
+    if (!scriviArchivio("studenti.txt", origine, 4))
+        return 1;
+
+    Classe caricati{};
+    int quanti = 0;
+    int scartati = 0;
+    if (!leggiArchivio("studenti.txt", caricati,
+                       quanti, scartati))
+        return 2;
+
+    std::cout &lt;&lt; "Validi: " &lt;&lt; quanti
+              &lt;&lt; ", scartati: " &lt;&lt; scartati &lt;&lt; '\n';
+}</code></pre>
+    </figure>
+
+    <div class="callout"><strong>Durante lo sviluppo:</strong> compilando con gli avvisi attivi, i parametri dei TODO risultano inizialmente non usati. Gli avvisi devono scomparire quando le funzioni sono completate.</div>
+
+    <details class="checkpoint">
+      <summary>Dataset di collaudo · Risultati attesi</summary>
+      <div class="answer">
+        <ul>
+          <li>quattro record validi e zero scartati;</li>
+          <li>media della classe: <code>7.75</code>;</li>
+          <li>studente migliore: indice <code>2</code>, Grace Hopper con <code>9.5</code>;</li>
+          <li>header errato: caricamento fallito senza record accettati;</li>
+          <li>riga aggiuntiva <code>errore</code>: quattro validi e uno scartato.</li>
+        </ul>
+      </div>
+    </details>
+
+    <section class="three-col">
+      <article class="topic-card">
+        <span class="badge">Base</span>
+        <h2>So usare gli stream</h2>
+        <p>Scelgo modalità e funzione di lettura, controllo apertura e operazioni.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge">Operativo</span>
+        <h2>So definire un formato</h2>
+        <p>Distinguo record, rappresentazione testuale e layout binario.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge">Consapevole</span>
+        <h2>So collaudare</h2>
+        <p>Provo file vuoti, troncati, malformati e risultati limite.</p>
+      </article>
+    </section>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Sfida facoltativa</span>
+      <h2>Versione binaria campo per campo</h2>
+      <p>Salva magic, versione e conteggio, poi per ogni studente matricola, lunghezza del nome, caratteri del nome e media. Non scrivere direttamente l’intera <code>struct</code>.</p>
+    </section>
+
+    <aside class="next-step"><strong>Lezione completata.</strong> Nella Lezione 4 passeremo dalle struct alle classi, portando dati e operazioni dentro un’unica astrazione.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_15.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="../lez4/lez4_1.html">Lezione 4 &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>
