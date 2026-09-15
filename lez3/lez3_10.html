@@ -115,6 +115,13 @@ int main() {
       <div class="checkpoint-prompt">
         <span class="checkpoint-label">Checkpoint</span>
         <h2>Quali righe vengono rifiutate?</h2>
+        <ul>
+          <li><code>-1;Ada;8.5</code></li>
+          <li><code>1001;;8.5</code></li>
+          <li><code>1001;Ada;12</code></li>
+          <li><code>1001;Ada</code></li>
+          <li><code>1001;Ada;8.5abc</code></li>
+        </ul>
       </div>
       <details class="answer-reveal">
         <summary>
@@ -122,7 +129,7 @@ int main() {
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p><code>-1;Ada;8.5</code>, <code>1001;;8.5</code>, <code>1001;Ada;12</code>, una riga con campo mancante e una riga con caratteri extra dopo la media.</p>
+        <p><strong>Tutte.</strong> Nell’ordine: matricola negativa, nome vuoto, media fuori intervallo, campo mancante e caratteri extra dopo la media.</p>
       </div>
       </details>
     </section>

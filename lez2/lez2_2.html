@@ -106,18 +106,18 @@ int main() {
         <span class="checkpoint-label">Controllo rapido</span>
         <h2>Quanti oggetti vengono creati?</h2>
       </div>
+      <figure class="code-example">
+        <figcaption>Codice da leggere</figcaption>
+<pre><code class="language-cpp">Studente a{};
+Studente b{};
+Studente c = b;</code></pre>
+      </figure>
       <details class="answer-reveal">
         <summary>
           <span class="when-closed">Mostra risposta</span>
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <figure class="code-example">
-          <figcaption>Codice da leggere</figcaption>
-<pre><code class="language-cpp">Studente a{};
-Studente b{};
-Studente c = b;</code></pre>
-        </figure>
         <p>Vengono creati tre oggetti. <code>c</code> nasce come copia di <code>b</code>; modificare poi <code>c</code> non modifica <code>b</code>.</p>
       </div>
       </details>

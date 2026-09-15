@@ -69,6 +69,26 @@
       <article class="topic-card"><span class="badge">3</span><h2>Aggiorna</h2><p>Somma sempre; conta soltanto quando la condizione è vera.</p></article>
     </section>
 
+    <section class="concept-card">
+      <h2>Prima della media: quale cast?</h2>
+      <p>In questo esempio <code>(double)somma</code> e <code>static_cast&lt;double&gt;(somma)</code> eseguono la stessa conversione numerica, senza differenze di prestazioni. In C++ preferiamo la seconda forma perché comunica meglio l’intenzione.</p>
+    </section>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2><code>(double)somma</code></h2>
+        <p><strong>Cast in stile C:</strong> è breve, familiare e utilizzabile sia in C sia in C++.</p>
+        <p><strong>Contro in C++:</strong> la sintassi non precisa il tipo di conversione richiesta; può anche rimuovere <code>const</code> o reinterpretare puntatori. Queste operazioni sono più difficili da riconoscere durante la revisione del codice.</p>
+      </article>
+      <article class="topic-card">
+        <h2><code>static_cast&lt;double&gt;(somma)</code></h2>
+        <p><strong>Cast C++:</strong> è esplicito, ricercabile nel codice e il compilatore rifiuta le conversioni non ammesse da <code>static_cast</code>.</p>
+        <p><strong>Contro:</strong> è più lungo, non esiste in C e non garantisce che una conversione sia priva di perdita; per esempio, da <code>double</code> a <code>int</code> elimina la parte decimale.</p>
+      </article>
+    </section>
+
+    <div class="callout"><strong>Qui la posizione conta:</strong> convertiamo <code>somma</code> prima di dividere. Scrivere <code>static_cast&lt;double&gt;(somma / N)</code> convertirebbe soltanto il risultato già troncato della divisione tra interi.</div>
+
     <figure class="code-example">
       <figcaption>C++17 · somma, media e conteggio</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
@@ -100,7 +120,7 @@ int main() {
     <section class="checkpoint">
       <div class="checkpoint-prompt">
         <span class="checkpoint-label">Checkpoint</span>
-        <h2>Risultati dell’esempio</h2>
+        <h2>Quanto valgono <code>somma</code>, <code>media</code> e <code>positivi</code>?</h2>
       </div>
       <details class="answer-reveal">
         <summary>

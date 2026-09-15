@@ -99,18 +99,18 @@ for (int r = 0; r &lt; R; ++r) {
         <span class="checkpoint-label">Trova l’errore</span>
         <h2>Il ciclo è corretto per una matrice R × C?</h2>
       </div>
+      <figure class="code-example">
+        <figcaption>Codice da controllare</figcaption>
+<pre><code class="language-cpp">for (int r = 0; r &lt; R; ++r)
+    for (int c = 0; c &lt; R; ++c)
+        std::cout &lt;&lt; m[r][c];</code></pre>
+      </figure>
       <details class="answer-reveal">
         <summary>
           <span class="when-closed">Mostra risposta</span>
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <figure class="code-example">
-          <figcaption>Codice da controllare</figcaption>
-<pre><code class="language-cpp">for (int r = 0; r &lt; R; ++r)
-    for (int c = 0; c &lt; R; ++c)
-        std::cout &lt;&lt; m[r][c];</code></pre>
-        </figure>
         <p><strong>No:</strong> il secondo limite deve essere <code>c &lt; C</code>. L’errore può restare nascosto se si prova il programma soltanto con matrici quadrate.</p>
       </div>
       </details>
