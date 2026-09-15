@@ -116,12 +116,21 @@ int main(void) {
       </article>
     </section>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Perché non basta controllare <code>ferror</code>?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Perché non basta controllare <code>ferror</code>?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Una lettura corta può dipendere da un file troncato o dalla fine del file. Il contratto richiede tre elementi, quindi il confronto con 3 è il controllo diretto.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 14</span>

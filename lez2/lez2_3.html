@@ -93,9 +93,17 @@ int main() {
       </article>
     </section>
 
-    <details class="checkpoint">
-      <summary>Perché preferire le graffe?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Perché preferire le graffe?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Oltre a rendere visibile l’inizializzazione, le graffe rifiutano conversioni con perdita di informazione:</p>
         <figure class="code-example">
           <figcaption>C++17 · errore di compilazione intenzionale</figcaption>
@@ -103,11 +111,20 @@ int main() {
 // 1001.7 non può inizializzare int con le graffe</code></pre>
         </figure>
       </div>
-    </details>
+      </details>
+    </section>
 
-    <details class="checkpoint">
-      <summary>Estensione · Valori predefiniti nei campi</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Estensione</span>
+        <h2>Valori predefiniti nei campi</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra approfondimento</span>
+          <span class="when-open">Nascondi approfondimento</span>
+        </summary>
+        <div class="answer">
         <figure class="code-example">
           <figcaption>C++17</figcaption>
 <pre><code class="language-cpp">struct Studente {
@@ -118,7 +135,8 @@ int main() {
         </figure>
         <p>I valori predefiniti documentano uno stato iniziale valido e vengono usati quando l’inizializzatore non fornisce quel campo.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 2 · 6 minuti</span>

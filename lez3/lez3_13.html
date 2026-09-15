@@ -111,12 +111,21 @@ int main() {
 
     <div class="callout warning"><strong>Semplificazione intenzionale:</strong> per isolare l’uso di <code>read</code> e <code>write</code>, questo esempio omette magic e versione. In un archivio destinato a durare vanno aggiunti come mostrato nella slide precedente.</div>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Perché controlliamo <code>letti != 3</code> prima del secondo blocco?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Perché controlliamo <code>letti != 3</code> prima del secondo blocco?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>L’array ha capacità tre. Fidarsi di un conteggio arbitrario letto dal file potrebbe causare una lettura oltre i limiti o interpretare un file incompatibile.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 13</span>

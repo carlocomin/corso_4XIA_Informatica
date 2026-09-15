@@ -98,9 +98,17 @@ void ordinaPerMedia(Studente studenti[], int n) {
       </article>
     </section>
 
-    <details class="checkpoint">
-      <summary>Estensione C++ · std::sort e lambda</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Estensione C++</span>
+        <h2>std::sort e lambda</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra approfondimento</span>
+          <span class="when-open">Nascondi approfondimento</span>
+        </summary>
+        <div class="answer">
         <figure class="code-example">
           <figcaption>C++17 · stesso criterio vicino all’algoritmo</figcaption>
 <pre><code class="language-cpp">#include &lt;algorithm&gt;
@@ -114,14 +122,24 @@ void ordinaConStl(std::vector&lt;Studente&gt;&amp; classe) {
         </figure>
         <p>La lambda è una piccola funzione anonima che descrive il criterio. È comoda con un <code>vector</code>, ma non sostituisce la comprensione dell’ordinamento.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
-    <details class="checkpoint">
-      <summary>Errore concettuale · Scambiare soltanto le medie</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Errore concettuale</span>
+        <h2>Scambiare soltanto le medie</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Se scambi <code>studenti[i].media</code> ma non gli altri campi, rompi il record: la media finisce associata alla persona sbagliata. Va scambiato l’intero <code>Studente</code>.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 12 · 15 minuti</span>

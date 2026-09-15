@@ -95,12 +95,21 @@ int massimo(const int (&amp;m)[R][C]) {
       <p>Inizializziamo <code>max</code> con una cella reale. Così la funzione è corretta anche quando tutti i valori sono negativi.</p>
     </section>
 
-    <details class="checkpoint">
-      <summary>Trova il caso che rompe il programma · Perché <code>int max = 0;</code> è rischioso?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Trova il caso che rompe il programma</span>
+        <h2>Perché <code>int max = 0;</code> è rischioso?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Con la matrice <code>{{-8, -3}, {-10, -5}}</code> il risultato sarebbe erroneamente 0, un valore che non compare nei dati. Il massimo corretto è -3.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 7 · 10 minuti</span>

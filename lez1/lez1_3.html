@@ -102,9 +102,17 @@ int main() {
 
     <div class="callout warning"><strong>Attenzione:</strong> <code>int m[3][4];</code> dichiarata dentro una funzione contiene valori indeterminati. Leggerli prima di averli assegnati produce comportamento indefinito.</div>
 
-    <details class="checkpoint">
-      <summary>Confronto mirato · La stessa idea in C</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Confronto mirato</span>
+        <h2>La stessa idea in C</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra approfondimento</span>
+          <span class="when-open">Nascondi approfondimento</span>
+        </summary>
+        <div class="answer">
         <figure class="code-example">
           <figcaption>C11</figcaption>
 <pre><code class="language-c">#include &lt;stdio.h&gt;
@@ -123,7 +131,8 @@ int main(void) {
         </figure>
         <p>La struttura della matrice e gli indici sono gli stessi; cambia l’I/O e cambia il modo usuale di dichiarare le costanti.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 2 · 5 minuti</span>

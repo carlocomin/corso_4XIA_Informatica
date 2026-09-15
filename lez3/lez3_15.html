@@ -114,12 +114,21 @@ int main() {
 
     <div class="callout warning"><strong>Portabilità:</strong> nei file testuali non trattare liberamente le posizioni come numeri di byte; traduzioni di newline e codifiche variabili rendono fragile l’aritmetica sugli offset. Usa il seek calcolato sui file binari.</div>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Dove inizia il record di indice 2?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Dove inizia il record di indice 2?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Dopo l’header e due record: <code>sizeof(conteggio) + 2 * sizeof(record)</code>. Gli indici partono da zero.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 15</span>

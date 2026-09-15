@@ -147,9 +147,17 @@ int main() {
 
     <div class="callout"><strong>Durante lo sviluppo:</strong> compilando con gli avvisi attivi, i parametri dei TODO risultano inizialmente non usati. Gli avvisi devono scomparire quando le funzioni sono completate.</div>
 
-    <details class="checkpoint">
-      <summary>Dataset di collaudo · Risultati attesi</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Dataset di collaudo</span>
+        <h2>Risultati attesi</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risultati</span>
+          <span class="when-open">Nascondi risultati</span>
+        </summary>
+        <div class="answer">
         <ul>
           <li>quattro record validi e zero scartati;</li>
           <li>media della classe: <code>7.75</code>;</li>
@@ -158,7 +166,205 @@ int main() {
           <li>riga aggiuntiva <code>errore</code>: quattro validi e uno scartato.</li>
         </ul>
       </div>
-    </details>
+      </details>
+    </section>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Soluzione guidata</span>
+      <h2>Archivio testuale: programma completo</h2>
+      <p>Apri la soluzione dopo avere definito il formato e tentato il parser. Verifica che ogni funzione aggiorni i propri parametri di output soltanto quando dispone di un risultato coerente.</p>
+      <details class="answer-reveal solution-reveal">
+        <summary>
+          <span class="when-closed">Mostra soluzione</span>
+          <span class="when-open">Nascondi soluzione</span>
+        </summary>
+        <div class="solution-content">
+          <figure class="code-example">
+            <figcaption>C++17 · una possibile soluzione completa</figcaption>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;sstream&gt;
+#include &lt;string&gt;
+
+struct Studente {
+    int matricola;
+    std::string nome;
+    double media;
+};
+
+constexpr int MAX = 10;
+using Classe = Studente[MAX];
+
+bool valido(const Studente&amp; s) {
+    return s.matricola &gt; 0
+        &amp;&amp; !s.nome.empty()
+        &amp;&amp; s.nome.find(';') == std::string::npos
+        &amp;&amp; s.nome.find('\n') == std::string::npos
+        &amp;&amp; s.nome.find('\r') == std::string::npos
+        &amp;&amp; s.media &gt;= 0.0
+        &amp;&amp; s.media &lt;= 10.0;
+}
+
+bool leggiInteroEsatto(const std::string&amp; testo, int&amp; valore) {
+    std::istringstream input(testo);
+    int temporaneo = 0;
+    if (!(input &gt;&gt; temporaneo))
+        return false;
+    input &gt;&gt; std::ws;
+    if (!input.eof())
+        return false;
+    valore = temporaneo;
+    return true;
+}
+
+bool leggiDoubleEsatto(const std::string&amp; testo, double&amp; valore) {
+    std::istringstream input(testo);
+    double temporaneo = 0.0;
+    if (!(input &gt;&gt; temporaneo))
+        return false;
+    input &gt;&gt; std::ws;
+    if (!input.eof())
+        return false;
+    valore = temporaneo;
+    return true;
+}
+
+bool parseStudente(const std::string&amp; riga, Studente&amp; risultato) {
+    std::size_t primo = riga.find(';');
+    if (primo == std::string::npos)
+        return false;
+
+    std::size_t secondo = riga.find(';', primo + 1);
+    if (secondo == std::string::npos
+        || riga.find(';', secondo + 1) != std::string::npos)
+        return false;
+
+    Studente candidato{};
+    candidato.nome = riga.substr(primo + 1, secondo - primo - 1);
+    if (!leggiInteroEsatto(riga.substr(0, primo), candidato.matricola)
+        || !leggiDoubleEsatto(riga.substr(secondo + 1), candidato.media)
+        || !valido(candidato))
+        return false;
+
+    risultato = candidato;
+    return true;
+}
+
+bool scriviArchivio(const std::string&amp; path,
+                     const Classe&amp; classe,
+                     int quanti) {
+    if (quanti &lt; 0 || quanti &gt; MAX)
+        return false;
+
+    std::ofstream output(path);
+    if (!output)
+        return false;
+
+    output &lt;&lt; "STUDENTI;1\n";
+    for (int i = 0; i &lt; quanti; ++i) {
+        if (valido(classe[i]))
+            output &lt;&lt; classe[i].matricola &lt;&lt; ';'
+                   &lt;&lt; classe[i].nome &lt;&lt; ';'
+                   &lt;&lt; classe[i].media &lt;&lt; '\n';
+    }
+
+    output.close();
+    return static_cast&lt;bool&gt;(output);
+}
+
+bool leggiArchivio(const std::string&amp; path,
+                   Classe&amp; classe,
+                   int&amp; quanti,
+                   int&amp; scartati) {
+    quanti = 0;
+    scartati = 0;
+
+    std::ifstream input(path);
+    if (!input)
+        return false;
+
+    std::string riga;
+    if (!std::getline(input, riga) || riga != "STUDENTI;1")
+        return false;
+
+    Classe temporanei{};
+    int validiTemporanei = 0;
+    int scartatiTemporanei = 0;
+
+    while (std::getline(input, riga)) {
+        Studente candidato{};
+        if (parseStudente(riga, candidato)
+            &amp;&amp; validiTemporanei &lt; MAX) {
+            temporanei[validiTemporanei] = candidato;
+            ++validiTemporanei;
+        } else {
+            ++scartatiTemporanei;
+        }
+    }
+
+    if (!input.eof())
+        return false;
+
+    for (int i = 0; i &lt; validiTemporanei; ++i)
+        classe[i] = temporanei[i];
+    quanti = validiTemporanei;
+    scartati = scartatiTemporanei;
+    return true;
+}
+
+double mediaClasse(const Classe&amp; classe, int quanti) {
+    if (quanti == 0)
+        return 0.0;
+
+    double somma = 0.0;
+    for (int i = 0; i &lt; quanti; ++i)
+        somma += classe[i].media;
+    return somma / quanti;
+}
+
+int indiceMigliore(const Classe&amp; classe, int quanti) {
+    if (quanti == 0)
+        return -1;
+
+    int migliore = 0;
+    for (int i = 1; i &lt; quanti; ++i) {
+        if (classe[i].media &gt; classe[migliore].media)
+            migliore = i;
+    }
+    return migliore;
+}
+
+int main() {
+    Classe origine{
+        {1001, "Ada Lovelace", 8.5},
+        {1002, "Alan Turing", 7.0},
+        {1003, "Grace Hopper", 9.5},
+        {1004, "Barbara Liskov", 6.0}
+    };
+
+    if (!scriviArchivio("studenti.txt", origine, 4))
+        return 1;
+
+    Classe caricati{};
+    int quanti = 0;
+    int scartati = 0;
+    if (!leggiArchivio("studenti.txt", caricati, quanti, scartati))
+        return 2;
+
+    std::cout &lt;&lt; "Validi: " &lt;&lt; quanti
+              &lt;&lt; ", scartati: " &lt;&lt; scartati &lt;&lt; '\n';
+    std::cout &lt;&lt; "Media: " &lt;&lt; mediaClasse(caricati, quanti) &lt;&lt; '\n';
+
+    int migliore = indiceMigliore(caricati, quanti);
+    if (migliore != -1)
+        std::cout &lt;&lt; "Migliore: " &lt;&lt; caricati[migliore].nome
+                  &lt;&lt; " (" &lt;&lt; caricati[migliore].media &lt;&lt; ")\n";
+}</code></pre>
+          </figure>
+          <p><strong>Garanzia utile:</strong> il parser costruisce prima un candidato locale e il caricamento usa un array temporaneo. Un errore non lascia nel risultato un record parzialmente aggiornato.</p>
+        </div>
+      </details>
+    </section>
 
     <section class="three-col">
       <article class="topic-card">
@@ -182,6 +388,120 @@ int main() {
       <span class="exercise-label">Sfida facoltativa</span>
       <h2>Versione binaria campo per campo</h2>
       <p>Salva magic, versione e conteggio, poi per ogni studente matricola, lunghezza del nome, caratteri del nome e media. Non scrivere direttamente l’intera <code>struct</code>.</p>
+      <details class="answer-reveal solution-reveal">
+        <summary>
+          <span class="when-closed">Mostra soluzione</span>
+          <span class="when-open">Nascondi soluzione</span>
+        </summary>
+        <div class="solution-content">
+          <figure class="code-example">
+            <figcaption>C++17 · formato binario campo per campo</figcaption>
+<pre><code class="language-cpp">#include &lt;cstdint&gt;
+#include &lt;cstring&gt;
+
+constexpr char MAGIC[4]{'S', 'T', 'U', 'D'};
+constexpr std::uint32_t VERSIONE = 1;
+constexpr std::uint32_t MAX_NOME = 200;
+
+template &lt;typename T&gt;
+bool scriviValore(std::ostream&amp; output, const T&amp; valore) {
+    output.write(reinterpret_cast&lt;const char*&gt;(&amp;valore),
+                 sizeof valore);
+    return static_cast&lt;bool&gt;(output);
+}
+
+template &lt;typename T&gt;
+bool leggiValore(std::istream&amp; input, T&amp; valore) {
+    input.read(reinterpret_cast&lt;char*&gt;(&amp;valore), sizeof valore);
+    return static_cast&lt;bool&gt;(input);
+}
+
+bool scriviBinario(const std::string&amp; path,
+                   const Classe&amp; classe,
+                   int quanti) {
+    if (quanti &lt; 0 || quanti &gt; MAX)
+        return false;
+    for (int i = 0; i &lt; quanti; ++i) {
+        if (!valido(classe[i]) || classe[i].nome.size() &gt; MAX_NOME)
+            return false;
+    }
+
+    std::ofstream output(path, std::ios::binary);
+    if (!output)
+        return false;
+
+    std::uint32_t conteggio = static_cast&lt;std::uint32_t&gt;(quanti);
+    output.write(MAGIC, sizeof MAGIC);
+    if (!scriviValore(output, VERSIONE)
+        || !scriviValore(output, conteggio))
+        return false;
+
+    for (int i = 0; i &lt; quanti; ++i) {
+        std::int32_t matricola = classe[i].matricola;
+        std::uint32_t lunghezza =
+            static_cast&lt;std::uint32_t&gt;(classe[i].nome.size());
+
+        if (!scriviValore(output, matricola)
+            || !scriviValore(output, lunghezza))
+            return false;
+        output.write(classe[i].nome.data(), lunghezza);
+        if (!output || !scriviValore(output, classe[i].media))
+            return false;
+    }
+    output.close();
+    return static_cast&lt;bool&gt;(output);
+}
+
+bool leggiBinario(const std::string&amp; path,
+                  Classe&amp; classe,
+                  int&amp; quanti) {
+    quanti = 0;
+    std::ifstream input(path, std::ios::binary);
+    if (!input)
+        return false;
+
+    char magicLetto[sizeof MAGIC]{};
+    std::uint32_t versione = 0;
+    std::uint32_t conteggio = 0;
+    input.read(magicLetto, sizeof magicLetto);
+    if (!input
+        || std::memcmp(magicLetto, MAGIC, sizeof MAGIC) != 0
+        || !leggiValore(input, versione)
+        || !leggiValore(input, conteggio)
+        || versione != VERSIONE || conteggio &gt; MAX)
+        return false;
+
+    Classe temporanei{};
+    for (std::uint32_t i = 0; i &lt; conteggio; ++i) {
+        std::int32_t matricola = 0;
+        std::uint32_t lunghezza = 0;
+        double media = 0.0;
+
+        if (!leggiValore(input, matricola)
+            || !leggiValore(input, lunghezza)
+            || lunghezza == 0 || lunghezza &gt; MAX_NOME)
+            return false;
+
+        std::string nome(lunghezza, '\0');
+        input.read(nome.data(), lunghezza);
+        if (!input || !leggiValore(input, media))
+            return false;
+
+        Studente candidato{matricola, nome, media};
+        if (!valido(candidato))
+            return false;
+        temporanei[i] = candidato;
+    }
+
+    for (std::uint32_t i = 0; i &lt; conteggio; ++i)
+        classe[i] = temporanei[i];
+    quanti = static_cast&lt;int&gt;(conteggio);
+    return true;
+}</code></pre>
+          </figure>
+          <p><strong>Limite dichiarato:</strong> questa versione definisce l’ordine dei campi, ma usa ancora la rappresentazione binaria nativa di interi e <code>double</code>. Per scambiare file tra architetture diverse occorre definire anche byte order e codifica numerica.</p>
+        </div>
+      </details>
     </section>
 
     <aside class="next-step"><strong>Lezione completata.</strong> Nella Lezione 4 passeremo dalle struct alle classi, portando dati e operazioni dentro un’unica astrazione.</aside>

@@ -93,12 +93,21 @@ int main() {
 
     <div class="callout warning"><strong>Comportamento indefinito:</strong> leggere un elemento locale non inizializzato o accedere fuori dai limiti può sembrare funzionare, cambiare risultato o danneggiare altri dati. Non è un caso da “gestire dopo”: va evitato.</div>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Trova i due errori</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Trova i due errori</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>In <code>for (int i = 1; i &lt;= 5; ++i) cout &lt;&lt; a[i];</code> viene saltato l’indice 0 e viene usato l’indice non valido 5.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 2 · 5 minuti</span>

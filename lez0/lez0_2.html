@@ -103,12 +103,21 @@ int main() {
       <p>La dimensione di un array statico deve essere una costante intera nota durante la compilazione. Anche alcuni <code>const int</code> possono soddisfare questo requisito, ma <code>constexpr</code> lo dichiara e lo fa controllare esplicitamente dal compilatore.</p>
     </section>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Quali dichiarazioni sono valide?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Quali dichiarazioni sono valide?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Dopo aver letto <code>n</code> da input, <code>const int a = n;</code> è valido: <code>a</code> non cambierà, ma nasce a runtime. <code>constexpr int b = 10;</code> è valido e noto a compile time. <code>constexpr int c = n;</code> non è valido, perché il compilatore non conosce l’input.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Attività lampo · 3 minuti</span>

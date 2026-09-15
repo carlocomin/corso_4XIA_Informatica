@@ -105,12 +105,21 @@ int main() {
 
     <div class="callout warning"><strong>Contratto:</strong> se la validazione fallisce, il record deve restare invariato. Evita modifiche parziali prima di aver controllato tutti i dati.</div>
 
-    <details class="checkpoint">
-      <summary>Controllo rapido · Che cosa accade con <code>aggiornaMedia(ada, 12)</code>?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Controllo rapido</span>
+        <h2>Che cosa accade con <code>aggiornaMedia(ada, 12)</code>?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>La funzione restituisce <code>false</code> e <code>ada.media</code> conserva il valore precedente, perché l’assegnazione viene eseguita soltanto dopo il controllo.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 6 · 10 minuti</span>

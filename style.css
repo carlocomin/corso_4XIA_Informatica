@@ -90,6 +90,20 @@ li {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
+/* Elenchi del programma: bullet vicini al testo e rientro stabile. */
+ul.program-list {
+    padding: 0.8rem 1rem 0.8rem 2rem;
+}
+
+ul.program-list > li {
+    margin: 0.4rem 0;
+    padding-left: 0.25rem;
+}
+
+ul.program-list > li::marker {
+    color: #00897b;
+}
+
 /* MENU LATERALE A COMPARSA SOVRAPPOSITIVA */
 
 .menu-toggle {
@@ -645,21 +659,110 @@ body.lesson-review {
     background: #effaf6;
 }
 
-.lesson-review details.checkpoint {
-    padding: 0;
+.lesson-review .checkpoint-prompt {
+    margin-bottom: 14px;
 }
 
-.lesson-review .checkpoint summary {
-    padding: 18px 22px;
+.lesson-review .checkpoint-label {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    padding: 4px 9px;
+    border-radius: 999px;
+    color: #ffffff;
+    background: var(--review-teal);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.lesson-review .checkpoint .checkpoint-prompt h2 {
+    margin-bottom: 0;
+}
+
+.lesson-review .answer-reveal {
+    margin: 0;
+}
+
+.lesson-review .answer-reveal > summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 8px 15px;
+    border: 2px solid var(--review-teal);
+    border-radius: 999px;
     cursor: pointer;
     color: var(--review-deep);
+    background: #ffffff;
     font-weight: 800;
     text-align: left;
+    list-style: none;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+.lesson-review .answer-reveal > summary::-webkit-details-marker {
+    display: none;
+}
+
+.lesson-review .answer-reveal > summary::before {
+    content: "+";
+    margin-right: 0.45rem;
+    font-size: 1.2em;
+    line-height: 1;
+}
+
+.lesson-review .answer-reveal[open] > summary {
+    color: #ffffff;
+    background: var(--review-teal);
+}
+
+.lesson-review .answer-reveal[open] > summary::before {
+    content: "−";
+}
+
+.lesson-review .answer-reveal .when-open,
+.lesson-review .answer-reveal[open] .when-closed {
+    display: none;
+}
+
+.lesson-review .answer-reveal[open] .when-open {
+    display: inline;
 }
 
 .lesson-review .checkpoint .answer {
-    padding: 0 22px 18px;
-    border-top: 1px dashed #9ccfc4;
+    margin-top: 14px;
+    padding: 16px 18px;
+    border: 1px dashed #79b6aa;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.lesson-review .checkpoint .answer > :first-child {
+    margin-top: 0;
+}
+
+.lesson-review .checkpoint .answer > :last-child {
+    margin-bottom: 0;
+}
+
+.lesson-review .solution-reveal {
+    margin-top: 14px;
+}
+
+.lesson-review .solution-content {
+    margin-top: 14px;
+    padding: 16px 18px;
+    border: 1px dashed #d5a03d;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.lesson-review .solution-content > :first-child {
+    margin-top: 0;
+}
+
+.lesson-review .solution-content > :last-child {
+    margin-bottom: 0;
 }
 
 .lesson-review .exercise-card {

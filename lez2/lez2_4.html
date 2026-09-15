@@ -108,12 +108,21 @@ int main() {
       </article>
     </section>
 
-    <details class="checkpoint">
-      <summary>Trova il problema · Perché il nome può risultare vuoto?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Trova il problema</span>
+        <h2>Perché il nome può risultare vuoto?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Se chiami subito <code>getline</code> dopo <code>std::cin &gt;&gt; s.matricola</code>, <code>getline</code> consuma il <code>'\n'</code> già presente. Serve prima <code>ignore</code>, come nell’esempio.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 3 · 10 minuti</span>

@@ -101,12 +101,21 @@ int main() {
 
     <div class="callout"><strong>Costo:</strong> nel caso peggiore vengono esaminati tutti gli <code>n</code> elementi. Il tempo cresce linearmente: <code>O(n)</code>.</div>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Che cosa cambia senza <code>break</code>?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Che cosa cambia senza <code>break</code>?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Continuando ad assegnare <code>posizione = i</code>, il risultato diventa l’ultima occorrenza: nell’esempio l’indice 3 invece dell’indice 1.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 6 · 8 minuti</span>

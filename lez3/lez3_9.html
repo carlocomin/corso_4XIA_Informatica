@@ -116,12 +116,21 @@ int main() {
       </article>
     </section>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Perché passiamo <code>const Studente&amp;</code>?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Perché passiamo <code>const Studente&amp;</code>?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>La funzione deve soltanto leggere il record: il riferimento evita la copia e <code>const</code> impedisce modifiche accidentali.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 9</span>

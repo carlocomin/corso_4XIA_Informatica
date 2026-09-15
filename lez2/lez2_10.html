@@ -81,9 +81,17 @@ int main() {
       <p>I compilatori moderni possono eliminare copie superflue. Non serve restituire un riferimento per rendere questa operazione efficiente.</p>
     </section>
 
-    <details class="checkpoint">
-      <summary>Errore grave · Riferimento a un oggetto locale</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Errore grave</span>
+        <h2>Riferimento a un oggetto locale</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <figure class="code-example">
           <figcaption>C++17 · codice errato, non imitare</figcaption>
 <pre><code class="language-cpp">const Studente&amp; creaStudenteSbagliato() {
@@ -93,7 +101,8 @@ int main() {
         </figure>
         <p><code>temporaneo</code> viene distrutto alla fine della funzione. Il riferimento restituito non indica più un oggetto esistente e usarlo produce comportamento indefinito.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="two-col">
       <article class="topic-card">
@@ -106,12 +115,21 @@ int main() {
       </article>
     </section>
 
-    <details class="checkpoint">
-      <summary>Controllo rapido · Il puntatore a una variabile locale sarebbe più sicuro?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Controllo rapido</span>
+        <h2>Il puntatore a una variabile locale sarebbe più sicuro?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>No. Anche <code>return &amp;temporaneo;</code> restituirebbe l’indirizzo di un oggetto che smette di esistere alla fine della funzione.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 9 · 10 minuti</span>

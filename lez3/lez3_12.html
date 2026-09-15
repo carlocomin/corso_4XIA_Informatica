@@ -93,12 +93,21 @@
 
     <div class="callout warning"><strong>Regola:</strong> salva i campi uno alla volta secondo il formato; non usare <code>sizeof(Studente)</code> come specifica del file.</div>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Il layout in memoria coincide con quello su disco?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Il layout in memoria coincide con quello su disco?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Non necessariamente. Il formato su disco deve essere una scelta esplicita e stabile; il compilatore può invece modificare dimensioni, padding e rappresentazione degli oggetti.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 12</span>

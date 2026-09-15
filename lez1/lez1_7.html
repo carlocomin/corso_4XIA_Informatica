@@ -101,9 +101,17 @@ int main() {
       </article>
     </section>
 
-    <details class="checkpoint">
-      <summary>Una forma più leggibile · Alias di tipo</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Una forma più leggibile</span>
+        <h2>Alias di tipo</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra approfondimento</span>
+          <span class="when-open">Nascondi approfondimento</span>
+        </summary>
+        <div class="answer">
         <figure class="code-example">
           <figcaption>C++17</figcaption>
 <pre><code class="language-cpp">using Matrice = int[R][C];
@@ -113,7 +121,8 @@ int somma(const Matrice&amp; m);</code></pre>
         </figure>
         <p><code>using</code> assegna un nome al tipo della matrice. Non crea una nuova rappresentazione e non cambia il comportamento del programma.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 5 · 6 minuti</span>

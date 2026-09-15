@@ -104,12 +104,21 @@ int main() {
 
     <div class="callout"><strong>Differenza dal puntatore:</strong> un riferimento deve essere associato a un oggetto; non si controlla contro <code>nullptr</code> e nel corpo non si usa <code>*</code>.</div>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Dove si vede che la funzione modifica?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Dove si vede che la funzione modifica?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Nella firma <code>int&amp; a, int&amp; b</code>. La chiamata resta <code>ordinaDue(x, y)</code>; per capire gli effetti bisogna leggere il contratto e i tipi dei parametri.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 17 · 10 minuti</span>

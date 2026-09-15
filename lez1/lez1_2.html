@@ -88,13 +88,22 @@
 
     <div class="callout warning"><strong>Errore frequente:</strong> usare <code>&lt;= R</code> o <code>&lt;= C</code> in un ciclo. Gli indici <code>R</code> e <code>C</code> sono già fuori dalla matrice.</div>
 
-    <details class="checkpoint">
-      <summary>Controllo rapido · Quali accessi sono validi?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Controllo rapido</span>
+        <h2>Quali accessi sono validi?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Per <code>int m[3][4]</code>, valuta: <code>m[0][0]</code>, <code>m[3][1]</code>, <code>m[2][3]</code>, <code>m[1][4]</code>.</p>
         <p><strong>Risposta:</strong> sono validi <code>m[0][0]</code> e <code>m[2][3]</code>. Negli altri due casi almeno un indice supera il limite.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 1 · 3 minuti</span>

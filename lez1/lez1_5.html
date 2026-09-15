@@ -94,9 +94,17 @@ for (int r = 0; r &lt; R; ++r) {
 
     <div class="callout"><strong>Regola pratica:</strong> per leggere, stampare o elaborare l’intera matrice, parti dalla scansione per righe. Cambia ordine solo quando il problema lo richiede.</div>
 
-    <details class="checkpoint">
-      <summary>Trova l’errore · Il ciclo è corretto per una matrice R × C?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Trova l’errore</span>
+        <h2>Il ciclo è corretto per una matrice R × C?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <figure class="code-example">
           <figcaption>Codice da controllare</figcaption>
 <pre><code class="language-cpp">for (int r = 0; r &lt; R; ++r)
@@ -105,7 +113,8 @@ for (int r = 0; r &lt; R; ++r) {
         </figure>
         <p><strong>No:</strong> il secondo limite deve essere <code>c &lt; C</code>. L’errore può restare nascosto se si prova il programma soltanto con matrici quadrate.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 3 · 7 minuti</span>

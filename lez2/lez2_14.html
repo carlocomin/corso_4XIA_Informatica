@@ -107,12 +107,21 @@ int main() {
       </article>
     </section>
 
-    <details class="checkpoint">
-      <summary>Controllo rapido · Perché è particolarmente errato salvare raw uno Studente C++?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Controllo rapido</span>
+        <h2>Perché è particolarmente errato salvare raw uno Studente C++?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Perché contiene <code>std::string</code>. I byte dell’oggetto descrivono la rappresentazione interna usata dalla libreria, non una sequenza portabile contenente semplicemente i caratteri del nome.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 13 · Ragionamento</span>

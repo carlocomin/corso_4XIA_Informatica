@@ -108,12 +108,21 @@ int main() {
 
     <div class="callout warning"><strong>Errore tipico:</strong> usare <code>sizeof(a)</code> dentro la funzione per cercare la lunghezza. Lì <code>a</code> è un puntatore, non l’array originale.</div>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Perché <code>raddoppia</code> modifica il chiamante senza <code>&amp;</code>?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Perché <code>raddoppia</code> modifica il chiamante senza <code>&amp;</code>?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Il parametro riceve l’indirizzo del primo elemento. Le espressioni <code>a[i]</code> raggiungono quindi le celle dell’array originale.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 16 · 12 minuti</span>

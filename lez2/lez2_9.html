@@ -96,9 +96,17 @@ int main() {
       </article>
     </section>
 
-    <details class="checkpoint">
-      <summary>Confronto mirato · In C si modifica tramite puntatore</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Confronto mirato</span>
+        <h2>In C si modifica tramite puntatore</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra approfondimento</span>
+          <span class="when-open">Nascondi approfondimento</span>
+        </summary>
+        <div class="answer">
         <figure class="code-example">
           <figcaption>C11 · il controllo usa NULL</figcaption>
 <pre><code class="language-c">int aggiorna_media(Studente *s, double nuova_media) {
@@ -111,14 +119,24 @@ int main() {
         </figure>
         <p>Il C non possiede riferimenti: passare l’indirizzo del record è il modo usuale per permettere alla funzione di modificare l’originale.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
-    <details class="checkpoint">
-      <summary>Trova l’errore · <code>Studente* p = &amp;ada; p.media = 8;</code></summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Trova l’errore</span>
+        <h2><code>Studente* p = &amp;ada; p.media = 8;</code></h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p><code>p</code> è un puntatore, quindi serve <code>p-&gt;media = 8;</code>. L’operatore punto si usa con l’oggetto <code>ada.media</code>.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 8 · 8 minuti</span>

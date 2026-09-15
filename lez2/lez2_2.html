@@ -101,9 +101,17 @@ int main() {
       <p>L’operatore <code>.</code> seleziona un campo di un oggetto. Il nome prima del punto identifica l’oggetto; quello dopo il punto identifica il membro.</p>
     </section>
 
-    <details class="checkpoint">
-      <summary>Controllo rapido · Quanti oggetti vengono creati?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Controllo rapido</span>
+        <h2>Quanti oggetti vengono creati?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <figure class="code-example">
           <figcaption>Codice da leggere</figcaption>
 <pre><code class="language-cpp">Studente a{};
@@ -112,7 +120,8 @@ Studente c = b;</code></pre>
         </figure>
         <p>Vengono creati tre oggetti. <code>c</code> nasce come copia di <code>b</code>; modificare poi <code>c</code> non modifica <code>b</code>.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 1 · 7 minuti</span>

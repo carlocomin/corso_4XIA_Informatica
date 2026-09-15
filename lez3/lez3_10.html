@@ -111,12 +111,21 @@ int main() {
       <div class="callout"><strong>Limite intenzionale:</strong> questo non è un parser CSV generale. Implementa soltanto il formato semplificato dichiarato nella slide precedente.</div>
     </section>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Quali righe vengono rifiutate?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Quali righe vengono rifiutate?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p><code>-1;Ada;8.5</code>, <code>1001;;8.5</code>, <code>1001;Ada;12</code>, una riga con campo mancante e una riga con caratteri extra dopo la media.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 10</span>

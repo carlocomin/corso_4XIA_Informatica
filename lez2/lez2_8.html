@@ -93,16 +93,25 @@ bool promosso(const Studente&amp; s) {
       </table>
     </section>
 
-    <details class="checkpoint">
-      <summary>Scegli la firma · Leggere, modificare o copiare?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Scegli la firma</span>
+        <h2>Leggere, modificare o copiare?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <ul>
           <li><code>stampa</code>: <code>const Studente&amp;</code>, perché legge;</li>
           <li><code>aggiornaMedia</code>: <code>Studente&amp;</code>, perché modifica;</li>
           <li><code>creaVersioneAnonima</code>: può ricevere per valore se vuole modificare e restituire intenzionalmente una copia.</li>
         </ul>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 7 · 8 minuti</span>

@@ -88,9 +88,17 @@ bool simmetrica(const int (&amp;m)[N][N]) {
       <p>Non appena troviamo una coppia diversa, abbiamo già la risposta e possiamo terminare la funzione.</p>
     </section>
 
-    <details class="checkpoint">
-      <summary>Estensione · Riconoscere una matrice triangolare superiore</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Estensione</span>
+        <h2>Riconoscere una matrice triangolare superiore</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra approfondimento</span>
+          <span class="when-open">Nascondi approfondimento</span>
+        </summary>
+        <div class="answer">
         <p>Una matrice è triangolare superiore se tutte le celle <strong>sotto</strong> la diagonale sono zero. La zona da verificare soddisfa <code>r &gt; c</code>.</p>
         <figure class="code-example">
           <figcaption>Condizione essenziale</figcaption>
@@ -98,14 +106,24 @@ bool simmetrica(const int (&amp;m)[N][N]) {
     return false;</code></pre>
         </figure>
       </div>
-    </details>
+      </details>
+    </section>
 
-    <details class="checkpoint">
-      <summary>Controllo rapido · Quanti confronti servono al massimo con N = 4?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Controllo rapido</span>
+        <h2>Quanti confronti servono al massimo con N = 4?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Al massimo 6 confronti: 3 nella riga 0, 2 nella riga 1, 1 nella riga 2 e nessuno nell’ultima. Se una coppia è diversa, l’uscita anticipata può fermare prima l’algoritmo. Il massimo è <code>N * (N - 1) / 2</code>, quindi <code>O(N²)</code>.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 10 · 15 minuti</span>

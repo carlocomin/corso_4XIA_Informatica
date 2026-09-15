@@ -124,9 +124,17 @@ int main() {
       </figure>
     </section>
 
-    <details class="checkpoint">
-      <summary>Dataset di collaudo · Risultati attesi</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Dataset di collaudo</span>
+        <h2>Risultati attesi</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risultati</span>
+          <span class="when-open">Nascondi risultati</span>
+        </summary>
+        <div class="answer">
         <ul>
           <li>tutti e quattro i record sono validi;</li>
           <li>media della classe: <code>7.75</code>;</li>
@@ -135,7 +143,103 @@ int main() {
           <li>ricerca della matricola <code>9999</code>: <code>-1</code>.</li>
         </ul>
       </div>
-    </details>
+      </details>
+    </section>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Soluzione guidata</span>
+      <h2>Registro studenti: programma completo</h2>
+      <p>Apri la soluzione dopo avere tentato almeno <code>mediaClasse</code> e una delle due ricerche. Controlla soprattutto come viene rappresentato il caso “nessun valido”.</p>
+      <details class="answer-reveal solution-reveal">
+        <summary>
+          <span class="when-closed">Mostra soluzione</span>
+          <span class="when-open">Nascondi soluzione</span>
+        </summary>
+        <div class="solution-content">
+          <figure class="code-example">
+            <figcaption>C++17 · una possibile soluzione completa</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+struct Studente {
+    int matricola;
+    std::string nome;
+    double media;
+};
+
+constexpr int N = 4;
+using Classe = Studente[N];
+
+bool valido(const Studente&amp; s) {
+    return s.matricola &gt; 0
+        &amp;&amp; !s.nome.empty()
+        &amp;&amp; s.media &gt;= 0.0
+        &amp;&amp; s.media &lt;= 10.0;
+}
+
+void stampa(const Classe&amp; classe) {
+    for (const Studente&amp; s : classe) {
+        if (valido(s))
+            std::cout &lt;&lt; s.matricola &lt;&lt; '\t'
+                      &lt;&lt; s.nome &lt;&lt; '\t' &lt;&lt; s.media &lt;&lt; '\n';
+    }
+}
+
+double mediaClasse(const Classe&amp; classe) {
+    double somma = 0.0;
+    int validi = 0;
+
+    for (const Studente&amp; s : classe) {
+        if (valido(s)) {
+            somma += s.media;
+            ++validi;
+        }
+    }
+    return validi == 0 ? 0.0 : somma / validi;
+}
+
+int cercaMatricola(const Classe&amp; classe, int matricola) {
+    for (int i = 0; i &lt; N; ++i) {
+        if (valido(classe[i]) &amp;&amp; classe[i].matricola == matricola)
+            return i;
+    }
+    return -1;
+}
+
+int indiceMigliore(const Classe&amp; classe) {
+    int migliore = -1;
+    for (int i = 0; i &lt; N; ++i) {
+        if (valido(classe[i])
+            &amp;&amp; (migliore == -1
+                || classe[i].media &gt; classe[migliore].media))
+            migliore = i;
+    }
+    return migliore;
+}
+
+int main() {
+    Classe classe{
+        {1001, "Ada", 8.5},
+        {1002, "Alan", 7.0},
+        {1003, "Grace", 9.5},
+        {1004, "Barbara", 6.0}
+    };
+
+    stampa(classe);
+    std::cout &lt;&lt; "Media: " &lt;&lt; mediaClasse(classe) &lt;&lt; '\n';
+    std::cout &lt;&lt; "Indice matricola 1002: "
+              &lt;&lt; cercaMatricola(classe, 1002) &lt;&lt; '\n';
+
+    int migliore = indiceMigliore(classe);
+    if (migliore != -1)
+        std::cout &lt;&lt; "Migliore: " &lt;&lt; classe[migliore].nome
+                  &lt;&lt; " (" &lt;&lt; classe[migliore].media &lt;&lt; ")\n";
+}</code></pre>
+          </figure>
+          <p><strong>Scelta chiave:</strong> <code>migliore</code> parte da <code>-1</code>; il primo record valido inizializza davvero il confronto, evitando valori sentinella inventati per la media.</p>
+        </div>
+      </details>
+    </section>
 
     <section class="three-col">
       <article class="topic-card">
@@ -159,6 +263,43 @@ int main() {
       <span class="exercise-label">Sfida facoltativa</span>
       <h2>Archivio dinamico e ordinato</h2>
       <p>Trasforma l’array in <code>std::vector&lt;Studente&gt;</code>, aggiungi l’inserimento da input e ordina gli studenti per media decrescente con matricola crescente come spareggio.</p>
+      <details class="answer-reveal solution-reveal">
+        <summary>
+          <span class="when-closed">Mostra soluzione</span>
+          <span class="when-open">Nascondi soluzione</span>
+        </summary>
+        <div class="solution-content">
+          <figure class="code-example">
+            <figcaption>C++17 · inserimento e ordinamento</figcaption>
+<pre><code class="language-cpp">#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+
+bool aggiungiDaInput(std::vector&lt;Studente&gt;&amp; archivio) {
+    Studente candidato{};
+
+    if (!(std::cin &gt;&gt; candidato.matricola))
+        return false;
+    if (!std::getline(std::cin &gt;&gt; std::ws, candidato.nome))
+        return false;
+    if (!(std::cin &gt;&gt; candidato.media) || !valido(candidato))
+        return false;
+
+    archivio.push_back(candidato);
+    return true;
+}
+
+void ordina(std::vector&lt;Studente&gt;&amp; archivio) {
+    std::sort(archivio.begin(), archivio.end(),
+        [](const Studente&amp; a, const Studente&amp; b) {
+            if (a.media != b.media)
+                return a.media &gt; b.media;
+            return a.matricola &lt; b.matricola;
+        });
+}</code></pre>
+          </figure>
+          <p>Il nuovo record viene inserito solo dopo la validazione. Il comparatore tratta esplicitamente prima il criterio principale e poi lo spareggio.</p>
+        </div>
+      </details>
     </section>
 
     <aside class="next-step"><strong>Lezione completata.</strong> Nella Lezione 3 trasformeremo i record in dati persistenti definendo formati testuali e binari.</aside>

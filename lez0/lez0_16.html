@@ -96,12 +96,21 @@ int main() {
 
     <div class="callout warning"><strong>Sicurezza:</strong> non dereferenziare un puntatore nullo, non inizializzato o che non indica più un oggetto valido.</div>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Perché cambia anche <code>x</code>?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Perché cambia anche <code>x</code>?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p><code>*p</code> non è una copia: è un altro modo per nominare l’oggetto <code>x</code>. L’assegnazione scrive nella stessa cella di memoria.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 14 · 8 minuti</span>

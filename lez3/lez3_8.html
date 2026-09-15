@@ -113,12 +113,21 @@ int main(void) {
 
     <div class="callout"><strong>Per leggere righe:</strong> <code>fgets(buffer, dimensione, file)</code> restituisce il buffer in caso di successo e <code>NULL</code> a fine file o in caso di errore.</div>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Perché compare <code>%39s</code>?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Perché compare <code>%39s</code>?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Il limite impedisce di scrivere oltre il buffer da 40 caratteri e lascia spazio al terminatore <code>'\0'</code>. Il formato accetta comunque soltanto nomi senza spazi.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 8</span>

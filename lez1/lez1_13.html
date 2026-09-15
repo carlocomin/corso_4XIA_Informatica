@@ -81,9 +81,17 @@ int main() {
       <p><code>std::vector</code> gestisce automaticamente la memoria. Non servono <code>new[]</code> e <code>delete[]</code>.</p>
     </section>
 
-    <details class="checkpoint">
-      <summary>Confronto mirato · Buffer contiguo in C</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Confronto mirato</span>
+        <h2>Buffer contiguo in C</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra approfondimento</span>
+          <span class="when-open">Nascondi approfondimento</span>
+        </summary>
+        <div class="answer">
         <figure class="code-example">
           <figcaption>C11 · allocazione e rilascio</figcaption>
 <pre><code class="language-c">#include &lt;stddef.h&gt;
@@ -104,7 +112,8 @@ int main(void) {
         </figure>
         <p>In C il programmatore deve controllare l’esito dell’allocazione e chiamare <code>free</code> esattamente una volta quando il buffer non serve più.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="two-col">
       <article class="topic-card">
@@ -117,12 +126,21 @@ int main(void) {
       </article>
     </section>
 
-    <details class="checkpoint">
-      <summary>Controllo rapido · Quale cella corrisponde all’indice 14 con C = 5?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Controllo rapido</span>
+        <h2>Quale cella corrisponde all’indice 14 con C = 5?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p><code>r = 14 / 5 = 2</code> e <code>c = 14 % 5 = 4</code>. La cella è quindi <code>(2,4)</code>.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 11 · Estensione</span>

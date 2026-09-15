@@ -109,9 +109,17 @@ int main() {
       <div class="callout"><strong>Precondizione di <code>sommaRiga</code>:</strong> il chiamante deve fornire un indice tale che <code>0 &lt;= r &amp;&amp; r &lt; R</code>.</div>
     </section>
 
-    <details class="checkpoint">
-      <summary>Dataset di collaudo · Risultati attesi</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Dataset di collaudo</span>
+        <h2>Risultati attesi</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risultati</span>
+          <span class="when-open">Nascondi risultati</span>
+        </summary>
+        <div class="answer">
         <div class="output">1  2  3  4
 5  6  7  8
 9 10 11 12</div>
@@ -121,7 +129,116 @@ int main() {
           <li>massimo: <code>12</code> nella cella <code>(2,3)</code>.</li>
         </ul>
       </div>
-    </details>
+      </details>
+    </section>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Soluzione guidata</span>
+      <h2>Vendite mensili: programma completo</h2>
+      <p>Confronta la soluzione soltanto dopo avere scritto almeno la stampa, una somma per riga e la ricerca del massimo.</p>
+      <details class="answer-reveal solution-reveal">
+        <summary>
+          <span class="when-closed">Mostra soluzione</span>
+          <span class="when-open">Nascondi soluzione</span>
+        </summary>
+        <div class="solution-content">
+          <figure class="code-example">
+            <figcaption>C++17 · una possibile soluzione completa</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+constexpr int R = 3;
+constexpr int C = 4;
+using Matrice = int[R][C];
+
+bool leggi(Matrice&amp; m) {
+    for (int r = 0; r &lt; R; ++r) {
+        for (int c = 0; c &lt; C; ++c) {
+            if (!(std::cin &gt;&gt; m[r][c]) || m[r][c] &lt; 0)
+                return false;
+        }
+    }
+    return true;
+}
+
+void stampa(const Matrice&amp; m) {
+    for (int r = 0; r &lt; R; ++r) {
+        for (int c = 0; c &lt; C; ++c) {
+            if (c &gt; 0)
+                std::cout &lt;&lt; ' ';
+            std::cout &lt;&lt; m[r][c];
+        }
+        std::cout &lt;&lt; '\n';
+    }
+}
+
+int sommaRiga(const Matrice&amp; m, int r) {
+    int somma = 0;
+    for (int c = 0; c &lt; C; ++c)
+        somma += m[r][c];
+    return somma;
+}
+
+int sommaColonna(const Matrice&amp; m, int c) {
+    int somma = 0;
+    for (int r = 0; r &lt; R; ++r)
+        somma += m[r][c];
+    return somma;
+}
+
+int indiceSettimanaMigliore(const Matrice&amp; m) {
+    int migliore = 0;
+    int totaleMigliore = sommaColonna(m, 0);
+
+    for (int c = 1; c &lt; C; ++c) {
+        int totale = sommaColonna(m, c);
+        if (totale &gt; totaleMigliore) {
+            migliore = c;
+            totaleMigliore = totale;
+        }
+    }
+    return migliore;
+}
+
+void trovaMassimo(const Matrice&amp; m, int&amp; rMax, int&amp; cMax) {
+    rMax = 0;
+    cMax = 0;
+
+    for (int r = 0; r &lt; R; ++r) {
+        for (int c = 0; c &lt; C; ++c) {
+            if (m[r][c] &gt; m[rMax][cMax]) {
+                rMax = r;
+                cMax = c;
+            }
+        }
+    }
+}
+
+int main() {
+    Matrice vendite{};
+    if (!leggi(vendite)) {
+        std::cerr &lt;&lt; "Input non valido\n";
+        return 1;
+    }
+
+    stampa(vendite);
+    for (int r = 0; r &lt; R; ++r)
+        std::cout &lt;&lt; "Reparto " &lt;&lt; r
+                  &lt;&lt; ": " &lt;&lt; sommaRiga(vendite, r) &lt;&lt; '\n';
+
+    int settimana = indiceSettimanaMigliore(vendite);
+    std::cout &lt;&lt; "Settimana migliore: " &lt;&lt; settimana &lt;&lt; '\n';
+
+    int rMax = 0;
+    int cMax = 0;
+    trovaMassimo(vendite, rMax, cMax);
+    std::cout &lt;&lt; "Massimo: " &lt;&lt; vendite[rMax][cMax]
+              &lt;&lt; " in (" &lt;&lt; rMax &lt;&lt; ',' &lt;&lt; cMax &lt;&lt; ")\n";
+}</code></pre>
+          </figure>
+          <p><strong>Spareggi:</strong> i confronti usano <code>&gt;</code>, non <code>&gt;=</code>. Per questo, a parità, rimane memorizzato il primo indice incontrato.</p>
+        </div>
+      </details>
+    </section>
 
     <section class="three-col">
       <article class="topic-card">
@@ -145,6 +262,33 @@ int main() {
       <span class="exercise-label">Sfida facoltativa</span>
       <h2>Trasposta</h2>
       <p>Costruisci una matrice <code>trasposta[4][3]</code> tale che <code>trasposta[c][r] = vendite[r][c]</code>. Stampala e controlla che righe e colonne si siano scambiate.</p>
+      <details class="answer-reveal solution-reveal">
+        <summary>
+          <span class="when-closed">Mostra soluzione</span>
+          <span class="when-open">Nascondi soluzione</span>
+        </summary>
+        <div class="solution-content">
+          <figure class="code-example">
+            <figcaption>C++17 · funzioni da aggiungere</figcaption>
+<pre><code class="language-cpp">using Trasposta = int[C][R];
+
+void trasponi(const Matrice&amp; origine, Trasposta&amp; destinazione) {
+    for (int r = 0; r &lt; R; ++r)
+        for (int c = 0; c &lt; C; ++c)
+            destinazione[c][r] = origine[r][c];
+}
+
+void stampaTrasposta(const Trasposta&amp; m) {
+    for (int r = 0; r &lt; C; ++r) {
+        for (int c = 0; c &lt; R; ++c)
+            std::cout &lt;&lt; m[r][c] &lt;&lt; ' ';
+        std::cout &lt;&lt; '\n';
+    }
+}</code></pre>
+          </figure>
+          <p>Nel <code>main</code> dichiara <code>Trasposta t{};</code>, poi chiama <code>trasponi(vendite, t)</code> e <code>stampaTrasposta(t)</code>.</p>
+        </div>
+      </details>
     </section>
 
     <aside class="next-step"><strong>Lezione completata.</strong> Nella Lezione 2 useremo le <code>struct</code> per raggruppare dati che descrivono la stessa entità.</aside>

@@ -100,12 +100,21 @@
       <p>Dopo un ciclo formattato, <code>!in.eof()</code> segnala spesso un dato malformato; <code>in.bad()</code> segnala un errore di I/O.</p>
     </section>
 
-    <details class="checkpoint">
-      <summary>Checkpoint · Perché il ciclo sbagliato può duplicare l’ultima riga?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint</span>
+        <h2>Perché il ciclo sbagliato può duplicare l’ultima riga?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p>Perché dopo il fallimento di <code>getline</code> la variabile non contiene una nuova riga valida, ma il corpo del ciclo viene comunque eseguito.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 7</span>

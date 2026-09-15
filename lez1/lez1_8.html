@@ -93,9 +93,17 @@ int main(void) {
       </article>
     </section>
 
-    <details class="checkpoint">
-      <summary>Estensione C99 · Dimensioni determinate a runtime</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Estensione C99</span>
+        <h2>Dimensioni determinate a runtime</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra approfondimento</span>
+          <span class="when-open">Nascondi approfondimento</span>
+        </summary>
+        <div class="answer">
         <figure class="code-example">
           <figcaption>C99 · variable length array</figcaption>
 <pre><code class="language-c">void stampa(size_t R, size_t C, int m[R][C]) {
@@ -106,14 +114,24 @@ int main(void) {
         </figure>
         <p>I VLA appartengono al C, non al C++ standard, e il loro supporto può dipendere dalla versione e dal compilatore. Le dimensioni devono essere positive quando la funzione viene chiamata. Per il ripasso di base manteniamo <code>C</code> costante.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
-    <details class="checkpoint">
-      <summary>Controllo rapido · Quale firma accetta <code>int a[4][3]</code>?</summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Controllo rapido</span>
+        <h2>Quale firma accetta <code>int a[4][3]</code>?</h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
         <p><code>void f(int righe, int m[][3])</code> è compatibile in C11. <code>void f(int **m)</code> e <code>void f(int righe, int m[][4])</code> non lo sono.</p>
       </div>
-    </details>
+      </details>
+    </section>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 6 · 8 minuti</span>

@@ -121,9 +121,17 @@ int main() {
 }</code></pre>
     </figure>
 
-    <details class="checkpoint">
-      <summary>Dataset di collaudo · <code>7 2 9 2 5</code></summary>
-      <div class="answer">
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Dataset di collaudo</span>
+        <h2><code>n = 5</code>, valori <code>7 2 9 2 5</code></h2>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risultati</span>
+          <span class="when-open">Nascondi risultati</span>
+        </summary>
+        <div class="answer">
         <ul>
           <li>somma: <code>25</code>;</li>
           <li>prima occorrenza di 2: indice <code>1</code>;</li>
@@ -133,7 +141,150 @@ int main() {
           <li>ricerca binaria di 7: indice <code>3</code>.</li>
         </ul>
       </div>
-    </details>
+      </details>
+    </section>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Soluzione guidata</span>
+      <h2>Toolkit completo</h2>
+      <p>Apri la soluzione soltanto dopo avere definito il contratto e tentato almeno le funzioni <code>somma</code>, <code>cerca</code> e <code>indiceMassimo</code>.</p>
+      <details class="answer-reveal solution-reveal">
+        <summary>
+          <span class="when-closed">Mostra soluzione</span>
+          <span class="when-open">Nascondi soluzione</span>
+        </summary>
+        <div class="solution-content">
+          <figure class="code-example">
+            <figcaption>C++17 · una possibile soluzione completa</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+constexpr int CAP = 10;
+
+bool leggi(int a[], int capacita, int&amp; n) {
+    n = 0;
+    int richiesti = 0;
+
+    if (!(std::cin &gt;&gt; richiesti)
+        || richiesti &lt; 0 || richiesti &gt; capacita)
+        return false;
+
+    for (int i = 0; i &lt; richiesti; ++i) {
+        if (!(std::cin &gt;&gt; a[i]))
+            return false;
+    }
+
+    n = richiesti;
+    return true;
+}
+
+void stampa(const int a[], int n) {
+    for (int i = 0; i &lt; n; ++i) {
+        if (i &gt; 0)
+            std::cout &lt;&lt; ' ';
+        std::cout &lt;&lt; a[i];
+    }
+    std::cout &lt;&lt; '\n';
+}
+
+int somma(const int a[], int n) {
+    int totale = 0;
+    for (int i = 0; i &lt; n; ++i)
+        totale += a[i];
+    return totale;
+}
+
+int cerca(const int a[], int n, int valore) {
+    for (int i = 0; i &lt; n; ++i) {
+        if (a[i] == valore)
+            return i;
+    }
+    return -1;
+}
+
+int indiceMassimo(const int a[], int n) {
+    if (n == 0)
+        return -1;
+
+    int migliore = 0;
+    for (int i = 1; i &lt; n; ++i) {
+        if (a[i] &gt; a[migliore])
+            migliore = i;
+    }
+    return migliore;
+}
+
+void inverti(int a[], int n) {
+    for (int i = 0; i &lt; n / 2; ++i) {
+        int opposto = n - 1 - i;
+        int temporaneo = a[i];
+        a[i] = a[opposto];
+        a[opposto] = temporaneo;
+    }
+}
+
+void ordinaSelezione(int a[], int n) {
+    for (int i = 0; i &lt; n - 1; ++i) {
+        int indiceMinimo = i;
+        for (int j = i + 1; j &lt; n; ++j) {
+            if (a[j] &lt; a[indiceMinimo])
+                indiceMinimo = j;
+        }
+
+        int temporaneo = a[i];
+        a[i] = a[indiceMinimo];
+        a[indiceMinimo] = temporaneo;
+    }
+}
+
+int ricercaBinaria(const int a[], int n, int valore) {
+    int sinistra = 0;
+    int destra = n - 1;
+
+    while (sinistra &lt;= destra) {
+        int centro = sinistra + (destra - sinistra) / 2;
+        if (a[centro] == valore)
+            return centro;
+        if (a[centro] &lt; valore)
+            sinistra = centro + 1;
+        else
+            destra = centro - 1;
+    }
+    return -1;
+}
+
+int main() {
+    int dati[CAP]{};
+    int n = 0;
+
+    if (!leggi(dati, CAP, n)) {
+        std::cerr &lt;&lt; "Input non valido\n";
+        return 1;
+    }
+
+    stampa(dati, n);
+    std::cout &lt;&lt; "Somma: " &lt;&lt; somma(dati, n) &lt;&lt; '\n';
+    std::cout &lt;&lt; "Prima occorrenza di 2: "
+              &lt;&lt; cerca(dati, n, 2) &lt;&lt; '\n';
+
+    int massimo = indiceMassimo(dati, n);
+    if (massimo != -1)
+        std::cout &lt;&lt; "Massimo: " &lt;&lt; dati[massimo]
+                  &lt;&lt; ", indice: " &lt;&lt; massimo &lt;&lt; '\n';
+
+    inverti(dati, n);
+    stampa(dati, n);
+
+    ordinaSelezione(dati, n);
+    stampa(dati, n);
+
+    std::cout &lt;&lt; "Posizione di 7: "
+              &lt;&lt; ricercaBinaria(dati, n, 7) &lt;&lt; '\n';
+}</code></pre>
+          </figure>
+          <p><strong>Controllo del progetto:</strong> le funzioni di sola lettura ricevono <code>const int[]</code>; soltanto <code>leggi</code>, <code>inverti</code> e <code>ordinaSelezione</code> possono modificare l’array.</p>
+        </div>
+      </details>
+    </section>
 
     <section class="three-col">
       <article class="topic-card"><span class="badge">Base</span><h2>So attraversare</h2><p>Uso indici validi, dimensione logica e cicli senza errori di confine.</p></article>
@@ -145,6 +296,22 @@ int main() {
       <span class="exercise-label">Collaudo obbligatorio</span>
       <h2>Non provare soltanto il caso normale</h2>
       <p>Verifica anche array vuoto, un elemento, tutti uguali, ordine già crescente, ordine decrescente, valore assente, quantità negativa e quantità superiore a <code>CAP</code>.</p>
+      <details class="answer-reveal solution-reveal">
+        <summary>
+          <span class="when-closed">Mostra piano di collaudo</span>
+          <span class="when-open">Nascondi piano di collaudo</span>
+        </summary>
+        <div class="solution-content">
+          <ul>
+            <li>con <code>n = 0</code>, somma vale 0 e gli indici restituiti valgono <code>-1</code>;</li>
+            <li>un solo elemento resta invariato dopo inversione e ordinamento;</li>
+            <li>con elementi tutti uguali, <code>indiceMassimo</code> conserva l’indice 0;</li>
+            <li>ordine crescente e decrescente producono entrambi lo stesso array crescente;</li>
+            <li>un valore assente produce <code>-1</code> sia nella ricerca lineare sia in quella binaria;</li>
+            <li>quantità negativa o maggiore di <code>CAP</code> rende <code>leggi</code> falsa e lascia <code>n</code> uguale a 0.</li>
+          </ul>
+        </div>
+      </details>
     </section>
 
     <aside class="next-step"><strong>Lezione completata.</strong> Nella Lezione 1 ogni elemento diventerà una riga: aggiungeremo un secondo indice e trasformeremo la scansione singola in un doppio ciclo.</aside>
