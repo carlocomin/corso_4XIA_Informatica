@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L0.8 · Ricerca lineare</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:38.10%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html" class="active" aria-current="page">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html">L0.21 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso fondamentale · Array e funzioni · 8/21</p>
+    <h1>Ricerca lineare</h1>
+    <p class="lead">La ricerca lineare controlla gli elementi nell’ordine e può fermarsi appena trova la prima occorrenza.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_7.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_9.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Cercare senza ipotesi sull’ordine</h2>
+      <p><strong>Idea chiave:</strong> la posizione vale <code>-1</code> finché il valore non viene trovato; quando troviamo la prima corrispondenza salviamo l’indice e usciamo.</p>
+    </section>
+
+    <figure class="code-example">
+      <figcaption>C++17 · prima occorrenza</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    int a[]{6, 3, 9, 3, 5};
+    constexpr int N = 5;
+    int cercato = 3;
+    int posizione = -1;
+
+    for (int i = 0; i &lt; N; ++i) {
+        if (a[i] == cercato) {
+            posizione = i;
+            break;
+        }
+    }
+
+    if (posizione == -1)
+        std::cout &lt;&lt; "Non trovato\n";
+    else
+        std::cout &lt;&lt; "Prima posizione: "
+                  &lt;&lt; posizione &lt;&lt; '\n';
+}</code></pre>
+    </figure>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Perché <code>-1</code>?</h2>
+        <p>Non è un indice valido e quindi distingue chiaramente il caso “assente” dalle posizioni <code>0..N-1</code>.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Perché <code>break</code>?</h2>
+        <p>Il contratto richiede la prima occorrenza. Dopo averla trovata, altre letture non possono migliorare il risultato.</p>
+      </article>
+    </section>
+
+    <div class="callout"><strong>Costo:</strong> nel caso peggiore vengono esaminati tutti gli <code>n</code> elementi. Il tempo cresce linearmente: <code>O(n)</code>.</div>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Che cosa cambia senza <code>break</code>?</summary>
+      <div class="answer">
+        <p>Continuando ad assegnare <code>posizione = i</code>, il risultato diventa l’ultima occorrenza: nell’esempio l’indice 3 invece dell’indice 1.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 6 · 8 minuti</span>
+      <h2>Tre varianti</h2>
+      <p>Modifica l’algoritmo per contare le occorrenze, trovare l’ultima posizione e verificare soltanto se il valore è presente.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Una ricerca può selezionare non un valore dato, ma l’elemento migliore incontrato finora.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_7.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_9.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

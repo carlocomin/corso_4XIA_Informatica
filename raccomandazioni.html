@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prima di iniziare – Come lavorare bene in informatica</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="default.css">
+  <script src="menu.js" defer></script>
+  <script>
+    function prevSlide(){ window.location.href = "programma.html"; }
+    function nextSlide(){ window.location.href = "impatto-ai.html"; }
+  </script>
+  <style>
+    .content-box { text-align:left; }
+    .content-box > p:first-child { margin-top:0; }
+    .recommendations-grid {
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+    .recommendation-card {
+      width:auto;
+      margin:0;
+      border:1px solid #d5e6e3;
+      box-shadow:0 2px 6px rgba(0,0,0,.08);
+    }
+    .recommendation-card h2 { margin-top:0; }
+    .recommendation-card ul,
+    .commitment-box ul {
+      margin:.5rem 0 .5rem 1rem;
+      padding-left:1.25rem;
+    }
+    .recommendation-card li,
+    .commitment-box li {
+      margin:.4rem 0;
+      padding-left:.2rem;
+    }
+    .study-cycle {
+      display:grid;
+      grid-template-columns:repeat(5, minmax(0, 1fr));
+      gap:8px;
+      margin:16px 0;
+      counter-reset:phase;
+    }
+    .study-cycle div {
+      counter-increment:phase;
+      padding:10px;
+      border-radius:8px;
+      background:#eefbf9;
+      border:1px solid #80cbc4;
+      text-align:center;
+    }
+    .study-cycle div::before {
+      content:counter(phase) ". ";
+      font-weight:bold;
+    }
+    .commitment-box {
+      width:auto;
+      margin:14px 0 0;
+      border-left:5px solid #00796b;
+    }
+    .career-box {
+      width:auto;
+      margin:14px 0 0;
+      border-left:5px solid #3b82f6;
+    }
+    .career-paths {
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
+    }
+    .career-paths > div {
+      padding:.75rem 1rem;
+      border-radius:8px;
+      background:#f7faff;
+    }
+    .career-paths h3 { margin:.2rem 0 .5rem; }
+    .closing-note {
+      margin-bottom:0;
+      padding:.75rem 1rem;
+      border-radius:8px;
+      background:#fff7ed;
+      border-left:4px solid #f59e0b;
+    }
+    @media (max-width:800px) {
+      .recommendations-grid { grid-template-columns:1fr; }
+      .study-cycle { grid-template-columns:1fr; }
+      .study-cycle div { text-align:left; }
+      .career-paths { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Menu Lezioni</h2>
+  <ul>
+    <li><a href="raccomandazioni.html" class="active" aria-current="page">Prima di iniziare: metodo di lavoro</a></li>
+    <li><a href="impatto-ai.html">AI: didattica e lavoro informatico</a></li>
+    <li><a href="lez0/lez0_1.html">Lezione 0: Array, funzioni e parametri</a></li>
+    <li><a href="lez1/lez1_1.html">Lezione 1: Matrici 2D in C/C++</a></li>
+    <li><a href="lez2/lez2_1.html">Lezione 2: Struct in C/C++</a></li>
+    <li><a href="lez3/lez3_1.html">Lezione 3: File I/O in C/C++</a></li>
+    <li><a href="lez4/lez4_1.html">Lezione 4: OOP in C++</a></li>
+    <li><a href="lez5/lez5_1.html">Lezione 5: Ereditarietà e polimorfismo in C++</a></li>
+    <li><a href="lez6/lez6_1.html">Lezione 6: Alberi e BST in C/C++</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>Prima di iniziare</h1>
+  <p><strong>Come lavorare bene in informatica</strong></p>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <main class="content-box">
+    <p>L'informatica si impara costruendo, provando e correggendo. Capire una spiegazione è il punto di partenza; la competenza nasce quando riesci ad applicarla da solo e a spiegare le tue scelte.</p>
+
+    <h2>Un ciclo di studio efficace</h2>
+    <div class="study-cycle" aria-label="Cinque fasi del ciclo di studio">
+      <div><strong>Comprendi</strong><br>Chiarisci il problema e i dati.</div>
+      <div><strong>Prevedi</strong><br>Anticipa il risultato.</div>
+      <div><strong>Prova</strong><br>Scrivi o esegui la soluzione.</div>
+      <div><strong>Controlla</strong><br>Confronta previsione e risultato.</div>
+      <div><strong>Spiega</strong><br>Motiva ogni passaggio.</div>
+    </div>
+
+    <div class="recommendations-grid">
+      <section class="inner-box recommendation-card">
+        <h2>Metodo di studio</h2>
+        <ul>
+          <li>Studia con regolarità, in sessioni brevi e frequenti.</li>
+          <li>Prova gli esercizi prima di aprire la soluzione.</li>
+          <li>Esegui a mano qualche esempio con una tabella di traccia.</li>
+          <li>Modifica dati e condizioni per verificare se hai davvero capito.</li>
+          <li>Riprendi gli errori dopo alcuni giorni e risolvi di nuovo il problema.</li>
+        </ul>
+      </section>
+
+      <section class="inner-box recommendation-card">
+        <h2>Appunti utili</h2>
+        <ul>
+          <li>Indica sempre data, argomento e obiettivo della lezione.</li>
+          <li>Annota definizioni, esempi svolti e motivi delle scelte.</li>
+          <li>Registra gli errori incontrati e la correzione che ha funzionato.</li>
+          <li>Completa gli appunti nella stessa giornata, finché i passaggi sono chiari.</li>
+          <li>Conserva codice e diagrammi in cartelle ordinate e con nomi riconoscibili.</li>
+        </ul>
+      </section>
+
+      <section class="inner-box recommendation-card">
+        <h2>Durante gli esercizi</h2>
+        <ul>
+          <li>Leggi il testo e individua input, output, vincoli e casi limite.</li>
+          <li>Dividi il problema in passi piccoli prima di scrivere il programma.</li>
+          <li>Esegui spesso: trovare presto un errore rende più facile capirlo.</li>
+          <li>Leggi con attenzione il primo messaggio di errore e cambia una cosa alla volta.</li>
+          <li>Verifica la soluzione con casi normali, casi limite e dati non validi.</li>
+        </ul>
+      </section>
+
+      <section class="inner-box recommendation-card">
+        <h2>Rapporto con il docente</h2>
+        <ul>
+          <li>Comunica con sincerità che cosa hai capito e dove ti sei bloccato.</li>
+          <li>Quando chiedi aiuto, mostra il tentativo fatto e descrivi il risultato ottenuto.</li>
+          <li>Dichiara le fonti e gli aiuti usati, compresi strumenti di intelligenza artificiale.</li>
+          <li>Presenta come tuo soltanto il lavoro che sai ricostruire e spiegare.</li>
+          <li>Segnala per tempo difficoltà, assenze o problemi che ostacolano il lavoro.</li>
+        </ul>
+      </section>
+    </div>
+
+    <section class="inner-box career-box">
+      <h2>Dove possono portare queste competenze</h2>
+      <p>Il corso costruisce basi comuni a molti percorsi. Due profili tipici sono:</p>
+      <div class="career-paths">
+        <div>
+          <h3>Programmatore</h3>
+          <p>Analizza esigenze, progetta soluzioni, scrive e verifica software, corregge errori e mantiene il codice nel tempo.</p>
+          <p><strong>Possibili ambiti:</strong> applicazioni web e mobili, software gestionali, automazione, videogiochi, dati e servizi cloud.</p>
+        </div>
+        <div>
+          <h3>Sistemista</h3>
+          <p>Installa, configura, controlla e protegge computer, reti, server e servizi, garantendone disponibilità e affidabilità.</p>
+          <p><strong>Possibili ambiti:</strong> assistenza tecnica, amministrazione di sistemi e reti, cloud, DevOps e sicurezza informatica.</p>
+        </div>
+      </div>
+      <p><strong>Competenze comuni:</strong> ragionamento logico, documentazione, inglese tecnico, collaborazione, responsabilità e apprendimento continuo. I profili crescono con esperienza, studio ulteriore, progetti e certificazioni.</p>
+    </section>
+
+    <section class="inner-box commitment-box">
+      <h2>Il patto di lavoro</h2>
+      <p>Durante il corso ci impegniamo a:</p>
+      <ul>
+        <li>fare domande precise e ascoltare quelle degli altri;</li>
+        <li>considerare l'errore un'informazione da analizzare;</li>
+        <li>rispettare consegne, persone, strumenti e tempi del laboratorio;</li>
+        <li>chiedere aiuto senza nascondere il percorso già seguito;</li>
+        <li>dare e ricevere osservazioni sul lavoro con rispetto.</li>
+      </ul>
+      <p class="closing-note"><strong>Obiettivo:</strong> rendere visibile il ragionamento. In questo modo dubbi, tentativi ed errori diventano materiale utile per imparare.</p>
+    </section>
+  </main>
+
+  <div class="nav-buttons" style="margin-top:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intelligenza artificiale – Didattica e lavoro informatico</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="default.css">
+  <script src="menu.js" defer></script>
+  <script>
+    function prevSlide(){ window.location.href = "raccomandazioni.html"; }
+    function nextSlide(){ window.location.href = "lez0/lez0_1.html"; }
+  </script>
+  <style>
+    .content-box { text-align:left; }
+    .content-box > p:first-child { margin-top:0; }
+    .ai-grid,
+    .profession-grid,
+    .focus-grid {
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+    .ai-card,
+    .profession-card {
+      width:auto;
+      margin:0;
+      border:1px solid #d5e6e3;
+      box-shadow:0 2px 6px rgba(0,0,0,.08);
+    }
+    .ai-card h2,
+    .profession-card h3 { margin-top:0; }
+    .ai-card ul,
+    .profession-card ul,
+    .deep-box ul,
+    .rules-box ol {
+      margin:.5rem 0 .5rem 1rem;
+      padding-left:1.25rem;
+    }
+    .ai-card li,
+    .profession-card li,
+    .deep-box li,
+    .rules-box li {
+      margin:.4rem 0;
+      padding-left:.2rem;
+    }
+    .workflow {
+      display:grid;
+      grid-template-columns:repeat(6, minmax(0, 1fr));
+      gap:7px;
+      margin:16px 0;
+    }
+    .workflow div {
+      position:relative;
+      padding:12px 8px;
+      border-radius:8px;
+      background:#eefbf9;
+      border:1px solid #80cbc4;
+      text-align:center;
+      font-weight:bold;
+    }
+    .workflow div:not(:last-child)::after {
+      content:"→";
+      position:absolute;
+      right:-9px;
+      color:#00695c;
+      z-index:1;
+    }
+    .deep-box,
+    .rules-box {
+      width:auto;
+      margin:14px 0 0;
+    }
+    .deep-box { border-left:5px solid #00796b; }
+    .rules-box { border-left:5px solid #f59e0b; }
+    .focus-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); }
+    .focus-grid div {
+      padding:.75rem 1rem;
+      border-radius:8px;
+      background:#f7faff;
+      border-top:4px solid #3b82f6;
+    }
+    .focus-grid h3 { margin:.2rem 0 .5rem; }
+    .closing-note {
+      margin:14px 0 0;
+      padding:.8rem 1rem;
+      border-radius:8px;
+      background:#eefbf1;
+      border-left:4px solid #22c55e;
+    }
+    details.sources {
+      margin-top:14px;
+      padding:.7rem .9rem;
+      border-radius:8px;
+      background:#f3f6f6;
+    }
+    details.sources li { margin:.35rem 0; }
+    @media (max-width:900px) {
+      .workflow { grid-template-columns:repeat(3, minmax(0, 1fr)); }
+      .workflow div:nth-child(3)::after { content:""; }
+    }
+    @media (max-width:720px) {
+      .ai-grid,
+      .profession-grid,
+      .focus-grid,
+      .workflow { grid-template-columns:1fr; }
+      .workflow div { text-align:left; }
+      .workflow div::after { content:"" !important; }
+    }
+  </style>
+</head>
+<body>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Menu Lezioni</h2>
+  <ul>
+    <li><a href="raccomandazioni.html">Prima di iniziare: metodo di lavoro</a></li>
+    <li><a href="impatto-ai.html" class="active" aria-current="page">AI: didattica e lavoro informatico</a></li>
+    <li><a href="lez0/lez0_1.html">Lezione 0: Array, funzioni e parametri</a></li>
+    <li><a href="lez1/lez1_1.html">Lezione 1: Matrici 2D in C/C++</a></li>
+    <li><a href="lez2/lez2_1.html">Lezione 2: Struct in C/C++</a></li>
+    <li><a href="lez3/lez3_1.html">Lezione 3: File I/O in C/C++</a></li>
+    <li><a href="lez4/lez4_1.html">Lezione 4: OOP in C++</a></li>
+    <li><a href="lez5/lez5_1.html">Lezione 5: Ereditarietà e polimorfismo in C++</a></li>
+    <li><a href="lez6/lez6_1.html">Lezione 6: Alberi e BST in C/C++</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<div class="slide">
+  <h1>AI, didattica e lavoro informatico</h1>
+  <p><strong>Produrre codice più velocemente rende ancora più importante capire che cosa stiamo costruendo.</strong></p>
+
+  <div class="nav-buttons" style="margin-bottom:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+
+  <main class="content-box">
+    <p>Gli strumenti di intelligenza artificiale generativa possono proporre codice, spiegazioni, test e documentazione in pochi secondi. Sono assistenti potenti, ma producono risposte sulla base di modelli statistici: possono essere convincenti anche quando il risultato è incompleto, fragile o sbagliato.</p>
+
+    <h2>Il codice è una parte del lavoro</h2>
+    <div class="workflow" aria-label="Fasi necessarie per costruire e mantenere un sistema informatico">
+      <div>Problema</div>
+      <div>Requisiti</div>
+      <div>Progetto</div>
+      <div>Codice</div>
+      <div>Verifica</div>
+      <div>Manutenzione</div>
+    </div>
+    <p>L'AI può assistere in ciascuna fase. La responsabilità di capire il contesto, scegliere i criteri, verificare il risultato e valutarne le conseguenze rimane alle persone.</p>
+
+    <div class="ai-grid">
+      <section class="inner-box ai-card">
+        <h2>Che cosa può accelerare</h2>
+        <ul>
+          <li>creare una prima bozza di programma o configurazione;</li>
+          <li>spiegare un concetto in modi diversi;</li>
+          <li>suggerire test, esempi e casi limite;</li>
+          <li>riassumere documentazione e proporre ipotesi di debug;</li>
+          <li>automatizzare attività ripetitive e produrre documentazione iniziale.</li>
+        </ul>
+      </section>
+
+      <section class="inner-box ai-card">
+        <h2>Dove serve giudizio umano</h2>
+        <ul>
+          <li>comprendere esigenze ambigue o in conflitto;</li>
+          <li>riconoscere errori plausibili, vulnerabilità e casi mancanti;</li>
+          <li>valutare fonti, dati, dipendenze e informazioni non aggiornate;</li>
+          <li>integrare la risposta in un sistema reale senza comprometterlo;</li>
+          <li>assumersi la responsabilità tecnica, legale ed etica del risultato.</li>
+        </ul>
+      </section>
+    </div>
+
+    <section class="inner-box deep-box">
+      <h2>Perché serve una comprensione più profonda</h2>
+      <ul>
+        <li><strong>Per formulare il problema:</strong> una richiesta confusa produce facilmente una risposta inadatta.</li>
+        <li><strong>Per scegliere:</strong> spesso esistono più soluzioni corrette, con costi e rischi diversi.</li>
+        <li><strong>Per verificare:</strong> un programma che compila può comunque calcolare risultati errati o essere insicuro.</li>
+        <li><strong>Per correggere:</strong> quando il contesto cambia, bisogna sapere quali parti modificare e quali invarianti preservare.</li>
+        <li><strong>Per spiegare:</strong> lavorare in gruppo richiede decisioni comprensibili, documentate e difendibili.</li>
+        <li><strong>Per imparare ancora:</strong> strumenti e linguaggi cambiano; i concetti permettono di adattarsi.</li>
+      </ul>
+
+      <div class="focus-grid">
+        <div><h3>Conoscenza</h3><p>Algoritmi, dati, sistemi, reti, sicurezza e principi dei linguaggi.</p></div>
+        <div><h3>Metodo</h3><p>Analisi, scomposizione, test, misura, debug e documentazione.</p></div>
+        <div><h3>Giudizio</h3><p>Scelta tra alternative, valutazione dei rischi e responsabilità sul risultato.</p></div>
+      </div>
+    </section>
+
+    <h2>Come cambiano i profili professionali</h2>
+    <div class="profession-grid">
+      <section class="inner-box profession-card">
+        <h3>Programmatore con l'AI</h3>
+        <ul>
+          <li>dedica meno tempo ad alcune parti ripetitive;</li>
+          <li>confronta proposte diverse e seleziona quella adatta;</li>
+          <li>progetta test e controlla correttezza, prestazioni e sicurezza;</li>
+          <li>legge, integra e mantiene anche codice prodotto da altri strumenti.</li>
+        </ul>
+      </section>
+      <section class="inner-box profession-card">
+        <h3>Sistemista con l'AI</h3>
+        <ul>
+          <li>ottiene bozze di comandi, script e configurazioni;</li>
+          <li>analizza log e ipotesi di guasto più rapidamente;</li>
+          <li>verifica permessi, impatto delle modifiche, backup e possibilità di ripristino;</li>
+          <li>mantiene il controllo sui sistemi e sui dati affidati all'organizzazione.</li>
+        </ul>
+      </section>
+    </div>
+    <p>Le evidenze disponibili indicano soprattutto una trasformazione dei compiti e dei ruoli. Cresce il valore di chi possiede <b>fondamentali solidi</b> e sa usare l'AI con metodo, verificandone i risultati.</p>
+
+    <section class="inner-box rules-box">
+      <h2>Uso dell'AI durante il corso</h2>
+      <ol>
+        <li><strong>Tenta prima:</strong> chiarisci il problema e produci un tuo abbozzo.</li>
+        <li><strong>Chiedi in modo mirato:</strong> usa l'AI per un indizio, un confronto o una spiegazione.</li>
+        <li><strong>Verifica:</strong> controlla documentazione, esegui test e considera casi limite.</li>
+        <li><strong>Rielabora:</strong> riscrivi e spiega la soluzione con parole tue, senza dipendere dalla conversazione.</li>
+        <li><strong>Dichiara:</strong> indica come hai usato lo strumento e rispetta le regole dell'attività.</li>
+        <li><strong>Proteggi i dati:</strong> non inserire dati personali, credenziali o materiale riservato.</li>
+      </ol>
+      <p class="closing-note"><strong>Criterio pratico:</strong> puoi considerare acquisita una competenza quando sai ricostruire, verificare, modificare e spiegare la soluzione anche senza l'assistente.</p>
+    </section>
+
+    <details class="sources">
+      <summary><strong>Riferimenti per approfondire</strong></summary>
+      <ul>
+        <li><a href="https://www.unesco.org/en/articles/guidance-generative-ai-education-and-research">UNESCO — Guidance for generative AI in education and research</a></li>
+        <li><a href="https://www.unesco.org/en/articles/ai-competency-framework-students">UNESCO — AI competency framework for students</a></li>
+        <li><a href="https://www.ilo.org/publications/generative-ai-and-jobs-2025-update">ILO — Generative AI and jobs: a 2025 update</a></li>
+        <li><a href="https://dora.dev/research/2025/dora-report/">DORA — State of AI-assisted Software Development 2025</a></li>
+      </ul>
+    </details>
+  </main>
+
+  <div class="nav-buttons" style="margin-top:10px">
+    <button onclick="prevSlide()">&#8592; Indietro</button>
+    <button onclick="nextSlide()">Avanti &#8594;</button>
+  </div>
+</div>
+
+</body>
+</html>

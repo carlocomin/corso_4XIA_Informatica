@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L0.21 · Laboratorio e autoverifica</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:100.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html" class="active" aria-current="page">L0.21 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso fondamentale · Array e funzioni · 21/21</p>
+    <h1>Laboratorio e autoverifica</h1>
+    <p class="lead">Costruiamo un piccolo toolkit su array: ogni funzione ha un contratto, gestisce i casi limite e può essere collaudata separatamente.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_20.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="../lez1/lez1_1.html">Lezione 1 &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Consegna: toolkit per una sequenza</h2>
+      <p>Il programma gestisce al massimo dieci interi. Implementa le funzioni senza usare variabili globali e senza accedere oltre la dimensione logica.</p>
+      <p><strong>Idea chiave:</strong> separare input/output dagli algoritmi e scegliere consapevolmente valore, indirizzo o riferimento per ogni parametro.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Funzioni richieste, in ordine</h2>
+      <ol class="steps">
+        <li><code>leggi</code> valida quantità e valori inseriti;</li>
+        <li><code>stampa</code> mostra soltanto gli elementi validi;</li>
+        <li><code>somma</code> e <code>cerca</code> non modificano l’array;</li>
+        <li><code>indiceMassimo</code> restituisce <code>-1</code> se <code>n == 0</code>;</li>
+        <li><code>inverti</code> e <code>ordinaSelezione</code> modificano l’array;</li>
+        <li><code>ricercaBinaria</code> viene chiamata soltanto dopo l’ordinamento.</li>
+      </ol>
+    </section>
+
+    <figure class="code-example">
+      <figcaption>C++17 · interfaccia da completare</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+constexpr int CAP = 10;
+
+bool leggi(int a[], int capacita, int&amp; n);
+void stampa(const int a[], int n);
+int somma(const int a[], int n);
+int cerca(const int a[], int n, int valore);
+int indiceMassimo(const int a[], int n);
+void inverti(int a[], int n);
+void ordinaSelezione(int a[], int n);
+int ricercaBinaria(const int a[], int n, int valore);
+
+int main() {
+    int dati[CAP]{};
+    int n = 0;
+
+    if (!leggi(dati, CAP, n))
+        return 1;
+
+    stampa(dati, n);
+    std::cout &lt;&lt; "Somma: " &lt;&lt; somma(dati, n) &lt;&lt; '\n';
+
+    int posizione = cerca(dati, n, 2);
+    std::cout &lt;&lt; "Prima occorrenza di 2: "
+              &lt;&lt; posizione &lt;&lt; '\n';
+
+    int massimo = indiceMassimo(dati, n);
+    if (massimo != -1)
+        std::cout &lt;&lt; "Massimo: " &lt;&lt; dati[massimo]
+                  &lt;&lt; ", indice: " &lt;&lt; massimo &lt;&lt; '\n';
+
+    inverti(dati, n);
+    stampa(dati, n);
+
+    ordinaSelezione(dati, n);
+    stampa(dati, n);
+
+    std::cout &lt;&lt; "Posizione di 7: "
+              &lt;&lt; ricercaBinaria(dati, n, 7) &lt;&lt; '\n';
+}</code></pre>
+    </figure>
+
+    <details class="checkpoint">
+      <summary>Dataset di collaudo · <code>7 2 9 2 5</code></summary>
+      <div class="answer">
+        <ul>
+          <li>somma: <code>25</code>;</li>
+          <li>prima occorrenza di 2: indice <code>1</code>;</li>
+          <li>massimo: valore <code>9</code>, indice <code>2</code>;</li>
+          <li>array invertito: <code>5 2 9 2 7</code>;</li>
+          <li>array ordinato: <code>2 2 5 7 9</code>;</li>
+          <li>ricerca binaria di 7: indice <code>3</code>.</li>
+        </ul>
+      </div>
+    </details>
+
+    <section class="three-col">
+      <article class="topic-card"><span class="badge">Base</span><h2>So attraversare</h2><p>Uso indici validi, dimensione logica e cicli senza errori di confine.</p></article>
+      <article class="topic-card"><span class="badge">Operativo</span><h2>So scegliere</h2><p>Riconosco accumulo, ricerca, estremo, shift, inversione e ordinamento.</p></article>
+      <article class="topic-card"><span class="badge">Consapevole</span><h2>So progettare</h2><p>Scrivo firme che rendono visibili input, output ed effetti.</p></article>
+    </section>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Collaudo obbligatorio</span>
+      <h2>Non provare soltanto il caso normale</h2>
+      <p>Verifica anche array vuoto, un elemento, tutti uguali, ordine già crescente, ordine decrescente, valore assente, quantità negativa e quantità superiore a <code>CAP</code>.</p>
+    </section>
+
+    <aside class="next-step"><strong>Lezione completata.</strong> Nella Lezione 1 ogni elemento diventerà una riga: aggiungeremo un secondo indice e trasformeremo la scansione singola in un doppio ciclo.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_20.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="../lez1/lez1_1.html">Lezione 1 &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

@@ -63,14 +63,14 @@
         <figure class="code-example">
           <figcaption>C++17</figcaption>
 <pre><code class="language-cpp">void stampaSommeRighe(const int (&amp;m)[R][C]) {
-  for (int r = 0; r &lt; R; ++r) {
-    int somma = 0;
+    for (int r = 0; r &lt; R; ++r) {
+        int somma = 0;
 
-    for (int c = 0; c &lt; C; ++c)
-      somma += m[r][c];
+        for (int c = 0; c &lt; C; ++c)
+            somma += m[r][c];
 
-    std::cout &lt;&lt; somma &lt;&lt; '\n';
-  }
+        std::cout &lt;&lt; somma &lt;&lt; '\n';
+    }
 }</code></pre>
         </figure>
         <p><code>r</code> resta fisso mentre <code>c</code> attraversa la riga.</p>
@@ -80,14 +80,14 @@
         <figure class="code-example">
           <figcaption>C++17</figcaption>
 <pre><code class="language-cpp">void stampaSommeColonne(const int (&amp;m)[R][C]) {
-  for (int c = 0; c &lt; C; ++c) {
-    int somma = 0;
+    for (int c = 0; c &lt; C; ++c) {
+        int somma = 0;
 
-    for (int r = 0; r &lt; R; ++r)
-      somma += m[r][c];
+        for (int r = 0; r &lt; R; ++r)
+            somma += m[r][c];
 
-    std::cout &lt;&lt; somma &lt;&lt; '\n';
-  }
+        std::cout &lt;&lt; somma &lt;&lt; '\n';
+    }
 }</code></pre>
         </figure>
         <p><code>c</code> resta fisso mentre <code>r</code> attraversa la colonna.</p>

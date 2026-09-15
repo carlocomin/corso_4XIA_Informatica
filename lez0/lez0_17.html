@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L0.17 · Passaggio per indirizzo</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:80.95%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html" class="active" aria-current="page">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html">L0.21 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso fondamentale · Array e funzioni · 17/21</p>
+    <h1>Passaggio per indirizzo</h1>
+    <p class="lead">Nel passaggio per indirizzo la funzione riceve puntatori e modifica gli oggetti del chiamante attraverso la dereferenziazione.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_16.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_18.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Il meccanismo disponibile anche in C</h2>
+      <p><strong>Idea chiave:</strong> il chiamante usa <code>&amp;</code> per fornire l’indirizzo; la funzione usa <code>*</code> per leggere o modificare l’oggetto puntato.</p>
+    </section>
+
+    <figure class="code-example">
+      <figcaption>C11 · scambio tramite indirizzi</figcaption>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int scambia(int* a, int* b) {
+    if (a == NULL || b == NULL)
+        return 0;
+
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+    return 1;
+}
+
+int main(void) {
+    int x = 3;
+    int y = 8;
+
+    if (!scambia(&amp;x, &amp;y))
+        return 1;
+
+    printf("x = %d, y = %d\n", x, y);
+    return 0;
+}</code></pre>
+    </figure>
+
+    <div class="parameter-flow" aria-label="Gli indirizzi di x e y vengono passati alla funzione">
+      <div class="parameter-box"><span>chiamante</span><strong><code>&amp;x</code>, <code>&amp;y</code></strong></div>
+      <span class="copy-arrow" aria-hidden="true"><span>indirizzi</span><span class="flow-arrow">&#8594;</span></span>
+      <div class="parameter-box copied"><span>funzione</span><strong><code>int* a</code>, <code>int* b</code></strong></div>
+    </div>
+
+    <div class="callout"><strong>Precisazione:</strong> in C tutti i parametri sono passati per valore. Qui vengono copiate le due informazioni “indirizzo”; attraverso quelle copie la funzione raggiunge gli oggetti originali.</div>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Effetto visibile</h2>
+        <p>Le assegnazioni a <code>*a</code> e <code>*b</code> raggiungono direttamente <code>x</code> e <code>y</code>.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Contratto</h2>
+        <p>La funzione accetta anche puntatori nulli, li controlla e comunica successo o fallimento con il valore restituito.</p>
+      </article>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Firma, chiamata, accesso</summary>
+      <div class="answer">
+        <p>Firma: <code>int* a</code>. Chiamata: <code>&amp;x</code>. Dentro la funzione: <code>*a</code>. I tre simboli descrivono tipo, indirizzo fornito e oggetto raggiunto.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 15 · 12 minuti</span>
+      <h2>Quoziente e resto</h2>
+      <p>Scrivi in C una funzione che riceva dividendo e divisore per valore, produca quoziente e resto tramite due puntatori e restituisca 0 se il divisore è zero.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Gli array passati a funzione seguono naturalmente il modello puntatore più dimensione.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_16.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_18.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

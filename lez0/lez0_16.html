@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L0.16 · Indirizzi e puntatori</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:76.19%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html" class="active" aria-current="page">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html">L0.21 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso fondamentale · Array e funzioni · 16/21</p>
+    <h1>Indirizzi e puntatori</h1>
+    <p class="lead">Un puntatore contiene l’indirizzo di un oggetto; dereferenziarlo permette di accedere all’oggetto che si trova a quell’indirizzo.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_15.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_17.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Il collegamento con la memoria</h2>
+      <p><strong>Idea chiave:</strong> <code>&amp;x</code> produce l’indirizzo di <code>x</code>; <code>p</code> lo memorizza; <code>*p</code> designa l’oggetto raggiunto, che possiamo leggere o modificare.</p>
+    </section>
+
+    <div class="pointer-diagram" aria-label="Il puntatore p contiene l'indirizzo della variabile x">
+      <div class="address-box pointer"><span><code>p</code></span><strong>indirizzo di x</strong></div>
+      <span class="pointer-arrow" aria-hidden="true">&#8594;</span>
+      <div class="address-box target"><span><code>x</code></span><strong>42</strong><small>oggetto puntato</small></div>
+    </div>
+
+    <figure class="code-example">
+      <figcaption>C++17 · indirizzo e dereferenziazione</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    int x = 42;
+    int* p = &amp;x;
+
+    std::cout &lt;&lt; x &lt;&lt; ' ' &lt;&lt; *p &lt;&lt; '\n';
+
+    *p = 50;
+    std::cout &lt;&lt; x &lt;&lt; '\n';
+
+    p = nullptr;
+    if (p != nullptr)
+        std::cout &lt;&lt; *p &lt;&lt; '\n';
+}</code></pre>
+    </figure>
+
+    <section class="three-col">
+      <article class="topic-card"><h2><code>int*</code></h2><p>Tipo “puntatore a intero”.</p></article>
+      <article class="topic-card"><h2><code>&amp;x</code></h2><p>Indirizzo dell’oggetto <code>x</code>.</p></article>
+      <article class="topic-card"><h2><code>*p</code></h2><p>Oggetto raggiunto tramite <code>p</code>.</p></article>
+    </section>
+
+    <div class="callout warning"><strong>Sicurezza:</strong> non dereferenziare un puntatore nullo, non inizializzato o che non indica più un oggetto valido.</div>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Perché cambia anche <code>x</code>?</summary>
+      <div class="answer">
+        <p><code>*p</code> non è una copia: è un altro modo per nominare l’oggetto <code>x</code>. L’assegnazione scrive nella stessa cella di memoria.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 14 · 8 minuti</span>
+      <h2>Segui gli alias</h2>
+      <p>Crea due puntatori che contengano entrambi <code>&amp;x</code>. Modifica prima <code>*p</code> e poi <code>*q</code>, prevedendo ogni volta il valore osservato tramite <code>x</code>.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Passiamo gli indirizzi a una funzione per permetterle di modificare le variabili del chiamante.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_15.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_17.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

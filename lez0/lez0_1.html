@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L0.1 · Partiamo da ciò che serve</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:4.76%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html" class="active" aria-current="page">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html">L0.21 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso fondamentale · Array e funzioni · 1/21</p>
+    <h1>Partiamo da ciò che serve</h1>
+    <p class="lead">Prima delle matrici ricostruiamo una base sicura: array monodimensionali, algoritmi elementari, funzioni e passaggio dei parametri.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="../impatto-ai.html">&#8592; AI e informatica</a>
+    <a class="nav-button primary" href="lez0_2.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Obiettivo della Lezione 0</h2>
+      <p>Questa lezione non introduce scorciatoie: rimette in ordine gli strumenti che useremo continuamente nel resto del corso.</p>
+      <p><strong>Idea chiave:</strong> per lavorare bene con una matrice bisogna prima saper attraversare un array, controllare gli indici e spostare un algoritmo dentro una funzione.</p>
+    </section>
+
+    <section class="three-col">
+      <article class="topic-card">
+        <span class="badge">Dati</span>
+        <h2>Array</h2>
+        <p>Capacità, dimensione logica, indici validi e scansione completa.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge">Algoritmi</span>
+        <h2>Pattern notevoli</h2>
+        <p>Accumulo, ricerca, estremi, shift, inversione, ordinamento e ricerca binaria.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge extra">Struttura</span>
+        <h2>Funzioni</h2>
+        <p>Contratti e passaggio per valore, indirizzo e riferimento.</p>
+      </article>
+    </section>
+
+    <section class="topic-card">
+      <h2>Diagnosi iniziale: prevedi senza eseguire</h2>
+      <figure class="code-example">
+        <figcaption>C++17 · frammento di diagnosi</figcaption>
+<pre><code class="language-cpp">int a[4]{3, 1, 4, 1};
+int risultato = 0;
+
+for (int i = 0; i &lt; 4; ++i) {
+    if (a[i] &gt; 1)
+        risultato += a[i];
+}</code></pre>
+      </figure>
+      <p>Scrivi su carta i valori assunti da <code>i</code> e <code>risultato</code>. Non serve indovinare: serve costruire una traccia.</p>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Diagnosi · Controlla il ragionamento</summary>
+      <div class="answer">
+        <p>Gli indici visitati sono <code>0, 1, 2, 3</code>. Vengono sommati 3 e 4, quindi <code>risultato</code> vale <code>7</code>.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Metodo di lavoro</span>
+      <h2>Crea il quaderno degli errori</h2>
+      <p>Per ogni esercizio annota previsione, risultato ottenuto, primo errore osservato e correzione. Durante il ripasso conterà più spiegare il procedimento che arrivare subito alla risposta.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Prima di dichiarare un array distinguiamo due parole che useremo nel codice: <code>const</code> e <code>constexpr</code>.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="../impatto-ai.html">&#8592; AI e informatica</a>
+    <a class="nav-button primary" href="lez0_2.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

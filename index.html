@@ -14,10 +14,13 @@
 </head>
 <body>
 <!-- BEGIN MENU -->
-<button class="menu-toggle" onclick="toggleMenu()">&#9776; Menu</button>
-<div class="sidebar" id="menu">
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Menu Lezioni</h2>
   <ul>
+    <li><a href="raccomandazioni.html">Prima di iniziare: metodo di lavoro</a></li>
+    <li><a href="impatto-ai.html">AI: didattica e lavoro informatico</a></li>
+    <li><a href="lez0/lez0_1.html">Lezione 0: Array, funzioni e parametri</a></li>
     <li><a href="lez1/lez1_1.html">Lezione 1: Matrici 2D in C/C++</a></li>
     <li><a href="lez2/lez2_1.html">Lezione 2: Struct in C/C++</a></li>
     <li><a href="lez3/lez3_1.html">Lezione 3: File I/O in C/C++</a></li>
@@ -25,7 +28,7 @@
     <li><a href="lez5/lez5_1.html">Lezione 5: Ereditarietà e polimorfismo in C++</a></li>
     <li><a href="lez6/lez6_1.html">Lezione 6: Alberi e BST in C/C++</a></li>
   </ul>
-</div>
+</nav>
 <!-- END MENU -->
 
 

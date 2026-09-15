@@ -101,9 +101,9 @@ bool simmetrica(const int (&amp;m)[N][N]) {
     </details>
 
     <details class="checkpoint">
-      <summary>Controllo rapido · Quanti confronti servono con N = 4?</summary>
+      <summary>Controllo rapido · Quanti confronti servono al massimo con N = 4?</summary>
       <div class="answer">
-        <p>Servono 6 confronti: 3 nella riga 0, 2 nella riga 1, 1 nella riga 2 e nessuno nell’ultima. Una visita completa ne farebbe 16.</p>
+        <p>Al massimo 6 confronti: 3 nella riga 0, 2 nella riga 1, 1 nella riga 2 e nessuno nell’ultima. Se una coppia è diversa, l’uscita anticipata può fermare prima l’algoritmo. Il massimo è <code>N * (N - 1) / 2</code>, quindi <code>O(N²)</code>.</p>
       </div>
     </details>
 

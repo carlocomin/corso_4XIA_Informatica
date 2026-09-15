@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L0.2 · const e constexpr</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:9.52%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html" class="active" aria-current="page">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html">L0.21 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso fondamentale · Array e funzioni · 2/21</p>
+    <h1><code>const</code> e <code>constexpr</code></h1>
+    <p class="lead">Entrambe impediscono di modificare una variabile, ma <code>constexpr</code> aggiunge una garanzia: il valore deve essere determinabile durante la compilazione.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_1.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_3.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Due promesse diverse</h2>
+      <p><strong><code>const</code> promette:</strong> dopo l’inizializzazione non cambierò questo oggetto. Il valore iniziale può però arrivare mentre il programma è in esecuzione.</p>
+      <p><strong><code>constexpr</code> promette:</strong> questo valore è una costante calcolabile dal compilatore. Una variabile <code>constexpr</code> è automaticamente anche <code>const</code>.</p>
+    </section>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <span class="badge">Runtime</span>
+        <h2><code>const</code></h2>
+        <p>Protegge un valore da modifiche successive. Non garantisce, da solo, che quel valore sia noto a compile time.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge extra">Compile time</span>
+        <h2><code>constexpr</code></h2>
+        <p>Richiede un’inizializzazione valutabile dal compilatore e rende esplicito che il valore può essere usato dove serve una costante.</p>
+      </article>
+    </section>
+
+    <div class="callout"><strong>Relazione da ricordare:</strong> ogni variabile <code>constexpr</code> è <code>const</code>; non ogni variabile <code>const</code> è una costante valutabile a compile time.</div>
+
+    <figure class="code-example">
+      <figcaption>C++17 · il momento in cui il valore diventa noto</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    int datoLetto = 0;
+    if (!(std::cin &gt;&gt; datoLetto))
+        return 1;
+
+    const int copia = datoLetto;   // noto solo a runtime
+    constexpr int GIORNI = 7;      // noto a compile time
+
+    std::cout &lt;&lt; copia &lt;&lt; ' ' &lt;&lt; GIORNI &lt;&lt; '\n';
+
+    // copia = 10;                 // errore: copia è const
+    // constexpr int x = datoLetto; // errore: non è una costante
+}</code></pre>
+    </figure>
+
+    <section class="topic-card">
+      <h2>Perché useremo <code>constexpr int N = 5;</code></h2>
+      <p>La dimensione di un array statico deve essere una costante intera nota durante la compilazione. Anche alcuni <code>const int</code> possono soddisfare questo requisito, ma <code>constexpr</code> lo dichiara e lo fa controllare esplicitamente dal compilatore.</p>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Quali dichiarazioni sono valide?</summary>
+      <div class="answer">
+        <p>Dopo aver letto <code>n</code> da input, <code>const int a = n;</code> è valido: <code>a</code> non cambierà, ma nasce a runtime. <code>constexpr int b = 10;</code> è valido e noto a compile time. <code>constexpr int c = n;</code> non è valido, perché il compilatore non conosce l’input.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Attività lampo · 3 minuti</span>
+      <h2>Scegli la promessa corretta</h2>
+      <p>Per ciascun caso scegli <code>const</code> o <code>constexpr</code>: numero di giorni della settimana; voto letto da tastiera che non deve più cambiare; capacità fissa di un array; risultato ricevuto da una funzione durante l’esecuzione.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Usiamo una costante <code>constexpr</code> per fissare la dimensione e costruiamo il modello mentale di un array.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_1.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_3.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

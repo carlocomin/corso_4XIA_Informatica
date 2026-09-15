@@ -118,12 +118,39 @@ function Remove-InlineToggleMenu {
 }
 
 $rootItems = @(
+    @{ Path = "raccomandazioni.html"; Label = "Prima di iniziare: metodo di lavoro" },
+    @{ Path = "impatto-ai.html"; Label = "AI: didattica e lavoro informatico" },
+    @{ Path = "lez0/lez0_1.html"; Label = "Lezione 0: Array, funzioni e parametri" },
     @{ Path = "lez1/lez1_1.html"; Label = "Lezione 1: Matrici 2D in C/C++" },
     @{ Path = "lez2/lez2_1.html"; Label = "Lezione 2: Struct in C/C++" },
     @{ Path = "lez3/lez3_1.html"; Label = "Lezione 3: File I/O in C/C++" },
     @{ Path = "lez4/lez4_1.html"; Label = "Lezione 4: OOP in C++" },
     @{ Path = "lez5/lez5_1.html"; Label = "Lezione 5: Ereditarietà e polimorfismo in C++" },
     @{ Path = "lez6/lez6_1.html"; Label = "Lezione 6: Alberi e BST in C/C++" }
+)
+
+$lez0Items = @(
+    @{ Path = "lez0_1.html"; Label = "L0.1 - Partiamo da ciò che serve" },
+    @{ Path = "lez0_2.html"; Label = "L0.2 - const e constexpr" },
+    @{ Path = "lez0_3.html"; Label = "L0.3 - Un array, molti valori" },
+    @{ Path = "lez0_4.html"; Label = "L0.4 - Inizializzare e rispettare i limiti" },
+    @{ Path = "lez0_5.html"; Label = "L0.5 - Scorrere con un ciclo" },
+    @{ Path = "lez0_6.html"; Label = "L0.6 - Leggere e stampare in sicurezza" },
+    @{ Path = "lez0_7.html"; Label = "L0.7 - Accumulare e contare" },
+    @{ Path = "lez0_8.html"; Label = "L0.8 - Ricerca lineare" },
+    @{ Path = "lez0_9.html"; Label = "L0.9 - Minimo, massimo e posizione" },
+    @{ Path = "lez0_10.html"; Label = "L0.10 - Inserire e cancellare con gli shift" },
+    @{ Path = "lez0_11.html"; Label = "L0.11 - Invertire in place" },
+    @{ Path = "lez0_12.html"; Label = "L0.12 - Ordinamento per selezione" },
+    @{ Path = "lez0_13.html"; Label = "L0.13 - Ricerca binaria" },
+    @{ Path = "lez0_14.html"; Label = "L0.14 - Costruire funzioni con un contratto" },
+    @{ Path = "lez0_15.html"; Label = "L0.15 - Passaggio per valore" },
+    @{ Path = "lez0_16.html"; Label = "L0.16 - Indirizzi e puntatori" },
+    @{ Path = "lez0_17.html"; Label = "L0.17 - Passaggio per indirizzo" },
+    @{ Path = "lez0_18.html"; Label = "L0.18 - Array passati a funzione" },
+    @{ Path = "lez0_19.html"; Label = "L0.19 - Passaggio per riferimento in C++" },
+    @{ Path = "lez0_20.html"; Label = "L0.20 - Scegliere il passaggio corretto" },
+    @{ Path = "lez0_21.html"; Label = "L0.21 - Laboratorio e autoverifica" }
 )
 
 $lez1Items = @(
@@ -230,8 +257,14 @@ $lez6Items = @(
 
 $targets = @(
     @{ Path = "index.html"; Heading = "Menu Lezioni"; Items = $rootItems; Active = ""; ScriptSrc = "menu.js" },
-    @{ Path = "programma.html"; Heading = "Menu Lezioni"; Items = $rootItems; Active = ""; ScriptSrc = "menu.js" }
+    @{ Path = "programma.html"; Heading = "Menu Lezioni"; Items = $rootItems; Active = ""; ScriptSrc = "menu.js" },
+    @{ Path = "raccomandazioni.html"; Heading = "Menu Lezioni"; Items = $rootItems; Active = "raccomandazioni.html"; ScriptSrc = "menu.js" },
+    @{ Path = "impatto-ai.html"; Heading = "Menu Lezioni"; Items = $rootItems; Active = "impatto-ai.html"; ScriptSrc = "menu.js" }
 )
+
+$targets += @($lez0Items | ForEach-Object {
+    @{ Path = "lez0/$($_.Path)"; Heading = "Lezione 0 - Array e funzioni"; Items = $lez0Items; Active = $_.Path; ScriptSrc = "../menu.js" }
+})
 
 $targets += @($lez1Items | ForEach-Object {
     @{ Path = "lez1/$($_.Path)"; Heading = "Lezione 1 - Matrici 2D (ripasso guidato)"; Items = $lez1Items; Active = $_.Path; ScriptSrc = "../menu.js" }

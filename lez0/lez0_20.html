@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L0.20 · Scegliere il passaggio corretto</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:95.24%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html" class="active" aria-current="page">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html">L0.21 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso fondamentale · Array e funzioni · 20/21</p>
+    <h1>Scegliere il passaggio corretto</h1>
+    <p class="lead">La firma è parte della documentazione: deve rendere evidente quali dati entrano, quali possono cambiare e quale risultato viene prodotto.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_19.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_21.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>L’intento guida la scelta</h2>
+      <p><strong>Idea chiave:</strong> non scegliere per abitudine. Usa il meccanismo più semplice che esprime correttamente il contratto.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Tabella decisionale</h2>
+      <div class="table-wrap">
+        <table class="decision-table">
+          <thead><tr><th>Esigenza</th><th>Firma tipica</th><th>Motivo</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Esigenza"><span>Piccolo dato di input</span></td><td data-label="Firma"><span><code>int x</code></span></td><td data-label="Motivo"><span>Copia semplice e nessun effetto esterno.</span></td></tr>
+            <tr><td data-label="Esigenza"><span>Un risultato principale</span></td><td data-label="Firma"><span><code>int funzione(...)</code></span></td><td data-label="Motivo"><span><code>return</code> rende esplicito il risultato.</span></td></tr>
+            <tr><td data-label="Esigenza"><span>Modifica obbligatoria in C++</span></td><td data-label="Firma"><span><code>int&amp; x</code></span></td><td data-label="Motivo"><span>Alias non nullo, sintassi diretta.</span></td></tr>
+            <tr><td data-label="Esigenza"><span>Modifica o parametro opzionale</span></td><td data-label="Firma"><span><code>int* x</code></span></td><td data-label="Motivo"><span>Può rappresentare anche assenza con <code>nullptr</code>.</span></td></tr>
+            <tr><td data-label="Esigenza"><span>Oggetto grande di sola lettura</span></td><td data-label="Firma"><span><code>const T&amp; x</code></span></td><td data-label="Motivo"><span>Evita copia e impedisce modifiche.</span></td></tr>
+            <tr><td data-label="Esigenza"><span>Array di sola lettura</span></td><td data-label="Firma"><span><code>const int a[], int n</code></span></td><td data-label="Motivo"><span>Puntatore più intervallo valido.</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <figure class="code-example">
+      <figcaption>C++17 · firme da saper leggere</figcaption>
+<pre><code class="language-cpp">int quadrato(int x);
+
+bool dividi(int a, int b,
+            int* quoziente, int* resto);
+
+void incrementa(int&amp; x);
+
+int somma(const int a[], int n);
+
+void stampa(const std::string&amp; testo);</code></pre>
+    </figure>
+
+    <div class="callout warning"><strong>Non abusare dei parametri di output:</strong> se una funzione produce un solo risultato naturale, restituirlo è di solito più chiaro che modificarlo tramite puntatore o riferimento.</div>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Leggi gli effetti dalle firme</summary>
+      <div class="answer">
+        <p><code>quadrato</code> non modifica l’argomento; <code>dividi</code> può scrivere due risultati; <code>incrementa</code> modifica; <code>somma</code> legge l’array; <code>stampa</code> legge una stringa senza copiarla.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 18 · 10 minuti</span>
+      <h2>Progetta le firme</h2>
+      <p>Scrivi soltanto la firma per: contare gli zeri di un array, azzerare un array, confrontare due stringhe lunghe e produrre minimo e massimo in C. Motiva ogni scelta.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Mettiamo insieme array, algoritmi e funzioni in un unico laboratorio verificabile.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_19.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_21.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

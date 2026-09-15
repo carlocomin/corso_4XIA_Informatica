@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L0.11 · Invertire in place</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:52.38%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html" class="active" aria-current="page">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html">L0.21 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso fondamentale · Array e funzioni · 11/21</p>
+    <h1>Invertire in place</h1>
+    <p class="lead">Stampare al contrario non modifica i dati; invertire in place scambia coppie simmetriche dentro lo stesso array.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_10.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_12.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Due estremi che si avvicinano</h2>
+      <p><strong>Idea chiave:</strong> scambia primo e ultimo, secondo e penultimo, finché l’indice sinistro non raggiunge quello destro.</p>
+    </section>
+
+    <div class="array-strip" aria-label="Coppie da scambiare per invertire un array">
+      <div class="array-cell focus"><span class="array-index">0</span><strong>2</strong></div>
+      <div class="array-cell shifted"><span class="array-index">1</span><strong>4</strong></div>
+      <div class="array-cell"><span class="array-index">2</span><strong>6</strong></div>
+      <div class="array-cell shifted"><span class="array-index">3</span><strong>8</strong></div>
+      <div class="array-cell focus"><span class="array-index">4</span><strong>10</strong></div>
+    </div>
+
+    <figure class="code-example">
+      <figcaption>C++17 · inversione senza array ausiliario</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    int a[]{2, 4, 6, 8, 10};
+    constexpr int N = 5;
+
+    for (int sinistra = 0, destra = N - 1;
+         sinistra &lt; destra;
+         ++sinistra, --destra) {
+        int temp = a[sinistra];
+        a[sinistra] = a[destra];
+        a[destra] = temp;
+    }
+
+    for (int valore : a)
+        std::cout &lt;&lt; valore &lt;&lt; ' ';
+}</code></pre>
+    </figure>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>In place</h2>
+        <p>L’algoritmo usa lo stesso array e una sola variabile temporanea: non alloca una seconda sequenza.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Elemento centrale</h2>
+        <p>Con un numero dispari di elementi, la cella centrale resta dov’è e non deve essere scambiata.</p>
+      </article>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Quanti scambi con cinque elementi?</summary>
+      <div class="answer">
+        <p>Due scambi: indici 0-4 e 1-3. Quando entrambi raggiungono 2, la condizione <code>sinistra &lt; destra</code> è falsa.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 9 · 10 minuti</span>
+      <h2>Array palindromo</h2>
+      <p>Usa due indici per verificare se un array si legge allo stesso modo da sinistra e da destra, fermandoti alla prima coppia diversa.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Ripetiamo la scelta di un minimo per costruire un array ordinato.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_10.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_12.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L0.14 · Costruire funzioni con un contratto</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:66.67%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html" class="active" aria-current="page">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html">L0.21 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso fondamentale · Array e funzioni · 14/21</p>
+    <h1>Costruire funzioni con un contratto</h1>
+    <p class="lead">Una funzione ben progettata svolge un compito preciso e rende visibili ingressi, risultato, precondizioni ed effetti.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_13.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_15.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Un nome per una responsabilità</h2>
+      <p><strong>Idea chiave:</strong> prima della sintassi viene il contratto: che cosa riceve la funzione, che cosa restituisce e quali condizioni richiede.</p>
+    </section>
+
+    <section class="three-col">
+      <article class="topic-card"><span class="badge">Input</span><h2>Parametri</h2><p>I dati necessari per svolgere il compito.</p></article>
+      <article class="topic-card"><span class="badge">Output</span><h2>Valore restituito</h2><p>Il risultato principale comunicato con <code>return</code>.</p></article>
+      <article class="topic-card"><span class="badge extra">Regole</span><h2>Contratto</h2><p>Precondizioni, casi limite ed eventuali modifiche visibili.</p></article>
+    </section>
+
+    <figure class="code-example">
+      <figcaption>C++17 · dichiarazione, chiamata e definizione</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+bool compreso(int valore, int minimo, int massimo);
+
+int main() {
+    int voto = 8;
+
+    if (compreso(voto, 0, 10))
+        std::cout &lt;&lt; "Voto valido\n";
+}
+
+bool compreso(int valore, int minimo, int massimo) {
+    return valore &gt;= minimo &amp;&amp; valore &lt;= massimo;
+}</code></pre>
+    </figure>
+
+    <div class="callout"><strong>Precondizione dell’esempio:</strong> <code>minimo &lt;= massimo</code>. Il nome dei parametri aiuta a leggere la firma, ma il contratto deve dichiarare anche questa relazione.</div>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Dichiarazione</h2>
+        <p>Comunica firma e tipo restituito prima della chiamata.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Definizione</h2>
+        <p>Contiene le istruzioni che realizzano il contratto. Parametri e variabili locali esistono soltanto nel proprio ambito.</p>
+      </article>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Parametri e argomenti</summary>
+      <div class="answer">
+        <p>Nella definizione <code>valore</code>, <code>minimo</code> e <code>massimo</code> sono parametri locali alla funzione. Nella chiamata <code>voto</code>, <code>0</code> e <code>10</code> sono argomenti.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 12 · 8 minuti</span>
+      <h2>Due contratti piccoli</h2>
+      <p>Scrivi <code>quadrato</code>, che restituisce il quadrato di un intero, e <code>pari</code>, che restituisce se un intero è divisibile per due. Specifica input e output.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Osserviamo che cosa succede quando un parametro è una copia del valore passato.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_13.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_15.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

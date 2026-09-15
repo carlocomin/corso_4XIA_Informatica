@@ -1,5 +1,6 @@
 # Generated visual test artifacts
 _visual_test/
+.codex_tmp/
 tools/
 
 # Keep only the repository README as Markdown source

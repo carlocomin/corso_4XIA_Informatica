@@ -43,7 +43,7 @@
   <header class="lesson-hero">
     <p class="eyebrow">Ripasso guidato · Matrici 2D · 8/14</p>
     <h1>Matrici nelle funzioni C</h1>
-    <p class="lead">In C, quando una matrice è un parametro, la funzione deve conoscere la lunghezza di ogni riga per calcolare correttamente m[r][c].</p>
+    <p class="lead">In C, quando una matrice è un parametro, la funzione deve conoscere la lunghezza di ogni riga per calcolare correttamente <code>m[r][c]</code>.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez1_7.html">&#8592; Precedente</a>
@@ -63,7 +63,7 @@
 
 enum { C = 3 };
 
-void stampa(int righe, const int m[][C]) {
+void stampa(int righe, int m[][C]) {
     for (int r = 0; r &lt; righe; ++r) {
         for (int c = 0; c &lt; C; ++c)
             printf("%4d", m[r][c]);
@@ -78,13 +78,14 @@ int main(void) {
 }</code></pre>
       </figure>
       <p>La prima dimensione può essere omessa nel parametro; <code>C</code> no, perché determina il passo necessario per raggiungere la riga successiva.</p>
+      <div class="callout"><strong>Perché qui non usiamo <code>const</code>?</strong> Nel C11 rigoroso, passare una normale matrice <code>int[R][C]</code> a un puntatore a righe di <code>const int</code> non è portabile. La funzione si impegna comunque, per contratto, a non modificare le celle.</div>
     </section>
 
     <section class="two-col">
       <article class="topic-card">
         <h2>Il tipo effettivo</h2>
         <p>Nel parametro, <code>m[][C]</code> viene trattato come puntatore a una riga di <code>C</code> interi:</p>
-        <div class="formula">const int (*)[C]</div>
+        <div class="formula">int (*)[C]</div>
       </article>
       <article class="topic-card">
         <h2>Non è <code>int**</code></h2>
@@ -97,27 +98,27 @@ int main(void) {
       <div class="answer">
         <figure class="code-example">
           <figcaption>C99 · variable length array</figcaption>
-<pre><code class="language-c">void stampa(size_t R, size_t C, const int m[R][C]) {
+<pre><code class="language-c">void stampa(size_t R, size_t C, int m[R][C]) {
     for (size_t r = 0; r &lt; R; ++r)
         for (size_t c = 0; c &lt; C; ++c)
             printf("%d ", m[r][c]);
 }</code></pre>
         </figure>
-        <p>I VLA appartengono al C, non al C++ standard, e il loro supporto può dipendere dalla versione e dal compilatore. Per il ripasso di base manteniamo <code>C</code> costante.</p>
+        <p>I VLA appartengono al C, non al C++ standard, e il loro supporto può dipendere dalla versione e dal compilatore. Le dimensioni devono essere positive quando la funzione viene chiamata. Per il ripasso di base manteniamo <code>C</code> costante.</p>
       </div>
     </details>
 
     <details class="checkpoint">
       <summary>Controllo rapido · Quale firma accetta <code>int a[4][3]</code>?</summary>
       <div class="answer">
-        <p><code>void f(int righe, const int m[][3])</code> è compatibile. <code>void f(int **m)</code> e <code>void f(int righe, const int m[][4])</code> non lo sono.</p>
+        <p><code>void f(int righe, int m[][3])</code> è compatibile in C11. <code>void f(int **m)</code> e <code>void f(int righe, int m[][4])</code> non lo sono.</p>
       </div>
     </details>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 6 · 8 minuti</span>
       <h2>Completa la funzione C</h2>
-      <p>Scrivi <code>int conta_zeri(int righe, const int m[][C])</code>. Verificala con una matrice di 2 righe, 3 colonne e almeno due zeri.</p>
+      <p>Scrivi <code>int conta_zeri(int righe, int m[][C])</code> senza modificare le celle. Verificala con una matrice di 2 righe, 3 colonne e almeno due zeri.</p>
     </section>
 
     <aside class="next-step"><strong>Prossimo passo:</strong> applichiamo la visita completa al pattern più comune, l’accumulazione.</aside>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L0.10 · Inserire e cancellare con gli shift</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:47.62%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html" class="active" aria-current="page">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html">L0.21 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso fondamentale · Array e funzioni · 10/21</p>
+    <h1>Inserire e cancellare con gli shift</h1>
+    <p class="lead">In un array statico non si creano né si eliminano celle: si spostano valori e si aggiorna la dimensione logica.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_9.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_11.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Fare spazio o chiudere un vuoto</h2>
+      <p><strong>Idea chiave:</strong> per inserire si sposta verso destra partendo dalla fine; per cancellare si sposta verso sinistra partendo dalla posizione rimossa.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Inserimento di 8 in posizione 2</h2>
+      <div class="array-strip" aria-label="Risultato di un inserimento">
+        <div class="array-cell"><span class="array-index">0</span><strong>3</strong></div>
+        <div class="array-cell"><span class="array-index">1</span><strong>5</strong></div>
+        <div class="array-cell focus"><span class="array-index">2</span><strong>8</strong></div>
+        <div class="array-cell shifted"><span class="array-index">3</span><strong>7</strong></div>
+        <div class="array-cell shifted"><span class="array-index">4</span><strong>9</strong></div>
+        <div class="array-cell empty"><span class="array-index">5</span><strong>libera</strong></div>
+      </div>
+    </section>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Inserire</h2>
+        <figure class="code-example">
+          <figcaption>C++17 e C11 · frammento contestuale</figcaption>
+<pre><code class="language-cpp">if (n &lt; CAP &amp;&amp; posizione &gt;= 0
+    &amp;&amp; posizione &lt;= n) {
+    for (int i = n; i &gt; posizione; --i)
+        a[i] = a[i - 1];
+
+    a[posizione] = valore;
+    ++n;
+}</code></pre>
+        </figure>
+      </article>
+      <article class="topic-card">
+        <h2>Cancellare</h2>
+        <figure class="code-example">
+          <figcaption>C++17 e C11 · frammento contestuale</figcaption>
+<pre><code class="language-cpp">if (posizione &gt;= 0 &amp;&amp; posizione &lt; n) {
+    for (int i = posizione; i &lt; n - 1; ++i)
+        a[i] = a[i + 1];
+
+    --n;
+}</code></pre>
+        </figure>
+      </article>
+    </section>
+
+    <div class="callout warning"><strong>Direzione decisiva:</strong> spostare a destra partendo dall’inizio sovrascrive valori che servono ancora. Si parte dall’ultimo elemento valido.</div>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Quali precondizioni servono?</summary>
+      <div class="answer">
+        <p>Inserimento: spazio disponibile e posizione tra 0 e <code>n</code>. Cancellazione: posizione tra 0 e <code>n - 1</code>. Dopo <code>--n</code> l’ultima cella fisica può ancora contenere un vecchio valore, ma è fuori dalla sequenza logica e non va elaborata.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 8 · 12 minuti</span>
+      <h2>Simula su carta</h2>
+      <p>Parti da <code>[3, 5, 7, 9]</code>: inserisci 8 in posizione 2, poi cancella la posizione 1. Scrivi ogni assegnazione e il nuovo valore di <code>n</code>.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Usiamo due indici per invertire davvero l’array senza crearne un secondo.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_9.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_11.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

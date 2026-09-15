@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L0.15 · Passaggio per valore</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:71.43%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html" class="active" aria-current="page">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html">L0.21 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso fondamentale · Array e funzioni · 15/21</p>
+    <h1>Passaggio per valore</h1>
+    <p class="lead">Nel passaggio per valore la funzione lavora su una copia: modificare il parametro non cambia la variabile del chiamante.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_14.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_16.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Due variabili distinte</h2>
+      <p><strong>Idea chiave:</strong> l’argomento fornisce il valore iniziale del parametro, ma i due oggetti occupano posizioni di memoria differenti.</p>
+    </section>
+
+    <div class="parameter-flow" aria-label="Il valore 5 viene copiato nel parametro">
+      <div class="parameter-box"><span>chiamante</span><strong><code>numero = 5</code></strong></div>
+      <span class="copy-arrow" aria-hidden="true"><span>copia</span><span class="flow-arrow">&#8594;</span></span>
+      <div class="parameter-box copied"><span>funzione</span><strong><code>x = 5</code></strong></div>
+    </div>
+
+    <figure class="code-example">
+      <figcaption>C++17 · il parametro è una copia</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+void provaRaddoppio(int x) {
+    x *= 2;
+    std::cout &lt;&lt; "Dentro: " &lt;&lt; x &lt;&lt; '\n';
+}
+
+int doppio(int x) {
+    return x * 2;
+}
+
+int main() {
+    int numero = 5;
+
+    provaRaddoppio(numero);
+    std::cout &lt;&lt; "Fuori: " &lt;&lt; numero &lt;&lt; '\n';
+
+    numero = doppio(numero);
+    std::cout &lt;&lt; "Risultato: " &lt;&lt; numero &lt;&lt; '\n';
+}</code></pre>
+    </figure>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Quando usarlo</h2>
+        <p>È la scelta naturale per piccoli dati di solo ingresso: interi, caratteri, booleani e spesso numeri reali.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Come produrre un risultato</h2>
+        <p>Se esiste un solo risultato principale, preferisci restituirlo e assegnarlo esplicitamente.</p>
+      </article>
+    </section>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Output del programma</summary>
+      <div class="answer">
+        <p>Stampa <code>Dentro: 10</code>, <code>Fuori: 5</code>, <code>Risultato: 10</code>. Soltanto l’assegnazione del valore restituito modifica <code>numero</code>.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 13 · 6 minuti</span>
+      <h2>Prevedi prima di eseguire</h2>
+      <p>Scrivi una funzione per valore che aggiunga 3 al parametro. Mostra il valore dentro la funzione e nel chiamante, poi riscrivila restituendo il risultato.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Per modificare direttamente un oggetto dobbiamo prima capire indirizzi, puntatori e dereferenziazione.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_14.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_16.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

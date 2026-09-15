@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L0.9 · Minimo, massimo e posizione</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:42.86%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html" class="active" aria-current="page">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html">L0.21 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso fondamentale · Array e funzioni · 9/21</p>
+    <h1>Minimo, massimo e posizione</h1>
+    <p class="lead">Per trovare un estremo affidabile si parte da un elemento reale dell’array, non da un valore inventato.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_8.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_10.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Il migliore visto finora</h2>
+      <p><strong>Idea chiave:</strong> se l’array non è vuoto, l’indice 0 è il primo candidato; ogni elemento successivo può sostituirlo.</p>
+    </section>
+
+    <figure class="code-example">
+      <figcaption>C++17 · indice del minimo</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    int a[]{7, -4, 2, -4, 9};
+    constexpr int N = 5;
+
+    int indiceMinimo = 0;
+
+    for (int i = 1; i &lt; N; ++i) {
+        if (a[i] &lt; a[indiceMinimo])
+            indiceMinimo = i;
+    }
+
+    std::cout &lt;&lt; "Minimo: " &lt;&lt; a[indiceMinimo]
+              &lt;&lt; ", indice: " &lt;&lt; indiceMinimo
+              &lt;&lt; '\n';
+}</code></pre>
+    </figure>
+
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Prima occorrenza</h2>
+        <p>Con il confronto stretto <code>&lt;</code>, due valori uguali non sostituiscono il candidato: resta il primo minimo.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Array vuoto</h2>
+        <p>Se la dimensione logica può essere zero, bisogna controllarla prima di usare <code>a[0]</code>.</p>
+      </article>
+    </section>
+
+    <div class="callout warning"><strong>Errore tipico:</strong> inizializzare <code>minimo = 0</code>. Se tutti i valori sono positivi, 0 non appartiene ai dati e il risultato è falso.</div>
+
+    <details class="checkpoint">
+      <summary>Checkpoint · Risultato e spareggio</summary>
+      <div class="answer">
+        <p>Il minimo vale <code>-4</code> e l’indice restituito è <code>1</code>. Per ottenere l’ultima occorrenza useremmo <code>&lt;=</code>.</p>
+      </div>
+    </details>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Esercizio 7 · 10 minuti</span>
+      <h2>Estremi completi</h2>
+      <p>Trova valore e indice sia del minimo sia del massimo in una sola scansione. Specifica come gestisci valori uguali e array vuoto.</p>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo.</strong> Quando cambia la dimensione logica, gli elementi devono essere spostati nell’ordine corretto.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_8.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez0_10.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>
