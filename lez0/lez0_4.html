@@ -97,6 +97,7 @@ int main() {
       <div class="checkpoint-prompt">
         <span class="checkpoint-label">Checkpoint</span>
         <h2>Trova i due errori</h2>
+        <p><code>for (int i = 1; i &lt;= 5; ++i) cout &lt;&lt; a[i];</code></p>
       </div>
       <details class="answer-reveal">
         <summary>
@@ -104,7 +105,7 @@ int main() {
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p>In <code>for (int i = 1; i &lt;= 5; ++i) cout &lt;&lt; a[i];</code> viene saltato l’indice 0 e viene usato l’indice non valido 5.</p>
+        <p>Viene saltato l’indice 0 e viene usato l’indice non valido 5. Il ciclo corretto parte da <code>i = 0</code> e continua finché <code>i &lt; 5</code>.</p>
       </div>
       </details>
     </section>

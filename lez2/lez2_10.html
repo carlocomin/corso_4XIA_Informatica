@@ -84,21 +84,21 @@ int main() {
     <section class="checkpoint">
       <div class="checkpoint-prompt">
         <span class="checkpoint-label">Errore grave</span>
-        <h2>Riferimento a un oggetto locale</h2>
+        <h2>Perché questa funzione restituisce un riferimento non valido?</h2>
       </div>
+      <figure class="code-example">
+        <figcaption>C++17 · codice errato, non imitare</figcaption>
+<pre><code class="language-cpp">const Studente&amp; creaStudenteSbagliato() {
+    Studente temporaneo{1001, "Ada", 9.4};
+    return temporaneo; // riferimento dangling
+}</code></pre>
+      </figure>
       <details class="answer-reveal">
         <summary>
           <span class="when-closed">Mostra risposta</span>
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <figure class="code-example">
-          <figcaption>C++17 · codice errato, non imitare</figcaption>
-<pre><code class="language-cpp">const Studente&amp; creaStudenteSbagliato() {
-    Studente temporaneo{1001, "Ada", 9.4};
-    return temporaneo; // riferimento dangling
-}</code></pre>
-        </figure>
         <p><code>temporaneo</code> viene distrutto alla fine della funzione. Il riferimento restituito non indica più un oggetto esistente e usarlo produce comportamento indefinito.</p>
       </div>
       </details>

@@ -107,6 +107,12 @@ int main() {
       <div class="checkpoint-prompt">
         <span class="checkpoint-label">Checkpoint</span>
         <h2>Quali dichiarazioni sono valide?</h2>
+        <p>Dopo aver letto <code>n</code> da input, valuta:</p>
+        <ul>
+          <li><code>const int a = n;</code></li>
+          <li><code>constexpr int b = 10;</code></li>
+          <li><code>constexpr int c = n;</code></li>
+        </ul>
       </div>
       <details class="answer-reveal">
         <summary>
@@ -114,7 +120,7 @@ int main() {
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p>Dopo aver letto <code>n</code> da input, <code>const int a = n;</code> è valido: <code>a</code> non cambierà, ma nasce a runtime. <code>constexpr int b = 10;</code> è valido e noto a compile time. <code>constexpr int c = n;</code> non è valido, perché il compilatore non conosce l’input.</p>
+        <p>Le prime due dichiarazioni sono valide. <code>a</code> non cambierà, ma nasce a runtime; <code>b</code> è noto a compile time. La terza non è valida, perché il compilatore non conosce il valore letto in <code>n</code>.</p>
       </div>
       </details>
     </section>

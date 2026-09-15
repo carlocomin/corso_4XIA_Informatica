@@ -121,6 +121,11 @@ int main(void) {
       <div class="checkpoint-prompt">
         <span class="checkpoint-label">Controllo rapido</span>
         <h2>Quale firma accetta <code>int a[4][3]</code>?</h2>
+        <ul>
+          <li><code>void f(int righe, int m[][3])</code></li>
+          <li><code>void f(int **m)</code></li>
+          <li><code>void f(int righe, int m[][4])</code></li>
+        </ul>
       </div>
       <details class="answer-reveal">
         <summary>
@@ -128,7 +133,7 @@ int main(void) {
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p><code>void f(int righe, int m[][3])</code> è compatibile in C11. <code>void f(int **m)</code> e <code>void f(int righe, int m[][4])</code> non lo sono.</p>
+        <p>La prima firma, <code>void f(int righe, int m[][3])</code>, è compatibile in C11. <code>int**</code> è un tipo diverso, mentre l’ultima firma dichiara righe da quattro colonne anziché tre.</p>
       </div>
       </details>
     </section>
