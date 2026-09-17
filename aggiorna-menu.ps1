@@ -150,7 +150,8 @@ $lez0Items = @(
     @{ Path = "lez0_18.html"; Label = "L0.18 - Array passati a funzione" },
     @{ Path = "lez0_19.html"; Label = "L0.19 - Passaggio per riferimento in C++" },
     @{ Path = "lez0_20.html"; Label = "L0.20 - Scegliere il passaggio corretto" },
-    @{ Path = "lez0_21.html"; Label = "L0.21 - Laboratorio e autoverifica" }
+    @{ Path = "lez0_21.html"; Label = "L0.21 - Laboratorio e autoverifica" },
+    @{ Path = "lez0_lab.html"; Label = "Laboratorio extra - Missione serra" }
 )
 
 $lez1Items = @(

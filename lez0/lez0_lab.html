@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - Laboratorio Lezione 0 · Missione serra</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-arrays-functions">
+<div class="lesson-progress" aria-hidden="true"><span style="width:100%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 0 - Array e funzioni</h2>
+  <ul>
+    <li><a href="lez0_1.html">L0.1 - Partiamo da ciò che serve</a></li>
+    <li><a href="lez0_2.html">L0.2 - const e constexpr</a></li>
+    <li><a href="lez0_3.html">L0.3 - Un array, molti valori</a></li>
+    <li><a href="lez0_4.html">L0.4 - Inizializzare e rispettare i limiti</a></li>
+    <li><a href="lez0_5.html">L0.5 - Scorrere con un ciclo</a></li>
+    <li><a href="lez0_6.html">L0.6 - Leggere e stampare in sicurezza</a></li>
+    <li><a href="lez0_7.html">L0.7 - Accumulare e contare</a></li>
+    <li><a href="lez0_8.html">L0.8 - Ricerca lineare</a></li>
+    <li><a href="lez0_9.html">L0.9 - Minimo, massimo e posizione</a></li>
+    <li><a href="lez0_10.html">L0.10 - Inserire e cancellare con gli shift</a></li>
+    <li><a href="lez0_11.html">L0.11 - Invertire in place</a></li>
+    <li><a href="lez0_12.html">L0.12 - Ordinamento per selezione</a></li>
+    <li><a href="lez0_13.html">L0.13 - Ricerca binaria</a></li>
+    <li><a href="lez0_14.html">L0.14 - Costruire funzioni con un contratto</a></li>
+    <li><a href="lez0_15.html">L0.15 - Passaggio per valore</a></li>
+    <li><a href="lez0_16.html">L0.16 - Indirizzi e puntatori</a></li>
+    <li><a href="lez0_17.html">L0.17 - Passaggio per indirizzo</a></li>
+    <li><a href="lez0_18.html">L0.18 - Array passati a funzione</a></li>
+    <li><a href="lez0_19.html">L0.19 - Passaggio per riferimento in C++</a></li>
+    <li><a href="lez0_20.html">L0.20 - Scegliere il passaggio corretto</a></li>
+    <li><a href="lez0_21.html">L0.21 - Laboratorio e autoverifica</a></li>
+    <li><a href="lez0_lab.html" class="active" aria-current="page">Laboratorio extra - Missione serra</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Esercitazione di laboratorio · Lezione 0 · 3 ore</p>
+    <h1>Missione serra: i segnali del robot</h1>
+    <p class="lead">Un solo problema, dall'analisi della situazione reale alla gestione sicura di un array in C11 oppure C++17.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_21.html">&#8592; Lezione 0</a>
+    <a class="nav-button primary" href="../lez1/lez1_1.html">Lezione 1 &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>La situazione da modellare</h2>
+      <p>Un robot percorre una serra e osserva una fila di punti di controllo. Un sistema di analisi delle immagini ha già assegnato a ciascun punto un <strong>punteggio di anomalia</strong> intero da 0 a 100: più è alto, più quel punto merita un'ispezione umana. La soglia operativa è <code>70</code>, inclusa.</p>
+      <p>Il tuo programma riceve punteggi simulati da tastiera, li conserva nell'ordine del percorso e prepara un rapporto per il tecnico. Il punteggio è un indice convenzionale, non una probabilità né una diagnosi certa.</p>
+    </section>
+
+    <div class="array-strip" aria-label="Esempio: cinque punteggi nell'ordine del percorso, con indici da zero a quattro">
+      <div class="array-cell"><span class="array-index">0</span><strong>20</strong></div>
+      <div class="array-cell focus"><span class="array-index">1</span><strong>75</strong></div>
+      <div class="array-cell focus"><span class="array-index">2</span><strong>75</strong></div>
+      <div class="array-cell"><span class="array-index">3</span><strong>40</strong></div>
+      <div class="array-cell focus"><span class="array-index">4</span><strong>90</strong></div>
+    </div>
+
+    <div class="callout"><strong>Modello unico:</strong> usa un array monodimensionale di capacità <code>CAP = 20</code> e una dimensione logica <code>n</code> tra 0 e 20. L'utente numera i punti da <code>1</code> a <code>n</code>; nel programma il punto 1 è <code>a[0]</code>. Le celle da <code>n</code> a <code>CAP - 1</code> non appartengono al percorso.</div>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Fase 1 · Analisi · 20 minuti</span>
+      <h2>Prima di scrivere codice</h2>
+      <ol class="steps">
+        <li>Indica che cosa rappresentano una cella, l'indice, <code>CAP</code> e <code>n</code>. Quali dati entrano e quali informazioni devono uscire?</li>
+        <li>Scrivi su carta le regole per <code>n = 0</code>, un punteggio fuori dall'intervallo <code>0..100</code> e due massimi uguali.</li>
+        <li>Abbozza le funzioni necessarie: quali leggono soltanto l'array e quali cambiano array o dimensione logica?</li>
+      </ol>
+      <p><strong>Vincoli:</strong> usa soltanto array statici monodimensionali per i punteggi. Niente <code>vector</code>, <code>struct</code>, file, librerie di AI o hardware reale.</p>
+    </section>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Fase 2 · Base · 50 minuti</span>
+      <h2>Acquisisci e descrivi il percorso</h2>
+      <ol class="steps">
+        <li>Leggi <code>n</code> e poi <code>n</code> punteggi. Accetta <code>0 &lt;= n &lt;= CAP</code> e <code>0 &lt;= punteggio &lt;= 100</code>. Se la lettura fallisce o un valore è fuori intervallo, mostra un messaggio e termina senza produrre un rapporto parziale.</li>
+        <li>Stampa i soli <code>n</code> punti nel formato <code>Punto 1: 20</code>, <code>Punto 2: 75</code> e così via.</li>
+        <li>Conta i punti con punteggio almeno <code>70</code>, calcola la somma e la media reale dei punteggi. Se <code>n = 0</code>, conteggio e somma valgono zero; per la media stampa <code>Nessun dato</code> invece di dividere per zero.</li>
+      </ol>
+      <p>Usa un ciclo di scansione e almeno una funzione di sola lettura con parametro <code>const int a[]</code>.</p>
+    </section>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Fase 3 · Intermedio · 65 minuti</span>
+      <h2>Cerca, aggiorna e ricalcola</h2>
+      <ol class="steps">
+        <li>Trova il <strong>primo</strong> punto con punteggio almeno <code>70</code> e l'indice del punteggio massimo. Se non c'è un punto critico, la ricerca restituisce <code>-1</code>; se <code>n = 0</code>, anche il massimo restituisce <code>-1</code>. A parità di massimo conserva il primo punto. Nel rapporto stampa <code>Nessun punto</code> quando ricevi <code>-1</code>, senza trasformarlo in un numero di punto.</li>
+        <li>Il tecnico può aggiungere <strong>una lettura tardiva</strong> in una posizione scelta da <code>1</code> a <code>n + 1</code>. Sposta gli elementi verso destra, inserisci il nuovo punteggio e incrementa <code>n</code>. Se l'array è pieno o posizione/punteggio sono invalidi, rifiuta l'operazione senza cambiare i dati.</li>
+        <li>Il tecnico può eliminare <strong>una lettura errata</strong> scegliendo un punto da <code>1</code> a <code>n</code>. Sposta gli elementi verso sinistra e decrementa <code>n</code>. Se la posizione è invalida, non modificare nulla.</li>
+        <li>Dopo ciascuna operazione riuscita ristampa il percorso e il rapporto aggiornato. Per il laboratorio bastano una richiesta di inserimento e una di cancellazione, in quest'ordine: <strong>non serve un menu</strong>.</li>
+      </ol>
+      <p>Realizza almeno tre funzioni oltre a <code>main</code>. Le funzioni che modificano <code>n</code> lo ricevono per riferimento in C++ (<code>int&amp;</code>) o tramite puntatore in C (<code>int*</code>). Converti la posizione visibile all'utente in indice dell'array una sola volta, in modo esplicito.</p>
+    </section>
+
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Collaudo guidato</span>
+        <h2>Che cosa deve risultare prima e dopo queste due operazioni?</h2>
+        <p>Parti dai punteggi <code>20 75 75 40 90</code>. Inserisci <code>95</code> al <strong>punto 3</strong>, poi elimina il <strong>punto 2</strong> del percorso aggiornato. Calcola anche conteggio critici, media, massimo e primo punto critico.</p>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risultati attesi</span>
+          <span class="when-open">Nascondi risultati attesi</span>
+        </summary>
+        <div class="answer">
+          <ul>
+            <li>All'inizio: <code>20 75 75 40 90</code>; critici <code>3</code>; media <code>60</code>; massimo <code>90</code> al punto <code>5</code>; primo critico al punto <code>2</code>.</li>
+            <li>Dopo l'inserimento: <code>20 75 95 75 40 90</code>; critici <code>4</code>; media circa <code>65,83</code>; massimo <code>95</code> al punto <code>3</code>; primo critico al punto <code>2</code>.</li>
+            <li>Dopo la cancellazione: <code>20 95 75 40 90</code>; critici <code>3</code>; media <code>64</code>; massimo <code>95</code> al punto <code>2</code>; primo critico al punto <code>2</code>.</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Fase 4 · Collaudo e consegna · 25 minuti</span>
+      <h2>Dimostra che funziona anche ai confini</h2>
+      <p>Prova almeno: percorso vuoto; un solo punteggio <code>70</code>; due massimi uguali; nessun critico; inserimento all'inizio e alla fine; cancellazione all'inizio e alla fine; <code>n = CAP</code> con tentativo di inserimento; punteggio e posizioni invalidi. Per ogni caso annota l'input, il risultato previsto e quello ottenuto.</p>
+      <p><strong>Consegna:</strong> file sorgente <code>missione.c</code> o <code>missione.cpp</code> compilabile, breve schema iniziale dell'array e almeno tre prove documentate, di cui una su un caso limite. Compila con gli avvisi attivi, per esempio <code>gcc -std=c11 -Wall -Wextra -pedantic missione.c -o missione</code> oppure <code>g++ -std=c++17 -Wall -Wextra -pedantic missione.cpp -o missione</code>.</p>
+    </section>
+
+    <section class="exercise-card">
+      <span class="exercise-label">Bonus avanzato · circa 20 minuti per chi conclude prima</span>
+      <h2>Prepara la lista delle priorità senza perdere il percorso</h2>
+      <p>Crea un secondo array di indici <code>ordine[CAP]</code> e ordina <strong>gli indici</strong> per punteggio decrescente. A parità di punteggio, conserva prima il punto con numero minore. Stampa la graduatoria <code>punto: punteggio</code> senza cambiare l'array originale: se ordinassi direttamente i punteggi, perderesti la loro posizione nel percorso.</p>
+      <p><strong>Quesito:</strong> con il percorso iniziale <code>20 75 75 40 90</code>, in quale ordine dovrebbero comparire i punti? Spiega perché i due punti con <code>75</code> non si scambiano.</p>
+    </section>
+
+    <aside class="next-step"><strong>Idea da portare a casa.</strong> Un array non è solo una lista di numeri: la posizione dà significato al dato. Prima si definisce il modello, poi si scrivono e si verificano gli algoritmi.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez0_21.html">&#8592; Lezione 0</a>
+    <a class="nav-button primary" href="../lez1/lez1_1.html">Lezione 1 &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>
