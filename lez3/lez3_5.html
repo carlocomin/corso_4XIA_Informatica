@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:31.25%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:27.78%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -33,7 +33,9 @@
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
     <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
     <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
     <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
@@ -43,7 +45,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 5/16</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 5/18</p>
     <h1>Leggere valori in C++</h1>
     <p class="lead">L’operatore <code>&gt;&gt;</code> separa gli elementi usando gli spazi e prova a convertirli nel tipo della variabile.</p>
   </header>
@@ -96,7 +98,11 @@ int main() {
     double somma = 0.0;
     int quanti = 0;
 
-    while (in &gt;&gt; nome &gt;&gt; voto) {
+    while (in &gt;&gt; nome) {
+        if (!(in &gt;&gt; voto)) {
+            std::cerr &lt;&lt; "Voto mancante o non valido\n";
+            return 3;
+        }
         somma += voto;
         ++quanti;
     }
@@ -119,7 +125,7 @@ int main() {
     <section class="checkpoint">
       <div class="checkpoint-prompt">
         <span class="checkpoint-label">Checkpoint</span>
-        <h2>Perché la condizione contiene entrambe le estrazioni?</h2>
+      <h2>Il file termina con il solo nome <code>Ada</code>: è una fine regolare?</h2>
       </div>
       <details class="answer-reveal">
         <summary>
@@ -127,10 +133,12 @@ int main() {
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p>Il corpo deve essere eseguito soltanto quando nome e voto appartengono a un record completo. Una lettura parziale non deve essere elaborata.</p>
+        <p>No: è iniziato un record, ma manca il voto. Il ciclo legge il nome e verifica subito il secondo campo prima di elaborare. Se il voto manca, la fine del file non rende valido il record incompleto.</p>
       </div>
       </details>
     </section>
+
+    <div class="callout"><strong>Due controlli, due ruoli:</strong> la condizione legge il primo campo; il controllo interno completa il record. Solo dopo entrambi i successi sommiamo il voto. Per imporre anche “un record per riga”, useremo <code>getline</code> e un parser.</div>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 5</span>

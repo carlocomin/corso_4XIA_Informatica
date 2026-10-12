@@ -174,6 +174,7 @@ $lez1Items = @(
 $lez2Items = @(
     @{ Path = "lez2_1.html"; Label = "L2.1 - Dati che viaggiano insieme" },
     @{ Path = "lez2_2.html"; Label = "L2.2 - Definire un nuovo tipo" },
+    @{ Path = "lez2_memoria.html"; Label = "L2.2bis - Nomi e oggetti in memoria" },
     @{ Path = "lez2_3.html"; Label = "L2.3 - Inizializzare senza sorprese" },
     @{ Path = "lez2_4.html"; Label = "L2.4 - Leggere e modificare i campi" },
     @{ Path = "lez2_5.html"; Label = "L2.5 - La stessa idea in C" },
@@ -202,7 +203,9 @@ $lez3Items = @(
     @{ Path = "lez3_10.html"; Label = "L3.10 - Ricostruire una struct" },
     @{ Path = "lez3_11.html"; Label = "L3.11 - Testo robusto e round-trip" },
     @{ Path = "lez3_12.html"; Label = "L3.12 - Progettare un formato binario" },
-    @{ Path = "lez3_13.html"; Label = "L3.13 - Binario con gli stream C++" },
+    @{ Path = "lez3_blocchi.html"; Label = "L3.12bis - Byte, modalità e operazioni" },
+    @{ Path = "lez3_13.html"; Label = "L3.13 - Scrivere un file binario in C++" },
+    @{ Path = "lez3_lettura_binaria.html"; Label = "L3.13bis - Leggere e controllare un file binario" },
     @{ Path = "lez3_14.html"; Label = "L3.14 - Binario con la libreria C" },
     @{ Path = "lez3_15.html"; Label = "L3.15 - Cursore, seek e record fissi" },
     @{ Path = "lez3_16.html"; Label = "L3.16 - Laboratorio e autoverifica" }

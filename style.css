@@ -1105,6 +1105,111 @@ body.lesson-review {
     opacity: 0.82;
 }
 
+/* Lezione 2: distinguere sorgente, compilazione e oggetto in esecuzione. */
+.lesson-structs .object-model {
+    margin: 16px 0;
+}
+
+.lesson-structs .object-model-flow {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.lesson-structs .object-model-stage {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #b8d2cc;
+    border-top: 5px solid var(--review-sun);
+    border-radius: 12px;
+    background: #fffaf0;
+    overflow-wrap: anywhere;
+}
+
+.lesson-structs .object-model-stage.runtime {
+    border-top-color: var(--review-teal);
+    background: #f0f9f5;
+}
+
+.lesson-structs .object-model-phase {
+    min-height: 2.8em;
+    margin: 0 0 8px;
+    color: #455e5c;
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.lesson-structs .object-model-stage h3 {
+    margin: 0 0 12px;
+    color: var(--review-deep);
+    font-family: Georgia, Cambria, serif;
+    font-size: 1.2rem;
+}
+
+.lesson-structs .object-model-stage > p:last-child {
+    margin-bottom: 0;
+}
+
+.lesson-structs .object-model-token,
+.lesson-structs .object-model-facts {
+    min-height: 150px;
+    margin: 0 0 14px;
+    padding: 12px;
+    border: 1px solid #b8d2cc;
+    border-radius: 9px;
+    background: #ffffff;
+}
+
+.lesson-structs .object-model-token {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 1.4rem;
+}
+
+.lesson-structs .object-model-token span {
+    color: var(--review-teal);
+}
+
+.lesson-structs .object-model-facts > div + div {
+    margin-top: 8px;
+}
+
+.lesson-structs .object-model-facts dt {
+    color: #455e5c;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.lesson-structs .object-model-facts dd {
+    margin: 0;
+    color: var(--review-deep);
+    font-weight: 800;
+}
+
+.lesson-structs .object-model-values dt {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.lesson-structs .object-model > figcaption {
+    margin-top: 12px;
+    color: #455e5c;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 1050px) {
+    .lesson-structs .object-model-flow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 /* Lezione 0: rappresentazioni concrete per array, copie e indirizzi. */
 .lesson-review .array-strip {
     display: grid;
@@ -1300,6 +1405,19 @@ body.lesson-review {
     .lesson-review .io-flow,
     .lesson-review .binary-layout {
         grid-template-columns: 1fr;
+    }
+
+    .lesson-structs .object-model-flow {
+        grid-template-columns: 1fr;
+    }
+
+    .lesson-structs .object-model-phase {
+        min-height: 0;
+    }
+
+    .lesson-structs .object-model-token,
+    .lesson-structs .object-model-facts {
+        min-height: 0;
     }
 
     .lesson-review .io-flow li {

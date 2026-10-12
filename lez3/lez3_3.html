@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:18.75%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:16.67%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -33,7 +33,9 @@
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
     <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
     <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
     <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
@@ -43,7 +45,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 3/16</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 3/18</p>
     <h1>Apri, usa, controlla</h1>
     <p class="lead">L’I/O affidabile nasce da una sequenza stabile: scegliere la modalità, aprire, verificare, elaborare e controllare l’esito.</p>
   </header>
@@ -111,7 +113,7 @@ int main() {
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p>Lo stream viene chiuso automaticamente quando esce dal proprio ambito. Una chiamata esplicita a <code>close()</code> serve soprattutto quando dobbiamo chiuderlo prima.</p>
+        <p>Lo stream viene chiuso automaticamente alla distruzione, normalmente all’uscita dall’ambito. Usiamo <code>close()</code> anche per controllare esplicitamente l’esito della conclusione della scrittura: eventuali errori nel trasferimento dei dati rimasti nel buffer non devono essere ignorati.</p>
       </div>
       </details>
     </section>

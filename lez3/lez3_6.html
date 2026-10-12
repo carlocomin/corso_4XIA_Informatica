@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:37.50%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:33.33%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -33,7 +33,9 @@
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
     <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
     <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
     <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
@@ -43,7 +45,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 6/16</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 6/18</p>
     <h1>Leggere righe in C++</h1>
     <p class="lead"><code>std::getline</code> conserva gli spazi interni e usa il fine riga come confine logico.</p>
   </header>
@@ -78,7 +80,7 @@ int main() {
             std::cout &lt;&lt; numero &lt;&lt; ": " &lt;&lt; riga &lt;&lt; '\n';
     }
 
-    if (in.bad()) {
+    if (in.bad() || !in.eof()) {
         std::cerr &lt;&lt; "Errore durante la lettura\n";
         return 2;
     }
@@ -96,7 +98,7 @@ int main() {
       </article>
       <article class="topic-card">
         <h2>Quando li mescoli</h2>
-        <p><code>&gt;&gt;</code> lascia il fine riga nello stream. Prima del successivo <code>getline</code> puoi scartarlo:</p>
+        <p>Dopo un’estrazione con <code>&gt;&gt;</code> può restare il fine riga. Se la descrizione deve iniziare sulla <strong>riga successiva</strong>, scarta il resto della riga corrente:</p>
         <figure class="code-example">
           <figcaption>C++17 · frammento contestuale</figcaption>
 <pre><code class="language-cpp">in.ignore(
@@ -108,7 +110,7 @@ std::getline(in, descrizione);</code></pre>
       </article>
     </section>
 
-    <div class="callout warning"><strong>Nota:</strong> il frammento richiede <code>&lt;limits&gt;</code> e va eseguito solo dopo che la precedente estrazione con <code>&gt;&gt;</code> è riuscita.</div>
+    <div class="callout warning"><strong>Nota:</strong> il frammento richiede <code>&lt;limits&gt;</code> e va eseguito solo dopo che la precedente estrazione con <code>&gt;&gt;</code> è riuscita. <code>ignore</code> scarta tutto fino a <code>\n</code>, compreso il delimitatore: non usarlo se vuoi conservare il testo che segue il numero sulla stessa riga.</div>
 
     <section class="checkpoint">
       <div class="checkpoint-prompt">

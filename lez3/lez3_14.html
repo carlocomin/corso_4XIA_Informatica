@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:87.50%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:88.89%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -33,7 +33,9 @@
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
     <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
     <li><a href="lez3_14.html" class="active" aria-current="page">L3.14 - Binario con la libreria C</a></li>
     <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
@@ -43,105 +45,94 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 14/16</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 16/18</p>
     <h1>Binario con la libreria C</h1>
-    <p class="lead">In C <code>fread</code> e <code>fwrite</code> contano elementi trasferiti, non interpretano il loro significato.</p>
+    <p class="lead">Gli stessi byte di ARRB con fread e fwrite: distinguiamo la dimensione di un elemento dal numero di elementi.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
-    <a class="nav-button" href="lez3_13.html">&#8592; Precedente</a>
+    <a class="nav-button" href="lez3_lettura_binaria.html">&#8592; Precedente</a>
     <a class="nav-button primary" href="lez3_15.html">Successiva &#8594;</a>
   </nav>
   <div class="content-box">
-
-    <section class="concept-card">
-      <h2>Stesso formato, API diversa</h2>
-      <p><strong>Idea chiave:</strong> il valore restituito deve coincidere con il numero di elementi richiesti; un trasferimento parziale è un errore da gestire.</p>
-    </section>
-
-    <figure class="code-example">
-      <figcaption>C11 · round-trip binario minimo</figcaption>
-<pre><code class="language-c">#include &lt;stdint.h&gt;
+<div class="callout"><strong>Confronto in C:</strong> le idee sono le stesse del C++. Concentrati sul significato dei tre argomenti <em>indirizzo, dimensione, quantità</em> e sul numero di elementi restituito. Non serve imparare a memoria un secondo programma completo.</div>
+<section class="concept-card"><h2>Stesso file, un’altra API</h2><p><strong>Idea chiave:</strong> C e C++ possono leggere il medesimo ARRB se rispettano gli stessi tipi, ordine e rappresentazione nativa. Cambiano le funzioni, non il contratto del file.</p><p>Questo programma <strong>legge soltanto</strong> il file creato dallo scrittore C++: non lo ricrea, quindi puoi riutilizzare i test di troncamento.</p></section>
+<section class="topic-card"><h2>fread e fwrite contano elementi, non sempre byte</h2><p>La forma è <code>fread(indirizzo, dimensione_elemento, numero_elementi, file)</code>; <code>fwrite</code> ha gli stessi argomenti per la scrittura. Il ritorno è il numero di <strong>elementi completi</strong> trasferiti.</p><ul class="compact-list"><li><code>fread(magic, 1, 4, f)</code>: 4 elementi da 1 byte; successo = 4.</li><li><code>fread(&amp;n, sizeof n, 1, f)</code>: 1 elemento da 4 byte; successo = 1.</li><li><code>fread(valori, sizeof valori[0], n, f)</code>: n elementi da 4 byte; successo = n.</li></ul><p>Un elemento letto solo in parte <strong>non</strong> conta come completo e non deve essere usato.</p></section>
+<figure class="code-example"><figcaption>C11 · lettore del formato ARRB</figcaption><pre><code class="language-c">#include &lt;limits.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;inttypes.h&gt;
 #include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+_Static_assert(CHAR_BIT == 8, "Servono byte da 8 bit");
 
 int main(void) {
-    uint32_t conteggio = 3;
-    int32_t valori[3] = {10, 20, 30};
+    enum { MAX = 10 };
+    FILE *f = fopen("dati.bin", "rb");
+    if (f == NULL) return 1;
 
-    FILE* out = fopen("dati.bin", "wb");
-    if (out == NULL) return 1;
+    char magic[4] = {0};
+    uint32_t versione = 0, n = 0;
+    int32_t valori[MAX] = {0};
 
-    if (fwrite(&amp;conteggio, sizeof conteggio, 1, out) != 1
-        || fwrite(valori, sizeof valori[0], 3, out) != 3) {
-        fclose(out);
+    if (fread(magic, 1, 4, f) != 4
+        || fread(&amp;versione, sizeof versione, 1, f) != 1
+        || fread(&amp;n, sizeof n, 1, f) != 1) {
+        fprintf(stderr, "%s\n", ferror(f)
+                ? "Errore di I/O" : "Header incompleto");
+        fclose(f);
         return 2;
     }
-    if (fclose(out) == EOF) return 3;
+    if (memcmp(magic, "ARRB", 4) != 0
+        || versione != 1 || n &gt; MAX) {
+        fclose(f);
+        return 3;
+    }
 
-    FILE* in = fopen("dati.bin", "rb");
-    if (in == NULL) return 4;
-
-    uint32_t letti = 0;
-    int32_t copia[3] = {0};
-
-    if (fread(&amp;letti, sizeof letti, 1, in) != 1
-        || letti != 3) {
-        fclose(in);
+    if (fread(valori, sizeof valori[0], n, f) != n) {
+        fprintf(stderr, "%s\n", ferror(f)
+                ? "Errore di I/O" : "Valori incompleti");
+        fclose(f);
+        return 4;
+    }
+    if (fgetc(f) != EOF || ferror(f) || !feof(f)) {
+        fclose(f);
         return 5;
     }
+    if (fclose(f) != 0) return 6;
 
-    if (fread(copia, sizeof copia[0], 3, in) != 3) {
-        fclose(in);
-        return 6;
-    }
+    for (uint32_t i = 0; i &lt; n; ++i)
+        printf("%" PRId32 " ", valori[i]);
+    putchar('\n');
+    return 0;
+}</code></pre></figure>
+<section class="topic-card"><h2>Controlli e chiusura espliciti</h2><p><code>rb</code> significa lettura binaria; <code>wb</code> scrittura binaria con creazione o cancellazione del vecchio contenuto. Dopo un ritorno insufficiente, <code>ferror</code> segnala un errore di I/O, mentre <code>feof</code> segnala EOF incontrato da una lettura.</p><p>La lettura di prova con <code>fgetc</code> deve incontrare EOF senza errore. <code>fclose</code> va chiamata su ogni percorso dopo un’apertura riuscita.</p><p><code>PRId32</code>, definita in <code>&lt;inttypes.h&gt;</code>, fornisce il formato di stampa corretto per <code>int32_t</code>; le stringhe adiacenti costruiscono il formato di <code>printf</code>.</p></section>
+<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>fread legge due valori completi e metà del terzo: che cosa restituisce?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>Con dimensione elemento 4 e conteggio richiesto 3 restituisce <code>2</code>, non 10 byte e non 3 elementi. Il controllo <code>!= n</code> fa rifiutare il file.</p></div></details></section>
+<section class="exercise-card"><span class="exercise-label">Esercizio 14</span><h2>Scrittore C compatibile</h2><p>Scrivi in C il file ARRB con 10, 20, 30. Verifica ogni fwrite e fclose, poi prova a leggerlo con il lettore C++. Deve avere gli stessi 24 byte del file creato dal C++ nello stesso ambiente.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><figure class="code-example"><figcaption>C11 · scrittore compatibile nello stesso ambiente</figcaption><pre><code class="language-c">#include &lt;limits.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdio.h&gt;
 
-    for (int i = 0; i &lt; 3; ++i)
-        printf("%d ", (int)copia[i]);
+_Static_assert(CHAR_BIT == 8, "Servono byte da 8 bit");
 
-    return fclose(in) == EOF ? 7 : 0;
-}</code></pre>
-    </figure>
+int main(void) {
+    const char magic[4] = {'A', 'R', 'R', 'B'};
+    const uint32_t versione = 1, n = 3;
+    const int32_t valori[3] = {10, 20, 30};
+    FILE *f = fopen("dati.bin", "wb");
+    if (f == NULL) return 1;
 
-    <section class="three-col">
-      <article class="topic-card">
-        <h2>Dimensione</h2>
-        <p>Il secondo argomento è la dimensione di un elemento.</p>
-      </article>
-      <article class="topic-card">
-        <h2>Quantità</h2>
-        <p>Il terzo argomento è il numero di elementi richiesti.</p>
-      </article>
-      <article class="topic-card">
-        <h2>Risultato</h2>
-        <p>La funzione restituisce quanti elementi sono stati trasferiti completamente.</p>
-      </article>
-    </section>
+    int ok = fwrite(magic, 1, 4, f) == 4
+          &amp;&amp; fwrite(&amp;versione, sizeof versione, 1, f) == 1
+          &amp;&amp; fwrite(&amp;n, sizeof n, 1, f) == 1
+          &amp;&amp; fwrite(valori, sizeof valori[0], n, f) == n;
+    if (fclose(f) != 0) ok = 0;
+    return ok ? 0 : 2;
+}</code></pre></figure><p>Il confronto è tra file di <strong>rappresentazione nativa compatibile</strong>, non una garanzia di portabilità fra architetture.</p></div></details></section>
+<p class="callout">Riferimenti: <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/fread?view=msvc-170">fread</a> e <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/fwrite?view=msvc-170">fwrite nel runtime Microsoft</a>.</p>
+<aside class="next-step"><strong>Prossimo passo.</strong> Usiamo le dimensioni fisse di ARRB per raggiungere un valore con seek.</aside>
 
-    <section class="checkpoint">
-      <div class="checkpoint-prompt">
-        <span class="checkpoint-label">Checkpoint</span>
-        <h2>Perché non basta controllare <code>ferror</code>?</h2>
-      </div>
-      <details class="answer-reveal">
-        <summary>
-          <span class="when-closed">Mostra risposta</span>
-          <span class="when-open">Nascondi risposta</span>
-        </summary>
-        <div class="answer">
-        <p>Una lettura corta può dipendere da un file troncato o dalla fine del file. Il contratto richiede tre elementi, quindi il confronto con 3 è il controllo diretto.</p>
-      </div>
-      </details>
-    </section>
-
-    <section class="exercise-card">
-      <span class="exercise-label">Esercizio 14</span>
-      <h2>Trasferimento parziale</h2>
-      <p>Riduci manualmente il file e osserva quale controllo fallisce. Aggiungi un messaggio diverso per apertura, header e blocco dati incompleto.</p>
-    </section>
-
-    <aside class="next-step"><strong>Prossimo passo.</strong> Usiamo la posizione nello stream per raggiungere un record senza leggere quelli precedenti.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
-    <a class="nav-button" href="lez3_13.html">&#8592; Precedente</a>
+    <a class="nav-button" href="lez3_lettura_binaria.html">&#8592; Precedente</a>
     <a class="nav-button primary" href="lez3_15.html">Successiva &#8594;</a>
   </nav>
 </main>

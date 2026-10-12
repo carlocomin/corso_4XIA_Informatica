@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:68.75%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:61.11%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -33,7 +33,9 @@
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
     <li><a href="lez3_11.html" class="active" aria-current="page">L3.11 - Testo robusto e round-trip</a></li>
     <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
     <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
     <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
@@ -43,7 +45,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 11/16</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 11/18</p>
     <h1>Testo robusto e round-trip</h1>
     <p class="lead">Un formato è affidabile quando scrittura e lettura condividono le stesse regole e vengono provate anche con dati difficili.</p>
   </header>
@@ -72,17 +74,18 @@
       <article class="topic-card">
         <h2>Regole minime</h2>
         <ul class="compact-list">
-          <li>codifica UTF-8;</li>
+          <li>codifica UTF-8 senza BOM (nessun marcatore iniziale); gli stream non convertono automaticamente la codifica;</li>
           <li>un record per riga;</li>
           <li><code>;</code> come separatore;</li>
           <li>punto per i decimali;</li>
           <li>prima riga <code>STUDENTI;1</code> come tipo e versione;</li>
           <li>righe malformate segnalate e scartate.</li>
+          <li>se i record validi superano la capacità dell’array, caricamento fallito invece di perdita silenziosa di dati.</li>
         </ul>
       </article>
       <article class="topic-card">
         <h2>Fine riga tra sistemi</h2>
-        <p>Leggendo un file Windows su altri sistemi può restare un <code>'\r'</code> finale:</p>
+        <p>Leggendo un file Windows su altri sistemi può restare un <code>'\r'</code> finale. Rimuovilo dopo <code>getline</code>, sia dall’header sia dai record:</p>
         <figure class="code-example">
           <figcaption>C++17 · frammento contestuale</figcaption>
 <pre><code class="language-cpp">if (!riga.empty()
@@ -95,6 +98,7 @@
 
     <section class="topic-card">
       <h2>CSV reale: un livello in più</h2>
+      <p><strong>Codifica:</strong> salva sorgente e file di prova in UTF-8. Gli esempi controllano struttura e valori dei campi, ma assumono che il testo sia già UTF-8 valido: non implementano un validatore della codifica.</p>
       <p>Se un campo può contenere separatore, virgolette o ritorni a capo, servono regole di escape: campi tra virgolette e virgolette interne raddoppiate. Il nostro formato didattico evita questi casi dichiarandoli non validi.</p>
       <div class="callout warning"><strong>Non fingere generalità:</strong> uno <code>split</code> sul separatore non è un parser CSV completo.</div>
     </section>

@@ -33,7 +33,9 @@
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
     <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
     <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
     <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
     <li><a href="lez3_16.html" class="active" aria-current="page">L3.16 - Laboratorio e autoverifica</a></li>
@@ -43,7 +45,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 16/16</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 18/18</p>
     <h1>Laboratorio e autoverifica</h1>
     <p class="lead">Costruiamo un archivio studenti completo: formato dichiarato, controlli espliciti, parsing sicuro e risultati verificabili.</p>
   </header>
@@ -60,24 +62,34 @@
     </section>
 
     <section class="topic-card">
-      <h2>Requisiti, in ordine</h2>
+      <h2>Costruisci il programma in tre tappe</h2>
+      <ol class="steps">
+        <li><strong>Prima la scrittura:</strong> salva i quattro studenti forniti; apri il file con un editor e controlla header e quattro righe.</li>
+        <li><strong>Poi la lettura:</strong> riusa il parser già studiato, senza reinventarlo. Ricarica il file e confronta matricole, nomi e medie con l’array originale.</li>
+        <li><strong>Infine gli errori:</strong> cambia una sola riga per volta e verifica il comportamento previsto. Aggiungi le statistiche solo quando salvataggio e caricamento funzionano.</li>
+      </ol>
+      <p>Per iniziare, usa il dataset già presente nel codice. Non devi progettare subito un menu né leggere tutti i dati da tastiera. Le funzioni più articolate sono accompagnate dalla soluzione guidata.</p>
+      <h3>Controlli da completare</h3>
       <ol class="steps">
         <li>implementa <code>scriviArchivio</code> e verifica lo stream dopo la scrittura;</li>
         <li>implementa <code>leggiArchivio</code>, controlla l’header e non superare <code>MAX</code>;</li>
         <li>riusa un parser che modifichi il risultato soltanto in caso di successo;</li>
-        <li>stampa numero di record validi e righe scartate;</li>
+        <li>stampa numero di record validi e righe malformate scartate; se i record validi superano MAX, segnala un fallimento, non uno scarto;</li>
         <li>calcola media della classe e indice dello studente migliore.</li>
       </ol>
     </section>
 
+    <div class="callout"><strong>Contratto delle funzioni:</strong> lo scrittore rifiuta dati non validi prima di aprire il file, senza ometterli silenziosamente. Il lettore aggiorna l’array solo a caricamento riuscito; in caso di fallimento lascia l’array invariato e azzera i conteggi. <code>mediaClasse</code> e <code>indiceMigliore</code> richiedono <code>0 &lt;= quanti &lt;= MAX</code>. La matricola è qui un <code>int32_t</code> per preparare anche la sfida binaria.</div>
+
     <figure class="code-example">
       <figcaption>C++17 · scheletro compilabile</figcaption>
-<pre><code class="language-cpp">#include &lt;fstream&gt;
+<pre><code class="language-cpp">#include &lt;cstdint&gt;
+#include &lt;fstream&gt;
 #include &lt;iostream&gt;
 #include &lt;string&gt;
 
 struct Studente {
-    int matricola;
+    std::int32_t matricola;
     std::string nome;
     double media;
 };
@@ -177,7 +189,7 @@ int main() {
     <section class="exercise-card">
       <span class="exercise-label">Soluzione guidata</span>
       <h2>Archivio testuale: programma completo</h2>
-      <p>Apri la soluzione dopo avere definito il formato e tentato il parser. Verifica che ogni funzione aggiorni i propri parametri di output soltanto quando dispone di un risultato coerente.</p>
+      <p>Apri la soluzione dopo avere definito il formato e tentato il parser. Verifica il contratto: l’array è aggiornato solo al successo; i conteggi sono azzerati al fallimento.</p>
       <details class="answer-reveal solution-reveal">
         <summary>
           <span class="when-closed">Mostra soluzione</span>
@@ -186,13 +198,17 @@ int main() {
         <div class="solution-content">
           <figure class="code-example">
             <figcaption>C++17 · una possibile soluzione completa</figcaption>
-<pre><code class="language-cpp">#include &lt;fstream&gt;
+<pre><code class="language-cpp">#include &lt;cstdint&gt;
+#include &lt;fstream&gt;
+#include &lt;iomanip&gt;
+#include &lt;limits&gt;
+#include &lt;locale&gt;
 #include &lt;iostream&gt;
 #include &lt;sstream&gt;
 #include &lt;string&gt;
 
 struct Studente {
-    int matricola;
+    std::int32_t matricola;
     std::string nome;
     double media;
 };
@@ -210,9 +226,10 @@ bool valido(const Studente&amp; s) {
         &amp;&amp; s.media &lt;= 10.0;
 }
 
-bool leggiInteroEsatto(const std::string&amp; testo, int&amp; valore) {
+bool leggiInteroEsatto(const std::string&amp; testo, std::int32_t&amp; valore) {
     std::istringstream input(testo);
-    int temporaneo = 0;
+    input.imbue(std::locale::classic());
+    std::int32_t temporaneo = 0;
     if (!(input &gt;&gt; temporaneo))
         return false;
     input &gt;&gt; std::ws;
@@ -224,6 +241,7 @@ bool leggiInteroEsatto(const std::string&amp; testo, int&amp; valore) {
 
 bool leggiDoubleEsatto(const std::string&amp; testo, double&amp; valore) {
     std::istringstream input(testo);
+    input.imbue(std::locale::classic());
     double temporaneo = 0.0;
     if (!(input &gt;&gt; temporaneo))
         return false;
@@ -261,20 +279,29 @@ bool scriviArchivio(const std::string&amp; path,
     if (quanti &lt; 0 || quanti &gt; MAX)
         return false;
 
+    for (int i = 0; i &lt; quanti; ++i) {
+        if (!valido(classe[i])) return false;
+    }
     std::ofstream output(path);
     if (!output)
         return false;
 
+    output.imbue(std::locale::classic());
+    output &lt;&lt; std::setprecision(std::numeric_limits&lt;double&gt;::max_digits10);
     output &lt;&lt; "STUDENTI;1\n";
     for (int i = 0; i &lt; quanti; ++i) {
-        if (valido(classe[i]))
-            output &lt;&lt; classe[i].matricola &lt;&lt; ';'
-                   &lt;&lt; classe[i].nome &lt;&lt; ';'
-                   &lt;&lt; classe[i].media &lt;&lt; '\n';
+        output &lt;&lt; classe[i].matricola &lt;&lt; ';'
+               &lt;&lt; classe[i].nome &lt;&lt; ';'
+               &lt;&lt; classe[i].media &lt;&lt; '\n';
     }
 
     output.close();
     return static_cast&lt;bool&gt;(output);
+}
+
+void normalizzaFineRiga(std::string&amp; riga) {
+    if (!riga.empty() &amp;&amp; riga.back() == '\r')
+        riga.pop_back();
 }
 
 bool leggiArchivio(const std::string&amp; path,
@@ -289,25 +316,26 @@ bool leggiArchivio(const std::string&amp; path,
         return false;
 
     std::string riga;
-    if (!std::getline(input, riga) || riga != "STUDENTI;1")
-        return false;
+    if (!std::getline(input, riga)) return false;
+    normalizzaFineRiga(riga);
+    if (riga != "STUDENTI;1") return false;
 
     Classe temporanei{};
     int validiTemporanei = 0;
     int scartatiTemporanei = 0;
 
     while (std::getline(input, riga)) {
+        normalizzaFineRiga(riga);
         Studente candidato{};
-        if (parseStudente(riga, candidato)
-            &amp;&amp; validiTemporanei &lt; MAX) {
-            temporanei[validiTemporanei] = candidato;
-            ++validiTemporanei;
-        } else {
+        if (!parseStudente(riga, candidato)) {
             ++scartatiTemporanei;
+            continue;
         }
+        if (validiTemporanei == MAX) return false;
+        temporanei[validiTemporanei++] = candidato;
     }
 
-    if (!input.eof())
+    if (input.bad() || !input.eof())
         return false;
 
     for (int i = 0; i &lt; validiTemporanei; ++i)
@@ -366,7 +394,8 @@ int main() {
                   &lt;&lt; " (" &lt;&lt; caricati[migliore].media &lt;&lt; ")\n";
 }</code></pre>
           </figure>
-          <p><strong>Garanzia utile:</strong> il parser costruisce prima un candidato locale e il caricamento usa un array temporaneo. Un errore non lascia nel risultato un record parzialmente aggiornato.</p>
+          <p><strong>Garanzia utile:</strong> il parser costruisce prima un candidato locale e il caricamento usa un array temporaneo. Un errore non lascia nell’array record parzialmente aggiornati. I conteggi sono azzerati in caso di fallimento.</p>
+          <p><code>locale::classic()</code> fissa il punto decimale; <code>max_digits10</code> evita di perdere precisione nel round-trip dei valori <code>double</code>. Normalizziamo l’eventuale <code>\r</code> sia nell’header sia nelle righe dei dati.</p>
         </div>
       </details>
     </section>
@@ -392,7 +421,12 @@ int main() {
     <section class="exercise-card">
       <span class="exercise-label">Sfida facoltativa</span>
       <h2>Versione binaria campo per campo</h2>
-      <p>Salva magic, versione e conteggio, poi per ogni studente matricola, lunghezza del nome, caratteri del nome e media. Non scrivere direttamente l’intera <code>struct</code>.</p>
+      <p><strong>Questa è una sfida aggiuntiva, non un requisito del laboratorio di base.</strong> Prima consolida l’archivio testuale e il semplice array binario delle slide precedenti. Non occorre studiare i template per raggiungere gli obiettivi fondamentali sui file.</p>
+      <p>Questo è un <strong>nuovo formato</strong>, STUD, non il file ARRB dei sensori. Riusa l’header di 12 byte ma cambia il tipo di record. I numeri sono ancora nativi: lettura e scrittura richiedono ambienti compatibili.</p>
+      <div class="table-wrap"><table><thead><tr><th>Parte</th><th>Ordine dei campi</th><th>Dimensione</th></tr></thead><tbody><tr><td>Header</td><td>ASCII STUD; versione uint32_t = 1; conteggio uint32_t</td><td>4 + 4 + 4 = 12 byte</td></tr><tr><td>Ogni studente</td><td>matricola int32_t; lunghezza uint32_t; byte del nome UTF-8; media double nativo</td><td>4 + 4 + lunghezza + sizeof(double)</td></tr></tbody></table></div>
+      <p>La lunghezza del nome conta <strong>byte, non lettere</strong>, da 1 a 200; il terminatore <code>\0</code> non viene scritto. Si assume testo già codificato correttamente in UTF-8, come nella versione testuale. Un <code>double</code> occupa normalmente 8 byte nei PC del laboratorio, ma il formato qui usa <code>sizeof(double)</code>. I record hanno lunghezza variabile: non puoi calcolarne l’offset usando <code>i × sizeof(Studente)</code>.</p>
+      <ol class="steps"><li>Convalida i dati prima di scrivere; salva campi e nome, non la struct.</li><li>In lettura controlla header, conteggio, lunghezza del nome, campi completi e validità dello studente.</li><li>Rifiuta anche byte extra; trasferisci l’array temporaneo nel risultato soltanto alla fine.</li></ol>
+      <p><strong>Test da eseguire prima di aprire la soluzione:</strong> classe vuota; nome “Nicolò”; nome troppo lungo; header sbagliato; ultimo record troncato; byte aggiuntivo. Dopo una modifica al file esegui solo la lettura, non una nuova scrittura.</p>
       <details class="answer-reveal solution-reveal">
         <summary>
           <span class="when-closed">Mostra soluzione</span>
@@ -400,16 +434,28 @@ int main() {
         </summary>
         <div class="solution-content">
           <figure class="code-example">
-            <figcaption>C++17 · formato binario campo per campo</figcaption>
-<pre><code class="language-cpp">#include &lt;cstdint&gt;
+            <figcaption>C++17 · estensione da aggiungere alla soluzione testuale, prima di main</figcaption>
+<pre><code class="language-cpp">// Da aggiungere alla soluzione testuale: riusa Studente, Classe e valido.
+#include &lt;climits&gt;
+#include &lt;cstdint&gt;
 #include &lt;cstring&gt;
+#include &lt;type_traits&gt;
 
+static_assert(CHAR_BIT == 8, "Servono byte da 8 bit");
 constexpr char MAGIC[4]{'S', 'T', 'U', 'D'};
 constexpr std::uint32_t VERSIONE = 1;
 constexpr std::uint32_t MAX_NOME = 200;
 
+// La funzione generica accetta solo i tre tipi previsti dal formato.
+template &lt;typename T&gt;
+constexpr bool campoNativo =
+    std::is_same_v&lt;T, std::int32_t&gt;
+    || std::is_same_v&lt;T, std::uint32_t&gt;
+    || std::is_same_v&lt;T, double&gt;;
+
 template &lt;typename T&gt;
 bool scriviValore(std::ostream&amp; output, const T&amp; valore) {
+    static_assert(campoNativo&lt;T&gt;, "Tipo non previsto dal formato");
     output.write(reinterpret_cast&lt;const char*&gt;(&amp;valore),
                  sizeof valore);
     return static_cast&lt;bool&gt;(output);
@@ -417,36 +463,37 @@ bool scriviValore(std::ostream&amp; output, const T&amp; valore) {
 
 template &lt;typename T&gt;
 bool leggiValore(std::istream&amp; input, T&amp; valore) {
-    input.read(reinterpret_cast&lt;char*&gt;(&amp;valore), sizeof valore);
-    return static_cast&lt;bool&gt;(input);
+    static_assert(campoNativo&lt;T&gt;, "Tipo non previsto dal formato");
+    T temporaneo{};
+    if (!input.read(reinterpret_cast&lt;char*&gt;(&amp;temporaneo),
+                    sizeof temporaneo))
+        return false;
+    valore = temporaneo;
+    return true;
 }
 
 bool scriviBinario(const std::string&amp; path,
                    const Classe&amp; classe,
                    int quanti) {
-    if (quanti &lt; 0 || quanti &gt; MAX)
-        return false;
+    if (quanti &lt; 0 || quanti &gt; MAX) return false;
     for (int i = 0; i &lt; quanti; ++i) {
         if (!valido(classe[i]) || classe[i].nome.size() &gt; MAX_NOME)
             return false;
     }
 
     std::ofstream output(path, std::ios::binary);
-    if (!output)
-        return false;
+    if (!output) return false;
 
-    std::uint32_t conteggio = static_cast&lt;std::uint32_t&gt;(quanti);
+    const auto conteggio = static_cast&lt;std::uint32_t&gt;(quanti);
     output.write(MAGIC, sizeof MAGIC);
     if (!scriviValore(output, VERSIONE)
         || !scriviValore(output, conteggio))
         return false;
 
     for (int i = 0; i &lt; quanti; ++i) {
-        std::int32_t matricola = classe[i].matricola;
-        std::uint32_t lunghezza =
+        const std::uint32_t lunghezza =
             static_cast&lt;std::uint32_t&gt;(classe[i].nome.size());
-
-        if (!scriviValore(output, matricola)
+        if (!scriviValore(output, classe[i].matricola)
             || !scriviValore(output, lunghezza))
             return false;
         output.write(classe[i].nome.data(), lunghezza);
@@ -462,15 +509,12 @@ bool leggiBinario(const std::string&amp; path,
                   int&amp; quanti) {
     quanti = 0;
     std::ifstream input(path, std::ios::binary);
-    if (!input)
-        return false;
+    if (!input) return false;
 
-    char magicLetto[sizeof MAGIC]{};
-    std::uint32_t versione = 0;
-    std::uint32_t conteggio = 0;
+    char magicLetto[4]{};
+    std::uint32_t versione = 0, conteggio = 0;
     input.read(magicLetto, sizeof magicLetto);
-    if (!input
-        || std::memcmp(magicLetto, MAGIC, sizeof MAGIC) != 0
+    if (!input || std::memcmp(magicLetto, MAGIC, 4) != 0
         || !leggiValore(input, versione)
         || !leggiValore(input, conteggio)
         || versione != VERSIONE || conteggio &gt; MAX)
@@ -481,7 +525,6 @@ bool leggiBinario(const std::string&amp; path,
         std::int32_t matricola = 0;
         std::uint32_t lunghezza = 0;
         double media = 0.0;
-
         if (!leggiValore(input, matricola)
             || !leggiValore(input, lunghezza)
             || lunghezza == 0 || lunghezza &gt; MAX_NOME)
@@ -493,10 +536,13 @@ bool leggiBinario(const std::string&amp; path,
             return false;
 
         Studente candidato{matricola, nome, media};
-        if (!valido(candidato))
-            return false;
+        if (!valido(candidato)) return false;
         temporanei[i] = candidato;
     }
+
+    char extra = 0;
+    if (input.get(extra)) return false;
+    if (input.bad() || !input.eof()) return false;
 
     for (std::uint32_t i = 0; i &lt; conteggio; ++i)
         classe[i] = temporanei[i];
@@ -504,6 +550,9 @@ bool leggiBinario(const std::string&amp; path,
     return true;
 }</code></pre>
           </figure>
+          <p><strong>Come provarla:</strong> in una copia del programma sostituisci le chiamate testuali con <code>scriviBinario("studenti.bin", origine, 4)</code> e <code>leggiBinario("studenti.bin", caricati, quanti)</code>. Il conteggio <code>scartati</code> non serve: qui un record errato fa rifiutare l’intero file.</p>
+          <p><strong>Dettaglio facoltativo:</strong> <code>template</code> riusa le stesse operazioni per tre tipi numerici; <code>static_assert</code> vieta altri tipi, quindi non permette il dump di stringhe, puntatori o struct. <code>leggiValore</code> assegna il risultato solo dopo una lettura completa.</p>
+          <p><strong>Risultati dei test:</strong> classe vuota e nome accentato valido: successo; nome oltre 200 byte, header errato, troncamento o byte extra: fallimento. In lettura l’array precedente resta invariato e quanti vale zero.</p>
           <p><strong>Limite dichiarato:</strong> questa versione definisce l’ordine dei campi, ma usa ancora la rappresentazione binaria nativa di interi e <code>double</code>. Per scambiare file tra architetture diverse occorre definire anche byte order e codifica numerica.</p>
         </div>
       </details>

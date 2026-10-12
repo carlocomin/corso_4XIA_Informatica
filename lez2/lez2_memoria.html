@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L2.2bis · Nomi e oggetti in memoria</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-structs">
+<div class="lesson-progress" aria-hidden="true"><span style="width:18.75%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 2">
+  <h2>Lezione 2 - Struct</h2>
+  <ul>
+    <li><a href="lez2_1.html">L2.1 - Dati che viaggiano insieme</a></li>
+    <li><a href="lez2_2.html">L2.2 - Definire un nuovo tipo</a></li>
+    <li><a href="lez2_memoria.html" class="active" aria-current="page">L2.2bis - Nomi e oggetti in memoria</a></li>
+    <li><a href="lez2_3.html">L2.3 - Inizializzare senza sorprese</a></li>
+    <li><a href="lez2_4.html">L2.4 - Leggere e modificare i campi</a></li>
+    <li><a href="lez2_5.html">L2.5 - La stessa idea in C</a></li>
+    <li><a href="lez2_6.html">L2.6 - Passaggio per valore</a></li>
+    <li><a href="lez2_7.html">L2.7 - Modificare con un riferimento</a></li>
+    <li><a href="lez2_8.html">L2.8 - Leggere con const&amp;</a></li>
+    <li><a href="lez2_9.html">L2.9 - Puntatori e operatore -></a></li>
+    <li><a href="lez2_10.html">L2.10 - Restituire una struct</a></li>
+    <li><a href="lez2_11.html">L2.11 - Collezioni di record</a></li>
+    <li><a href="lez2_12.html">L2.12 - Cercare, contare, scegliere</a></li>
+    <li><a href="lez2_13.html">L2.13 - Ordinare per un campo</a></li>
+    <li><a href="lez2_14.html">L2.14 - Layout, padding e file</a></li>
+    <li><a href="lez2_15.html">L2.15 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · Struct · 3/16</p>
+    <h1>Nomi e oggetti in memoria</h1>
+    <p class="lead">Il nome che scriviamo, le informazioni usate dal compilatore e l’oggetto che esiste durante l’esecuzione sono collegati, ma non sono la stessa cosa.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_2.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_3.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+    <section class="concept-card">
+      <h2>Idea chiave</h2>
+      <p>In <code>Studente s{1001, "Ada", 9.4};</code>, <strong><code>Studente</code> è il tipo</strong>, <strong><code>s</code> è il nome della variabile</strong> e <strong>l’oggetto è l’istanza concreta</strong> che contiene i valori. Il nome designa l’oggetto: non è il suo indirizzo né il suo contenuto.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Un esempio da seguire nei quattro livelli</h2>
+      <figure class="code-example" data-example="programma">
+        <figcaption>C++17 · programma completo</figcaption>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+struct Studente {
+    int matricola;
+    std::string nome;
+    double media;
+};
+
+int main() {
+    Studente s{1001, "Ada", 9.4};
+    std::cout &lt;&lt; s.media &lt;&lt; '\n'; // valore di un campo
+    std::cout &lt;&lt; &amp;s &lt;&lt; '\n';      // indirizzo dell’oggetto
+}</code></pre>
+      </figure>
+      <p>La prima stampa produce <code>9.4</code>. La seconda mostra un indirizzo, che può cambiare tra esecuzioni: <strong>non dobbiamo prevederne il valore</strong>.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Dal nome al dato: non saltare i passaggi</h2>
+      <p>Seguiamo lo stesso esempio in <strong>due momenti distinti</strong>: prima il compilatore legge e traduce il sorgente; poi il programma viene eseguito e lavora sui dati. I quattro riquadri descrivono aspetti collegati, <strong>non quattro trasformazioni dello stesso elemento</strong>: il nome non diventa un indirizzo e la tabella dei simboli non diventa l’oggetto.</p>
+      <figure class="object-model">
+        <ol class="object-model-flow" aria-label="Quattro livelli: sorgente, compilatore, indirizzo, oggetto">
+          <li class="object-model-stage">
+            <p class="object-model-phase">1 · Nel sorgente</p>
+            <h3>Il nome</h3>
+            <div class="object-model-token"><code>s</code></div>
+            <p>È un <strong>identificatore</strong>, cioè il nome introdotto dalla dichiarazione <code>Studente s{...};</code>.</p>
+            <p>Scrivere <code>s.media</code> significa selezionare il campo <code>media</code> dell’oggetto chiamato <code>s</code>. Il nome non è il dato memorizzato.</p>
+          </li>
+          <li class="object-model-stage">
+            <p class="object-model-phase">2 · Durante la compilazione</p>
+            <h3>La symbol table</h3>
+            <dl class="object-model-facts">
+              <div><dt>Nome</dt><dd><code>s</code></dd></div>
+              <div><dt>Tipo</dt><dd><code>Studente</code></dd></div>
+              <div><dt>Ambito</dt><dd>blocco di <code>main</code></dd></div>
+            </dl>
+            <p>La <strong>tabella dei simboli</strong> raccoglie informazioni sui nomi: qui <code>s</code> è associato alla sua dichiarazione e al tipo <code>Studente</code>.</p>
+            <p>L’<strong>ambito</strong> indica in quale parte del codice quel nome può essere usato. Questa tabella non contiene i valori dello studente.</p>
+          </li>
+          <li class="object-model-stage runtime">
+            <p class="object-model-phase">3 · Durante l’esecuzione</p>
+            <h3>L’indirizzo</h3>
+            <div class="object-model-token"><code>&amp;s</code><span aria-hidden="true">&#8595;</span><code>0x1000</code></div>
+            <p><code>&amp;s</code> ricava l’indirizzo dell’oggetto: il risultato è un valore di tipo puntatore, <code>Studente*</code>.</p>
+            <p>Nel nostro schema l’oggetto inizia a <code>0x1000</code>, nello <strong>spazio virtuale del processo</strong>. L’indirizzo dice <em>dove</em>, non <em>che cosa</em> contiene.</p>
+          </li>
+          <li class="object-model-stage runtime">
+            <p class="object-model-phase">4 · Durante l’esecuzione</p>
+            <h3>L’oggetto</h3>
+            <dl class="object-model-facts object-model-values">
+              <div><dt>matricola</dt><dd>1001</dd></div>
+              <div><dt>nome</dt><dd>"Ada"</dd></div>
+              <div><dt>media</dt><dd>9.4</dd></div>
+            </dl>
+            <p>È un’<strong>istanza di <code>Studente</code></strong>: occupa memoria e contiene i valori dei campi. Tipo e oggetto non coincidono.</p>
+            <p><code>s.media = 8.0;</code> cambia il dato nel campo <code>media</code>; non cambia il nome, il tipo o l’identità dell’oggetto.</p>
+          </li>
+        </ol>
+        <figcaption><strong>Schema didattico:</strong> la tabella è semplificata; <code>0x1000</code> è un indirizzo inventato, non da usare nel codice. I campi mostrano valori logici, non un layout di byte in scala.</figcaption>
+      </figure>
+      <div class="two-col">
+        <article class="topic-card">
+          <h3>Prima: il compilatore interpreta <code>s.media</code></h3>
+          <ol class="steps">
+            <li>Collega il nome <code>s</code> alla dichiarazione visibile in quel punto del codice.</li>
+            <li>Dal tipo <code>Studente</code> verifica che esista il campo <code>media</code> e che il suo tipo sia <code>double</code>. <code>s.eta</code> sarebbe invece un errore di compilazione.</li>
+            <li>Genera il codice necessario per accedere a quel campo, secondo la rappresentazione dell’oggetto scelta per la piattaforma.</li>
+          </ol>
+        </article>
+        <article class="topic-card">
+          <h3>Poi: il programma lavora sull’oggetto</h3>
+          <ol class="steps">
+            <li>Quando esegue la dichiarazione, inizializza l’oggetto <code>s</code> con i valori <code>1001</code>, <code>"Ada"</code> e <code>9.4</code>.</li>
+            <li>La stampa di <code>s.media</code> legge il campo <code>media</code> di quell’oggetto. Un’assegnazione allo stesso campo ne modifica il valore.</li>
+            <li>Se scriviamo <code>&amp;s</code>, otteniamo un puntatore all’oggetto. Non dobbiamo però scrivere <code>&amp;s</code> ogni volta che usiamo <code>s.media</code>.</li>
+          </ol>
+        </article>
+      </div>
+      <div class="callout">
+        <strong>Il ponte è il codice generato, non una ricerca del nome durante l’esecuzione.</strong> Il programma compilato non deve cercare la parola <code>s</code> nella tabella dei simboli a ogni accesso: esegue istruzioni già tradotte. Per questa variabile locale, il compilatore può predisporre l’accesso senza conoscere in anticipo l’indirizzo virtuale finale. Le eventuali informazioni di debug servono ad altri scopi.
+      </div>
+      <p>Un <strong>processo</strong> è un programma in esecuzione. La sua <strong>memoria virtuale</strong> è lo spazio di indirizzi che il sistema operativo gli mette a disposizione: possiamo pensarlo come una mappa numerata dei luoghi in cui accedere ai dati. L’indirizzo visto dal programma non è la posizione fisica nella RAM; sistema operativo e hardware gestiscono la traduzione.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Il tipo non è l’istanza</h2>
+      <p>La definizione di <code>struct Studente</code> descrive i campi; da sola non crea oggetti <code>Studente</code>. Ogni oggetto creato ha il proprio stato. Nell’esempio, <code>s</code> è locale con durata automatica: viene inizializzato quando si esegue la dichiarazione e distrutto all’uscita dal blocco.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>“Riferirsi” non significa sempre <code>&amp;</code></h2>
+      <p>Nel linguaggio comune, dire che un nome <em>si riferisce a un oggetto</em> significa che permette di individuarlo e usarlo. Così, in <code>s.media</code>, il nome <code>s</code> designa l’oggetto su cui lavoriamo. <strong>Questo non dichiara un riferimento C++</strong> e non richiede di scrivere un indirizzo.</p>
+      <p>In C++ dobbiamo distinguere tre casi. I frammenti seguenti vanno letti <strong>separatamente</strong>, inserendoli nel <code>main</code> dell’esempio subito dopo l’inizializzazione di <code>s</code>.</p>
+      <div class="three-col">
+        <article class="topic-card">
+          <h3>1. Ricavare l’indirizzo: <code>&amp;s</code></h3>
+          <figure class="code-example" data-example="indirizzo">
+            <figcaption>C++17 · un’espressione</figcaption>
+<pre><code class="language-cpp">std::cout &lt;&lt; &amp;s &lt;&lt; '\n';</code></pre>
+          </figure>
+          <p>Qui <code>&amp;</code> è l’<strong>operatore che ricava l’indirizzo</strong>. L’espressione <code>&amp;s</code> produce un puntatore di tipo <code>Studente*</code> all’oggetto <code>s</code>.</p>
+          <p>Da sola, questa espressione non dichiara una variabile puntatore e non crea un riferimento C++.</p>
+        </article>
+        <article class="topic-card">
+          <h3>2. Dichiarare un riferimento: <code>Studente&amp;</code></h3>
+          <figure class="code-example" data-example="riferimento">
+            <figcaption>C++17 · un alias dell’oggetto</figcaption>
+<pre><code class="language-cpp">Studente&amp; alias = s;
+alias.media = 8.0;</code></pre>
+          </figure>
+          <p>Qui <code>&amp;</code> fa parte della <strong>dichiarazione del riferimento</strong>. <code>alias</code> viene legato a <code>s</code>: possiamo pensarlo come un altro nome per lo stesso oggetto.</p>
+          <p><code>alias.media</code> e <code>s.media</code> indicano lo stesso campo. La modifica riguarda <code>s</code>; non nasce un secondo studente.</p>
+        </article>
+        <article class="topic-card">
+          <h3>3. Conservare l’indirizzo: <code>Studente*</code></h3>
+          <figure class="code-example" data-example="puntatore">
+            <figcaption>C++17 · una variabile puntatore</figcaption>
+<pre><code class="language-cpp">Studente* p = &amp;s;
+p-&gt;media = 8.0;</code></pre>
+          </figure>
+          <p><code>p</code> è un <strong>oggetto distinto di tipo puntatore</strong>. Il suo valore è il puntatore all’oggetto <code>s</code> ottenuto con <code>&amp;s</code>: non contiene una copia dello studente.</p>
+          <p><code>*p</code> designa lo studente puntato. <code>p-&gt;media</code> significa <code>(*p).media</code>, quindi anche questa modifica riguarda <code>s</code>.</p>
+        </article>
+      </div>
+      <div class="callout warning">
+        <strong>Stesso carattere, due ruoli diversi:</strong> in <code>&amp;s</code>, <code>&amp;</code> è un operatore applicato a un oggetto per ottenerne l’indirizzo; in <code>Studente&amp; alias = s;</code>, indica nella dichiarazione che <code>alias</code> è un riferimento. Leggi sempre il contesto, non soltanto il simbolo.
+      </div>
+      <p><strong>Controllo mentale:</strong> con <code>s</code>, <code>alias</code> e <code>*p</code> usiamo lo stesso studente in tre modi. <code>p</code> è invece il puntatore che permette di raggiungerlo. Perciò <code>&amp;alias</code> è uguale a <code>&amp;s</code>, e il valore di <code>p</code> è uguale a <code>&amp;s</code>: nessuna di queste operazioni crea una copia.</p>
+    </section>
+
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Checkpoint · nomi, riferimenti e copie</span>
+        <h2>Quanti oggetti Studente? Quale media cambia?</h2>
+        <p>Inserisci questo frammento nel <code>main</code> dell’esempio, subito dopo l’inizializzazione di <code>s</code>.</p>
+      </div>
+      <figure class="code-example" data-example="checkpoint">
+        <figcaption>C++17 · frammento da leggere prima di aprire la risposta</figcaption>
+<pre><code class="language-cpp">Studente&amp; alias = s;
+Studente* p = &amp;s;
+Studente copia = s;
+
+alias.media = 8.0;
+std::cout &lt;&lt; s.media &lt;&lt; " " &lt;&lt; copia.media &lt;&lt; '\n';</code></pre>
+      </figure>
+      <ol>
+        <li>Quanti oggetti di tipo <code>Studente</code> esistono dopo queste dichiarazioni? <code>p</code> è un terzo studente?</li>
+        <li>Che cosa stampa il frammento? <code>&amp;alias</code> e <code>&amp;s</code> individuano lo stesso oggetto?</li>
+      </ol>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra risposta</span>
+          <span class="when-open">Nascondi risposta</span>
+        </summary>
+        <div class="answer">
+          <p>Gli oggetti di tipo <code>Studente</code> sono <strong>due</strong>: quello designato da <code>s</code> e quello designato da <code>copia</code>. <code>alias</code> è un riferimento al primo; <code>p</code> è un oggetto distinto di tipo <code>Studente*</code>, che contiene un puntatore al primo studente.</p>
+          <p>La stampa è <code>8 9.4</code>: la modifica tramite <code>alias</code> riguarda <code>s</code>, non la copia. <code>&amp;alias == &amp;s</code> è vero; <code>&amp;copia == &amp;s</code> è falso.</p>
+        </div>
+      </details>
+    </section>
+
+    <section class="checkpoint">
+      <div class="checkpoint-prompt">
+        <span class="checkpoint-label">Estensione · limiti del modello</span>
+        <h2>Che cosa abbiamo semplificato?</h2>
+        <p>Lo schema distingue i concetti; non pretende di rappresentare tutti i dettagli di un compilatore o della RAM.</p>
+      </div>
+      <details class="answer-reveal">
+        <summary>
+          <span class="when-closed">Mostra precisazioni e fonti</span>
+          <span class="when-open">Nascondi precisazioni e fonti</span>
+        </summary>
+        <div class="answer">
+          <ul class="compact-list">
+            <li><strong>Symbol table:</strong> è un modello delle informazioni interne del compilatore, che può organizzarle in più strutture. Le eventuali tabelle di simboli dell’eseguibile e le informazioni di debug hanno altri scopi: non sono l’oggetto <code>s</code>.</li>
+            <li><strong>Memoria:</strong> il C++ definisce il comportamento degli oggetti, non impone questo specifico schema di memoria virtuale. Il disegno segue il modello dei comuni sistemi operativi; le ottimizzazioni possono cambiare la rappresentazione concreta rispettando il comportamento richiesto.</li>
+            <li><strong>Campi:</strong> possono esserci byte di padding. <code>nome</code> è un sotto-oggetto <code>std::string</code>: mostrare "Ada" non significa che la sua rappresentazione interna sia costituita soltanto da quei caratteri. Riprenderemo il layout in L2.14.</li>
+            <li><strong>Riferimenti:</strong> dire che <code>alias</code> non crea un secondo studente non significa affermare che la sua implementazione non usi memoria. Il C++ lascia non specificato se un riferimento richieda spazio: qui conta che permetta di usare lo stesso oggetto.</li>
+          </ul>
+          <p>Riferimenti tecnici per il docente:
+            <a href="https://eel.is/c++draft/basic.pre">nomi e variabili nella bozza C++</a>,
+            <a href="https://eel.is/c++draft/intro.object">oggetti</a>,
+            <a href="https://eel.is/c++draft/dcl.ref">riferimenti C++</a>,
+            <a href="https://eel.is/c++draft/expr.unary.op">operatori di indirizzo e indirezione</a>,
+            <a href="https://clang.llvm.org/docs/IntroductionToTheClangAST.html">dichiarazioni e usi dei nomi in Clang</a>,
+            <a href="https://learn.microsoft.com/en-us/windows/win32/memory/virtual-address-space">spazio di indirizzi virtuali in Windows</a>.
+          </p>
+        </div>
+      </details>
+    </section>
+
+    <aside class="next-step"><strong>Prossimo passo:</strong> ora che distinguiamo tipo, nome e oggetto, inizializziamo ogni record in uno stato noto.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez2_2.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez2_3.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

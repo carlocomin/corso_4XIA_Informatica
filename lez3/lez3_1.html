@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:6.25%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:5.56%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -33,7 +33,9 @@
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
     <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
     <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
     <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
@@ -43,7 +45,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 1/16</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 1/18</p>
     <h1>Dal dato al file</h1>
     <p class="lead">Un programma termina, ma alcuni dati devono restare: il file è il ponte tra memoria di lavoro e persistenza.</p>
   </header>
@@ -58,6 +60,25 @@
       <p>Nella Lezione 2 una <code>struct Studente</code> teneva insieme matricola, nome e media. Finché il programma è in esecuzione il record vive in memoria; quando il programma termina, quei dati scompaiono se non vengono salvati.</p>
       <p><strong>Idea chiave:</strong> un file conserva una sequenza di byte; il <em>formato</em> stabilisce come trasformare quei byte di nuovo in dati comprensibili.</p>
     </section>
+
+    <section class="three-col" aria-label="Percorso di apprendimento">
+      <article class="topic-card">
+        <span class="badge">Essenziale</span>
+        <h2>Aprire, scrivere, rileggere</h2>
+        <p>Partiamo dal testo: un valore, una riga, poi un array di studenti. Controlliamo sempre se apertura e operazioni riescono.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge">Guidato</span>
+        <h2>Capire il binario</h2>
+        <p>Seguiamo il viaggio di un numero dalla memoria al file e ritorno. Poi salviamo più valori, mantenendo uguali ordine e quantità in scrittura e lettura.</p>
+      </article>
+      <article class="topic-card">
+        <span class="badge extra">Facoltativo</span>
+        <h2>Andare oltre</h2>
+        <p>Accesso diretto con seek, dettagli di portabilità e archivio binario con stringhe. Si affrontano dopo avere consolidato le operazioni di base.</p>
+      </article>
+    </section>
+    <div class="callout"><strong>Come lavorare:</strong> leggi un blocco di codice alla volta, prevedi il risultato, eseguilo e cambia un solo dato. Non serve imparare programmi lunghi a memoria: devi saper spiegare da dove arriva il dato, dove va e come controlli l’operazione. Le slide in C servono a confrontare le stesse idee con un’altra libreria.</div>
 
     <section class="two-col">
       <article class="topic-card">

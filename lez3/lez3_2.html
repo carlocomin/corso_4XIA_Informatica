@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:12.50%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:11.11%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -33,7 +33,9 @@
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
     <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
     <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
     <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
@@ -43,7 +45,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 2/16</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 2/18</p>
     <h1>Testo o binario?</h1>
     <p class="lead">La scelta non dipende dall’estensione del nome: dipende dal modo in cui decidiamo di interpretare i byte.</p>
   </header>
@@ -71,11 +73,11 @@
       </article>
       <article class="topic-card">
         <span class="badge extra">Binario</span>
-        <h2><code>studenti.bin</code></h2>
-        <div class="byte-strip" aria-label="Esempio concettuale di byte">
-          <span>53</span><span>54</span><span>55</span><span>31</span><span>02</span><span>00</span>
+        <h2><code>dati.bin</code></h2>
+        <div class="byte-strip" aria-label="Primi quattro byte esadecimali del formato ARRB">
+          <span>41</span><span>52</span><span>52</span><span>42</span>
         </div>
-        <p>Non è pensato per la lettura a occhio; struttura e significato dipendono dal formato.</p>
+        <p>Qui vediamo soltanto i primi quattro byte, in esadecimale: codificano l’identificatore ASCII <code>ARRB</code>. Struttura e significato del resto dipendono dal formato, che definiremo nella slide 12.</p>
       </article>
     </section>
 

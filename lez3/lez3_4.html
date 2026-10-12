@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:25.00%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:22.22%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -33,7 +33,9 @@
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
     <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
     <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
     <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
@@ -43,7 +45,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 4/16</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 4/18</p>
     <h1>Scrivere testo in C++</h1>
     <p class="lead">Uno stream di output usa gli stessi operatori di <code>std::cout</code>, ma invia i caratteri a un file.</p>
   </header>
@@ -55,7 +57,7 @@
 
     <section class="concept-card">
       <h2>Dai valori ai caratteri</h2>
-      <p><code>std::ofstream</code> converte i valori in testo e li scrive in sequenza.</p>
+      <p>L’operatore <code>&lt;&lt;</code> applicato a uno stream come <code>std::ofstream</code> converte i valori in testo e li scrive in sequenza. Il metodo <code>write</code>, che incontreremo nel binario, trasferisce invece byte senza formattare i numeri.</p>
       <p><strong>Idea chiave:</strong> il programma deve decidere esplicitamente separatori e terminatori di riga, perché saranno il contratto della lettura.</p>
     </section>
 
@@ -108,7 +110,7 @@ int main() {
     <section class="checkpoint">
       <div class="checkpoint-prompt">
         <span class="checkpoint-label">Checkpoint</span>
-        <h2>Quanti caratteri di fine riga vengono scritti?</h2>
+        <h2>Quante righe scriviamo? Ogni <code>\n</code> occupa sempre un byte nel file?</h2>
       </div>
       <details class="answer-reveal">
         <summary>
@@ -116,7 +118,7 @@ int main() {
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p>Tre: ogni istruzione termina con <code>\n</code>. Senza separatori, i record finirebbero attaccati e sarebbero più difficili da rileggere.</p>
+        <p>Tre righe: ogni istruzione termina con <code>\n</code>. In modalità testo, su Windows il fine riga viene normalmente scritto come due byte, <code>\r\n</code>; su altri sistemi può essere un solo byte. Non confondiamo quindi il terminatore nel codice con la sua rappresentazione nel file.</p>
       </div>
       </details>
     </section>

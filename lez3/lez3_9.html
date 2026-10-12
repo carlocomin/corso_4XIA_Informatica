@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:56.25%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:50.00%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -33,7 +33,9 @@
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
     <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
     <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
     <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
@@ -43,7 +45,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 9/16</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 9/18</p>
     <h1>Salvare una struct in testo</h1>
     <p class="lead">Serializzare significa trasformare un record in una rappresentazione che può essere scritta e ricostruita.</p>
   </header>
@@ -72,6 +74,7 @@
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;iomanip&gt;
 #include &lt;limits&gt;
+#include &lt;locale&gt;
 #include &lt;ostream&gt;
 #include &lt;string&gt;
 
@@ -83,6 +86,7 @@ struct Studente {
 
 bool scriviStudente(std::ostream&amp; out,
                      const Studente&amp; s) {
+    out.imbue(std::locale::classic());
     out &lt;&lt; s.matricola &lt;&lt; ';'
         &lt;&lt; s.nome &lt;&lt; ';'
         &lt;&lt; std::setprecision(
@@ -112,7 +116,8 @@ int main() {
       </article>
       <article class="topic-card">
         <h2>Contratto semplificato</h2>
-        <p>Il nome può contenere spazi, ma non <code>;</code> né un ritorno a capo. La media usa il punto decimale e <code>max_digits10</code> evita di perdere precisione nel round-trip di un <code>double</code>.</p>
+        <p><strong>Precondizione:</strong> il chiamante fornisce un record valido: matricola positiva, nome non vuoto senza <code>;</code> né fine riga, media da 0 a 10. Nel laboratorio controlleremo questi vincoli prima di aprire il file.</p>
+        <p><code>locale::classic()</code> fissa il punto decimale. <code>setprecision(max_digits10)</code> conserva abbastanza cifre significative da ricostruire lo stesso <code>double</code> dopo la lettura: non significa scrivere sempre un numero fisso di cifre dopo il punto.</p>
       </article>
     </section>
 

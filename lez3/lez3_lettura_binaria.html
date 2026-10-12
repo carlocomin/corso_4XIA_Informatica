@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L3.13bis · Leggere e controllare un file binario</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:83.33%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+  <h2>Lezione 3 - File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
+    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
+    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html" class="active" aria-current="page">L3.13bis - Leggere e controllare un file binario</a></li>
+    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
+    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Ripasso guidato · File I/O · 15/18</p>
+    <h1>Leggere e controllare un file binario</h1>
+    <p class="lead">Prima ricostruisci il contratto; poi accetta i dati soltanto se il file lo rispetta interamente.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_13.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_14.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+<section class="concept-card"><h2>Non fidarti dei dati appena letti</h2><p><strong>Idea chiave:</strong> verifica prima la riuscita dell’operazione, poi il significato dei campi. Solo dopo questi controlli usa n per determinare quanti byte leggere nell’array.</p></section>
+<section class="topic-card"><h2>I controlli hanno un ordine</h2><ol class="steps"><li>Apertura riuscita e header letto completamente.</li><li>Magic e versione riconosciute; <code>n &lt;= MAX</code>.</li><li>Ricevuti tutti gli <code>n × 4</code> byte dei valori.</li><li>Nessun byte extra e nessun errore di I/O.</li><li>Solo ora: elaborazione dei valori.</li></ol></section>
+<section class="topic-card"><h2>Prima segui un caso riuscito: 10, 20, 30</h2><ol class="steps"><li><strong>Header:</strong> ci aspettiamo <code>ARRB</code>, versione 1 e n = 3. <code>memcmp</code> confronta i quattro byte dell’etichetta.</li><li><strong>Array:</strong> chiediamo <code>3 × 4 = 12</code> byte, non tutta la capacità dell’array.</li><li><strong>Risultato:</strong> se il file è completo e non contiene dati extra, stampiamo <code>10 20 30</code>.</li></ol><p>Segui prima questo percorso. Poi proveremo i controlli su un file sbagliato, un errore alla volta.</p></section>
+<figure class="code-example"><figcaption>C++17 · programma lettore separato; eseguirlo dopo lo scrittore</figcaption><pre><code class="language-cpp">#include &lt;climits&gt;
+#include &lt;cstdint&gt;
+#include &lt;cstring&gt;
+#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+
+static_assert(CHAR_BIT == 8, "Servono byte da 8 bit");
+
+int main() {
+    constexpr std::uint32_t MAX = 10;
+    std::ifstream in("dati.bin", std::ios::binary);
+    if (!in) return 1;
+
+    // 1. Leggiamo e convalidiamo l'header.
+    char magic[4]{};
+    std::uint32_t versione = 0;
+    std::uint32_t n = 0;
+    in.read(magic, sizeof magic);
+    in.read(reinterpret_cast&lt;char*&gt;(&amp;versione), sizeof versione);
+    in.read(reinterpret_cast&lt;char*&gt;(&amp;n), sizeof n);
+    if (!in) {
+        std::cerr &lt;&lt; "Header incompleto o errore di lettura\n";
+        return 2;
+    }
+    if (std::memcmp(magic, "ARRB", 4) != 0
+        || versione != 1 || n &gt; MAX) {
+        std::cerr &lt;&lt; "Formato, versione o conteggio non validi\n";
+        return 3;
+    }
+
+    // 2. Leggiamo i valori solo dopo avere controllato n.
+    std::int32_t valori[MAX]{};
+    const auto richiesti =
+        static_cast&lt;std::streamsize&gt;(n * sizeof valori[0]);
+    in.read(reinterpret_cast&lt;char*&gt;(valori), richiesti);
+    if (!in) {
+        std::cerr &lt;&lt; "Blocco incompleto o errore: "
+                  &lt;&lt; in.gcount() &lt;&lt; " byte su " &lt;&lt; richiesti &lt;&lt; '\n';
+        return 4;
+    }
+
+    // 3. Verifichiamo che non ci siano dati aggiuntivi.
+    char extra = 0;
+    if (in.get(extra)) {
+        std::cerr &lt;&lt; "Byte aggiuntivi non previsti dal formato\n";
+        return 5;
+    }
+    if (in.bad() || !in.eof()) return 6;
+
+    // 4. Elaboriamo solo dopo tutti i controlli.
+    for (std::uint32_t i = 0; i &lt; n; ++i)
+        std::cout &lt;&lt; valori[i] &lt;&lt; ' ';
+    std::cout &lt;&lt; '\n';
+}</code></pre></figure>
+<section class="topic-card"><h2>Fine file attesa o file troncato?</h2><div class="two-col"><article><h3>Mancano dati necessari: errore</h3><p>Servono 12 byte di valori e ne arrivano soltanto 10. Il file è <strong>troncato</strong>: <code>read</code> fallisce e non elaboriamo l’array incompleto.</p></article><article><h3>Abbiamo tutto: fine corretta</h3><p>Abbiamo letto header e n valori. Cerchiamo un altro byte con <code>get(extra)</code>: se non c’è perché il file è finito, va bene. Se c’è, il formato non è rispettato.</p></article></div><p><strong>Da ricordare:</strong> “mancano byte necessari” è un errore; “non ci sono byte dopo il contenuto previsto” è la fine corretta.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra dettagli dei controlli</span><span class="when-open">Nascondi dettagli</span></summary><div class="answer"><p><code>gcount()</code> indica quanti byte ha trasferito l’ultima lettura non formattata: aiuta a spiegare perché il blocco è incompleto.</p><p>Leggere esattamente l’ultimo byte non obbliga lo stream a segnalare subito EOF. La lettura di prova lo distingue da dati extra. Dopo questa prova controlliamo <code>bad()</code> e <code>eof()</code>, non soltanto <code>!in</code>, perché il tentativo a EOF è atteso.</p></div></details></section>
+<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>L’header dichiara 3 valori, ma l’ultimo ha soltanto 2 byte: possiamo usare i primi due valori?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>In questo contratto no: il file è incompleto e si rifiuta l’intero caricamento. Un trasferimento parziale può anche avere modificato una parte dell’array: il codice non lo elabora dopo il fallimento.</p></div></details></section>
+<section class="exercise-card"><span class="exercise-label">Esercizio 13bis</span><h2>Collauda senza ricreare il file</h2><p><strong>Base:</strong> esegui lo scrittore e poi il lettore; verifica <code>10 20 30</code>. <strong>Controllo guidato con il docente:</strong> crea una copia del file corretto di 24 byte e modifica una sola cosa per volta con un editor esadecimale. Prova separatamente: togli l’ultimo byte; aggiungi un byte; cambia la magic; usa un file con header valido e n = 0. Esegui soltanto il lettore dopo ogni modifica, non lo scrittore.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Nel caso base si stampano i tre valori salvati: <code>10 20 30</code>. Per i test guidati:</p><ul><li>23 byte: blocco incompleto, <code>gcount() = 11</code> sui 12 richiesti.</li><li>25 byte: errore per byte aggiuntivi.</li><li>Magic diversa: formato rifiutato prima dell’array.</li><li>n = 0: valido soltanto se il file ha i soli 12 byte di header; nessun valore stampato.</li></ul><p>Se eseguissi di nuovo lo scrittore, cancelleresti la modifica da collaudare.</p></div></details></section>
+<aside class="next-step"><strong>Prossimo passo.</strong> Leggiamo lo stesso file con la libreria C, confrontando byte ed elementi.</aside>
+
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_13.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_14.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

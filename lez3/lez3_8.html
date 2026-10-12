@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:50.00%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:44.44%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -33,7 +33,9 @@
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
     <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_13.html">L3.13 - Binario con gli stream C++</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
     <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
     <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
@@ -43,7 +45,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 8/16</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 8/18</p>
     <h1>La stessa idea in C</h1>
     <p class="lead">Cambiano tipi e funzioni, non il metodo: aprire, controllare i valori restituiti, elaborare e chiudere.</p>
   </header>
@@ -111,7 +113,7 @@ int main(void) {
       </article>
     </section>
 
-    <div class="callout"><strong>Per leggere righe:</strong> <code>fgets(buffer, dimensione, file)</code> restituisce il buffer in caso di successo e <code>NULL</code> a fine file o in caso di errore.</div>
+    <div class="callout"><strong>Per leggere righe:</strong> <code>fgets(buffer, dimensione, file)</code> restituisce il buffer in caso di successo e <code>NULL</code> a fine file o in caso di errore. Legge al massimo <code>dimensione - 1</code> byte e conserva il <code>\n</code> se lo incontra: se una riga supera il buffer, occorrono altre letture per completarla.</div>
 
     <section class="checkpoint">
       <div class="checkpoint-prompt">
