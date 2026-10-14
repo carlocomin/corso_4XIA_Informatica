@@ -64,21 +64,23 @@
 #include &lt;iostream&gt;
 #include &lt;vector&gt;
 
-int main() {
-    std::size_t R = 3;
-    std::size_t C = 4;
-    std::vector&lt;int&gt; m(R * C, 0);
+using namespace std;
 
-    for (std::size_t r = 0; r &lt; R; ++r) {
-        for (std::size_t c = 0; c &lt; C; ++c) {
+int main() {
+    size_t R = 3;
+    size_t C = 4;
+    vector&lt;int&gt; m(R * C, 0);
+
+    for (size_t r = 0; r &lt; R; ++r) {
+        for (size_t c = 0; c &lt; C; ++c) {
             m[r * C + c] = static_cast&lt;int&gt;(r + c);
         }
     }
 
-    std::cout &lt;&lt; m[2 * C + 1] &lt;&lt; '\n';  // cella (2,1)
+    cout &lt;&lt; m[2 * C + 1] &lt;&lt; '\n';  // cella (2,1)
 }</code></pre>
       </figure>
-      <p><code>std::vector</code> gestisce automaticamente la memoria. Non servono <code>new[]</code> e <code>delete[]</code>.</p>
+      <p><code>vector</code> gestisce automaticamente la memoria. Non servono <code>new[]</code> e <code>delete[]</code>.</p>
     </section>
 
     <section class="checkpoint">

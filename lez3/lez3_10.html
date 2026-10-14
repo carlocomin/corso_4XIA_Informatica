@@ -67,9 +67,11 @@
 #include &lt;locale&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
     int matricola;
-    std::string nome;
+    string nome;
     double media;
 };
 
@@ -80,16 +82,16 @@ bool valido(const Studente&amp; s) {
         &amp;&amp; s.media &lt;= 10.0;
 }
 
-bool parseStudente(const std::string&amp; riga,
+bool parseStudente(const string&amp; riga,
                    Studente&amp; risultato) {
-    std::istringstream in(riga);
-    in.imbue(std::locale::classic());
+    istringstream in(riga);
+    in.imbue(locale::classic());
     Studente temp{};
     char separatore;
 
     if (!(in &gt;&gt; temp.matricola)) return false;
     if (!in.get(separatore) || separatore != ';') return false;
-    if (!std::getline(in, temp.nome, ';')) return false;
+    if (!getline(in, temp.nome, ';')) return false;
     if (!(in &gt;&gt; temp.media)) return false;
 
     char extra;
@@ -105,7 +107,7 @@ int main() {
     if (!parseStudente("1001;Ada Lovelace;8.5", s))
         return 1;
 
-    std::cout &lt;&lt; s.nome &lt;&lt; ": " &lt;&lt; s.media &lt;&lt; '\n';
+    cout &lt;&lt; s.nome &lt;&lt; ": " &lt;&lt; s.media &lt;&lt; '\n';
 }</code></pre>
     </figure>
 

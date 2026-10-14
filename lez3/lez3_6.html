@@ -47,7 +47,7 @@
   <header class="lesson-hero">
     <p class="eyebrow">Ripasso guidato · File I/O · 6/18</p>
     <h1>Leggere righe in C++</h1>
-    <p class="lead"><code>std::getline</code> conserva gli spazi interni e usa il fine riga come confine logico.</p>
+    <p class="lead"><code>getline</code> conserva gli spazi interni e usa il fine riga come confine logico.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_5.html">&#8592; Precedente</a>
@@ -67,21 +67,23 @@
 #include &lt;iostream&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 int main() {
-    std::ifstream in("note.txt");
+    ifstream in("note.txt");
     if (!in) return 1;
 
-    std::string riga;
+    string riga;
     int numero = 0;
 
-    while (std::getline(in, riga)) {
+    while (getline(in, riga)) {
         ++numero;
         if (!riga.empty())
-            std::cout &lt;&lt; numero &lt;&lt; ": " &lt;&lt; riga &lt;&lt; '\n';
+            cout &lt;&lt; numero &lt;&lt; ": " &lt;&lt; riga &lt;&lt; '\n';
     }
 
     if (in.bad() || !in.eof()) {
-        std::cerr &lt;&lt; "Errore durante la lettura\n";
+        cerr &lt;&lt; "Errore durante la lettura\n";
         return 2;
     }
 }</code></pre>
@@ -102,10 +104,10 @@ int main() {
         <figure class="code-example">
           <figcaption>C++17 · frammento contestuale</figcaption>
 <pre><code class="language-cpp">in.ignore(
-    std::numeric_limits&lt;std::streamsize&gt;::max(),
+    numeric_limits&lt;streamsize&gt;::max(),
     '\n'
 );
-std::getline(in, descrizione);</code></pre>
+getline(in, descrizione);</code></pre>
         </figure>
       </article>
     </section>
@@ -123,7 +125,7 @@ std::getline(in, descrizione);</code></pre>
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p><code>std::getline</code>, se l’intero nome occupa la riga o se specifichiamo un delimitatore diverso per il campo.</p>
+        <p><code>getline</code>, se l’intero nome occupa la riga o se specifichiamo un delimitatore diverso per il campo.</p>
       </div>
       </details>
     </section>

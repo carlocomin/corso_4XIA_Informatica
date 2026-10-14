@@ -67,6 +67,8 @@
       <figcaption>C++17 · indice del minimo</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 int main() {
     int a[]{7, -4, 2, -4, 9};
     constexpr int N = 5;
@@ -78,7 +80,7 @@ int main() {
             indiceMinimo = i;
     }
 
-    std::cout &lt;&lt; "Minimo: " &lt;&lt; a[indiceMinimo]
+    cout &lt;&lt; "Minimo: " &lt;&lt; a[indiceMinimo]
               &lt;&lt; ", indice: " &lt;&lt; indiceMinimo
               &lt;&lt; '\n';
 }</code></pre>

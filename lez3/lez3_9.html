@@ -78,25 +78,27 @@
 #include &lt;ostream&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
     int matricola;
-    std::string nome;
+    string nome;
     double media;
 };
 
-bool scriviStudente(std::ostream&amp; out,
+bool scriviStudente(ostream&amp; out,
                      const Studente&amp; s) {
-    out.imbue(std::locale::classic());
+    out.imbue(locale::classic());
     out &lt;&lt; s.matricola &lt;&lt; ';'
         &lt;&lt; s.nome &lt;&lt; ';'
-        &lt;&lt; std::setprecision(
-               std::numeric_limits&lt;double&gt;::max_digits10)
+        &lt;&lt; setprecision(
+               numeric_limits&lt;double&gt;::max_digits10)
         &lt;&lt; s.media &lt;&lt; '\n';
     return static_cast&lt;bool&gt;(out);
 }
 
 int main() {
-    std::ofstream out("studenti.txt");
+    ofstream out("studenti.txt");
     if (!out) return 1;
 
     Studente ada{1001, "Ada Lovelace", 8.5};

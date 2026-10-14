@@ -79,19 +79,23 @@
 
     <div class="callout"><strong>Relazione da ricordare:</strong> ogni variabile <code>constexpr</code> è <code>const</code>; non ogni variabile <code>const</code> è una costante valutabile a compile time.</div>
 
+    <div class="callout"><strong>Convenzione negli esempi C++:</strong> dopo gli <code>#include</code> scriviamo <code>using namespace std;</code>. Possiamo così usare <code>cin</code>, <code>cout</code>, <code>string</code> e gli altri nomi della libreria standard senza prefisso. Gli <code>#include</code> restano necessari. Nei frammenti brevi si assume che siano già presenti gli include necessari e questa direttiva nel programma che li contiene.</div>
+
     <figure class="code-example">
       <figcaption>C++17 · il momento in cui il valore diventa noto</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 int main() {
     int datoLetto = 0;
-    if (!(std::cin &gt;&gt; datoLetto))
+    if (!(cin &gt;&gt; datoLetto))
         return 1;
 
     const int copia = datoLetto;   // noto solo a runtime
     constexpr int GIORNI = 7;      // noto a compile time
 
-    std::cout &lt;&lt; copia &lt;&lt; ' ' &lt;&lt; GIORNI &lt;&lt; '\n';
+    cout &lt;&lt; copia &lt;&lt; ' ' &lt;&lt; GIORNI &lt;&lt; '\n';
 
     // copia = 10;                 // errore: copia è const
     // constexpr int x = datoLetto; // errore: non è una costante

@@ -67,6 +67,8 @@
       <figcaption>C++17 · lettura e modifica dell’array</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 int somma(const int a[], int n) {
     int risultato = 0;
 
@@ -85,9 +87,9 @@ int main() {
     int valori[]{2, 4, 6, 8};
     constexpr int N = 4;
 
-    std::cout &lt;&lt; somma(valori, N) &lt;&lt; '\n';
+    cout &lt;&lt; somma(valori, N) &lt;&lt; '\n';
     raddoppia(valori, N);
-    std::cout &lt;&lt; valori[0] &lt;&lt; '\n';
+    cout &lt;&lt; valori[0] &lt;&lt; '\n';
 }</code></pre>
     </figure>
 

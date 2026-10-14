@@ -76,9 +76,11 @@
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
     int matricola;
-    std::string nome;
+    string nome;
     double media;
 };
 
@@ -120,7 +122,7 @@ int main() {
     };
 
     stampa(classe);
-    std::cout &lt;&lt; "Media: " &lt;&lt; mediaClasse(classe) &lt;&lt; '\n';
+    cout &lt;&lt; "Media: " &lt;&lt; mediaClasse(classe) &lt;&lt; '\n';
 }</code></pre>
       </figure>
     </section>
@@ -168,9 +170,11 @@ int main() {
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
     int matricola;
-    std::string nome;
+    string nome;
     double media;
 };
 
@@ -187,7 +191,7 @@ bool valido(const Studente&amp; s) {
 void stampa(const Classe&amp; classe) {
     for (const Studente&amp; s : classe) {
         if (valido(s))
-            std::cout &lt;&lt; s.matricola &lt;&lt; '\t'
+            cout &lt;&lt; s.matricola &lt;&lt; '\t'
                       &lt;&lt; s.nome &lt;&lt; '\t' &lt;&lt; s.media &lt;&lt; '\n';
     }
 }
@@ -233,13 +237,13 @@ int main() {
     };
 
     stampa(classe);
-    std::cout &lt;&lt; "Media: " &lt;&lt; mediaClasse(classe) &lt;&lt; '\n';
-    std::cout &lt;&lt; "Indice matricola 1002: "
+    cout &lt;&lt; "Media: " &lt;&lt; mediaClasse(classe) &lt;&lt; '\n';
+    cout &lt;&lt; "Indice matricola 1002: "
               &lt;&lt; cercaMatricola(classe, 1002) &lt;&lt; '\n';
 
     int migliore = indiceMigliore(classe);
     if (migliore != -1)
-        std::cout &lt;&lt; "Migliore: " &lt;&lt; classe[migliore].nome
+        cout &lt;&lt; "Migliore: " &lt;&lt; classe[migliore].nome
                   &lt;&lt; " (" &lt;&lt; classe[migliore].media &lt;&lt; ")\n";
 }</code></pre>
           </figure>
@@ -269,7 +273,7 @@ int main() {
     <section class="exercise-card">
       <span class="exercise-label">Sfida facoltativa</span>
       <h2>Archivio dinamico e ordinato</h2>
-      <p>Trasforma l’array in <code>std::vector&lt;Studente&gt;</code>, aggiungi l’inserimento da input e ordina gli studenti per media decrescente con matricola crescente come spareggio.</p>
+      <p>Trasforma l’array in <code>vector&lt;Studente&gt;</code>, aggiungi l’inserimento da input e ordina gli studenti per media decrescente con matricola crescente come spareggio.</p>
       <details class="answer-reveal solution-reveal">
         <summary>
           <span class="when-closed">Mostra soluzione</span>
@@ -281,22 +285,24 @@ int main() {
 <pre><code class="language-cpp">#include &lt;algorithm&gt;
 #include &lt;vector&gt;
 
-bool aggiungiDaInput(std::vector&lt;Studente&gt;&amp; archivio) {
+using namespace std;
+
+bool aggiungiDaInput(vector&lt;Studente&gt;&amp; archivio) {
     Studente candidato{};
 
-    if (!(std::cin &gt;&gt; candidato.matricola))
+    if (!(cin &gt;&gt; candidato.matricola))
         return false;
-    if (!std::getline(std::cin &gt;&gt; std::ws, candidato.nome))
+    if (!getline(cin &gt;&gt; ws, candidato.nome))
         return false;
-    if (!(std::cin &gt;&gt; candidato.media) || !valido(candidato))
+    if (!(cin &gt;&gt; candidato.media) || !valido(candidato))
         return false;
 
     archivio.push_back(candidato);
     return true;
 }
 
-void ordina(std::vector&lt;Studente&gt;&amp; archivio) {
-    std::sort(archivio.begin(), archivio.end(),
+void ordina(vector&lt;Studente&gt;&amp; archivio) {
+    sort(archivio.begin(), archivio.end(),
         [](const Studente&amp; a, const Studente&amp; b) {
             if (a.media != b.media)
                 return a.media &gt; b.media;

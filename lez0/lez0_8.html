@@ -67,6 +67,8 @@
       <figcaption>C++17 · prima occorrenza</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 int main() {
     int a[]{6, 3, 9, 3, 5};
     constexpr int N = 5;
@@ -81,9 +83,9 @@ int main() {
     }
 
     if (posizione == -1)
-        std::cout &lt;&lt; "Non trovato\n";
+        cout &lt;&lt; "Non trovato\n";
     else
-        std::cout &lt;&lt; "Prima posizione: "
+        cout &lt;&lt; "Prima posizione: "
                   &lt;&lt; posizione &lt;&lt; '\n';
 }</code></pre>
     </figure>

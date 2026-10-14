@@ -67,6 +67,8 @@
       <figcaption>C++17 · due riferimenti modificabili</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 void ordinaDue(int&amp; a, int&amp; b) {
     if (a &gt; b) {
         int temp = a;
@@ -81,7 +83,7 @@ int main() {
 
     ordinaDue(x, y);
 
-    std::cout &lt;&lt; x &lt;&lt; ' ' &lt;&lt; y &lt;&lt; '\n';
+    cout &lt;&lt; x &lt;&lt; ' ' &lt;&lt; y &lt;&lt; '\n';
 }</code></pre>
     </figure>
 
@@ -95,7 +97,7 @@ int main() {
         <figure class="code-example">
           <figcaption>C++17 · frammento contestuale</figcaption>
 <pre><code class="language-cpp">void stampa(
-    const std::string&amp; testo
+    const string&amp; testo
 );</code></pre>
         </figure>
         <p>Evita la copia di un oggetto e impedisce modifiche.</p>

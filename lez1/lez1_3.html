@@ -63,6 +63,8 @@
         <figcaption>C++17 · dichiarazione e accesso</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 int main() {
     constexpr int R = 2;
     constexpr int C = 3;
@@ -72,7 +74,7 @@ int main() {
         {6, 9, 8}
     };
 
-    std::cout &lt;&lt; voti[1][1] &lt;&lt; '\n';  // stampa 9
+    cout &lt;&lt; voti[1][1] &lt;&lt; '\n';  // stampa 9
 }</code></pre>
       </figure>
       <p>Le parentesi graffe interne rappresentano le righe. Il compilatore controlla che ogni accesso usi un tipo intero, ma <strong>non impedisce automaticamente</strong> di superare i limiti: la correttezza degli indici resta responsabilità del programmatore.</p>

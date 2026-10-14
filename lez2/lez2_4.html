@@ -65,34 +65,36 @@
 #include &lt;limits&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
     int matricola;
-    std::string nome;
+    string nome;
     double media;
 };
 
 int main() {
     Studente s{};
 
-    if (!(std::cin &gt;&gt; s.matricola)) {
-        std::cerr &lt;&lt; "Matricola non valida\n";
+    if (!(cin &gt;&gt; s.matricola)) {
+        cerr &lt;&lt; "Matricola non valida\n";
         return 1;
     }
 
-    std::cin.ignore(
-        std::numeric_limits&lt;std::streamsize&gt;::max(), '\n'
+    cin.ignore(
+        numeric_limits&lt;streamsize&gt;::max(), '\n'
     );
-    if (!std::getline(std::cin, s.nome) || s.nome.empty()) {
-        std::cerr &lt;&lt; "Nome non valido\n";
+    if (!getline(cin, s.nome) || s.nome.empty()) {
+        cerr &lt;&lt; "Nome non valido\n";
         return 1;
     }
 
-    if (!(std::cin &gt;&gt; s.media) || s.media &lt; 0 || s.media &gt; 10) {
-        std::cerr &lt;&lt; "Media non valida\n";
+    if (!(cin &gt;&gt; s.media) || s.media &lt; 0 || s.media &gt; 10) {
+        cerr &lt;&lt; "Media non valida\n";
         return 1;
     }
 
-    std::cout &lt;&lt; s.matricola &lt;&lt; " | "
+    cout &lt;&lt; s.matricola &lt;&lt; " | "
               &lt;&lt; s.nome &lt;&lt; " | " &lt;&lt; s.media &lt;&lt; '\n';
 }</code></pre>
       </figure>
@@ -120,7 +122,7 @@ int main() {
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p>Se chiami subito <code>getline</code> dopo <code>std::cin &gt;&gt; s.matricola</code>, <code>getline</code> consuma il <code>'\n'</code> già presente. Serve prima <code>ignore</code>, come nell’esempio.</p>
+        <p>Se chiami subito <code>getline</code> dopo <code>cin &gt;&gt; s.matricola</code>, <code>getline</code> consuma il <code>'\n'</code> già presente. Serve prima <code>ignore</code>, come nell’esempio.</p>
       </div>
       </details>
     </section>

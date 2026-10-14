@@ -64,14 +64,16 @@
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
     int matricola;
-    std::string nome;
+    string nome;
     double media;
 };
 
 void stampa(const Studente&amp; s) {
-    std::cout &lt;&lt; s.matricola &lt;&lt; " | "
+    cout &lt;&lt; s.matricola &lt;&lt; " | "
               &lt;&lt; s.nome &lt;&lt; " | " &lt;&lt; s.media &lt;&lt; '\n';
 }
 

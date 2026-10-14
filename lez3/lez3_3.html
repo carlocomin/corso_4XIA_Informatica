@@ -72,10 +72,10 @@
       <article class="topic-card">
         <h2>Modalità essenziali</h2>
         <ul class="compact-list">
-          <li><code>std::ifstream</code>: lettura;</li>
-          <li><code>std::ofstream</code>: scrittura, con troncamento predefinito;</li>
-          <li><code>std::ios::app</code>: aggiunta in fondo;</li>
-          <li><code>std::ios::binary</code>: modalità binaria.</li>
+          <li><code>ifstream</code>: lettura;</li>
+          <li><code>ofstream</code>: scrittura, con troncamento predefinito;</li>
+          <li><code>ios::app</code>: aggiunta in fondo;</li>
+          <li><code>ios::binary</code>: modalità binaria.</li>
         </ul>
       </article>
       <article class="topic-card">
@@ -90,11 +90,13 @@
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;iostream&gt;
 
+using namespace std;
+
 int main() {
-    std::ifstream in("dati.txt");
+    ifstream in("dati.txt");
 
     if (!in) {
-        std::cerr &lt;&lt; "Impossibile aprire dati.txt\n";
+        cerr &lt;&lt; "Impossibile aprire dati.txt\n";
         return 1;
     }
 

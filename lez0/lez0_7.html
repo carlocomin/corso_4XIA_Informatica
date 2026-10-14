@@ -93,6 +93,8 @@
       <figcaption>C++17 · somma, media e conteggio</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 int main() {
     int a[]{4, -2, 7, 0, 3};
     constexpr int N = 5;
@@ -109,7 +111,7 @@ int main() {
 
     double media = static_cast&lt;double&gt;(somma) / N;
 
-    std::cout &lt;&lt; "Somma: " &lt;&lt; somma &lt;&lt; '\n'
+    cout &lt;&lt; "Somma: " &lt;&lt; somma &lt;&lt; '\n'
               &lt;&lt; "Media: " &lt;&lt; media &lt;&lt; '\n'
               &lt;&lt; "Positivi: " &lt;&lt; positivi &lt;&lt; '\n';
 }</code></pre>

@@ -64,16 +64,18 @@
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
     int matricola;
-    std::string nome;
+    string nome;
     double media;
 };
 
 int main() {
     Studente s{1001, "Ada", 9.4};
-    std::cout &lt;&lt; s.media &lt;&lt; '\n'; // valore di un campo
-    std::cout &lt;&lt; &amp;s &lt;&lt; '\n';      // indirizzo dell’oggetto
+    cout &lt;&lt; s.media &lt;&lt; '\n'; // valore di un campo
+    cout &lt;&lt; &amp;s &lt;&lt; '\n';      // indirizzo dell’oggetto
 }</code></pre>
       </figure>
       <p>La prima stampa produce <code>9.4</code>. La seconda mostra un indirizzo, che può cambiare tra esecuzioni: <strong>non dobbiamo prevederne il valore</strong>.</p>
@@ -161,7 +163,7 @@ int main() {
           <h3>1. Ricavare l’indirizzo: <code>&amp;s</code></h3>
           <figure class="code-example" data-example="indirizzo">
             <figcaption>C++17 · un’espressione</figcaption>
-<pre><code class="language-cpp">std::cout &lt;&lt; &amp;s &lt;&lt; '\n';</code></pre>
+<pre><code class="language-cpp">cout &lt;&lt; &amp;s &lt;&lt; '\n';</code></pre>
           </figure>
           <p>Qui <code>&amp;</code> è l’<strong>operatore che ricava l’indirizzo</strong>. L’espressione <code>&amp;s</code> produce un puntatore di tipo <code>Studente*</code> all’oggetto <code>s</code>.</p>
           <p>Da sola, questa espressione non dichiara una variabile puntatore e non crea un riferimento C++.</p>
@@ -206,7 +208,7 @@ Studente* p = &amp;s;
 Studente copia = s;
 
 alias.media = 8.0;
-std::cout &lt;&lt; s.media &lt;&lt; " " &lt;&lt; copia.media &lt;&lt; '\n';</code></pre>
+cout &lt;&lt; s.media &lt;&lt; " " &lt;&lt; copia.media &lt;&lt; '\n';</code></pre>
       </figure>
       <ol>
         <li>Quanti oggetti di tipo <code>Studente</code> esistono dopo queste dichiarazioni? <code>p</code> è un terzo studente?</li>
@@ -239,7 +241,7 @@ std::cout &lt;&lt; s.media &lt;&lt; " " &lt;&lt; copia.media &lt;&lt; '\n';</cod
           <ul class="compact-list">
             <li><strong>Symbol table:</strong> è un modello delle informazioni interne del compilatore, che può organizzarle in più strutture. Le eventuali tabelle di simboli dell’eseguibile e le informazioni di debug hanno altri scopi: non sono l’oggetto <code>s</code>.</li>
             <li><strong>Memoria:</strong> il C++ definisce il comportamento degli oggetti, non impone questo specifico schema di memoria virtuale. Il disegno segue il modello dei comuni sistemi operativi; le ottimizzazioni possono cambiare la rappresentazione concreta rispettando il comportamento richiesto.</li>
-            <li><strong>Campi:</strong> possono esserci byte di padding. <code>nome</code> è un sotto-oggetto <code>std::string</code>: mostrare "Ada" non significa che la sua rappresentazione interna sia costituita soltanto da quei caratteri. Riprenderemo il layout in L2.14.</li>
+            <li><strong>Campi:</strong> possono esserci byte di padding. <code>nome</code> è un sotto-oggetto <code>string</code>: mostrare "Ada" non significa che la sua rappresentazione interna sia costituita soltanto da quei caratteri. Riprenderemo il layout in L2.14.</li>
             <li><strong>Riferimenti:</strong> dire che <code>alias</code> non crea un secondo studente non significa affermare che la sua implementazione non usi memoria. Il C++ lascia non specificato se un riferimento richieda spazio: qui conta che permetta di usare lo stesso oggetto.</li>
           </ul>
           <p>Riferimenti tecnici per il docente:

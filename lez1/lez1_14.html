@@ -73,6 +73,8 @@
         <figcaption>C++17 · completa i TODO</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 constexpr int R = 3;
 constexpr int C = 4;
 using Matrice = int[R][C];
@@ -80,7 +82,7 @@ using Matrice = int[R][C];
 bool leggi(Matrice&amp; m) {
     for (int r = 0; r &lt; R; ++r)
         for (int c = 0; c &lt; C; ++c)
-            if (!(std::cin &gt;&gt; m[r][c]) || m[r][c] &lt; 0)
+            if (!(cin &gt;&gt; m[r][c]) || m[r][c] &lt; 0)
                 return false;
     return true;
 }
@@ -98,7 +100,7 @@ int main() {
     Matrice vendite{};
 
     if (!leggi(vendite)) {
-        std::cerr &lt;&lt; "Input non valido\n";
+        cerr &lt;&lt; "Input non valido\n";
         return 1;
     }
 
@@ -146,6 +148,8 @@ int main() {
             <figcaption>C++17 · una possibile soluzione completa</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 constexpr int R = 3;
 constexpr int C = 4;
 using Matrice = int[R][C];
@@ -153,7 +157,7 @@ using Matrice = int[R][C];
 bool leggi(Matrice&amp; m) {
     for (int r = 0; r &lt; R; ++r) {
         for (int c = 0; c &lt; C; ++c) {
-            if (!(std::cin &gt;&gt; m[r][c]) || m[r][c] &lt; 0)
+            if (!(cin &gt;&gt; m[r][c]) || m[r][c] &lt; 0)
                 return false;
         }
     }
@@ -164,10 +168,10 @@ void stampa(const Matrice&amp; m) {
     for (int r = 0; r &lt; R; ++r) {
         for (int c = 0; c &lt; C; ++c) {
             if (c &gt; 0)
-                std::cout &lt;&lt; ' ';
-            std::cout &lt;&lt; m[r][c];
+                cout &lt;&lt; ' ';
+            cout &lt;&lt; m[r][c];
         }
-        std::cout &lt;&lt; '\n';
+        cout &lt;&lt; '\n';
     }
 }
 
@@ -216,22 +220,22 @@ void trovaMassimo(const Matrice&amp; m, int&amp; rMax, int&amp; cMax) {
 int main() {
     Matrice vendite{};
     if (!leggi(vendite)) {
-        std::cerr &lt;&lt; "Input non valido\n";
+        cerr &lt;&lt; "Input non valido\n";
         return 1;
     }
 
     stampa(vendite);
     for (int r = 0; r &lt; R; ++r)
-        std::cout &lt;&lt; "Reparto " &lt;&lt; r
+        cout &lt;&lt; "Reparto " &lt;&lt; r
                   &lt;&lt; ": " &lt;&lt; sommaRiga(vendite, r) &lt;&lt; '\n';
 
     int settimana = indiceSettimanaMigliore(vendite);
-    std::cout &lt;&lt; "Settimana migliore: " &lt;&lt; settimana &lt;&lt; '\n';
+    cout &lt;&lt; "Settimana migliore: " &lt;&lt; settimana &lt;&lt; '\n';
 
     int rMax = 0;
     int cMax = 0;
     trovaMassimo(vendite, rMax, cMax);
-    std::cout &lt;&lt; "Massimo: " &lt;&lt; vendite[rMax][cMax]
+    cout &lt;&lt; "Massimo: " &lt;&lt; vendite[rMax][cMax]
               &lt;&lt; " in (" &lt;&lt; rMax &lt;&lt; ',' &lt;&lt; cMax &lt;&lt; ")\n";
 }</code></pre>
           </figure>
@@ -281,8 +285,8 @@ void trasponi(const Matrice&amp; origine, Trasposta&amp; destinazione) {
 void stampaTrasposta(const Trasposta&amp; m) {
     for (int r = 0; r &lt; C; ++r) {
         for (int c = 0; c &lt; R; ++c)
-            std::cout &lt;&lt; m[r][c] &lt;&lt; ' ';
-        std::cout &lt;&lt; '\n';
+            cout &lt;&lt; m[r][c] &lt;&lt; ' ';
+        cout &lt;&lt; '\n';
     }
 }</code></pre>
           </figure>

@@ -62,21 +62,23 @@
 #include &lt;fstream&gt;
 #include &lt;iostream&gt;
 
+using namespace std;
+
 static_assert(CHAR_BIT == 8, "Servono byte da 8 bit");
 
 int main() {
-    constexpr std::uint32_t MAX = 10;
+    constexpr uint32_t MAX = 10;
     // 1. Prepariamo etichetta, versione, conteggio e array.
     const char magic[4]{'A', 'R', 'R', 'B'};
-    const std::uint32_t versione = 1;
-    const std::uint32_t n = 3;
-    const std::int32_t valori[MAX]{10, 20, 30};
+    const uint32_t versione = 1;
+    const uint32_t n = 3;
+    const int32_t valori[MAX]{10, 20, 30};
 
     if (n &gt; MAX) return 1;
     // 2. Apriamo e controlliamo il file.
-    std::ofstream out("dati.bin", std::ios::binary);
+    ofstream out("dati.bin", ios::binary);
     if (!out) {
-        std::cerr &lt;&lt; "Apertura fallita\n";
+        cerr &lt;&lt; "Apertura fallita\n";
         return 2;
     }
 
@@ -87,16 +89,16 @@ int main() {
     out.write(reinterpret_cast&lt;const char*&gt;(&amp;n), sizeof n);
     // 4. Scriviamo solo la parte valida dell'array.
     const auto byteValori =
-        static_cast&lt;std::streamsize&gt;(n * sizeof valori[0]);
+        static_cast&lt;streamsize&gt;(n * sizeof valori[0]);
     out.write(reinterpret_cast&lt;const char*&gt;(valori), byteValori);
 
     // 5. Chiudiamo: anche i byte nel buffer devono essere inviati.
     out.close();
     if (!out) {
-        std::cerr &lt;&lt; "Scrittura o chiusura fallita\n";
+        cerr &lt;&lt; "Scrittura o chiusura fallita\n";
         return 3;
     }
-    std::cout &lt;&lt; "Salvati " &lt;&lt; n &lt;&lt; " valori: "
+    cout &lt;&lt; "Salvati " &lt;&lt; n &lt;&lt; " valori: "
               &lt;&lt; 12 + byteValori &lt;&lt; " byte\n";
 }</code></pre></figure>
 <div class="callout warning"><strong>Attenzione:</strong> <code>ofstream</code> aperto così crea il file o ne cancella il contenuto precedente. Il lettore nella prossima slide è un programma separato e non riscrive il file. Un errore di scrittura può comunque lasciare un file incompleto: il controllo segnala l’errore, non annulla ciò che è già stato scritto.</div>

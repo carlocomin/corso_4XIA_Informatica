@@ -73,18 +73,20 @@
       <figcaption>C++17 · indirizzo e dereferenziazione</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 int main() {
     int x = 42;
     int* p = &amp;x;
 
-    std::cout &lt;&lt; x &lt;&lt; ' ' &lt;&lt; *p &lt;&lt; '\n';
+    cout &lt;&lt; x &lt;&lt; ' ' &lt;&lt; *p &lt;&lt; '\n';
 
     *p = 50;
-    std::cout &lt;&lt; x &lt;&lt; '\n';
+    cout &lt;&lt; x &lt;&lt; '\n';
 
     p = nullptr;
     if (p != nullptr)
-        std::cout &lt;&lt; *p &lt;&lt; '\n';
+        cout &lt;&lt; *p &lt;&lt; '\n';
 }</code></pre>
     </figure>
 

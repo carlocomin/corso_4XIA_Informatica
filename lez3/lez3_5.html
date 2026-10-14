@@ -57,7 +57,7 @@
 
     <section class="concept-card">
       <h2>Lettura formattata</h2>
-      <p>Come con <code>std::cin</code>, lo stream salta gli spazi iniziali, legge un token e lo converte.</p>
+      <p>Come con <code>cin</code>, lo stream salta gli spazi iniziali, legge un token e lo converte.</p>
       <p><strong>Idea chiave:</strong> l’operazione di lettura stessa dice se un record completo è stato acquisito.</p>
     </section>
 
@@ -89,18 +89,20 @@
 #include &lt;iostream&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 int main() {
-    std::ifstream in("voti.txt");
+    ifstream in("voti.txt");
     if (!in) return 1;
 
-    std::string nome;
+    string nome;
     double voto;
     double somma = 0.0;
     int quanti = 0;
 
     while (in &gt;&gt; nome) {
         if (!(in &gt;&gt; voto)) {
-            std::cerr &lt;&lt; "Voto mancante o non valido\n";
+            cerr &lt;&lt; "Voto mancante o non valido\n";
             return 3;
         }
         somma += voto;
@@ -108,17 +110,17 @@ int main() {
     }
 
     if (in.bad()) {
-        std::cerr &lt;&lt; "Errore durante la lettura\n";
+        cerr &lt;&lt; "Errore durante la lettura\n";
         return 2;
     }
 
     if (!in.eof()) {
-        std::cerr &lt;&lt; "Record non valido\n";
+        cerr &lt;&lt; "Record non valido\n";
         return 3;
     }
 
     if (quanti &gt; 0)
-        std::cout &lt;&lt; somma / quanti &lt;&lt; '\n';
+        cout &lt;&lt; somma / quanti &lt;&lt; '\n';
 }</code></pre>
     </figure>
 

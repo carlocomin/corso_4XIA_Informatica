@@ -63,9 +63,11 @@
         <figcaption>C++17 · confronta gli stati iniziali</figcaption>
 <pre><code class="language-cpp">#include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
     int matricola;
-    std::string nome;
+    string nome;
     double media;
 };
 
@@ -130,7 +132,7 @@ int main() {
           <figcaption>C++17</figcaption>
 <pre><code class="language-cpp">struct Studente {
     int matricola = 0;
-    std::string nome = "Senza nome";
+    string nome = "Senza nome";
     double media = 0.0;
 };</code></pre>
         </figure>

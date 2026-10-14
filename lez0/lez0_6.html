@@ -79,26 +79,28 @@
       <figcaption>C++17 · input con controllo</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 int main() {
     constexpr int CAP = 8;
     int valori[CAP]{};
     int n;
 
-    std::cout &lt;&lt; "Quanti valori? ";
-    if (!(std::cin &gt;&gt; n) || n &lt; 0 || n &gt; CAP) {
-        std::cerr &lt;&lt; "Dimensione non valida\n";
+    cout &lt;&lt; "Quanti valori? ";
+    if (!(cin &gt;&gt; n) || n &lt; 0 || n &gt; CAP) {
+        cerr &lt;&lt; "Dimensione non valida\n";
         return 1;
     }
 
     for (int i = 0; i &lt; n; ++i) {
-        if (!(std::cin &gt;&gt; valori[i])) {
-            std::cerr &lt;&lt; "Valore non valido\n";
+        if (!(cin &gt;&gt; valori[i])) {
+            cerr &lt;&lt; "Valore non valido\n";
             return 2;
         }
     }
 
     for (int i = 0; i &lt; n; ++i)
-        std::cout &lt;&lt; valori[i] &lt;&lt; ' ';
+        cout &lt;&lt; valori[i] &lt;&lt; ' ';
 }</code></pre>
     </figure>
 

@@ -64,22 +64,24 @@
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
     int matricola;
-    std::string nome;
+    string nome;
     double media;
 };
 
 void provaModifica(Studente copia) {
     copia.media = 4.0;
-    std::cout &lt;&lt; "Dentro: " &lt;&lt; copia.media &lt;&lt; '\n';
+    cout &lt;&lt; "Dentro: " &lt;&lt; copia.media &lt;&lt; '\n';
 }
 
 int main() {
     Studente ada{1001, "Ada", 9.4};
 
     provaModifica(ada);
-    std::cout &lt;&lt; "Fuori: " &lt;&lt; ada.media &lt;&lt; '\n';
+    cout &lt;&lt; "Fuori: " &lt;&lt; ada.media &lt;&lt; '\n';
 }</code></pre>
       </figure>
       <div class="output">Dentro: 4
@@ -108,7 +110,7 @@ Fuori: 9.4</div>
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p>Tutti: <code>matricola</code>, <code>nome</code> e <code>media</code>. La nuova <code>std::string</code> gestisce il proprio contenuto; modificare <code>copia.nome</code> non cambia <code>ada.nome</code>.</p>
+        <p>Tutti: <code>matricola</code>, <code>nome</code> e <code>media</code>. La nuova <code>string</code> gestisce il proprio contenuto; modificare <code>copia.nome</code> non cambia <code>ada.nome</code>.</p>
       </div>
       </details>
     </section>

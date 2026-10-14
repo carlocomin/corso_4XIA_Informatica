@@ -64,9 +64,11 @@
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
     int matricola;
-    std::string nome;
+    string nome;
     double media;
 };
 
@@ -80,7 +82,7 @@ int main() {
     classe[1].media = 8.5;
 
     for (const Studente&amp; s : classe) {
-        std::cout &lt;&lt; s.nome &lt;&lt; ": " &lt;&lt; s.media &lt;&lt; '\n';
+        cout &lt;&lt; s.nome &lt;&lt; ": " &lt;&lt; s.media &lt;&lt; '\n';
     }
 }</code></pre>
       </figure>
@@ -110,11 +112,13 @@ int main() {
         </summary>
         <div class="answer">
         <figure class="code-example">
-          <figcaption>C++17 · std::vector</figcaption>
+          <figcaption>C++17 · vector</figcaption>
 <pre><code class="language-cpp">#include &lt;vector&gt;
 
+using namespace std;
+
 int main() {
-    std::vector&lt;Studente&gt; classe{
+    vector&lt;Studente&gt; classe{
         {1001, "Ada", 9.4},
         {1002, "Alan", 8.5}
     };

@@ -63,6 +63,8 @@
         <figcaption>C++17 · ripasso dell’algoritmo noto</figcaption>
 <pre><code class="language-cpp">#include &lt;utility&gt;
 
+using namespace std;
+
 void ordinaPerMedia(Studente studenti[], int n) {
     for (int i = 0; i &lt; n - 1; ++i) {
         int migliore = i;
@@ -73,11 +75,11 @@ void ordinaPerMedia(Studente studenti[], int n) {
         }
 
         if (migliore != i)
-            std::swap(studenti[i], studenti[migliore]);
+            swap(studenti[i], studenti[migliore]);
     }
 }</code></pre>
       </figure>
-      <p><code>std::swap</code> scambia due oggetti <code>Studente</code> completi: matricola, nome e media restano correttamente associati.</p>
+      <p><code>swap</code> scambia due oggetti <code>Studente</code> completi: matricola, nome e media restano correttamente associati.</p>
     </section>
 
     <section class="two-col">
@@ -102,7 +104,7 @@ void ordinaPerMedia(Studente studenti[], int n) {
     <section class="checkpoint">
       <div class="checkpoint-prompt">
         <span class="checkpoint-label">Estensione C++</span>
-        <h2>std::sort e lambda</h2>
+        <h2>sort e lambda</h2>
       </div>
       <details class="answer-reveal">
         <summary>
@@ -114,8 +116,10 @@ void ordinaPerMedia(Studente studenti[], int n) {
           <figcaption>C++17 · stesso criterio vicino all’algoritmo</figcaption>
 <pre><code class="language-cpp">#include &lt;algorithm&gt;
 
-void ordinaConStl(std::vector&lt;Studente&gt;&amp; classe) {
-    std::sort(classe.begin(), classe.end(),
+using namespace std;
+
+void ordinaConStl(vector&lt;Studente&gt;&amp; classe) {
+    sort(classe.begin(), classe.end(),
         [](const Studente&amp; a, const Studente&amp; b) {
             return a.media &gt; b.media;
         });

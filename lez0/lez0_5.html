@@ -67,12 +67,14 @@
       <figcaption>C++17 · programma completo</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 int main() {
     constexpr int N = 5;
     int valori[N]{4, 7, 2, 9, 5};
 
     for (int i = 0; i &lt; N; ++i) {
-        std::cout &lt;&lt; "a[" &lt;&lt; i &lt;&lt; "] = "
+        cout &lt;&lt; "a[" &lt;&lt; i &lt;&lt; "] = "
                   &lt;&lt; valori[i] &lt;&lt; '\n';
     }
 }</code></pre>

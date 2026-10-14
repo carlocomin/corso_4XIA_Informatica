@@ -73,13 +73,15 @@
       <figcaption>C++17 · dichiarazione, chiamata e definizione</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 bool compreso(int valore, int minimo, int massimo);
 
 int main() {
     int voto = 8;
 
     if (compreso(voto, 0, 10))
-        std::cout &lt;&lt; "Voto valido\n";
+        cout &lt;&lt; "Voto valido\n";
 }
 
 bool compreso(int valore, int minimo, int massimo) {

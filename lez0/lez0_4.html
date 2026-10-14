@@ -79,6 +79,8 @@
       <figcaption>C++17 · quattro stati iniziali</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 int main() {
     int a[5];             // valori indeterminati
     int b[5]{};           // tutti zero
@@ -86,7 +88,7 @@ int main() {
     int d[5]{4, 7};       // 4, 7, 0, 0, 0
 
     a[0] = 10;            // questa cella ora è inizializzata
-    std::cout &lt;&lt; a[0] &lt;&lt; ' ' &lt;&lt; b[4] &lt;&lt; ' '
+    cout &lt;&lt; a[0] &lt;&lt; ' ' &lt;&lt; b[4] &lt;&lt; ' '
               &lt;&lt; c[2] &lt;&lt; ' ' &lt;&lt; d[4] &lt;&lt; '\n';
 }</code></pre>
     </figure>

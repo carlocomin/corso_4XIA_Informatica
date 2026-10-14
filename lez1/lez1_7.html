@@ -61,6 +61,8 @@
         <figcaption>C++17 · modifica e sola lettura</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 constexpr int R = 2;
 constexpr int C = 3;
 
@@ -80,7 +82,7 @@ int somma(const int (&amp;m)[R][C]) {
 
 int main() {
     int dati[R][C] = {{1, 2, 3}, {4, 5, 6}};
-    std::cout &lt;&lt; somma(dati) &lt;&lt; '\n';  // 21
+    cout &lt;&lt; somma(dati) &lt;&lt; '\n';  // 21
     azzera(dati);
 }</code></pre>
       </figure>

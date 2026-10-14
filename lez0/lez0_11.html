@@ -75,6 +75,8 @@
       <figcaption>C++17 · inversione senza array ausiliario</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 int main() {
     int a[]{2, 4, 6, 8, 10};
     constexpr int N = 5;
@@ -88,7 +90,7 @@ int main() {
     }
 
     for (int valore : a)
-        std::cout &lt;&lt; valore &lt;&lt; ' ';
+        cout &lt;&lt; valore &lt;&lt; ' ';
 }</code></pre>
     </figure>
 

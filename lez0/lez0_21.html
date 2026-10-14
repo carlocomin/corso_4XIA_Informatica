@@ -81,6 +81,8 @@
       <figcaption>C++17 · interfaccia da completare</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 constexpr int CAP = 10;
 
 bool leggi(int a[], int capacita, int&amp; n);
@@ -100,15 +102,15 @@ int main() {
         return 1;
 
     stampa(dati, n);
-    std::cout &lt;&lt; "Somma: " &lt;&lt; somma(dati, n) &lt;&lt; '\n';
+    cout &lt;&lt; "Somma: " &lt;&lt; somma(dati, n) &lt;&lt; '\n';
 
     int posizione = cerca(dati, n, 2);
-    std::cout &lt;&lt; "Prima occorrenza di 2: "
+    cout &lt;&lt; "Prima occorrenza di 2: "
               &lt;&lt; posizione &lt;&lt; '\n';
 
     int massimo = indiceMassimo(dati, n);
     if (massimo != -1)
-        std::cout &lt;&lt; "Massimo: " &lt;&lt; dati[massimo]
+        cout &lt;&lt; "Massimo: " &lt;&lt; dati[massimo]
                   &lt;&lt; ", indice: " &lt;&lt; massimo &lt;&lt; '\n';
 
     inverti(dati, n);
@@ -117,7 +119,7 @@ int main() {
     ordinaSelezione(dati, n);
     stampa(dati, n);
 
-    std::cout &lt;&lt; "Posizione di 7: "
+    cout &lt;&lt; "Posizione di 7: "
               &lt;&lt; ricercaBinaria(dati, n, 7) &lt;&lt; '\n';
 }</code></pre>
     </figure>
@@ -159,18 +161,20 @@ int main() {
             <figcaption>C++17 · una possibile soluzione completa</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 constexpr int CAP = 10;
 
 bool leggi(int a[], int capacita, int&amp; n) {
     n = 0;
     int richiesti = 0;
 
-    if (!(std::cin &gt;&gt; richiesti)
+    if (!(cin &gt;&gt; richiesti)
         || richiesti &lt; 0 || richiesti &gt; capacita)
         return false;
 
     for (int i = 0; i &lt; richiesti; ++i) {
-        if (!(std::cin &gt;&gt; a[i]))
+        if (!(cin &gt;&gt; a[i]))
             return false;
     }
 
@@ -181,10 +185,10 @@ bool leggi(int a[], int capacita, int&amp; n) {
 void stampa(const int a[], int n) {
     for (int i = 0; i &lt; n; ++i) {
         if (i &gt; 0)
-            std::cout &lt;&lt; ' ';
-        std::cout &lt;&lt; a[i];
+            cout &lt;&lt; ' ';
+        cout &lt;&lt; a[i];
     }
-    std::cout &lt;&lt; '\n';
+    cout &lt;&lt; '\n';
 }
 
 int somma(const int a[], int n) {
@@ -258,18 +262,18 @@ int main() {
     int n = 0;
 
     if (!leggi(dati, CAP, n)) {
-        std::cerr &lt;&lt; "Input non valido\n";
+        cerr &lt;&lt; "Input non valido\n";
         return 1;
     }
 
     stampa(dati, n);
-    std::cout &lt;&lt; "Somma: " &lt;&lt; somma(dati, n) &lt;&lt; '\n';
-    std::cout &lt;&lt; "Prima occorrenza di 2: "
+    cout &lt;&lt; "Somma: " &lt;&lt; somma(dati, n) &lt;&lt; '\n';
+    cout &lt;&lt; "Prima occorrenza di 2: "
               &lt;&lt; cerca(dati, n, 2) &lt;&lt; '\n';
 
     int massimo = indiceMassimo(dati, n);
     if (massimo != -1)
-        std::cout &lt;&lt; "Massimo: " &lt;&lt; dati[massimo]
+        cout &lt;&lt; "Massimo: " &lt;&lt; dati[massimo]
                   &lt;&lt; ", indice: " &lt;&lt; massimo &lt;&lt; '\n';
 
     inverti(dati, n);
@@ -278,7 +282,7 @@ int main() {
     ordinaSelezione(dati, n);
     stampa(dati, n);
 
-    std::cout &lt;&lt; "Posizione di 7: "
+    cout &lt;&lt; "Posizione di 7: "
               &lt;&lt; ricercaBinaria(dati, n, 7) &lt;&lt; '\n';
 }</code></pre>
           </figure>

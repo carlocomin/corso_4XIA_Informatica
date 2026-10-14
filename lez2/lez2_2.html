@@ -64,9 +64,11 @@
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
     int matricola;
-    std::string nome;
+    string nome;
     double media;
 };  // punto e virgola obbligatorio
 
@@ -76,7 +78,7 @@ int main() {
     s.nome = "Ada";
     s.media = 9.4;
 
-    std::cout &lt;&lt; s.nome &lt;&lt; ": " &lt;&lt; s.media &lt;&lt; '\n';
+    cout &lt;&lt; s.nome &lt;&lt; ": " &lt;&lt; s.media &lt;&lt; '\n';
 }</code></pre>
       </figure>
     </section>

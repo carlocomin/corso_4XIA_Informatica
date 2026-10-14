@@ -73,9 +73,11 @@
       <figcaption>C++17 · il parametro è una copia</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 void provaRaddoppio(int x) {
     x *= 2;
-    std::cout &lt;&lt; "Dentro: " &lt;&lt; x &lt;&lt; '\n';
+    cout &lt;&lt; "Dentro: " &lt;&lt; x &lt;&lt; '\n';
 }
 
 int doppio(int x) {
@@ -86,10 +88,10 @@ int main() {
     int numero = 5;
 
     provaRaddoppio(numero);
-    std::cout &lt;&lt; "Fuori: " &lt;&lt; numero &lt;&lt; '\n';
+    cout &lt;&lt; "Fuori: " &lt;&lt; numero &lt;&lt; '\n';
 
     numero = doppio(numero);
-    std::cout &lt;&lt; "Risultato: " &lt;&lt; numero &lt;&lt; '\n';
+    cout &lt;&lt; "Risultato: " &lt;&lt; numero &lt;&lt; '\n';
 }</code></pre>
     </figure>
 

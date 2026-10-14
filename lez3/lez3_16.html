@@ -88,9 +88,11 @@
 #include &lt;iostream&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
-    std::int32_t matricola;
-    std::string nome;
+    int32_t matricola;
+    string nome;
     double media;
 };
 
@@ -100,21 +102,21 @@ using Classe = Studente[MAX];
 bool valido(const Studente&amp; s) {
     return s.matricola &gt; 0
         &amp;&amp; !s.nome.empty()
-        &amp;&amp; s.nome.find(';') == std::string::npos
-        &amp;&amp; s.nome.find('\n') == std::string::npos
-        &amp;&amp; s.nome.find('\r') == std::string::npos
+        &amp;&amp; s.nome.find(';') == string::npos
+        &amp;&amp; s.nome.find('\n') == string::npos
+        &amp;&amp; s.nome.find('\r') == string::npos
         &amp;&amp; s.media &gt;= 0.0
         &amp;&amp; s.media &lt;= 10.0;
 }
 
-bool scriviArchivio(const std::string&amp; path,
+bool scriviArchivio(const string&amp; path,
                      const Classe&amp; classe,
                      int quanti) {
     // TODO: apri, scrivi header e record validi, controlla
     return false;
 }
 
-bool leggiArchivio(const std::string&amp; path,
+bool leggiArchivio(const string&amp; path,
                    Classe&amp; classe,
                    int&amp; quanti,
                    int&amp; scartati) {
@@ -152,7 +154,7 @@ int main() {
                        quanti, scartati))
         return 2;
 
-    std::cout &lt;&lt; "Validi: " &lt;&lt; quanti
+    cout &lt;&lt; "Validi: " &lt;&lt; quanti
               &lt;&lt; ", scartati: " &lt;&lt; scartati &lt;&lt; '\n';
 }</code></pre>
     </figure>
@@ -207,9 +209,11 @@ int main() {
 #include &lt;sstream&gt;
 #include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
-    std::int32_t matricola;
-    std::string nome;
+    int32_t matricola;
+    string nome;
     double media;
 };
 
@@ -219,47 +223,47 @@ using Classe = Studente[MAX];
 bool valido(const Studente&amp; s) {
     return s.matricola &gt; 0
         &amp;&amp; !s.nome.empty()
-        &amp;&amp; s.nome.find(';') == std::string::npos
-        &amp;&amp; s.nome.find('\n') == std::string::npos
-        &amp;&amp; s.nome.find('\r') == std::string::npos
+        &amp;&amp; s.nome.find(';') == string::npos
+        &amp;&amp; s.nome.find('\n') == string::npos
+        &amp;&amp; s.nome.find('\r') == string::npos
         &amp;&amp; s.media &gt;= 0.0
         &amp;&amp; s.media &lt;= 10.0;
 }
 
-bool leggiInteroEsatto(const std::string&amp; testo, std::int32_t&amp; valore) {
-    std::istringstream input(testo);
-    input.imbue(std::locale::classic());
-    std::int32_t temporaneo = 0;
+bool leggiInteroEsatto(const string&amp; testo, int32_t&amp; valore) {
+    istringstream input(testo);
+    input.imbue(locale::classic());
+    int32_t temporaneo = 0;
     if (!(input &gt;&gt; temporaneo))
         return false;
-    input &gt;&gt; std::ws;
+    input &gt;&gt; ws;
     if (!input.eof())
         return false;
     valore = temporaneo;
     return true;
 }
 
-bool leggiDoubleEsatto(const std::string&amp; testo, double&amp; valore) {
-    std::istringstream input(testo);
-    input.imbue(std::locale::classic());
+bool leggiDoubleEsatto(const string&amp; testo, double&amp; valore) {
+    istringstream input(testo);
+    input.imbue(locale::classic());
     double temporaneo = 0.0;
     if (!(input &gt;&gt; temporaneo))
         return false;
-    input &gt;&gt; std::ws;
+    input &gt;&gt; ws;
     if (!input.eof())
         return false;
     valore = temporaneo;
     return true;
 }
 
-bool parseStudente(const std::string&amp; riga, Studente&amp; risultato) {
-    std::size_t primo = riga.find(';');
-    if (primo == std::string::npos)
+bool parseStudente(const string&amp; riga, Studente&amp; risultato) {
+    size_t primo = riga.find(';');
+    if (primo == string::npos)
         return false;
 
-    std::size_t secondo = riga.find(';', primo + 1);
-    if (secondo == std::string::npos
-        || riga.find(';', secondo + 1) != std::string::npos)
+    size_t secondo = riga.find(';', primo + 1);
+    if (secondo == string::npos
+        || riga.find(';', secondo + 1) != string::npos)
         return false;
 
     Studente candidato{};
@@ -273,7 +277,7 @@ bool parseStudente(const std::string&amp; riga, Studente&amp; risultato) {
     return true;
 }
 
-bool scriviArchivio(const std::string&amp; path,
+bool scriviArchivio(const string&amp; path,
                      const Classe&amp; classe,
                      int quanti) {
     if (quanti &lt; 0 || quanti &gt; MAX)
@@ -282,12 +286,12 @@ bool scriviArchivio(const std::string&amp; path,
     for (int i = 0; i &lt; quanti; ++i) {
         if (!valido(classe[i])) return false;
     }
-    std::ofstream output(path);
+    ofstream output(path);
     if (!output)
         return false;
 
-    output.imbue(std::locale::classic());
-    output &lt;&lt; std::setprecision(std::numeric_limits&lt;double&gt;::max_digits10);
+    output.imbue(locale::classic());
+    output &lt;&lt; setprecision(numeric_limits&lt;double&gt;::max_digits10);
     output &lt;&lt; "STUDENTI;1\n";
     for (int i = 0; i &lt; quanti; ++i) {
         output &lt;&lt; classe[i].matricola &lt;&lt; ';'
@@ -299,24 +303,24 @@ bool scriviArchivio(const std::string&amp; path,
     return static_cast&lt;bool&gt;(output);
 }
 
-void normalizzaFineRiga(std::string&amp; riga) {
+void normalizzaFineRiga(string&amp; riga) {
     if (!riga.empty() &amp;&amp; riga.back() == '\r')
         riga.pop_back();
 }
 
-bool leggiArchivio(const std::string&amp; path,
+bool leggiArchivio(const string&amp; path,
                    Classe&amp; classe,
                    int&amp; quanti,
                    int&amp; scartati) {
     quanti = 0;
     scartati = 0;
 
-    std::ifstream input(path);
+    ifstream input(path);
     if (!input)
         return false;
 
-    std::string riga;
-    if (!std::getline(input, riga)) return false;
+    string riga;
+    if (!getline(input, riga)) return false;
     normalizzaFineRiga(riga);
     if (riga != "STUDENTI;1") return false;
 
@@ -324,7 +328,7 @@ bool leggiArchivio(const std::string&amp; path,
     int validiTemporanei = 0;
     int scartatiTemporanei = 0;
 
-    while (std::getline(input, riga)) {
+    while (getline(input, riga)) {
         normalizzaFineRiga(riga);
         Studente candidato{};
         if (!parseStudente(riga, candidato)) {
@@ -384,13 +388,13 @@ int main() {
     if (!leggiArchivio("studenti.txt", caricati, quanti, scartati))
         return 2;
 
-    std::cout &lt;&lt; "Validi: " &lt;&lt; quanti
+    cout &lt;&lt; "Validi: " &lt;&lt; quanti
               &lt;&lt; ", scartati: " &lt;&lt; scartati &lt;&lt; '\n';
-    std::cout &lt;&lt; "Media: " &lt;&lt; mediaClasse(caricati, quanti) &lt;&lt; '\n';
+    cout &lt;&lt; "Media: " &lt;&lt; mediaClasse(caricati, quanti) &lt;&lt; '\n';
 
     int migliore = indiceMigliore(caricati, quanti);
     if (migliore != -1)
-        std::cout &lt;&lt; "Migliore: " &lt;&lt; caricati[migliore].nome
+        cout &lt;&lt; "Migliore: " &lt;&lt; caricati[migliore].nome
                   &lt;&lt; " (" &lt;&lt; caricati[migliore].media &lt;&lt; ")\n";
 }</code></pre>
           </figure>
@@ -441,20 +445,22 @@ int main() {
 #include &lt;cstring&gt;
 #include &lt;type_traits&gt;
 
+using namespace std;
+
 static_assert(CHAR_BIT == 8, "Servono byte da 8 bit");
 constexpr char MAGIC[4]{'S', 'T', 'U', 'D'};
-constexpr std::uint32_t VERSIONE = 1;
-constexpr std::uint32_t MAX_NOME = 200;
+constexpr uint32_t VERSIONE = 1;
+constexpr uint32_t MAX_NOME = 200;
 
 // La funzione generica accetta solo i tre tipi previsti dal formato.
 template &lt;typename T&gt;
 constexpr bool campoNativo =
-    std::is_same_v&lt;T, std::int32_t&gt;
-    || std::is_same_v&lt;T, std::uint32_t&gt;
-    || std::is_same_v&lt;T, double&gt;;
+    is_same_v&lt;T, int32_t&gt;
+    || is_same_v&lt;T, uint32_t&gt;
+    || is_same_v&lt;T, double&gt;;
 
 template &lt;typename T&gt;
-bool scriviValore(std::ostream&amp; output, const T&amp; valore) {
+bool scriviValore(ostream&amp; output, const T&amp; valore) {
     static_assert(campoNativo&lt;T&gt;, "Tipo non previsto dal formato");
     output.write(reinterpret_cast&lt;const char*&gt;(&amp;valore),
                  sizeof valore);
@@ -462,7 +468,7 @@ bool scriviValore(std::ostream&amp; output, const T&amp; valore) {
 }
 
 template &lt;typename T&gt;
-bool leggiValore(std::istream&amp; input, T&amp; valore) {
+bool leggiValore(istream&amp; input, T&amp; valore) {
     static_assert(campoNativo&lt;T&gt;, "Tipo non previsto dal formato");
     T temporaneo{};
     if (!input.read(reinterpret_cast&lt;char*&gt;(&amp;temporaneo),
@@ -472,7 +478,7 @@ bool leggiValore(std::istream&amp; input, T&amp; valore) {
     return true;
 }
 
-bool scriviBinario(const std::string&amp; path,
+bool scriviBinario(const string&amp; path,
                    const Classe&amp; classe,
                    int quanti) {
     if (quanti &lt; 0 || quanti &gt; MAX) return false;
@@ -481,18 +487,18 @@ bool scriviBinario(const std::string&amp; path,
             return false;
     }
 
-    std::ofstream output(path, std::ios::binary);
+    ofstream output(path, ios::binary);
     if (!output) return false;
 
-    const auto conteggio = static_cast&lt;std::uint32_t&gt;(quanti);
+    const auto conteggio = static_cast&lt;uint32_t&gt;(quanti);
     output.write(MAGIC, sizeof MAGIC);
     if (!scriviValore(output, VERSIONE)
         || !scriviValore(output, conteggio))
         return false;
 
     for (int i = 0; i &lt; quanti; ++i) {
-        const std::uint32_t lunghezza =
-            static_cast&lt;std::uint32_t&gt;(classe[i].nome.size());
+        const uint32_t lunghezza =
+            static_cast&lt;uint32_t&gt;(classe[i].nome.size());
         if (!scriviValore(output, classe[i].matricola)
             || !scriviValore(output, lunghezza))
             return false;
@@ -504,33 +510,33 @@ bool scriviBinario(const std::string&amp; path,
     return static_cast&lt;bool&gt;(output);
 }
 
-bool leggiBinario(const std::string&amp; path,
+bool leggiBinario(const string&amp; path,
                   Classe&amp; classe,
                   int&amp; quanti) {
     quanti = 0;
-    std::ifstream input(path, std::ios::binary);
+    ifstream input(path, ios::binary);
     if (!input) return false;
 
     char magicLetto[4]{};
-    std::uint32_t versione = 0, conteggio = 0;
+    uint32_t versione = 0, conteggio = 0;
     input.read(magicLetto, sizeof magicLetto);
-    if (!input || std::memcmp(magicLetto, MAGIC, 4) != 0
+    if (!input || memcmp(magicLetto, MAGIC, 4) != 0
         || !leggiValore(input, versione)
         || !leggiValore(input, conteggio)
         || versione != VERSIONE || conteggio &gt; MAX)
         return false;
 
     Classe temporanei{};
-    for (std::uint32_t i = 0; i &lt; conteggio; ++i) {
-        std::int32_t matricola = 0;
-        std::uint32_t lunghezza = 0;
+    for (uint32_t i = 0; i &lt; conteggio; ++i) {
+        int32_t matricola = 0;
+        uint32_t lunghezza = 0;
         double media = 0.0;
         if (!leggiValore(input, matricola)
             || !leggiValore(input, lunghezza)
             || lunghezza == 0 || lunghezza &gt; MAX_NOME)
             return false;
 
-        std::string nome(lunghezza, '\0');
+        string nome(lunghezza, '\0');
         input.read(nome.data(), lunghezza);
         if (!input || !leggiValore(input, media))
             return false;
@@ -544,7 +550,7 @@ bool leggiBinario(const std::string&amp; path,
     if (input.get(extra)) return false;
     if (input.bad() || !input.eof()) return false;
 
-    for (std::uint32_t i = 0; i &lt; conteggio; ++i)
+    for (uint32_t i = 0; i &lt; conteggio; ++i)
         classe[i] = temporanei[i];
     quanti = static_cast&lt;int&gt;(conteggio);
     return true;

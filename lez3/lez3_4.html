@@ -47,7 +47,7 @@
   <header class="lesson-hero">
     <p class="eyebrow">Ripasso guidato · File I/O · 4/18</p>
     <h1>Scrivere testo in C++</h1>
-    <p class="lead">Uno stream di output usa gli stessi operatori di <code>std::cout</code>, ma invia i caratteri a un file.</p>
+    <p class="lead">Uno stream di output usa gli stessi operatori di <code>cout</code>, ma invia i caratteri a un file.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_3.html">&#8592; Precedente</a>
@@ -57,7 +57,7 @@
 
     <section class="concept-card">
       <h2>Dai valori ai caratteri</h2>
-      <p>L’operatore <code>&lt;&lt;</code> applicato a uno stream come <code>std::ofstream</code> converte i valori in testo e li scrive in sequenza. Il metodo <code>write</code>, che incontreremo nel binario, trasferisce invece byte senza formattare i numeri.</p>
+      <p>L’operatore <code>&lt;&lt;</code> applicato a uno stream come <code>ofstream</code> converte i valori in testo e li scrive in sequenza. Il metodo <code>write</code>, che incontreremo nel binario, trasferisce invece byte senza formattare i numeri.</p>
       <p><strong>Idea chiave:</strong> il programma deve decidere esplicitamente separatori e terminatori di riga, perché saranno il contratto della lettura.</p>
     </section>
 
@@ -66,10 +66,12 @@
 <pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;iostream&gt;
 
+using namespace std;
+
 int main() {
-    std::ofstream out("voti.txt");
+    ofstream out("voti.txt");
     if (!out) {
-        std::cerr &lt;&lt; "Errore di apertura\n";
+        cerr &lt;&lt; "Errore di apertura\n";
         return 1;
     }
 
@@ -79,7 +81,7 @@ int main() {
 
     out.close();
     if (!out) {
-        std::cerr &lt;&lt; "Errore di scrittura\n";
+        cerr &lt;&lt; "Errore di scrittura\n";
         return 2;
     }
 }</code></pre>
@@ -99,9 +101,9 @@ int main() {
         <p>L’apertura precedente ricrea il contenuto. La chiamata a <code>close()</code> forza la conclusione della scrittura prima del controllo finale. Per aggiungere in fondo:</p>
         <figure class="code-example">
           <figcaption>C++17 · frammento contestuale</figcaption>
-<pre><code class="language-cpp">std::ofstream out(
+<pre><code class="language-cpp">ofstream out(
     "voti.txt",
-    std::ios::app
+    ios::app
 );</code></pre>
         </figure>
       </article>

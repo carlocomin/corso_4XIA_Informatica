@@ -64,6 +64,8 @@
         <figcaption>C++17 · la dimensione va osservata, non indovinata</figcaption>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 struct Esempio {
     char flag;
     int codice;
@@ -71,7 +73,7 @@ struct Esempio {
 };
 
 int main() {
-    std::cout &lt;&lt; sizeof(Esempio) &lt;&lt; '\n';
+    cout &lt;&lt; sizeof(Esempio) &lt;&lt; '\n';
 }</code></pre>
       </figure>
       <div class="memory-strip" aria-label="Esempio di layout con padding">
@@ -93,7 +95,7 @@ int main() {
         <li>il layout e il padding possono cambiare tra piattaforme;</li>
         <li>dimensione e rappresentazione dei tipi possono cambiare;</li>
         <li>l’ordine dei byte dei numeri può essere diverso;</li>
-        <li>un oggetto C++ come <code>std::string</code> contiene stato interno, non il testo in forma portabile.</li>
+        <li>un oggetto C++ come <code>string</code> contiene stato interno, non il testo in forma portabile.</li>
       </ul>
     </section>
 
@@ -119,7 +121,7 @@ int main() {
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p>Perché contiene <code>std::string</code>. I byte dell’oggetto descrivono la rappresentazione interna usata dalla libreria, non una sequenza portabile contenente semplicemente i caratteri del nome.</p>
+        <p>Perché contiene <code>string</code>. I byte dell’oggetto descrivono la rappresentazione interna usata dalla libreria, non una sequenza portabile contenente semplicemente i caratteri del nome.</p>
       </div>
       </details>
     </section>

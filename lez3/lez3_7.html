@@ -67,7 +67,7 @@
         <figure class="code-example">
           <figcaption>C++17 · errore logico</figcaption>
 <pre><code class="language-cpp">while (!in.eof()) {
-    std::getline(in, riga);
+    getline(in, riga);
     elabora(riga);
 }</code></pre>
         </figure>
@@ -78,7 +78,7 @@
         <h2>La lettura governa il ciclo</h2>
         <figure class="code-example">
           <figcaption>C++17 · pattern corretto</figcaption>
-<pre><code class="language-cpp">while (std::getline(in, riga)) {
+<pre><code class="language-cpp">while (getline(in, riga)) {
     elabora(riga);
 }</code></pre>
         </figure>

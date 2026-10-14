@@ -63,14 +63,16 @@
         <figcaption>C++17 · restituzione sicura per valore</figcaption>
 <pre><code class="language-cpp">#include &lt;string&gt;
 
+using namespace std;
+
 struct Studente {
     int matricola;
-    std::string nome;
+    string nome;
     double media;
 };
 
 Studente creaStudente(int matricola,
-                       const std::string&amp; nome,
+                       const string&amp; nome,
                        double media) {
     return Studente{matricola, nome, media};
 }
@@ -135,7 +137,7 @@ int main() {
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 9 · 10 minuti</span>
       <h2>Funzione fabbrica per i libri</h2>
-      <p>Scrivi <code>Libro creaLibro(int codice, const std::string&amp; titolo, int pagine)</code>, assumendo come precondizione <code>pagine &gt;= 0</code>. Aggiungi poi una funzione <code>valido</code> che controlli il record restituito.</p>
+      <p>Scrivi <code>Libro creaLibro(int codice, const string&amp; titolo, int pagine)</code>, assumendo come precondizione <code>pagine &gt;= 0</code>. Aggiungi poi una funzione <code>valido</code> che controlli il record restituito.</p>
     </section>
 
     <aside class="next-step"><strong>Prossimo passo:</strong> passiamo dal singolo record a un archivio di record omogenei.</aside>
