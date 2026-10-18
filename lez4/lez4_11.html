@@ -70,17 +70,24 @@
         <li><b>shallow copy:</b> due oggetti puntano alla stessa risorsa;</li>
         <li><b>deep copy:</b> ogni oggetto riceve una propria copia indipendente.</li>
       </ul>
-<pre><code class="language-cpp">class Buffer {
+<pre><code class="language-cpp">#include &lt;cstddef&gt;
+
+using namespace std;
+
+class Buffer {
 private:
     int* data_;
-    std::size_t n_;
+    size_t n_;
 public:
     Buffer(const Buffer& other){
         n_ = other.n_;
         data_ = new int[n_];
-        for (std::size_t i = 0; i < n_; ++i) data_[i] = other.data_[i];
+        for (size_t i = 0; i < n_; ++i) {
+            data_[i] = other.data_[i];
+        }
     }
 };</code></pre>
+      <p>È il frammento del solo costruttore di copia, non una classe completa. Una classe che possiede questo array deve definire anche come costruirlo, distruggerlo e assegnarlo: è il problema riassunto dalla Rule of Three.</p>
     </div>
     <div class="inner-box box">
       <h2>Rule of Three</h2>

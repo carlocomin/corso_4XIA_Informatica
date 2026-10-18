@@ -69,33 +69,34 @@
 
     <div class="inner-box box">
       <h2>Esempio completo: <code>Persona</code> e <code>Studente</code></h2>
-      <p>Qui sotto c'è l'esempio centrale del testo sorgente. Va letto lentamente, perché in poche righe mostra già quasi tutto quello che ci serve: costruttore della base, derivazione <code>public</code>, uso di un metodo <code>protected</code>, attributo <code>private</code> e metodo ereditato.</p>
+      <p>Leggi l'esempio seguendo questi elementi: costruttore della base, derivazione <code>public</code>, uso di un metodo <code>protected</code>, attributo <code>private</code> e metodo ereditato.</p>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
-#include &lt;utility&gt;
+
+using namespace std;
 
 class Persona {
 public:
-    Persona(std::string nome) : nome_(std::move(nome)) {}
+    Persona(const string&amp; nome) : nome_(nome) {}
 
     void saluta() const {
-        std::cout &lt;&lt; "Ciao, sono " &lt;&lt; nome_ &lt;&lt; "\n";
+        cout &lt;&lt; "Ciao, sono " &lt;&lt; nome_ &lt;&lt; "\n";
     }
 
 protected:
-    const std::string&amp; nome() const { return nome_; }
+    const string&amp; nome() const { return nome_; }
 
 private:
-    std::string nome_;
+    string nome_;
 };
 
 class Studente : public Persona {
 public:
-    Studente(std::string nome, int classe)
-        : Persona(std::move(nome)), classe_(classe) {}
+    Studente(const string&amp; nome, int classe)
+        : Persona(nome), classe_(classe) {}
 
     void presenta() const {
-        std::cout &lt;&lt; "Sono " &lt;&lt; nome() &lt;&lt; " e sono in " &lt;&lt; classe_ &lt;&lt; "a.\n";
+        cout &lt;&lt; "Sono " &lt;&lt; nome() &lt;&lt; " e sono in " &lt;&lt; classe_ &lt;&lt; "a.\n";
     }
 
 private:
@@ -119,7 +120,7 @@ Sono Carlo e sono in 4a.</code></pre>
 
     <div class="inner-box box">
       <h2>Che cosa osservare davvero nel codice</h2>
-      <p>Il testo sorgente evidenzia tre osservazioni che vanno fissate bene, perché sono la base di quasi tutte le scelte successive.</p>
+      <p>Osserva tre aspetti del codice, che ritroveremo anche negli esempi successivi.</p>
       <ul>
         <li><b><code>Studente</code> eredita <code>saluta()</code> da <code>Persona</code>.</b> Questo è l'effetto più visibile della derivazione <code>public</code>: un metodo pubblico della base resta utilizzabile anche sulla derivata.</li>
         <li><b><code>Studente</code> non può accedere direttamente a <code>nome_</code>.</b> L'attributo è <code>private</code> dentro <code>Persona</code>, quindi la derivata non lo vede direttamente. Questo dettaglio è fondamentale: derivare non significa "avere accesso a tutto".</li>
@@ -167,15 +168,15 @@ Sono Carlo e sono in 4a.</code></pre>
 
     <div class="inner-box box">
       <h2>Perché <code>nome_</code> è <code>private</code> ma <code>nome()</code> è <code>protected</code>?</h2>
-      <p>Questa scelta è didatticamente molto istruttiva. Se la classe base rendesse l'attributo <code>nome_</code> direttamente accessibile alla derivata, la derivata conoscerebbe troppo dei dettagli interni della base. Invece, esponendo un metodo <code>protected</code> come <code>nome()</code>, la base conserva il controllo del proprio stato ma offre alle derivate una vista controllata sul dato che serve davvero.</p>
+      <p>Se la classe base rendesse l'attributo <code>nome_</code> direttamente accessibile alla derivata, la derivata dipenderebbe dai dettagli interni della base. Esponendo invece un metodo <code>protected</code> come <code>nome()</code>, la base conserva il controllo del proprio stato e offre alle derivate un accesso controllato al dato.</p>
       <p>In altre parole, <code>protected</code> può essere utile quando vogliamo aiutare le classi derivate a lavorare con la base senza aprire completamente l'interno della classe. Va comunque usato con attenzione: una base troppo esposta alle derivate rischia di diventare fragile nel tempo.</p>
     </div>
 
     <div class="inner-box box">
       <h2>Il costruttore della derivata e il costruttore della base</h2>
       <p>Guarda questa riga della classe <code>Studente</code>:</p>
-<pre><code class="language-cpp">Studente(std::string nome, int classe)
-    : Persona(std::move(nome)), classe_(classe) {}</code></pre>
+<pre><code class="language-cpp">Studente(const string&amp; nome, int classe)
+    : Persona(nome), classe_(classe) {}</code></pre>
       <p>Qui la derivata non "si costruisce da sola". Deve inizializzare anche la parte di base. Il costruttore di <code>Studente</code> richiama esplicitamente il costruttore di <code>Persona</code> nella lista di inizializzazione. Questo punto diventerà ancora più importante nella prossima pagina, quando parleremo di ordine di costruzione e distruzione.</p>
       <p>Per ora basta fissare il principio: un oggetto derivato contiene anche la parte base, quindi la base deve essere inizializzata correttamente fin dall'inizio.</p>
     </div>

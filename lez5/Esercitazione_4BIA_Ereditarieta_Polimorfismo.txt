@@ -43,7 +43,7 @@ Leggi ogni situazione e scegli l'alternativa che completa meglio il ragionamento
    A. `Base* p = new Derivata();`
    B. `Base& r = d;`
    C. `Base b = d;`
-   D. `std::unique_ptr<Base> p = std::make_unique<Derivata>();`
+   D. `Base* p = &d;`
 
 5) Supponi che il metodo `verso()` sia definito nella classe base ma NON sia dichiarato `virtual`.
    Se un puntatore di tipo `Base*` punta a un oggetto `Derivata` e chiami `p->verso()`, quale
@@ -95,8 +95,8 @@ Per ciascuna affermazione, indica se la ritieni vera o falsa.
     la scelta più sicura in qualsiasi situazione.                                   V / F
 13) L'istruzione `using Base::g;` può essere utile quando nella derivata si verifica
     un problema di name hiding sui metodi ereditati dalla base.                      V / F
-14) Usare un contenitore come `std::vector<std::unique_ptr<Base>>` permette di gestire
-    oggetti derivati evitando il problema dello slicing.                             V / F
+14) Un array di `Base*` può contenere indirizzi di oggetti derivati senza copiarli
+    in oggetti base per valore, evitando lo slicing.                                 V / F
 15) Una classe astratta, pur contenendo almeno un metodo virtuale puro, può essere
     istanziata direttamente come una classe normale.                                 V / F
 
@@ -140,13 +140,13 @@ Requisiti:
    - `DipendenteOrario` (attributi: pagaOraria, oreMese)
 3. In entrambe usa `override` dove serve.
 4. Scrivi quindi la funzione:
-   `double totaleStipendi(const std::vector<Dipendente*>& v);`
-5. Infine, nel `main`, crea almeno 4 dipendenti di tipo misto, stampa lo stipendio di ciascuno
-   e calcola il totale complessivo.
+   `double totaleStipendi(Dipendente* personale[], int n);`
+5. Nel `main`, crea quattro oggetti locali di tipo misto e raccogli i loro indirizzi
+   nell'array. Stampa lo stipendio di ciascuno e calcola il totale complessivo.
 
 Vincoli:
 - Evita slicing.
-- Non usare `new`/`delete` manuali.
+- Non usare `new`/`delete`: gli oggetti sono locali e restano vivi fino alla fine del `main`.
 - Usa nomi significativi e codice ordinato.
 
 ------------------------------------------------------------

@@ -79,15 +79,17 @@
     <div class="inner-box box">
       <h2>Senza <code>virtual</code>: binding statico</h2>
       <p>Se un metodo non è dichiarato <code>virtual</code>, il metodo chiamato dipende dal <b>tipo statico</b> della variabile attraverso cui fai la chiamata.</p>
-      <p>Il testo lo mostra con questo esempio:</p>
+      <p>Verifica che cosa accade nell'esempio seguente:</p>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 struct Animale {
-    void verso() const { std::cout &lt;&lt; "Verso generico\n"; }
+    void verso() const { cout &lt;&lt; "Verso generico\n"; }
 };
 
 struct Cane : public Animale {
-    void verso() const { std::cout &lt;&lt; "Bau!\n"; }
+    void verso() const { cout &lt;&lt; "Bau!\n"; }
 };
 
 int main() {
@@ -108,20 +110,22 @@ int main() {
     <div class="inner-box box">
       <h2>Con <code>virtual</code>: dispatch dinamico</h2>
       <p>Se invece il metodo è dichiarato <code>virtual</code> nella base, il metodo chiamato dipende dal <b>tipo dinamico</b> dell'oggetto reale. Qui il comportamento cambia radicalmente, ed è proprio questo il cuore del polimorfismo.</p>
-      <p>Il testo propone questo secondo esempio:</p>
+      <p>Confronta il caso precedente con questo secondo esempio:</p>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 struct Animale {
-    virtual void verso() const { std::cout &lt;&lt; "Verso generico\n"; }
+    virtual void verso() const { cout &lt;&lt; "Verso generico\n"; }
     virtual ~Animale() = default;
 };
 
 struct Cane : public Animale {
-    void verso() const override { std::cout &lt;&lt; "Bau!\n"; }
+    void verso() const override { cout &lt;&lt; "Bau!\n"; }
 };
 
 struct Gatto : public Animale {
-    void verso() const override { std::cout &lt;&lt; "Miao!\n"; }
+    void verso() const override { cout &lt;&lt; "Miao!\n"; }
 };
 
 void faiVerso(const Animale& a) {
@@ -147,7 +151,7 @@ Miao!</code></pre>
 
     <div class="inner-box box">
       <h2>Perché l'esempio con <code>faiVerso(const Animale&)</code> è così importante</h2>
-      <p>Questa piccola funzione è didatticamente perfetta:</p>
+      <p>Questa funzione riceve un riferimento alla base e chiama il metodo virtuale:</p>
 <pre><code class="language-cpp">void faiVerso(const Animale& a) {
     a.verso();
 }</code></pre>

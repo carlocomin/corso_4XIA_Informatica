@@ -66,8 +66,8 @@
       <p>Se i campi sono pubblici, chiunque puo mettere l'oggetto in uno stato assurdo. Se invece i campi sono privati, tutte le modifiche passano da un punto controllato.</p>
 <pre><code class="language-cpp">class Orario {
 private:
-    int hh_;
-    int mm_;
+    int hh_ = 0;
+    int mm_ = 0;
 public:
     bool set(int h, int m){
         if (0 <= h && h < 24 && 0 <= m && m < 60){

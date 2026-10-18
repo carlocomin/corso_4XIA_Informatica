@@ -61,11 +61,7 @@
       <h2>Selection sort per media decrescente</h2>
       <figure class="code-example">
         <figcaption>C++17 · ripasso dell’algoritmo noto</figcaption>
-<pre><code class="language-cpp">#include &lt;utility&gt;
-
-using namespace std;
-
-void ordinaPerMedia(Studente studenti[], int n) {
+<pre><code class="language-cpp">void ordinaPerMedia(Studente studenti[], int n) {
     for (int i = 0; i &lt; n - 1; ++i) {
         int migliore = i;
 
@@ -74,12 +70,13 @@ void ordinaPerMedia(Studente studenti[], int n) {
                 migliore = j;
         }
 
-        if (migliore != i)
-            swap(studenti[i], studenti[migliore]);
+        Studente temporaneo = studenti[i];
+        studenti[i] = studenti[migliore];
+        studenti[migliore] = temporaneo;
     }
 }</code></pre>
       </figure>
-      <p><code>swap</code> scambia due oggetti <code>Studente</code> completi: matricola, nome e media restano correttamente associati.</p>
+      <p>Le tre assegnazioni scambiano due oggetti <code>Studente</code> completi: matricola, nome e media restano associati. È lo stesso scambio con variabile temporanea già usato negli array di interi.</p>
     </section>
 
     <section class="two-col">
@@ -104,7 +101,7 @@ void ordinaPerMedia(Studente studenti[], int n) {
     <section class="checkpoint">
       <div class="checkpoint-prompt">
         <span class="checkpoint-label">Estensione C++</span>
-        <h2>sort e lambda</h2>
+        <h2>sort con una funzione di confronto</h2>
       </div>
       <details class="answer-reveal">
         <summary>
@@ -113,19 +110,21 @@ void ordinaPerMedia(Studente studenti[], int n) {
         </summary>
         <div class="answer">
         <figure class="code-example">
-          <figcaption>C++17 · stesso criterio vicino all’algoritmo</figcaption>
+          <figcaption>C++17 · approfondimento, non richiesto per il selection sort</figcaption>
 <pre><code class="language-cpp">#include &lt;algorithm&gt;
+#include &lt;vector&gt;
 
 using namespace std;
 
+bool mediaMaggiore(const Studente&amp; a, const Studente&amp; b) {
+    return a.media &gt; b.media;
+}
+
 void ordinaConStl(vector&lt;Studente&gt;&amp; classe) {
-    sort(classe.begin(), classe.end(),
-        [](const Studente&amp; a, const Studente&amp; b) {
-            return a.media &gt; b.media;
-        });
+    sort(classe.begin(), classe.end(), mediaMaggiore);
 }</code></pre>
         </figure>
-        <p>La lambda è una piccola funzione anonima che descrive il criterio. È comoda con un <code>vector</code>, ma non sostituisce la comprensione dell’ordinamento.</p>
+        <p>Il terzo argomento è il nome di una normale funzione: restituisce vero se il primo studente deve precedere il secondo. È un uso della libreria, non sostituisce il selection sort che devi saper scrivere.</p>
       </div>
       </details>
     </section>

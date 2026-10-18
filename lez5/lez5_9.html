@@ -122,7 +122,7 @@
         <li>A. <code>Base* p = new Derivata();</code></li>
         <li>B. <code>Base&amp; r = d;</code></li>
         <li>C. <code>Base b = d;</code></li>
-        <li>D. <code>std::unique_ptr&lt;Base&gt; p = std::make_unique&lt;Derivata&gt;();</code></li>
+        <li>D. <code>Base* p = &amp;d;</code></li>
       </ul>
       <div class="nav-buttons" style="justify-content:left">
         <button id="btn-q4" onclick="toggleBox('btn-q4','sol-q4')">Mostra soluzione</button>
@@ -245,10 +245,10 @@
         <li><b>11)</b> Trattare un oggetto di tipo <code>Derivata</code> come un oggetto di tipo <code>Base</code> tramite upcast è un'operazione normalmente sicura e non richiede cast espliciti. <b>Vero</b></li>
         <li><b>12)</b> Per effettuare un downcast da <code>Base*</code> a <code>Derivata*</code>, <code>static_cast</code> rappresenta sempre la scelta più sicura in qualsiasi situazione. <b>Falso</b></li>
         <li><b>13)</b> L'istruzione <code>using Base::g;</code> può essere utile quando nella derivata si verifica un problema di name hiding sui metodi ereditati dalla base. <b>Vero</b></li>
-        <li><b>14)</b> Usare un contenitore come <code>std::vector&lt;std::unique_ptr&lt;Base&gt;&gt;</code> permette di gestire oggetti derivati evitando il problema dello slicing. <b>Vero</b></li>
+        <li><b>14)</b> Un array di <code>Base*</code> può contenere indirizzi di oggetti derivati senza copiarli in oggetti base per valore, evitando lo slicing. <b>Vero</b></li>
         <li><b>15)</b> Una classe astratta, pur contenendo almeno un metodo virtuale puro, può essere istanziata direttamente come una classe normale. <b>Falso</b></li>
       </ul>
-      <p class="note"><b>Queste cinque affermazioni riassumono quasi tutto il percorso teorico:</b> upcast, downcast, name hiding, smart pointer e classe astratta.</p>
+      <p class="note"><b>Concetti da riconoscere:</b> upcast, downcast, name hiding, puntatori alla base e classe astratta.</p>
     </div>
 
     <div class="inner-box note">

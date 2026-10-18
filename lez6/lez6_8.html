@@ -123,7 +123,7 @@
         <li>copio quella chiave nel nodo da cancellare;</li>
         <li>cancello poi il nodo che conteneva originariamente il successore.</li>
       </ul>
-      <p>In alternativa si può usare il predecessore inorder, cioè il massimo del sottoalbero sinistro. Noi useremo il successore perché è molto comune e didatticamente pulito.</p>
+      <p>In alternativa si può usare il predecessore inorder, cioè il massimo del sottoalbero sinistro. Nel seguito useremo il successore; con il predecessore il ragionamento è analogo.</p>
     </div>
 
     <div class="inner-box box">
@@ -174,12 +174,16 @@
       <h2>Implementazione ricorsiva in C++</h2>
       <p>La versione ricorsiva più classica della cancellazione segue esattamente la logica dei tre casi:</p>
 <pre><code class="language-cpp">Node* findMin(Node* p) {
-    while (p != nullptr &amp;&amp; p-&gt;left != nullptr) p = p-&gt;left;
+    while (p != nullptr &amp;&amp; p-&gt;left != nullptr) {
+        p = p-&gt;left;
+    }
     return p;
 }
 
 Node* removeNode(Node* p, int x) {
-    if (p == nullptr) return nullptr;
+    if (p == nullptr) {
+        return nullptr;
+    }
 
     if (x &lt; p-&gt;key) {
         p-&gt;left = removeNode(p-&gt;left, x);
@@ -218,7 +222,7 @@ Node* removeNode(Node* p, int x) {
         <li>prima scende nell'albero per trovare la chiave da eliminare;</li>
         <li>poi, nel punto in cui la trova, sceglie uno dei tre casi strutturali.</li>
       </ul>
-      <p>Le righe più importanti, dal punto di vista didattico, sono quelle in cui il risultato della chiamata ricorsiva viene ricollegato al sottoalbero:</p>
+      <p>Osserva soprattutto le assegnazioni che ricollegano il risultato della chiamata ricorsiva al sottoalbero:</p>
 <pre><code class="language-cpp">p-&gt;left = removeNode(p-&gt;left, x);
 p-&gt;right = removeNode(p-&gt;right, x);</code></pre>
       <p>Come già accadeva per l'inserimento, la funzione restituisce la nuova radice del sottoalbero dopo la modifica. Questo rende uniforme il trattamento di radice, figli e sottoalberi interni.</p>
@@ -227,7 +231,7 @@ p-&gt;right = removeNode(p-&gt;right, x);</code></pre>
     <div class="inner-box box">
       <h2>Il legame con il predecessore e il successore</h2>
       <p>Il caso con due figli è anche il punto in cui i concetti di minimo, massimo, predecessore e successore smettono di essere nozioni teoriche isolate e diventano strumenti operativi. Non li stiamo citando per completezza astratta: li stiamo usando per mantenere corretto il BST durante una modifica strutturale.</p>
-      <p>Questo è un ottimo esempio di buona didattica delle strutture dati: un concetto teorico acquista valore quando si vede dove serve davvero.</p>
+      <p>Scegliere il successore o il predecessore serve quindi a conservare l'ordine del BST dopo aver eliminato un nodo con due figli.</p>
     </div>
 
     <div class="inner-box box">

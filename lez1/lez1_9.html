@@ -80,7 +80,7 @@
 <pre><code class="language-cpp">constexpr int R = 3;
 constexpr int C = 4;
 
-int massimo(const int (&amp;m)[R][C]) {
+int massimo(const int m[][C]) {
     int max = m[0][0];
 
     for (int r = 0; r &lt; R; ++r) {
@@ -114,7 +114,7 @@ int massimo(const int (&amp;m)[R][C]) {
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 7 · 10 minuti</span>
       <h2>Conta secondo una condizione</h2>
-      <p>Scrivi <code>int contaPari(const int (&amp;m)[R][C])</code>. Poi trasformala in <code>contaPositivi</code>: individua con precisione quale sola riga dell’algoritmo deve cambiare.</p>
+      <p>Scrivi <code>int contaPari(const int m[][C])</code> per una matrice di <code>R</code> righe e <code>C</code> colonne. Poi trasformala in <code>contaPositivi</code>: individua con precisione quale sola riga dell’algoritmo deve cambiare.</p>
     </section>
 
     <aside class="next-step"><strong>Prossimo passo:</strong> usiamo un accumulatore separato per ogni riga o per ogni colonna.</aside>

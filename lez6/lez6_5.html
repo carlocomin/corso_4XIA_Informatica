@@ -85,7 +85,7 @@
         <li>ricavo informazioni dal sottoalbero destro;</li>
         <li>combino questi risultati con il nodo corrente.</li>
       </ol>
-      <p>Questo schema è uno dei motivi per cui gli alberi sono didatticamente così importanti. Rendono concreta l'idea di decomporre un problema in sottoproblemi simili, trattarli ricorsivamente e poi ricombinare il tutto.</p>
+      <p>Lo schema si ripete in molte funzioni sugli alberi: risolvi lo stesso problema nei due sottoalberi, poi combina i risultati. Riconoscilo prima di scrivere il codice.</p>
       <p class="note"><b>Osservazione utile:</b> anche quando il codice finale sembra molto diverso, sotto spesso resta questo stesso schema logico.</p>
     </div>
 
@@ -93,13 +93,19 @@
       <h2>Problema 1: contare nodi e foglie</h2>
       <p>Un primo esempio molto naturale è il conteggio. Se voglio sapere quanti nodi ha un albero, il ragionamento è semplice: il numero totale è dato da 1 per il nodo corrente, più i nodi del sottoalbero sinistro, più i nodi del sottoalbero destro.</p>
 <pre><code class="language-cpp">int countNodes(const Node* p) {
-    if (p == nullptr) return 0;
+    if (p == nullptr) {
+        return 0;
+    }
     return 1 + countNodes(p-&gt;left) + countNodes(p-&gt;right);
 }</code></pre>
       <p>Per contare le foglie cambia solo il criterio locale: un nodo è una foglia se non ha né figlio sinistro né figlio destro.</p>
 <pre><code class="language-cpp">int countLeaves(const Node* p) {
-    if (p == nullptr) return 0;
-    if (p-&gt;left == nullptr &amp;&amp; p-&gt;right == nullptr) return 1;
+    if (p == nullptr) {
+        return 0;
+    }
+    if (p-&gt;left == nullptr &amp;&amp; p-&gt;right == nullptr) {
+        return 1;
+    }
     return countLeaves(p-&gt;left) + countLeaves(p-&gt;right);
 }</code></pre>
       <p>Qui non stiamo semplicemente "scorrendo" l'albero. Stiamo usando la sua struttura per costruire una formula ricorsiva naturale.</p>
@@ -107,14 +113,17 @@
 
     <div class="inner-box box">
       <h2>Problema 2: calcolare l'altezza</h2>
-      <p>L'altezza è un altro esempio didatticamente perfetto, perché costringe a combinare i risultati dei due sottoalberi. L'idea è: l'altezza di un nodo è 1 più il massimo tra l'altezza del sottoalbero sinistro e quella del sottoalbero destro.</p>
-<pre><code class="language-cpp">#include &lt;algorithm&gt;
-
-int height(const Node* p) {
-    if (p == nullptr) return 0;
+      <p>Per calcolare l'altezza devi combinare i risultati dei due sottoalberi: l'altezza di un nodo è 1 più il massimo tra l'altezza del sottoalbero sinistro e quella del sottoalbero destro.</p>
+<pre><code class="language-cpp">int height(const Node* p) {
+    if (p == nullptr) {
+        return 0;
+    }
     int hs = height(p-&gt;left);
     int hd = height(p-&gt;right);
-    return 1 + std::max(hs, hd);
+    if (hs &gt; hd) {
+        return 1 + hs;
+    }
+    return 1 + hd;
 }</code></pre>
       <p>Questo è un tipico caso in cui il nodo corrente <b>dipende</b> dai risultati ottenuti dai figli. Per questo il ragionamento è concettualmente vicino al postordine: prima ricavo le informazioni dei sottoalberi, poi costruisco il risultato del nodo corrente.</p>
     </div>
@@ -123,8 +132,12 @@ int height(const Node* p) {
       <h2>Problema 3: cercare un valore in un albero generico</h2>
       <p>Prima di arrivare ai BST, immaginiamo un albero binario generico, cioè senza nessuna proprietà di ordinamento. In questo caso, cercare un valore significa esplorare la struttura finché il valore non viene trovato oppure finché l'albero finisce.</p>
 <pre><code class="language-cpp">bool contains(const Node* p, int x) {
-    if (p == nullptr) return false;
-    if (p-&gt;key == x) return true;
+    if (p == nullptr) {
+        return false;
+    }
+    if (p-&gt;key == x) {
+        return true;
+    }
     return contains(p-&gt;left, x) || contains(p-&gt;right, x);
 }</code></pre>
       <p>Questa funzione è molto istruttiva: mostra che, in assenza di una proprietà speciale, l'albero va comunque esplorato in modo sistematico. Solo più avanti, con i BST, vedremo che l'ordinamento permette di evitare rami inutili e quindi di cercare in modo più efficiente.</p>
@@ -134,7 +147,9 @@ int height(const Node* p) {
       <h2>Problema 4: copiare l'albero</h2>
       <p>Copiare un albero non significa copiare solo il valore della radice. Significa ricostruire tutta la struttura con nuovi nodi, mantenendo la stessa forma e gli stessi dati. Questo è un caso in cui il preordine è molto intuitivo: creo prima il nodo corrente, poi gli collego le copie dei due sottoalberi.</p>
 <pre><code class="language-cpp">Node* cloneTree(const Node* p) {
-    if (p == nullptr) return nullptr;
+    if (p == nullptr) {
+        return nullptr;
+    }
 
     Node* q = new Node{p-&gt;key, nullptr, nullptr};
     q-&gt;left = cloneTree(p-&gt;left);
@@ -148,7 +163,9 @@ int height(const Node* p) {
       <h2>Problema 5: distruggere correttamente l'albero</h2>
       <p>Con strutture dinamiche non basta "smettere di usarle": bisogna liberare la memoria. Qui il postordine è il modello più naturale. Prima elimino i sottoalberi, poi elimino il nodo corrente. Se facessi il contrario, perderei i collegamenti ai figli e quindi non potrei più liberarli correttamente.</p>
 <pre><code class="language-cpp">void destroyTree(Node* p) {
-    if (p == nullptr) return;
+    if (p == nullptr) {
+        return;
+    }
     destroyTree(p-&gt;left);
     destroyTree(p-&gt;right);
     delete p;
@@ -234,7 +251,7 @@ int height(const Node* p) {
     </div>
 
     <div class="inner-box box">
-      <h2>Importanza didattica: le visite insegnano un metodo</h2>
+      <h2>Un metodo comune alle visite</h2>
       <p>Uno degli aspetti più forti degli alberi, dal punto di vista formativo, è che costringono a ragionare in termini di struttura, caso base, sottoproblemi e combinazione dei risultati. Questo è molto più importante della singola sintassi del linguaggio.</p>
       <p>Se uno studente impara davvero a usare le visite, impara anche un modo di affrontare i problemi algoritmici:</p>
       <ul>

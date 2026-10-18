@@ -66,7 +66,7 @@
         <li>cerca uno studente per matricola;</li>
         <li>trova l’indice dello studente con media maggiore.</li>
       </ol>
-      <div class="callout"><strong>Vincolo:</strong> tutte le elaborazioni ignorano i record non validi. Usa <code>const Classe&amp;</code> nelle funzioni di sola lettura; se non esistono record validi, restituisci <code>0.0</code> per la media e <code>-1</code> per gli indici.</div>
+      <div class="callout"><strong>Vincolo:</strong> tutte le funzioni ricevono un array di <code>N = 4</code> studenti e ignorano i record non validi. Usa <code>const Studente classe[]</code> per la sola lettura; se non esistono record validi, restituisci <code>0.0</code> per la media e <code>-1</code> per gli indici.</div>
     </section>
 
     <section class="topic-card">
@@ -85,7 +85,6 @@ struct Studente {
 };
 
 constexpr int N = 4;
-using Classe = Studente[N];
 
 bool valido(const Studente&amp; s) {
     return s.matricola &gt; 0
@@ -94,27 +93,27 @@ bool valido(const Studente&amp; s) {
         &amp;&amp; s.media &lt;= 10.0;
 }
 
-void stampa(const Classe&amp; classe) {
+void stampa(const Studente classe[]) {
     // TODO: stampa soltanto i record validi
 }
 
-double mediaClasse(const Classe&amp; classe) {
+double mediaClasse(const Studente classe[]) {
     // TODO: considera i validi; se non ce ne sono restituisci 0.0
     return 0.0;
 }
 
-int cercaMatricola(const Classe&amp; classe, int matricola) {
+int cercaMatricola(const Studente classe[], int matricola) {
     // TODO: cerca tra i validi; restituisci l’indice oppure -1
     return -1;
 }
 
-int indiceMigliore(const Classe&amp; classe) {
+int indiceMigliore(const Studente classe[]) {
     // TODO: considera i validi; restituisci l’indice oppure -1
     return -1;
 }
 
 int main() {
-    Classe classe{
+    Studente classe[N] = {
         {1001, "Ada", 8.5},
         {1002, "Alan", 7.0},
         {1003, "Grace", 9.5},
@@ -179,7 +178,6 @@ struct Studente {
 };
 
 constexpr int N = 4;
-using Classe = Studente[N];
 
 bool valido(const Studente&amp; s) {
     return s.matricola &gt; 0
@@ -188,28 +186,32 @@ bool valido(const Studente&amp; s) {
         &amp;&amp; s.media &lt;= 10.0;
 }
 
-void stampa(const Classe&amp; classe) {
-    for (const Studente&amp; s : classe) {
-        if (valido(s))
-            cout &lt;&lt; s.matricola &lt;&lt; '\t'
-                      &lt;&lt; s.nome &lt;&lt; '\t' &lt;&lt; s.media &lt;&lt; '\n';
+void stampa(const Studente classe[]) {
+    for (int i = 0; i &lt; N; ++i) {
+        if (valido(classe[i])) {
+            cout &lt;&lt; classe[i].matricola &lt;&lt; '\t'
+                 &lt;&lt; classe[i].nome &lt;&lt; '\t' &lt;&lt; classe[i].media &lt;&lt; '\n';
+        }
     }
 }
 
-double mediaClasse(const Classe&amp; classe) {
+double mediaClasse(const Studente classe[]) {
     double somma = 0.0;
     int validi = 0;
 
-    for (const Studente&amp; s : classe) {
-        if (valido(s)) {
-            somma += s.media;
+    for (int i = 0; i &lt; N; ++i) {
+        if (valido(classe[i])) {
+            somma += classe[i].media;
             ++validi;
         }
     }
-    return validi == 0 ? 0.0 : somma / validi;
+    if (validi == 0) {
+        return 0.0;
+    }
+    return somma / validi;
 }
 
-int cercaMatricola(const Classe&amp; classe, int matricola) {
+int cercaMatricola(const Studente classe[], int matricola) {
     for (int i = 0; i &lt; N; ++i) {
         if (valido(classe[i]) &amp;&amp; classe[i].matricola == matricola)
             return i;
@@ -217,7 +219,7 @@ int cercaMatricola(const Classe&amp; classe, int matricola) {
     return -1;
 }
 
-int indiceMigliore(const Classe&amp; classe) {
+int indiceMigliore(const Studente classe[]) {
     int migliore = -1;
     for (int i = 0; i &lt; N; ++i) {
         if (valido(classe[i])
@@ -229,7 +231,7 @@ int indiceMigliore(const Classe&amp; classe) {
 }
 
 int main() {
-    Classe classe{
+    Studente classe[N] = {
         {1001, "Ada", 8.5},
         {1002, "Alan", 7.0},
         {1003, "Grace", 9.5},
@@ -292,7 +294,8 @@ bool aggiungiDaInput(vector&lt;Studente&gt;&amp; archivio) {
 
     if (!(cin &gt;&gt; candidato.matricola))
         return false;
-    if (!getline(cin &gt;&gt; ws, candidato.nome))
+    cin &gt;&gt; ws;
+    if (!getline(cin, candidato.nome))
         return false;
     if (!(cin &gt;&gt; candidato.media) || !valido(candidato))
         return false;
@@ -301,13 +304,15 @@ bool aggiungiDaInput(vector&lt;Studente&gt;&amp; archivio) {
     return true;
 }
 
+bool precede(const Studente&amp; a, const Studente&amp; b) {
+    if (a.media != b.media) {
+        return a.media &gt; b.media;
+    }
+    return a.matricola &lt; b.matricola;
+}
+
 void ordina(vector&lt;Studente&gt;&amp; archivio) {
-    sort(archivio.begin(), archivio.end(),
-        [](const Studente&amp; a, const Studente&amp; b) {
-            if (a.media != b.media)
-                return a.media &gt; b.media;
-            return a.matricola &lt; b.matricola;
-        });
+    sort(archivio.begin(), archivio.end(), precede);
 }</code></pre>
           </figure>
           <p>Il nuovo record viene inserito solo dopo la validazione. Il comparatore tratta esplicitamente prima il criterio principale e poi lo spareggio.</p>

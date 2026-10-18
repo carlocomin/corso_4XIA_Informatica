@@ -139,9 +139,15 @@
         <li>richiamare se stessa sul sottoalbero sinistro e su quello destro.</li>
       </ul>
       <p>Per questo le visite DFS possono essere scritte in modo molto compatto e leggibile.</p>
-<pre><code class="language-cpp">void preorder(const Node* p) {
-    if (p == nullptr) return;
-    std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+using namespace std;
+
+void preorder(const Node* p) {
+    if (p == nullptr) {
+        return;
+    }
+    cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
     preorder(p-&gt;left);
     preorder(p-&gt;right);
 }</code></pre>
@@ -162,20 +168,28 @@
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;queue&gt;
 
-void bfs(const Node* root) {
-    if (root == nullptr) return;
+using namespace std;
 
-    std::queue&lt;const Node*&gt; q;
+void bfs(const Node* root) {
+    if (root == nullptr) {
+        return;
+    }
+
+    queue&lt;const Node*&gt; q;
     q.push(root);
 
     while (!q.empty()) {
         const Node* p = q.front();
         q.pop();
 
-        std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+        cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
 
-        if (p-&gt;left  != nullptr) q.push(p-&gt;left);
-        if (p-&gt;right != nullptr) q.push(p-&gt;right);
+        if (p-&gt;left  != nullptr) {
+            q.push(p-&gt;left);
+        }
+        if (p-&gt;right != nullptr) {
+            q.push(p-&gt;right);
+        }
     }
 }</code></pre>
       <p>Questa funzione è importante perché mostra bene il cambio di paradigma: qui non "scendo" ricorsivamente, ma mantengo una frontiera di nodi da processare.</p>

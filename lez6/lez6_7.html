@@ -156,16 +156,28 @@
 
     while (curr != nullptr) {
         parent = curr;
-        if (x &lt; curr-&gt;key) curr = curr-&gt;left;
-        else if (x &gt; curr-&gt;key) curr = curr-&gt;right;
-        else return root; // duplicato: non inserisco
+        if (x &lt; curr-&gt;key) {
+            curr = curr-&gt;left;
+        }
+        else if (x &gt; curr-&gt;key) {
+            curr = curr-&gt;right;
+        }
+        else {
+            return root; // duplicato: non inserisco
+        }
     }
 
     Node* n = new Node{x, nullptr, nullptr};
 
-    if (parent == nullptr) return n; // albero inizialmente vuoto
-    if (x &lt; parent-&gt;key) parent-&gt;left = n;
-    else                 parent-&gt;right = n;
+    if (parent == nullptr) {
+        return n; // albero inizialmente vuoto
+    }
+    if (x &lt; parent-&gt;key) {
+        parent-&gt;left = n;
+    }
+    else {
+        parent-&gt;right = n;
+    }
 
     return root;
 }</code></pre>
@@ -175,7 +187,7 @@
     <div class="inner-box box">
       <h2>Che cosa facciamo con i duplicati?</h2>
       <p>La gestione dei duplicati non è imposta dal linguaggio: è una scelta progettuale. Nella nostra trattazione di base adottiamo la politica più semplice: <b>se la chiave è già presente, non inseriamo nulla</b>.</p>
-      <p>Questa decisione ha un vantaggio didattico forte: mantiene il BST come insieme di chiavi distinte e rende più trasparenti ricerca, inserimento e cancellazione. In contesti reali si possono anche usare altre politiche, per esempio:</p>
+      <p>In questo modo il BST rappresenta un insieme di chiavi distinte, con un'unica occorrenza per ogni valore. Per gestire i duplicati si possono scegliere altre politiche, per esempio:</p>
       <ul>
         <li>inserire sempre i duplicati a destra;</li>
         <li>inserirli sempre a sinistra;</li>

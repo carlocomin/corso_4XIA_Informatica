@@ -81,12 +81,12 @@ int main() {
 
     classe[1].media = 8.5;
 
-    for (const Studente&amp; s : classe) {
-        cout &lt;&lt; s.nome &lt;&lt; ": " &lt;&lt; s.media &lt;&lt; '\n';
+    for (int i = 0; i &lt; 3; ++i) {
+        cout &lt;&lt; classe[i].nome &lt;&lt; ": " &lt;&lt; classe[i].media &lt;&lt; '\n';
     }
 }</code></pre>
       </figure>
-      <p>Nel ciclo range-based, <code>s</code> è un riferimento costante al record corrente: non copiamo gli studenti e non possiamo modificarli.</p>
+      <p>A ogni iterazione, <code>i</code> indica la posizione corrente. Leggiamo nome e media da <code>classe[i]</code>, proprio come accedevamo a una cella dell’array di interi.</p>
     </section>
 
     <section class="two-col">
@@ -95,8 +95,8 @@ int main() {
         <p>Usa <code>classe[i]</code> quando ti serve la posizione, devi confrontare elementi o devi restituire un indice.</p>
       </article>
       <article class="topic-card">
-        <h2>Range-based for</h2>
-        <p>Usa <code>for (const Studente&amp; s : classe)</code> quando vuoi leggere tutti gli elementi senza occuparti dell’indice.</p>
+        <h2>Alternativa facoltativa: range-based for</h2>
+        <p><code>for (const Studente&amp; s : classe)</code> legge tutti gli elementi senza un indice esplicito: <code>s</code> indica il record corrente. Nel percorso di base continuiamo a usare il ciclo indicizzato.</p>
       </article>
     </section>
 
@@ -134,7 +134,7 @@ int main() {
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 10 · 12 minuti</span>
       <h2>Media della classe</h2>
-      <p>Calcola la media delle medie dei tre studenti. Ripeti usando prima un ciclo con indice e poi un range-based <code>for</code>.</p>
+      <p>Calcola la media delle medie dei tre studenti usando un ciclo con indice. Come approfondimento facoltativo, ripeti il calcolo con un range-based <code>for</code>.</p>
     </section>
 
     <aside class="next-step"><strong>Prossimo passo:</strong> attraversiamo una collezione per cercare, contare e scegliere record.</aside>

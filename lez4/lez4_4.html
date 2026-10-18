@@ -78,8 +78,13 @@
 private:
     double saldo_;
 public:
-    Conto() : saldo_{0.0} {}
-    Conto(double s) : saldo_{ (s >= 0.0) ? s : 0.0 } {}
+    Conto() : saldo_(0.0) {}
+
+    Conto(double s) : saldo_(0.0) {
+        if (s >= 0.0) {
+            saldo_ = s;
+        }
+    }
 };</code></pre>
     </div>
 

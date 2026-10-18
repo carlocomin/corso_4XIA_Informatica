@@ -78,7 +78,7 @@
           <figcaption>C++17</figcaption>
 <pre><code class="language-cpp">constexpr int N = 3;
 
-int traccia(const int (&amp;m)[N][N]) {
+int traccia(const int m[][N]) {
     int somma = 0;
     for (int i = 0; i &lt; N; ++i)
         somma += m[i][i];
@@ -93,7 +93,7 @@ int traccia(const int (&amp;m)[N][N]) {
           <figcaption>C++17</figcaption>
 <pre><code class="language-cpp">constexpr int N = 3;
 
-int sommaSecondaria(const int (&amp;m)[N][N]) {
+int sommaSecondaria(const int m[][N]) {
     int somma = 0;
     for (int i = 0; i &lt; N; ++i)
         somma += m[i][N - 1 - i];

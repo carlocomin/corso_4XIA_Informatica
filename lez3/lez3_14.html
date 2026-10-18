@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:88.89%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:89.47%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -28,6 +28,7 @@
     <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
     <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
     <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
@@ -45,7 +46,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 16/18</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 17/19</p>
     <h1>Binario con la libreria C</h1>
     <p class="lead">Gli stessi byte di ARRB con fread e fwrite: distinguiamo la dimensione di un elemento dal numero di elementi.</p>
   </header>
@@ -77,8 +78,11 @@ int main(void) {
     if (fread(magic, 1, 4, f) != 4
         || fread(&amp;versione, sizeof versione, 1, f) != 1
         || fread(&amp;n, sizeof n, 1, f) != 1) {
-        fprintf(stderr, "%s\n", ferror(f)
-                ? "Errore di I/O" : "Header incompleto");
+        if (ferror(f)) {
+            fprintf(stderr, "Errore di I/O\n");
+        } else {
+            fprintf(stderr, "Header incompleto\n");
+        }
         fclose(f);
         return 2;
     }
@@ -89,8 +93,11 @@ int main(void) {
     }
 
     if (fread(valori, sizeof valori[0], n, f) != n) {
-        fprintf(stderr, "%s\n", ferror(f)
-                ? "Errore di I/O" : "Valori incompleti");
+        if (ferror(f)) {
+            fprintf(stderr, "Errore di I/O\n");
+        } else {
+            fprintf(stderr, "Valori incompleti\n");
+        }
         fclose(f);
         return 4;
     }
@@ -124,8 +131,13 @@ int main(void) {
           &amp;&amp; fwrite(&amp;versione, sizeof versione, 1, f) == 1
           &amp;&amp; fwrite(&amp;n, sizeof n, 1, f) == 1
           &amp;&amp; fwrite(valori, sizeof valori[0], n, f) == n;
-    if (fclose(f) != 0) ok = 0;
-    return ok ? 0 : 2;
+    if (fclose(f) != 0) {
+        ok = 0;
+    }
+    if (!ok) {
+        return 2;
+    }
+    return 0;
 }</code></pre></figure><p>Il confronto è tra file di <strong>rappresentazione nativa compatibile</strong>, non una garanzia di portabilità fra architetture.</p></div></details></section>
 <p class="callout">Riferimenti: <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/fread?view=msvc-170">fread</a> e <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/fwrite?view=msvc-170">fwrite nel runtime Microsoft</a>.</p>
 <aside class="next-step"><strong>Prossimo passo.</strong> Usiamo le dimensioni fisse di ARRB per raggiungere un valore con seek.</aside>

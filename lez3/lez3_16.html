@@ -28,6 +28,7 @@
     <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
     <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
     <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
@@ -45,7 +46,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 18/18</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 19/19</p>
     <h1>Laboratorio e autoverifica</h1>
     <p class="lead">Costruiamo un archivio studenti completo: formato dichiarato, controlli espliciti, parsing sicuro e risultati verificabili.</p>
   </header>
@@ -79,7 +80,7 @@
       </ol>
     </section>
 
-    <div class="callout"><strong>Contratto delle funzioni:</strong> lo scrittore rifiuta dati non validi prima di aprire il file, senza ometterli silenziosamente. Il lettore aggiorna l’array solo a caricamento riuscito; in caso di fallimento lascia l’array invariato e azzera i conteggi. <code>mediaClasse</code> e <code>indiceMigliore</code> richiedono <code>0 &lt;= quanti &lt;= MAX</code>. La matricola è qui un <code>int32_t</code> per preparare anche la sfida binaria.</div>
+    <div class="callout"><strong>Contratto delle funzioni:</strong> gli array passati devono avere capacità <code>MAX</code>. Lo scrittore rifiuta dati non validi prima di aprire il file, senza ometterli silenziosamente. Il lettore aggiorna l’array solo a caricamento riuscito; in caso di fallimento lascia l’array invariato e azzera i conteggi. <code>mediaClasse</code> e <code>indiceMigliore</code> richiedono <code>0 &lt;= quanti &lt;= MAX</code>. La matricola è qui un <code>int32_t</code> per preparare anche la sfida binaria.</div>
 
     <figure class="code-example">
       <figcaption>C++17 · scheletro compilabile</figcaption>
@@ -97,7 +98,6 @@ struct Studente {
 };
 
 constexpr int MAX = 10;
-using Classe = Studente[MAX];
 
 bool valido(const Studente&amp; s) {
     return s.matricola &gt; 0
@@ -110,14 +110,14 @@ bool valido(const Studente&amp; s) {
 }
 
 bool scriviArchivio(const string&amp; path,
-                     const Classe&amp; classe,
+                     const Studente classe[],
                      int quanti) {
     // TODO: apri, scrivi header e record validi, controlla
     return false;
 }
 
 bool leggiArchivio(const string&amp; path,
-                   Classe&amp; classe,
+                   Studente classe[],
                    int&amp; quanti,
                    int&amp; scartati) {
     // TODO: controlla header, leggi righe, usa parseStudente
@@ -126,18 +126,18 @@ bool leggiArchivio(const string&amp; path,
     return false;
 }
 
-double mediaClasse(const Classe&amp; classe, int quanti) {
+double mediaClasse(const Studente classe[], int quanti) {
     // TODO: se quanti == 0 restituisci 0.0
     return 0.0;
 }
 
-int indiceMigliore(const Classe&amp; classe, int quanti) {
+int indiceMigliore(const Studente classe[], int quanti) {
     // TODO: se quanti == 0 restituisci -1
     return -1;
 }
 
 int main() {
-    Classe origine{
+    Studente origine[MAX] = {
         {1001, "Ada Lovelace", 8.5},
         {1002, "Alan Turing", 7.0},
         {1003, "Grace Hopper", 9.5},
@@ -147,7 +147,7 @@ int main() {
     if (!scriviArchivio("studenti.txt", origine, 4))
         return 1;
 
-    Classe caricati{};
+    Studente caricati[MAX]{};
     int quanti = 0;
     int scartati = 0;
     if (!leggiArchivio("studenti.txt", caricati,
@@ -218,7 +218,6 @@ struct Studente {
 };
 
 constexpr int MAX = 10;
-using Classe = Studente[MAX];
 
 bool valido(const Studente&amp; s) {
     return s.matricola &gt; 0
@@ -278,7 +277,7 @@ bool parseStudente(const string&amp; riga, Studente&amp; risultato) {
 }
 
 bool scriviArchivio(const string&amp; path,
-                     const Classe&amp; classe,
+                     const Studente classe[],
                      int quanti) {
     if (quanti &lt; 0 || quanti &gt; MAX)
         return false;
@@ -309,7 +308,7 @@ void normalizzaFineRiga(string&amp; riga) {
 }
 
 bool leggiArchivio(const string&amp; path,
-                   Classe&amp; classe,
+                   Studente classe[],
                    int&amp; quanti,
                    int&amp; scartati) {
     quanti = 0;
@@ -324,7 +323,7 @@ bool leggiArchivio(const string&amp; path,
     normalizzaFineRiga(riga);
     if (riga != "STUDENTI;1") return false;
 
-    Classe temporanei{};
+    Studente temporanei[MAX]{};
     int validiTemporanei = 0;
     int scartatiTemporanei = 0;
 
@@ -336,7 +335,8 @@ bool leggiArchivio(const string&amp; path,
             continue;
         }
         if (validiTemporanei == MAX) return false;
-        temporanei[validiTemporanei++] = candidato;
+        temporanei[validiTemporanei] = candidato;
+        ++validiTemporanei;
     }
 
     if (input.bad() || !input.eof())
@@ -349,7 +349,7 @@ bool leggiArchivio(const string&amp; path,
     return true;
 }
 
-double mediaClasse(const Classe&amp; classe, int quanti) {
+double mediaClasse(const Studente classe[], int quanti) {
     if (quanti == 0)
         return 0.0;
 
@@ -359,7 +359,7 @@ double mediaClasse(const Classe&amp; classe, int quanti) {
     return somma / quanti;
 }
 
-int indiceMigliore(const Classe&amp; classe, int quanti) {
+int indiceMigliore(const Studente classe[], int quanti) {
     if (quanti == 0)
         return -1;
 
@@ -372,7 +372,7 @@ int indiceMigliore(const Classe&amp; classe, int quanti) {
 }
 
 int main() {
-    Classe origine{
+    Studente origine[MAX] = {
         {1001, "Ada Lovelace", 8.5},
         {1002, "Alan Turing", 7.0},
         {1003, "Grace Hopper", 9.5},
@@ -382,7 +382,7 @@ int main() {
     if (!scriviArchivio("studenti.txt", origine, 4))
         return 1;
 
-    Classe caricati{};
+    Studente caricati[MAX]{};
     int quanti = 0;
     int scartati = 0;
     if (!leggiArchivio("studenti.txt", caricati, quanti, scartati))
@@ -425,7 +425,7 @@ int main() {
     <section class="exercise-card">
       <span class="exercise-label">Sfida facoltativa</span>
       <h2>Versione binaria campo per campo</h2>
-      <p><strong>Questa è una sfida aggiuntiva, non un requisito del laboratorio di base.</strong> Prima consolida l’archivio testuale e il semplice array binario delle slide precedenti. Non occorre studiare i template per raggiungere gli obiettivi fondamentali sui file.</p>
+      <p><strong>Questa è una sfida aggiuntiva, non un requisito del laboratorio di base.</strong> Prima consolida l’archivio testuale e il semplice array binario delle slide precedenti. Qui applichiamo le stesse chiamate di lettura e scrittura a ciascun campo, senza introdurre funzioni generiche.</p>
       <p>Questo è un <strong>nuovo formato</strong>, STUD, non il file ARRB dei sensori. Riusa l’header di 12 byte ma cambia il tipo di record. I numeri sono ancora nativi: lettura e scrittura richiedono ambienti compatibili.</p>
       <div class="table-wrap"><table><thead><tr><th>Parte</th><th>Ordine dei campi</th><th>Dimensione</th></tr></thead><tbody><tr><td>Header</td><td>ASCII STUD; versione uint32_t = 1; conteggio uint32_t</td><td>4 + 4 + 4 = 12 byte</td></tr><tr><td>Ogni studente</td><td>matricola int32_t; lunghezza uint32_t; byte del nome UTF-8; media double nativo</td><td>4 + 4 + lunghezza + sizeof(double)</td></tr></tbody></table></div>
       <p>La lunghezza del nome conta <strong>byte, non lettere</strong>, da 1 a 200; il terminatore <code>\0</code> non viene scritto. Si assume testo già codificato correttamente in UTF-8, come nella versione testuale. Un <code>double</code> occupa normalmente 8 byte nei PC del laboratorio, ma il formato qui usa <code>sizeof(double)</code>. I record hanno lunghezza variabile: non puoi calcolarne l’offset usando <code>i × sizeof(Studente)</code>.</p>
@@ -439,11 +439,10 @@ int main() {
         <div class="solution-content">
           <figure class="code-example">
             <figcaption>C++17 · estensione da aggiungere alla soluzione testuale, prima di main</figcaption>
-<pre><code class="language-cpp">// Da aggiungere alla soluzione testuale: riusa Studente, Classe e valido.
+<pre><code class="language-cpp">// Da aggiungere alla soluzione testuale: riusa Studente, MAX e valido.
 #include &lt;climits&gt;
 #include &lt;cstdint&gt;
 #include &lt;cstring&gt;
-#include &lt;type_traits&gt;
 
 using namespace std;
 
@@ -452,34 +451,8 @@ constexpr char MAGIC[4]{'S', 'T', 'U', 'D'};
 constexpr uint32_t VERSIONE = 1;
 constexpr uint32_t MAX_NOME = 200;
 
-// La funzione generica accetta solo i tre tipi previsti dal formato.
-template &lt;typename T&gt;
-constexpr bool campoNativo =
-    is_same_v&lt;T, int32_t&gt;
-    || is_same_v&lt;T, uint32_t&gt;
-    || is_same_v&lt;T, double&gt;;
-
-template &lt;typename T&gt;
-bool scriviValore(ostream&amp; output, const T&amp; valore) {
-    static_assert(campoNativo&lt;T&gt;, "Tipo non previsto dal formato");
-    output.write(reinterpret_cast&lt;const char*&gt;(&amp;valore),
-                 sizeof valore);
-    return static_cast&lt;bool&gt;(output);
-}
-
-template &lt;typename T&gt;
-bool leggiValore(istream&amp; input, T&amp; valore) {
-    static_assert(campoNativo&lt;T&gt;, "Tipo non previsto dal formato");
-    T temporaneo{};
-    if (!input.read(reinterpret_cast&lt;char*&gt;(&amp;temporaneo),
-                    sizeof temporaneo))
-        return false;
-    valore = temporaneo;
-    return true;
-}
-
 bool scriviBinario(const string&amp; path,
-                   const Classe&amp; classe,
+                   const Studente classe[],
                    int quanti) {
     if (quanti &lt; 0 || quanti &gt; MAX) return false;
     for (int i = 0; i &lt; quanti; ++i) {
@@ -490,20 +463,26 @@ bool scriviBinario(const string&amp; path,
     ofstream output(path, ios::binary);
     if (!output) return false;
 
-    const auto conteggio = static_cast&lt;uint32_t&gt;(quanti);
+    const uint32_t conteggio = static_cast&lt;uint32_t&gt;(quanti);
     output.write(MAGIC, sizeof MAGIC);
-    if (!scriviValore(output, VERSIONE)
-        || !scriviValore(output, conteggio))
+    output.write(reinterpret_cast&lt;const char*&gt;(&amp;VERSIONE),
+                 sizeof VERSIONE);
+    output.write(reinterpret_cast&lt;const char*&gt;(&amp;conteggio),
+                 sizeof conteggio);
+    if (!output)
         return false;
 
     for (int i = 0; i &lt; quanti; ++i) {
         const uint32_t lunghezza =
             static_cast&lt;uint32_t&gt;(classe[i].nome.size());
-        if (!scriviValore(output, classe[i].matricola)
-            || !scriviValore(output, lunghezza))
-            return false;
+        output.write(reinterpret_cast&lt;const char*&gt;(&amp;classe[i].matricola),
+                     sizeof classe[i].matricola);
+        output.write(reinterpret_cast&lt;const char*&gt;(&amp;lunghezza),
+                     sizeof lunghezza);
         output.write(classe[i].nome.data(), lunghezza);
-        if (!output || !scriviValore(output, classe[i].media))
+        output.write(reinterpret_cast&lt;const char*&gt;(&amp;classe[i].media),
+                     sizeof classe[i].media);
+        if (!output)
             return false;
     }
     output.close();
@@ -511,7 +490,7 @@ bool scriviBinario(const string&amp; path,
 }
 
 bool leggiBinario(const string&amp; path,
-                  Classe&amp; classe,
+                  Studente classe[],
                   int&amp; quanti) {
     quanti = 0;
     ifstream input(path, ios::binary);
@@ -520,25 +499,26 @@ bool leggiBinario(const string&amp; path,
     char magicLetto[4]{};
     uint32_t versione = 0, conteggio = 0;
     input.read(magicLetto, sizeof magicLetto);
+    input.read(reinterpret_cast&lt;char*&gt;(&amp;versione), sizeof versione);
+    input.read(reinterpret_cast&lt;char*&gt;(&amp;conteggio), sizeof conteggio);
     if (!input || memcmp(magicLetto, MAGIC, 4) != 0
-        || !leggiValore(input, versione)
-        || !leggiValore(input, conteggio)
         || versione != VERSIONE || conteggio &gt; MAX)
         return false;
 
-    Classe temporanei{};
+    Studente temporanei[MAX]{};
     for (uint32_t i = 0; i &lt; conteggio; ++i) {
         int32_t matricola = 0;
         uint32_t lunghezza = 0;
         double media = 0.0;
-        if (!leggiValore(input, matricola)
-            || !leggiValore(input, lunghezza)
-            || lunghezza == 0 || lunghezza &gt; MAX_NOME)
+        input.read(reinterpret_cast&lt;char*&gt;(&amp;matricola), sizeof matricola);
+        input.read(reinterpret_cast&lt;char*&gt;(&amp;lunghezza), sizeof lunghezza);
+        if (!input || lunghezza == 0 || lunghezza &gt; MAX_NOME)
             return false;
 
         string nome(lunghezza, '\0');
         input.read(nome.data(), lunghezza);
-        if (!input || !leggiValore(input, media))
+        input.read(reinterpret_cast&lt;char*&gt;(&amp;media), sizeof media);
+        if (!input)
             return false;
 
         Studente candidato{matricola, nome, media};
@@ -557,7 +537,7 @@ bool leggiBinario(const string&amp; path,
 }</code></pre>
           </figure>
           <p><strong>Come provarla:</strong> in una copia del programma sostituisci le chiamate testuali con <code>scriviBinario("studenti.bin", origine, 4)</code> e <code>leggiBinario("studenti.bin", caricati, quanti)</code>. Il conteggio <code>scartati</code> non serve: qui un record errato fa rifiutare l’intero file.</p>
-          <p><strong>Dettaglio facoltativo:</strong> <code>template</code> riusa le stesse operazioni per tre tipi numerici; <code>static_assert</code> vieta altri tipi, quindi non permette il dump di stringhe, puntatori o struct. <code>leggiValore</code> assegna il risultato solo dopo una lettura completa.</p>
+          <p><strong>Segui l’ordine dei campi:</strong> ogni chiamata trasferisce un numero o i byte del nome. Il cast serve soltanto all’API binaria: non scriviamo mai la struct o l’oggetto stringa per intero. L’array temporaneo viene copiato nel risultato solo dopo tutti i controlli.</p>
           <p><strong>Risultati dei test:</strong> classe vuota e nome accentato valido: successo; nome oltre 200 byte, header errato, troncamento o byte extra: fallimento. In lettura l’array precedente resta invariato e quanti vale zero.</p>
           <p><strong>Limite dichiarato:</strong> questa versione definisce l’ordine dei campi, ma usa ancora la rappresentazione binaria nativa di interi e <code>double</code>. Per scambiare file tra architetture diverse occorre definire anche byte order e codifica numerica.</p>
         </div>

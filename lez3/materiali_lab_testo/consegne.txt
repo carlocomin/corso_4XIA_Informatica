@@ -1,0 +1,1 @@
+ingresso 3 laboratorio 5 biblioteca 2 segreteria 4 palestra 1

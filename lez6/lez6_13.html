@@ -95,6 +95,7 @@
       <h2>Strategia progettuale prima del codice</h2>
       <p>La scelta più pulita, a questo livello, è racchiudere l'ownership dell'albero in una piccola classe <code>BST</code> che possiede un solo puntatore membro: la radice. In questo modo il resto del programma non deve conoscere tutti i dettagli della memoria dinamica.</p>
       <p>Le funzioni ricorsive più comode possono restare private e lavorare su un <code>Node*</code> o <code>const Node*</code>. L'interfaccia pubblica, invece, espone operazioni semplici come <code>insert</code>, <code>contains</code>, <code>remove</code>, <code>printInorder</code>, <code>height</code> e <code>countNodes</code>.</p>
+      <p>Nel listato, le funzioni private sono <code>static</code>: lavorano sul nodo ricevuto come parametro, senza usare direttamente lo stato di un oggetto. Costruisci e prova un’operazione alla volta; il listato completo serve da riferimento, non da sequenza da memorizzare.</p>
       <p class="note"><b>Messaggio metodologico:</b> il laboratorio non richiede per forza C++ "super moderno" con template e astrazioni sofisticate. Qui conta soprattutto una struttura chiara, una buona separazione tra interfaccia pubblica e supporto ricorsivo privato, e una gestione corretta dei nodi.</p>
     </div>
 
@@ -118,10 +119,10 @@
       </div>
 
       <div id="sol1" style="display:none;margin-top:8px">
-<pre><code class="language-cpp">#include &lt;algorithm&gt;
-#include &lt;iostream&gt;
+<pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;queue&gt;
-#include &lt;vector&gt;
+
+using namespace std;
 
 class BST {
 private:
@@ -138,14 +139,18 @@ private:
     }
 
     static void destroy(Node* p) {
-        if (p == nullptr) return;
+        if (p == nullptr) {
+            return;
+        }
         destroy(p-&gt;left);
         destroy(p-&gt;right);
         delete p;
     }
 
     static Node* insertRec(Node* p, int key) {
-        if (p == nullptr) return createNode(key);
+        if (p == nullptr) {
+            return createNode(key);
+        }
 
         if (key &lt; p-&gt;key) {
             p-&gt;left = insertRec(p-&gt;left, key);
@@ -156,19 +161,29 @@ private:
     }
 
     static bool containsRec(const Node* p, int key) {
-        if (p == nullptr) return false;
-        if (key == p-&gt;key) return true;
-        if (key &lt; p-&gt;key) return containsRec(p-&gt;left, key);
+        if (p == nullptr) {
+            return false;
+        }
+        if (key == p-&gt;key) {
+            return true;
+        }
+        if (key &lt; p-&gt;key) {
+            return containsRec(p-&gt;left, key);
+        }
         return containsRec(p-&gt;right, key);
     }
 
     static Node* findMin(Node* p) {
-        while (p != nullptr &amp;&amp; p-&gt;left != nullptr) p = p-&gt;left;
+        while (p != nullptr &amp;&amp; p-&gt;left != nullptr) {
+            p = p-&gt;left;
+        }
         return p;
     }
 
     static Node* removeRec(Node* p, int key) {
-        if (p == nullptr) return nullptr;
+        if (p == nullptr) {
+            return nullptr;
+        }
 
         if (key &lt; p-&gt;key) {
             p-&gt;left = removeRec(p-&gt;left, key);
@@ -201,37 +216,56 @@ private:
     }
 
     static void preorderRec(const Node* p) {
-        if (p == nullptr) return;
-        std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+        if (p == nullptr) {
+            return;
+        }
+        cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
         preorderRec(p-&gt;left);
         preorderRec(p-&gt;right);
     }
 
     static void inorderRec(const Node* p) {
-        if (p == nullptr) return;
+        if (p == nullptr) {
+            return;
+        }
         inorderRec(p-&gt;left);
-        std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+        cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
         inorderRec(p-&gt;right);
     }
 
     static void postorderRec(const Node* p) {
-        if (p == nullptr) return;
+        if (p == nullptr) {
+            return;
+        }
         postorderRec(p-&gt;left);
         postorderRec(p-&gt;right);
-        std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+        cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
     }
 
     static int heightRec(const Node* p) {
-        if (p == nullptr) return 0;
-        return 1 + std::max(heightRec(p-&gt;left), heightRec(p-&gt;right));
+        if (p == nullptr) {
+            return 0;
+        }
+        int hs = heightRec(p-&gt;left);
+        int hd = heightRec(p-&gt;right);
+        if (hs &gt; hd) {
+            return 1 + hs;
+        }
+        return 1 + hd;
     }
 
     static int countRec(const Node* p) {
-        if (p == nullptr) return 0;
+        if (p == nullptr) {
+            return 0;
+        }
         return 1 + countRec(p-&gt;left) + countRec(p-&gt;right);
     }
 
 public:
+    BST() = default;
+    BST(const BST&amp;) = delete;
+    BST&amp; operator=(const BST&amp;) = delete;
+
     ~BST() {
         destroy(root_);
     }
@@ -250,38 +284,42 @@ public:
 
     void printPreorder() const {
         preorderRec(root_);
-        std::cout &lt;&lt; '\n';
+        cout &lt;&lt; '\n';
     }
 
     void printInorder() const {
         inorderRec(root_);
-        std::cout &lt;&lt; '\n';
+        cout &lt;&lt; '\n';
     }
 
     void printPostorder() const {
         postorderRec(root_);
-        std::cout &lt;&lt; '\n';
+        cout &lt;&lt; '\n';
     }
 
     void printLevelOrder() const {
         if (root_ == nullptr) {
-            std::cout &lt;&lt; "(albero vuoto)\n";
+            cout &lt;&lt; "(albero vuoto)\n";
             return;
         }
 
-        std::queue&lt;const Node*&gt; q;
+        queue&lt;const Node*&gt; q;
         q.push(root_);
 
         while (!q.empty()) {
             const Node* p = q.front();
             q.pop();
 
-            std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+            cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
 
-            if (p-&gt;left != nullptr) q.push(p-&gt;left);
-            if (p-&gt;right != nullptr) q.push(p-&gt;right);
+            if (p-&gt;left != nullptr) {
+                q.push(p-&gt;left);
+            }
+            if (p-&gt;right != nullptr) {
+                q.push(p-&gt;right);
+            }
         }
-        std::cout &lt;&lt; '\n';
+        cout &lt;&lt; '\n';
     }
 
     int height() const {
@@ -296,35 +334,39 @@ public:
 int main() {
     BST t;
 
-    std::vector&lt;int&gt; valori{10, 5, 18, 2, 7, 12, 25, 15};
-    for (int x : valori) t.insert(x);
+    constexpr int N = 8;
+    int valori[N] = {10, 5, 18, 2, 7, 12, 25, 15};
+    for (int i = 0; i &lt; N; ++i) {
+        t.insert(valori[i]);
+    }
 
-    std::cout &lt;&lt; "Inorder:    ";
+    cout &lt;&lt; "Inorder:    ";
     t.printInorder();
 
-    std::cout &lt;&lt; "Preorder:   ";
+    cout &lt;&lt; "Preorder:   ";
     t.printPreorder();
 
-    std::cout &lt;&lt; "Postorder:  ";
+    cout &lt;&lt; "Postorder:  ";
     t.printPostorder();
 
-    std::cout &lt;&lt; "Per livelli:";
+    cout &lt;&lt; "Per livelli:";
     t.printLevelOrder();
 
-    std::cout &lt;&lt; "Contiene 12? " &lt;&lt; (t.contains(12) ? "si" : "no") &lt;&lt; '\n';
-    std::cout &lt;&lt; "Contiene 99? " &lt;&lt; (t.contains(99) ? "si" : "no") &lt;&lt; '\n';
+    cout &lt;&lt; "Contiene 12? " &lt;&lt; t.contains(12) &lt;&lt; '\n';
+    cout &lt;&lt; "Contiene 99? " &lt;&lt; t.contains(99) &lt;&lt; '\n';
 
-    std::cout &lt;&lt; "Altezza = " &lt;&lt; t.height() &lt;&lt; '\n';
-    std::cout &lt;&lt; "Numero nodi = " &lt;&lt; t.countNodes() &lt;&lt; '\n';
+    cout &lt;&lt; "Altezza = " &lt;&lt; t.height() &lt;&lt; '\n';
+    cout &lt;&lt; "Numero nodi = " &lt;&lt; t.countNodes() &lt;&lt; '\n';
 
     t.remove(10); // caso con due figli
-    std::cout &lt;&lt; "\nDopo remove(10), inorder: ";
+    cout &lt;&lt; "\nDopo remove(10), inorder: ";
     t.printInorder();
 }</code></pre>
 
         <p class="ok"><b>Perché questa soluzione è buona:</b> l'ownership dei nodi è concentrata dentro la classe <code>BST</code>, le operazioni pubbliche sono pulite, e le funzioni ricorsive private lavorano in modo uniforme su qualunque sottoalbero.</p>
 
         <p class="note"><b>Osserva bene:</b> distruzione, altezza, conteggio, visite, inserimento e cancellazione sono tutti esempi diversi della stessa idea di fondo: lavorare ricorsivamente su un nodo come radice di un sottoalbero.</p>
+        <p>La stampa di un booleano produce <code>1</code> per vero e <code>0</code> per falso. Le copie di <code>BST</code> sono vietate con <code>= delete</code>: copiare soltanto il puntatore alla radice farebbe possedere gli stessi nodi a due oggetti. Il costruttore vuoto resta disponibile con <code>= default</code>.</p>
       </div>
     </div>
 
@@ -337,6 +379,7 @@ int main() {
 
     <div class="inner-box box">
       <h2>Bonus 1 · Segnalare uno squilibrio forte</h2>
+      <p>La funzione seguente va inserita nella sezione <code>private</code> di <code>BST</code>, dove sono già disponibili <code>Node</code> e <code>heightRec</code>.</p>
       <p>Come estensione coerente con la teoria finale, possiamo aggiungere una funzione che segnali se in qualche nodo la differenza tra altezza sinistra e destra supera una soglia. Non stiamo implementando un AVL completo, ma stiamo misurando il problema che motiva il bilanciamento.</p>
 
       <div class="nav-buttons" style="justify-content:left">
@@ -345,24 +388,32 @@ int main() {
 
       <div id="sol2" style="display:none;margin-top:8px">
 <pre><code class="language-cpp">static bool isVeryUnbalancedRec(const Node* p, int soglia = 2) {
-    if (p == nullptr) return false;
+    if (p == nullptr) {
+        return false;
+    }
 
     int hs = heightRec(p-&gt;left);
     int hd = heightRec(p-&gt;right);
-    int diff = (hs &gt; hd) ? (hs - hd) : (hd - hs);
+    int diff = hs - hd;
+    if (diff &lt; 0) {
+        diff = -diff;
+    }
 
-    if (diff &gt; soglia) return true;
+    if (diff &gt; soglia) {
+        return true;
+    }
 
     return isVeryUnbalancedRec(p-&gt;left, soglia) ||
            isVeryUnbalancedRec(p-&gt;right, soglia);
 }</code></pre>
 
-        <p class="note"><b>Messaggio didattico:</b> non basta sapere che l'albero "può sbilanciarsi". Qui stiamo trasformando quell'idea in una proprietà controllabile dal programma.</p>
+        <p class="note"><b>Controllo nel programma:</b> confrontando le altezze dei sottoalberi possiamo segnalare i nodi che superano la soglia di squilibrio scelta. La funzione rileva lo squilibrio, ma non lo corregge.</p>
       </div>
     </div>
 
     <div class="inner-box box">
       <h2>Bonus 2 · Rotazioni locali</h2>
+      <p>Anche queste due funzioni vanno aggiunte alla sezione <code>private</code> di <code>BST</code>. Una rotazione restituisce la nuova radice: chi la chiama deve ricollegarla all’albero.</p>
       <p>Come ulteriore estensione, si possono implementare le rotazioni locali già introdotte nella teoria. Non serve integrarle in un AVL completo: basta capire che una rotazione restituisce una nuova radice locale del sottoalbero e riconnette i puntatori senza perdere i sottoalberi intermedi.</p>
 
       <div class="nav-buttons" style="justify-content:left">
@@ -371,7 +422,9 @@ int main() {
 
       <div id="sol3" style="display:none;margin-top:8px">
 <pre><code class="language-cpp">static Node* rotateRight(Node* y) {
-    if (y == nullptr || y-&gt;left == nullptr) return y;
+    if (y == nullptr || y-&gt;left == nullptr) {
+        return y;
+    }
 
     Node* x = y-&gt;left;
     Node* T2 = x-&gt;right;
@@ -383,7 +436,9 @@ int main() {
 }
 
 static Node* rotateLeft(Node* x) {
-    if (x == nullptr || x-&gt;right == nullptr) return x;
+    if (x == nullptr || x-&gt;right == nullptr) {
+        return x;
+    }
 
     Node* y = x-&gt;right;
     Node* T2 = y-&gt;left;
@@ -399,9 +454,9 @@ static Node* rotateLeft(Node* x) {
     </div>
 
     <div class="inner-box box">
-      <h2>Riflessione finale: perché questa è una buona consegna</h2>
-      <p>Questo laboratorio è didatticamente molto ricco perché costringe a tenere insieme aspetti spesso studiati separatamente: puntatori, ricorsione, strutture dati dinamiche, visite, scelta degli algoritmi e gestione della memoria. Non è solo "esercizio sugli alberi": è un piccolo progetto in cui le idee devono collaborare.</p>
-      <p>In più, il BST è una struttura ottima per imparare una lezione di metodo: conoscere la teoria di una struttura dati significa capire anche quando e perché le sue operazioni funzionano bene, e quando invece la forma dell'albero rischia di tradirne le promesse.</p>
+      <h2>Riflessione finale: spiega le tue scelte</h2>
+      <p>Ripercorri il tuo programma: indica dove usi puntatori e ricorsione, come mantieni validi i collegamenti e come liberi la memoria. Spiega poi quali visite hai scelto per le diverse operazioni.</p>
+      <p>Infine, confronta due sequenze di inserimento che producono alberi di altezza diversa. Usa il confronto per spiegare perché la correttezza dell'ordinamento, da sola, non garantisce ricerche efficienti.</p>
     </div>
 
     <div class="inner-box box">

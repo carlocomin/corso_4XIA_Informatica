@@ -71,7 +71,7 @@
         <li>tutte le chiavi del sottoalbero destro sono <b>maggiori</b> della chiave del nodo.</li>
       </ul>
       <p>Questa regola non vale solo per i figli immediati: vale per <b>tutti</b> i nodi contenuti nei due sottoalberi. È questo il punto che bisogna fissare bene. Non basta controllare il confronto con il figlio sinistro e il figlio destro; bisogna ragionare sull'intero sottoalbero.</p>
-      <p class="note"><b>Assunzione didattica di questa lezione:</b> per semplicità consideriamo chiavi tutte distinte. La gestione dei duplicati è una scelta progettuale possibile, ma la tratteremo come variante successiva.</p>
+      <p class="note"><b>Ipotesi di lavoro:</b> per semplicità consideriamo chiavi tutte distinte. La gestione dei duplicati è una scelta progettuale possibile, ma la tratteremo come variante successiva.</p>
     </div>
 
     <div class="inner-box box">
@@ -127,10 +127,16 @@
       <h2>Ricerca ricorsiva: la forma più naturale</h2>
       <p>La versione ricorsiva della ricerca in un BST è molto elegante, perché traduce direttamente la definizione della struttura.</p>
 <pre><code class="language-cpp">Node* search(Node* p, int x) {
-    if (p == nullptr) return nullptr;
+    if (p == nullptr) {
+        return nullptr;
+    }
 
-    if (x == p-&gt;key) return p;
-    if (x &lt; p-&gt;key) return search(p-&gt;left, x);
+    if (x == p-&gt;key) {
+        return p;
+    }
+    if (x &lt; p-&gt;key) {
+        return search(p-&gt;left, x);
+    }
     return search(p-&gt;right, x);
 }</code></pre>
       <p>Questa funzione va letta come un piccolo dialogo logico con l'albero:</p>
@@ -166,13 +172,19 @@
       <p>La stessa idea può essere scritta anche in forma iterativa. Dal punto di vista concettuale non cambia nulla: cambia solo il fatto che il movimento nell'albero è espresso con un ciclo anziché con chiamate ricorsive.</p>
 <pre><code class="language-cpp">Node* searchIter(Node* p, int x) {
     while (p != nullptr) {
-        if (x == p-&gt;key) return p;
-        if (x &lt; p-&gt;key) p = p-&gt;left;
-        else            p = p-&gt;right;
+        if (x == p-&gt;key) {
+            return p;
+        }
+        if (x &lt; p-&gt;key) {
+            p = p-&gt;left;
+        }
+        else {
+            p = p-&gt;right;
+        }
     }
     return nullptr;
 }</code></pre>
-      <p>Questa versione è utile perché mostra che il cuore dell'algoritmo non è la ricorsione in sé, ma la decisione "sinistra o destra?" guidata dal confronto. La ricorsione resta però molto espressiva e didatticamente limpida.</p>
+      <p>La versione iterativa prende le stesse decisioni di quella ricorsiva: a ogni confronto sceglie se proseguire a sinistra o a destra. Cambia il modo di avanzare nell'albero, non il criterio di ricerca.</p>
     </div>
 
     <div class="inner-box box">
@@ -205,14 +217,22 @@
       <h2>Minimo e massimo in un BST</h2>
       <p>La proprietà d'ordine del BST rende semplici anche altre operazioni fondamentali. Per trovare il <b>minimo</b> basta seguire sempre il figlio sinistro finché possibile; per trovare il <b>massimo</b> basta seguire sempre il figlio destro.</p>
 <pre><code class="language-cpp">Node* findMin(Node* p) {
-    if (p == nullptr) return nullptr;
-    while (p-&gt;left != nullptr) p = p-&gt;left;
+    if (p == nullptr) {
+        return nullptr;
+    }
+    while (p-&gt;left != nullptr) {
+        p = p-&gt;left;
+    }
     return p;
 }
 
 Node* findMax(Node* p) {
-    if (p == nullptr) return nullptr;
-    while (p-&gt;right != nullptr) p = p-&gt;right;
+    if (p == nullptr) {
+        return nullptr;
+    }
+    while (p-&gt;right != nullptr) {
+        p = p-&gt;right;
+    }
     return p;
 }</code></pre>
       <p>Queste funzioni sono importanti anche per la cancellazione, perché il minimo del sottoalbero destro e il massimo del sottoalbero sinistro giocano un ruolo chiave nei casi con due figli.</p>

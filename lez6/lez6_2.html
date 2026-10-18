@@ -147,7 +147,7 @@ Node* createNode(int value) {
     p-&gt;right = NULL;
     return p;
 }</code></pre>
-      <p>Dal punto di vista didattico è utile confrontare le due versioni. In C++ l'inizializzazione può essere più compatta; in C è più esplicita. In entrambi i casi, però, resta identica la responsabilità centrale: creare un nodo valido e con figli assenti inizializzati correttamente.</p>
+      <p>Confronta le due versioni: in C++ l'inizializzazione può essere più compatta; in C è più esplicita. In entrambi i casi devi creare un nodo valido e inizializzare correttamente i puntatori ai figli assenti.</p>
     </div>
 
     <div class="inner-box box">
@@ -183,7 +183,7 @@ root-&gt;left-&gt;right = createNode(7);</code></pre>
       <h2>Attenzione alla memoria dinamica</h2>
       <p>Il fatto che i nodi vengano creati dinamicamente implica una responsabilità precisa: prima o poi devono essere liberati. In C++ con puntatori grezzi useremo <code>delete</code>; in C useremo <code>free</code>. Questo tema non va banalizzato, perché un albero non si distrugge "tutto insieme" da solo.</p>
       <p>Quando arriveremo alle visite, vedremo che la distruzione corretta dell'albero si esprime naturalmente con una visita in postordine: prima libero i sottoalberi, poi libero il nodo corrente. È un ottimo esempio di come struttura dati e algoritmo siano strettamente collegati.</p>
-      <p class="warn"><b>Nota progettuale:</b> in C++ moderno si possono usare anche smart pointer come <code>std::unique_ptr</code>, ma in questa fase è utile vedere prima il meccanismo nudo con i puntatori, così da capire davvero che cosa succede in memoria.</p>
+      <p class="warn"><b>Nota progettuale:</b> in C++ moderno si possono usare anche smart pointer come <code>unique_ptr</code>, ma in questa fase è utile vedere prima il meccanismo nudo con i puntatori, così da capire davvero che cosa succede in memoria.</p>
     </div>
 
     <div class="inner-box box">

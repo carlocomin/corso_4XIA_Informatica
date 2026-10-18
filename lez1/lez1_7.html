@@ -52,7 +52,7 @@
   <div class="content-box">
     <section class="concept-card">
       <h2>Idea chiave</h2>
-      <p>In C++ un riferimento a matrice conserva nel tipo entrambe le dimensioni. Aggiungere <code>const</code> comunica che la funzione può leggere, ma non modificare, le celle.</p>
+      <p>Nel parametro scriviamo <code>m[][C]</code>: il numero di colonne deve essere noto. Passiamo separatamente il numero di righe da visitare. Con <code>const</code> la funzione può leggere, ma non modificare, le celle.</p>
     </section>
 
     <section class="topic-card">
@@ -66,36 +66,40 @@ using namespace std;
 constexpr int R = 2;
 constexpr int C = 3;
 
-void azzera(int (&amp;m)[R][C]) {
-    for (int r = 0; r &lt; R; ++r)
-        for (int c = 0; c &lt; C; ++c)
+void azzera(int m[][C], int righe) {
+    for (int r = 0; r &lt; righe; ++r) {
+        for (int c = 0; c &lt; C; ++c) {
             m[r][c] = 0;
+        }
+    }
 }
 
-int somma(const int (&amp;m)[R][C]) {
+int somma(const int m[][C], int righe) {
     int totale = 0;
-    for (int r = 0; r &lt; R; ++r)
-        for (int c = 0; c &lt; C; ++c)
+    for (int r = 0; r &lt; righe; ++r) {
+        for (int c = 0; c &lt; C; ++c) {
             totale += m[r][c];
+        }
+    }
     return totale;
 }
 
 int main() {
     int dati[R][C] = {{1, 2, 3}, {4, 5, 6}};
-    cout &lt;&lt; somma(dati) &lt;&lt; '\n';  // 21
-    azzera(dati);
+    cout &lt;&lt; somma(dati, R) &lt;&lt; '\n';  // 21
+    azzera(dati, R);
 }</code></pre>
       </figure>
     </section>
 
     <section class="three-col">
       <article class="topic-card">
-        <h2><code>&amp;m</code></h2>
-        <p>La funzione riceve la matrice originale tramite riferimento, senza trasformarla in un altro tipo.</p>
+        <h2><code>m[][C]</code></h2>
+        <p>La funzione accede alle celle originali, non a una copia della matrice. Non occorre scrivere <code>&amp;</code> nel parametro.</p>
       </article>
       <article class="topic-card">
-        <h2><code>[R][C]</code></h2>
-        <p>Le dimensioni fanno parte del tipo accettato dalla funzione.</p>
+        <h2><code>righe</code></h2>
+        <p>Dice quante righe usare. Chi chiama la funzione deve passare un numero non negativo e non superiore alle righe disponibili.</p>
       </article>
       <article class="topic-card">
         <h2><code>const</code></h2>
@@ -105,8 +109,8 @@ int main() {
 
     <section class="checkpoint">
       <div class="checkpoint-prompt">
-        <span class="checkpoint-label">Una forma più leggibile</span>
-        <h2>Alias di tipo</h2>
+        <span class="checkpoint-label">Approfondimento facoltativo</span>
+        <h2>Come si possono vincolare entrambe le dimensioni?</h2>
       </div>
       <details class="answer-reveal">
         <summary>
@@ -116,12 +120,10 @@ int main() {
         <div class="answer">
         <figure class="code-example">
           <figcaption>C++17</figcaption>
-<pre><code class="language-cpp">using Matrice = int[R][C];
-
-void azzera(Matrice&amp; m);
-int somma(const Matrice&amp; m);</code></pre>
+<pre><code class="language-cpp">void azzera(int (&amp;m)[R][C]);
+int somma(const int (&amp;m)[R][C]);</code></pre>
         </figure>
-        <p><code>using</code> assegna un nome al tipo della matrice. Non crea una nuova rappresentazione e non cambia il comportamento del programma.</p>
+        <p>Il riferimento all’intera matrice conserva entrambe le dimensioni nel tipo: il compilatore rifiuta una matrice con dimensioni diverse. È una sintassi aggiuntiva, non richiesta nel percorso di base. Negli esercizi useremo <code>m[][C]</code> e dimensioni dichiarate chiaramente nella consegna.</p>
       </div>
       </details>
     </section>
@@ -132,7 +134,7 @@ int somma(const Matrice&amp; m);</code></pre>
       <p>Scrivi soltanto la firma di tre funzioni: <code>stampa</code>, <code>riempi</code> e <code>contaPositivi</code>. Quali parametri devono essere <code>const</code>? Motiva ogni scelta con “legge” oppure “modifica”.</p>
     </section>
 
-    <aside class="next-step"><strong>Prossimo passo:</strong> vediamo perché in C la seconda dimensione deve essere esplicita.</aside>
+    <aside class="next-step"><strong>Prossimo passo:</strong> ritroviamo lo stesso parametro con le colonne esplicite anche in C.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez1_6.html">&#8592; Precedente</a>

@@ -88,7 +88,7 @@ struct Der : Base {
 
     <div class="inner-box box">
       <h2>Errore tipico: firma quasi uguale, ma non uguale davvero</h2>
-      <p>Il testo insiste giustamente su un errore molto comune:</p>
+      <p>Un errore comune è cambiare involontariamente la firma del metodo:</p>
 <pre><code class="language-cpp">struct Base {
     virtual void f() const {}
 };
@@ -111,12 +111,14 @@ struct Der : Base {
       <h2>Esempio problematico</h2>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 struct Base {
-    ~Base() { std::cout &lt;&lt; "~Base\n"; }
+    ~Base() { cout &lt;&lt; "~Base\n"; }
 };
 
 struct Der : Base {
-    ~Der() { std::cout &lt;&lt; "~Der\n"; }
+    ~Der() { cout &lt;&lt; "~Der\n"; }
 };
 
 int main() {
@@ -138,10 +140,10 @@ int main() {
 
     <div class="inner-box box">
       <h2>Esempio: gerarchia <code>Forma</code></h2>
-<pre><code class="language-cpp">#include &lt;cmath&gt;
-#include &lt;iostream&gt;
-#include &lt;memory&gt;
-#include &lt;vector&gt;
+      <p>Creiamo due oggetti locali e usiamo un array di puntatori alla base. In questo modo osserviamo il polimorfismo senza introdurre contenitori dinamici.</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+using namespace std;
 
 class Forma {
 public:
@@ -149,7 +151,7 @@ public:
     virtual double area() const = 0;
 
     virtual void stampa() const {
-        std::cout &lt;&lt; "Area=" &lt;&lt; area() &lt;&lt; "\n";
+        cout &lt;&lt; "Area=" &lt;&lt; area() &lt;&lt; "\n";
     }
 };
 
@@ -175,25 +177,29 @@ private:
 };
 
 int main() {
-    std::vector&lt;std::unique_ptr&lt;Forma&gt;&gt; v;
-    v.push_back(std::make_unique&lt;Cerchio&gt;(2.0));
-    v.push_back(std::make_unique&lt;Rettangolo&gt;(3.0, 4.0));
+    Cerchio cerchio(2.0);
+    Rettangolo rettangolo(3.0, 4.0);
+    Forma* forme[2] = {&amp;cerchio, &amp;rettangolo};
 
-    for (const auto& f : v) {
-        f-&gt;stampa();
+    for (int i = 0; i &lt; 2; ++i) {
+        forme[i]-&gt;stampa();
     }
 }</code></pre>
     </div>
 
     <div class="inner-box box">
-      <h2>Perché qui si usano puntatori e <code>unique_ptr</code>?</h2>
-      <p>Il testo risponde in modo molto chiaro, e va tenuto così:</p>
+      <h2>Perché qui si usano puntatori alla base?</h2>
+      <p>Le tre scelte rispondono a esigenze diverse:</p>
       <ul>
         <li><code>Forma</code> è astratta, quindi non si possono creare oggetti <code>Forma</code> diretti;</li>
         <li>i puntatori a base permettono il polimorfismo;</li>
-        <li><code>unique_ptr</code> evita <code>new</code> e <code>delete</code> manuali e gestisce la memoria in modo sicuro.</li>
+        <li>gli oggetti sono locali: vengono distrutti automaticamente alla fine del blocco. Non dobbiamo chiamare <code>delete</code> sui loro indirizzi.</li>
       </ul>
-      <p>Questa è una pagina importante perché salda insieme linguaggio e stile moderno: base astratta, polimorfismo e gestione sicura della memoria entrano nello stesso esempio.</p>
+      <p>L’array contiene indirizzi, non copie di oggetti base: non c’è slicing. Tutti gli oggetti puntati devono restare vivi mentre usiamo l’array.</p>
+      <details class="answer-reveal">
+        <summary>Approfondimento: oggetti allocati dinamicamente</summary>
+        <p>Se invece gli oggetti devono vivere oltre il blocco che li crea, occorre progettare chi li possiede. Un <code>unique_ptr&lt;Forma&gt;</code>, dalla libreria <code>&lt;memory&gt;</code>, può gestire un oggetto derivato e distruggerlo automaticamente. Questa gestione è aggiuntiva: per esercitarsi sul polimorfismo bastano gli oggetti locali dell’esempio.</p>
+      </details>
     </div>
 
     <div class="inner-box box">
@@ -214,7 +220,7 @@ int main() {
 
     <div class="inner-box box">
       <h2>Name hiding e <code>using Base::g;</code></h2>
-      <p>Il testo chiude questa parte con un caso molto utile:</p>
+      <p>Osserva che cosa succede alle funzioni della base con lo stesso nome:</p>
 <pre><code class="language-cpp">struct Base {
     void g(int) {}
     void g(double) {}
@@ -234,7 +240,7 @@ struct Der : Base {
         <li><code>override</code> serve a far verificare al compilatore che la ridefinizione sia corretta;</li>
         <li>un distruttore virtuale è necessario quando la base viene usata polimorficamente;</li>
         <li>una classe astratta definisce un contratto comune e non può essere istanziata direttamente;</li>
-        <li><code>std::unique_ptr&lt;Base&gt;</code> è spesso il modo più pulito per gestire oggetti polimorfici;</li>
+        <li>per oggetti locali bastano i puntatori alla base; <code>unique_ptr&lt;Base&gt;</code> è un approfondimento per la gestione dinamica;</li>
         <li><code>override</code> e <code>overload</code> sono concetti diversi, e il name hiding è un problema a parte.</li>
       </ul>
       <p class="ok"><b>Sintesi finale:</b> il polimorfismo non si usa bene solo con <code>virtual</code>; si usa bene quando la base è progettata per essere sicura, chiara e controllabile dal compilatore.</p>

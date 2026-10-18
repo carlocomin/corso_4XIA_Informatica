@@ -69,8 +69,13 @@
         <li><code>operator&lt;&lt;</code> rende naturale stampare su stream;</li>
         <li>le due soluzioni non si escludono: spesso conviene far delegare l'una all'altra.</li>
       </ul>
-<pre><code class="language-cpp">std::ostream& operator<<(std::ostream& os, const Punto& p){
-    return os << "(" << p.x() << ", " << p.y() << ")";
+<pre><code class="language-cpp">#include &lt;ostream&gt;
+
+using namespace std;
+
+ostream& operator<<(ostream& os, const Punto& p){
+    os << "(" << p.x() << ", " << p.y() << ")";
+    return os;
 }</code></pre>
     </div>
 

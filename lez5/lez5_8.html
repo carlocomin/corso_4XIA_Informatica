@@ -57,7 +57,7 @@
     <div class="inner-box box">
       <h2>Ereditarietà multipla: che cos'è e quando ha senso</h2>
       <p>In C++ una classe può derivare da più classi base. Questo fatto rende il linguaggio molto espressivo, ma anche più delicato da progettare. L'ereditarietà multipla non è "sbagliata" in assoluto: va capita e usata con criterio.</p>
-      <p>Il testo propone un esempio semplice e ragionevole:</p>
+      <p>Un documento può soddisfare due interfacce distinte: essere stampabile ed essere salvabile.</p>
 <pre><code class="language-cpp">struct Stampabile {
     virtual ~Stampabile() = default;
     virtual void stampa() const = 0;
@@ -84,7 +84,7 @@ struct Documento : Stampabile, Salvabile {
    \ /
     D</code></pre>
       <p>Senza ereditarietà virtuale, <code>D</code> può contenere due copie separate di <code>A</code>. Questo crea ambiguità e complicazioni: quale copia di <code>A</code> stai usando? quale dato comune stai leggendo? quale metodo stai invocando?</p>
-      <p>Per evitare il problema, il testo mostra questa soluzione:</p>
+      <p>L'ereditarietà virtuale permette di condividere un'unica parte base:</p>
 <pre><code class="language-cpp">struct A { int v = 0; };
 struct B : virtual A {};
 struct C : virtual A {};
@@ -94,7 +94,7 @@ struct D : B, C {};</code></pre>
 
     <div class="inner-box box">
       <h2>Buone pratiche da portare via</h2>
-      <p>Il testo chiude la teoria con una lista molto sana. Vale la pena lasciarla quasi intatta, perché funziona come checklist mentale di progettazione:</p>
+      <p>Quando progetti o controlli una gerarchia, usa questa lista:</p>
       <ol>
         <li>Se usi il polimorfismo, metti un distruttore virtuale nella base.</li>
         <li>Usa <code>override</code> su ogni metodo virtuale ridefinito.</li>
@@ -109,60 +109,59 @@ struct D : B, C {};</code></pre>
 
     <div class="inner-box box">
       <h2>Esempio completo: sistema di notifiche</h2>
-      <p>L'obiettivo del testo è molto chiaro: inviare notifiche su canali diversi senza che il codice chiamante conosca i dettagli concreti. Questo è esattamente il tipo di scenario in cui una base astratta e il polimorfismo fanno davvero ordine.</p>
+      <p>Vogliamo inviare notifiche su canali diversi senza che il codice chiamante conosca i dettagli di ciascun canale. Una base astratta definisce l'operazione comune; le derivate implementano l'invio concreto.</p>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
-#include &lt;memory&gt;
 #include &lt;string&gt;
-#include &lt;utility&gt;
-#include &lt;vector&gt;
+
+using namespace std;
 
 class Notifica {
 public:
     virtual ~Notifica() = default;
-    virtual void invia(const std::string& messaggio) const = 0;
+    virtual void invia(const string& messaggio) const = 0;
 };
 
 class Email : public Notifica {
 public:
-    explicit Email(std::string destinatario) : destinatario_(std::move(destinatario)) {}
+    explicit Email(const string&amp; destinatario) : destinatario_(destinatario) {}
 
-    void invia(const std::string& messaggio) const override {
-        std::cout &lt;&lt; "[EMAIL a " &lt;&lt; destinatario_ &lt;&lt; "] " &lt;&lt; messaggio &lt;&lt; "\n";
+    void invia(const string& messaggio) const override {
+        cout &lt;&lt; "[EMAIL a " &lt;&lt; destinatario_ &lt;&lt; "] " &lt;&lt; messaggio &lt;&lt; "\n";
     }
 private:
-    std::string destinatario_;
+    string destinatario_;
 };
 
 class SMS : public Notifica {
 public:
-    explicit SMS(std::string numero) : numero_(std::move(numero)) {}
+    explicit SMS(const string&amp; numero) : numero_(numero) {}
 
-    void invia(const std::string& messaggio) const override {
-        std::cout &lt;&lt; "[SMS a " &lt;&lt; numero_ &lt;&lt; "] " &lt;&lt; messaggio &lt;&lt; "\n";
+    void invia(const string& messaggio) const override {
+        cout &lt;&lt; "[SMS a " &lt;&lt; numero_ &lt;&lt; "] " &lt;&lt; messaggio &lt;&lt; "\n";
     }
 private:
-    std::string numero_;
+    string numero_;
 };
 
 class Push : public Notifica {
 public:
-    explicit Push(std::string deviceId) : deviceId_(std::move(deviceId)) {}
+    explicit Push(const string&amp; deviceId) : deviceId_(deviceId) {}
 
-    void invia(const std::string& messaggio) const override {
-        std::cout &lt;&lt; "[PUSH a " &lt;&lt; deviceId_ &lt;&lt; "] " &lt;&lt; messaggio &lt;&lt; "\n";
+    void invia(const string& messaggio) const override {
+        cout &lt;&lt; "[PUSH a " &lt;&lt; deviceId_ &lt;&lt; "] " &lt;&lt; messaggio &lt;&lt; "\n";
     }
 private:
-    std::string deviceId_;
+    string deviceId_;
 };
 
 int main() {
-    std::vector&lt;std::unique_ptr&lt;Notifica&gt;&gt; canali;
-    canali.push_back(std::make_unique&lt;Email&gt;("alice@example.com"));
-    canali.push_back(std::make_unique&lt;SMS&gt;("+39 333 1234567"));
-    canali.push_back(std::make_unique&lt;Push&gt;("DEVICE-XYZ"));
+    Email email("alice@example.com");
+    SMS sms("+39 333 1234567");
+    Push push("DEVICE-XYZ");
+    Notifica* canali[3] = {&amp;email, &amp;sms, &amp;push};
 
-    for (const auto& c : canali) {
-        c-&gt;invia("Compito assegnato: esercizi di C++");
+    for (int i = 0; i &lt; 3; ++i) {
+        canali[i]-&gt;invia("Compito assegnato: esercizi di C++");
     }
 }</code></pre>
     </div>
@@ -179,8 +178,8 @@ int main() {
     </div>
 
     <div class="inner-box box">
-      <h2>Errori tipici da mostrare in classe</h2>
-      <p>Il testo chiude con quattro errori molto ben scelti, perché sono proprio quelli che producono fraintendimenti ricorrenti.</p>
+      <h2>Errori tipici da riconoscere</h2>
+      <p>Per ciascuno dei quattro casi, collega il sintomo alla causa e alla correzione.</p>
 
       <p><b>(A) Metodo non virtuale</b></p>
       <p><b>Sintomo:</b> chiami un metodo su <code>Base*</code>, ma viene eseguita la versione della base anche quando il puntatore punta a una derivata.</p>
@@ -201,14 +200,14 @@ int main() {
 
     <div class="inner-box box">
       <h2>Mini-esercizi finali</h2>
-      <p>Il testo della lezione si chiude con quattro mini-esercizi molto mirati. Sono utili per trasformare la teoria in allenamento immediato, senza aspettare il laboratorio finale.</p>
+      <p>Prima del laboratorio finale, applica i concetti della lezione con questi quattro esercizi.</p>
       <ol>
-        <li>Crea una gerarchia con classe base <code>Dipendente</code> e metodo virtuale <code>stipendioMensile() const</code>. Deriva <code>DipendenteFisso</code> e <code>DipendenteOrario</code>. Poi somma gli stipendi in un <code>vector&lt;unique_ptr&lt;Dipendente&gt;&gt;</code>.</li>
+        <li>Crea una gerarchia con classe base <code>Dipendente</code> e metodo virtuale <code>stipendioMensile() const</code>. Deriva <code>DipendenteFisso</code> e <code>DipendenteOrario</code>. Crea alcuni oggetti locali e somma gli stipendi tramite un array di <code>Dipendente*</code>.</li>
         <li>Definisci una classe astratta <code>Figura</code> con <code>area()</code> e <code>perimetro()</code>. Implementa <code>Quadrato</code>, <code>Rettangolo</code> e <code>Cerchio</code>. Stampa le aree con un ciclo polimorfico.</li>
         <li>Togli <code>virtual</code> da un metodo che dovrebbe essere polimorfico e osserva che cosa succede. Poi ripristina <code>virtual</code> e aggiungi <code>override</code>.</li>
         <li>Prova un caso di name hiding e risolvilo con <code>using Base::nomeMetodo;</code>.</li>
       </ol>
-      <p class="note"><b>Osservazione didattica:</b> questi esercizi sono piccoli, ma ognuno colpisce uno snodo concettuale importante: base astratta, ciclo polimorfico, ruolo di <code>virtual</code>, ruolo di <code>override</code>, gestione del name hiding.</p>
+      <p class="note"><b>Che cosa allenare:</b> base astratta, ciclo polimorfico, ruolo di <code>virtual</code>, ruolo di <code>override</code> e gestione del name hiding. Per ogni esercizio, spiega quali di questi concetti hai usato.</p>
     </div>
 
     <div class="inner-box box">
@@ -221,7 +220,7 @@ int main() {
         <li><code>dynamic_cast</code>: downcast sicuro a runtime</li>
         <li>classe astratta: contiene almeno un metodo virtuale puro</li>
       </ul>
-      <p>Il testo chiude con un piccolo esempio su <code>final</code>, utile per vedere sia un metodo finale sia una classe finale.</p>
+      <p>Nell'esempio seguente, <code>final</code> impedisce prima la ridefinizione di un metodo e poi la derivazione da una classe.</p>
 <pre><code class="language-cpp">struct Base {
     virtual void f() {}
 };

@@ -57,7 +57,7 @@
     <div class="inner-box box">
       <h2>Obiettivo di questa pagina</h2>
       <p>In questa parte dell'esercitazione non basta più riconoscere una risposta corretta. Bisogna spiegare i concetti con parole proprie, facendo riferimento agli esempi visti a lezione e usando un lessico preciso.</p>
-      <p>Il testo suggerisce risposte chiare e sintetiche, circa 5-8 righe per domanda. Questo è un ottimo vincolo didattico: costringe a essere precisi senza diventare prolissi e, soprattutto, obbliga a distinguere le idee davvero essenziali dal rumore.</p>
+      <p>Scrivi circa 5-8 righe per domanda. Usa i termini specifici della lezione e, quando richiesto, un piccolo esempio di codice. Non basta elencare le parole chiave: spiega il legame tra i concetti.</p>
       <p class="note"><b>Metodo di lavoro:</b> prima prova a costruire da solo una risposta breve. Poi confrontala con la traccia guidata qui sotto e verifica se stai nominando i concetti giusti e nel giusto ordine.</p>
     </div>
 
@@ -118,7 +118,7 @@ struct Der : Base {
       </div>
       <div id="sol-a19" style="display:none;margin-top:8px">
         <p><b>Traccia minima:</b> devi dire chiaramente che lo slicing avviene quando una derivata viene copiata in una base per valore.</p>
-        <p class="ok"><b>Risposta modello.</b> Lo slicing si verifica quando un oggetto derivato viene copiato in un oggetto base per valore, per esempio con un'istruzione come <code>Base b = d;</code>. In quel momento viene copiata solo la parte relativa alla base e la parte specifica della derivata viene persa. La conseguenza è che il nuovo oggetto non conserva più il comportamento completo del tipo derivato. Nel C++ moderno lo slicing si evita usando riferimenti a base, puntatori a base e, quando serve gestione dinamica della memoria, smart pointer come <code>std::unique_ptr&lt;Base&gt;</code>.</p>
+        <p class="ok"><b>Risposta modello.</b> Lo slicing si verifica quando un oggetto derivato viene copiato in un oggetto base per valore, per esempio con un'istruzione come <code>Base b = d;</code>. In quel momento viene copiata solo la parte relativa alla base e la parte specifica della derivata viene persa. La conseguenza è che il nuovo oggetto non conserva più il comportamento completo del tipo derivato. Nel C++ moderno lo slicing si evita usando riferimenti a base, puntatori a base e, quando serve gestione dinamica della memoria, smart pointer come <code>unique_ptr&lt;Base&gt;</code>.</p>
       </div>
     </div>
 

@@ -54,6 +54,7 @@
       <h2>Consegna: vendite mensili</h2>
       <p>Una matrice <code>vendite[3][4]</code> contiene le vendite di <strong>3 reparti</strong> durante <strong>4 settimane</strong>. Le righe rappresentano i reparti, le colonne le settimane.</p>
       <p>Realizza un programma C++ suddiviso in funzioni. Ogni funzione deve svolgere un solo compito.</p>
+      <p>In questo laboratorio le dimensioni sono fisse: tutte le funzioni lavorano su <code>R = 3</code> righe e <code>C = 4</code> colonne, dichiarate come costanti prima delle funzioni.</p>
     </section>
 
     <section class="topic-card">
@@ -77,27 +78,28 @@ using namespace std;
 
 constexpr int R = 3;
 constexpr int C = 4;
-using Matrice = int[R][C];
-
-bool leggi(Matrice&amp; m) {
-    for (int r = 0; r &lt; R; ++r)
-        for (int c = 0; c &lt; C; ++c)
-            if (!(cin &gt;&gt; m[r][c]) || m[r][c] &lt; 0)
+bool leggi(int m[][C]) {
+    for (int r = 0; r &lt; R; ++r) {
+        for (int c = 0; c &lt; C; ++c) {
+            if (!(cin &gt;&gt; m[r][c]) || m[r][c] &lt; 0) {
                 return false;
+            }
+        }
+    }
     return true;
 }
 
-void stampa(const Matrice&amp; m) {
+void stampa(const int m[][C]) {
     // TODO: stampa una riga della matrice per riga
 }
 
-int sommaRiga(const Matrice&amp; m, int r) {
+int sommaRiga(const int m[][C], int r) {
     // TODO: restituisci la somma della riga r
     return 0;
 }
 
 int main() {
-    Matrice vendite{};
+    int vendite[R][C]{};
 
     if (!leggi(vendite)) {
         cerr &lt;&lt; "Input non valido\n";
@@ -152,9 +154,7 @@ using namespace std;
 
 constexpr int R = 3;
 constexpr int C = 4;
-using Matrice = int[R][C];
-
-bool leggi(Matrice&amp; m) {
+bool leggi(int m[][C]) {
     for (int r = 0; r &lt; R; ++r) {
         for (int c = 0; c &lt; C; ++c) {
             if (!(cin &gt;&gt; m[r][c]) || m[r][c] &lt; 0)
@@ -164,7 +164,7 @@ bool leggi(Matrice&amp; m) {
     return true;
 }
 
-void stampa(const Matrice&amp; m) {
+void stampa(const int m[][C]) {
     for (int r = 0; r &lt; R; ++r) {
         for (int c = 0; c &lt; C; ++c) {
             if (c &gt; 0)
@@ -175,21 +175,21 @@ void stampa(const Matrice&amp; m) {
     }
 }
 
-int sommaRiga(const Matrice&amp; m, int r) {
+int sommaRiga(const int m[][C], int r) {
     int somma = 0;
     for (int c = 0; c &lt; C; ++c)
         somma += m[r][c];
     return somma;
 }
 
-int sommaColonna(const Matrice&amp; m, int c) {
+int sommaColonna(const int m[][C], int c) {
     int somma = 0;
     for (int r = 0; r &lt; R; ++r)
         somma += m[r][c];
     return somma;
 }
 
-int indiceSettimanaMigliore(const Matrice&amp; m) {
+int indiceSettimanaMigliore(const int m[][C]) {
     int migliore = 0;
     int totaleMigliore = sommaColonna(m, 0);
 
@@ -203,7 +203,7 @@ int indiceSettimanaMigliore(const Matrice&amp; m) {
     return migliore;
 }
 
-void trovaMassimo(const Matrice&amp; m, int&amp; rMax, int&amp; cMax) {
+void trovaMassimo(const int m[][C], int&amp; rMax, int&amp; cMax) {
     rMax = 0;
     cMax = 0;
 
@@ -218,7 +218,7 @@ void trovaMassimo(const Matrice&amp; m, int&amp; rMax, int&amp; cMax) {
 }
 
 int main() {
-    Matrice vendite{};
+    int vendite[R][C]{};
     if (!leggi(vendite)) {
         cerr &lt;&lt; "Input non valido\n";
         return 1;
@@ -274,15 +274,13 @@ int main() {
         <div class="solution-content">
           <figure class="code-example">
             <figcaption>C++17 · funzioni da aggiungere</figcaption>
-<pre><code class="language-cpp">using Trasposta = int[C][R];
-
-void trasponi(const Matrice&amp; origine, Trasposta&amp; destinazione) {
+<pre><code class="language-cpp">void trasponi(const int origine[][C], int destinazione[][R]) {
     for (int r = 0; r &lt; R; ++r)
         for (int c = 0; c &lt; C; ++c)
             destinazione[c][r] = origine[r][c];
 }
 
-void stampaTrasposta(const Trasposta&amp; m) {
+void stampaTrasposta(const int m[][R]) {
     for (int r = 0; r &lt; C; ++r) {
         for (int c = 0; c &lt; R; ++c)
             cout &lt;&lt; m[r][c] &lt;&lt; ' ';
@@ -290,7 +288,7 @@ void stampaTrasposta(const Trasposta&amp; m) {
     }
 }</code></pre>
           </figure>
-          <p>Nel <code>main</code> dichiara <code>Trasposta t{};</code>, poi chiama <code>trasponi(vendite, t)</code> e <code>stampaTrasposta(t)</code>.</p>
+          <p>Nel <code>main</code> dichiara <code>int t[C][R]{};</code>, poi chiama <code>trasponi(vendite, t)</code> e <code>stampaTrasposta(t)</code>.</p>
         </div>
       </details>
     </section>

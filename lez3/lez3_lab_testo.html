@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L3.7bis · Primo laboratorio sui file di testo</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try { hljs.highlightAll(); } catch (error) {}
+    });
+  </script>
+</head>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:42.11%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+  <h2>Lezione 3 - File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_lab_testo.html" class="active" aria-current="page">L3.7bis - Primo laboratorio sui file di testo</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
+    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
+    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
+    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
+    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Laboratorio guidato · File I/O · 8/19</p>
+    <h1>Il registro delle consegne del robot</h1>
+    <p class="lead">Primo laboratorio sui file di testo: scriviamo e rileggiamo token separati da spazi, un passo alla volta. Circa 2 ore per il percorso base; sfide aggiuntive facoltative.</p>
+  </header>
+<nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_7.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_8.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+
+    <section class="concept-card">
+      <h2>Un robot, un file, un piccolo rapporto</h2>
+      <p>Un robot porta pacchi in alcune zone della scuola. Per ogni tappa registriamo <strong>la destinazione</strong> e <strong>il numero di pacchi</strong>. Il primo programma salva il registro; un secondo programma lo rilegge e produce un riepilogo.</p>
+      <p><strong>Obiettivo:</strong> capire da dove arriva il dato e dove va. Procedi una fase alla volta: prima prevedi il risultato, poi esegui, infine controlla il file con un editor.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Il formato: soltanto token separati da spazi</h2>
+      <p>Un <strong>token</strong> è un elemento che leggiamo separatamente. Ogni consegna occupa due token, sempre nell’ordine <code>destinazione pacchi</code>. Questa coppia è un <strong>record</strong>, cioè i dati di una consegna. La destinazione è una sola parola; il numero di pacchi è un intero da 0 a 20. Nel programma finale accettiamo al massimo 20 tappe.</p>
+      <figure class="code-example">
+        <figcaption>consegne.txt · i cinque record del collaudo base, su un’unica riga</figcaption>
+<pre><code class="language-plaintext">ingresso 3 laboratorio 5 biblioteca 2 segreteria 4 palestra 1</code></pre>
+      </figure>
+      <p><code>ingresso 3</code> significa “3 pacchi all’ingresso”; la coppia successiva è <code>laboratorio 5</code>. <strong>Non aggiungere</strong> titoli, conteggi iniziali, virgole o punti e virgola al file.</p>
+      <div class="callout"><strong>Per questa attività:</strong> niente CSV, file binari, struct, vector, menu o lettura di righe con <code>getline</code>. Non servono nemmeno array: possiamo elaborare una coppia alla volta. In C++ useremo <code>ofstream</code>, <code>ifstream</code>, <code>&lt;&lt;</code> e <code>&gt;&gt;</code>.</div>
+    </section>
+
+    <section class="exercise-card" id="preparazione">
+      <span class="exercise-label">Fase 0 · Preparazione · 10 minuti</span>
+      <h2>Prepara due programmi separati</h2>
+      <ol class="steps">
+        <li>Crea una cartella di lavoro per il laboratorio. Scarica gli scheletri sotto oppure ricostruiscili nel tuo IDE.</li>
+        <li><code>scrivi_consegne.cpp</code> contiene il programma che scrive; <code>leggi_consegne.cpp</code> contiene quello che legge.</li>
+        <li>Compilali come <strong>due programmi distinti</strong>: non inserire due <code>main</code> nello stesso progetto eseguibile.</li>
+        <li>Imposta per entrambi la stessa <strong>cartella di lavoro</strong>, cioè quella da cui il programma cerca i percorsi relativi. Non è necessariamente la cartella del sorgente o dell’eseguibile.</li>
+      </ol>
+      <ul class="compact-list">
+        <li><a href="materiali_lab_testo/scrivi_consegne.cpp" download>Scarica lo scheletro dello scrittore</a></li>
+        <li><a href="materiali_lab_testo/leggi_consegne.cpp" download>Scarica lo scheletro del lettore</a></li>
+        <li><a href="materiali_lab_testo/consegne.txt" download>Scarica il file dati di riferimento</a>, da usare per confrontare il risultato, non per saltare la scrittura.</li>
+      </ul>
+      <p><strong>Prima decisione sul modello:</strong> quale tipo userai per la destinazione? Quale per i pacchi? Perché “sala docenti” non può essere una destinazione in questo formato?</p>
+      <details class="answer-reveal">
+  <summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary>
+  <div class="solution-content"><p>Usiamo <code>string</code> per la destinazione e <code>int</code> per i pacchi. “sala docenti” sarebbe divisa in due token: scegliamo un codice senza spazi, per esempio <code>sala_docenti</code>.</p></div>
+</details>
+      <div class="callout warning"><strong>File non trovato?</strong> Verifica prima la cartella di lavoro e il nome esatto <code>consegne.txt</code>, non <code>consegne.txt.txt</code>. Se l’IDE avvia un vecchio eseguibile dopo un errore di compilazione, correggi l’errore prima di proseguire.</div>
+    </section>
+
+    <section class="exercise-card" id="scrittura">
+      <span class="exercise-label">Fase 1 · Scrittura · 20 minuti</span>
+      <h2>Dal programma al file</h2>
+      <p>Lo scheletro scrive già la prima coppia. Eseguilo una volta e apri <code>consegne.txt</code> con un editor. Poi completa il TODO aggiungendo le altre quattro coppie del dataset, con un <strong>singolo spazio tra un token e il successivo</strong>.</p>
+      <figure class="code-example" data-example="scrittore-base">
+  <figcaption>C++17 · scrivi_consegne.cpp · scheletro compilabile</figcaption>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+
+using namespace std;
+
+int main() {
+    ofstream out("consegne.txt");
+    if (!out) {
+        cerr &lt;&lt; "Impossibile aprire consegne.txt in scrittura\n";
+        return 1;
+    }
+
+    out &lt;&lt; "ingresso" &lt;&lt; ' ' &lt;&lt; 3 &lt;&lt; ' ';
+    // TODO: aggiungi le altre quattro coppie, nello stesso ordine.
+
+    out.close();
+    if (!out) {
+        cerr &lt;&lt; "Errore durante la scrittura o la chiusura\n";
+        return 2;
+    }
+    cout &lt;&lt; "File consegne.txt scritto\n";
+}</code></pre>
+</figure>
+      <ol class="steps">
+        <li><code>ofstream out("consegne.txt")</code> apre il file per scrivere. <code>if (!out)</code> controlla che l’apertura sia riuscita.</li>
+        <li><code>out &lt;&lt; ...</code> invia testo al file, non allo schermo. <code>' '</code> è il carattere spazio che separa i token.</li>
+        <li><code>close()</code> conclude la scrittura; il controllo successivo serve a non ignorare errori finali.</li>
+      </ol>
+      <p><strong>Controllo pratico:</strong> confronta il file prodotto con il dataset. Esegui lo scrittore una seconda volta: le cinque coppie devono restare cinque, non diventare dieci.</p>
+      <details class="answer-reveal">
+  <summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary>
+  <div class="solution-content"><figure class="code-example" data-example="scrittore-soluzione">
+  <figcaption>C++17 · una possibile soluzione dello scrittore</figcaption>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+
+using namespace std;
+
+int main() {
+    ofstream out("consegne.txt");
+    if (!out) {
+        cerr &lt;&lt; "Impossibile aprire consegne.txt in scrittura\n";
+        return 1;
+    }
+
+    out &lt;&lt; "ingresso" &lt;&lt; ' ' &lt;&lt; 3 &lt;&lt; ' ';
+    out &lt;&lt; "laboratorio" &lt;&lt; ' ' &lt;&lt; 5 &lt;&lt; ' ';
+    out &lt;&lt; "biblioteca" &lt;&lt; ' ' &lt;&lt; 2 &lt;&lt; ' ';
+    out &lt;&lt; "segreteria" &lt;&lt; ' ' &lt;&lt; 4 &lt;&lt; ' ';
+    out &lt;&lt; "palestra" &lt;&lt; ' ' &lt;&lt; 1 &lt;&lt; ' ';
+
+    out.close();
+    if (!out) {
+        cerr &lt;&lt; "Errore durante la scrittura o la chiusura\n";
+        return 2;
+    }
+    cout &lt;&lt; "File consegne.txt scritto\n";
+}</code></pre>
+</figure></div>
+</details>
+      <div class="callout warning"><strong>Attenzione:</strong> questa apertura crea il file se manca, ma <strong>cancella il contenuto precedente</strong> se esiste. In questa fase è voluto. Non usare lo scrittore per provare a leggere un file modificato: lo riscriverebbe da capo.</div>
+    </section>
+
+    <section class="exercise-card" id="prima-lettura">
+      <span class="exercise-label">Fase 2 · Prima lettura · 15 minuti</span>
+      <h2>Dal file a due variabili</h2>
+      <p>Salva eventuali modifiche a <code>consegne.txt</code>, esegui il lettore e osserva le variabili <code>destinazione</code> e <code>pacchi</code>. Per ora vogliamo leggere <strong>soltanto la prima coppia</strong>.</p>
+      <figure class="code-example" data-example="lettore-base">
+  <figcaption>C++17 · leggi_consegne.cpp · prima prova compilabile</figcaption>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+using namespace std;
+
+int main() {
+    ifstream in("consegne.txt");
+    if (!in) {
+        cerr &lt;&lt; "Impossibile aprire consegne.txt in lettura\n";
+        return 1;
+    }
+
+    // Prima prova: leggiamo una sola coppia.
+    string destinazione;
+    int pacchi = 0;
+    if (!(in &gt;&gt; destinazione &gt;&gt; pacchi)) {
+        cerr &lt;&lt; "Prima coppia mancante o non leggibile\n";
+        return 2;
+    }
+    cout &lt;&lt; destinazione &lt;&lt; ": " &lt;&lt; pacchi &lt;&lt; " pacchi\n";
+
+    // Fase 3: sostituisci la lettura singola con un ciclo.
+    // Fase 4: aggiungi conteggio, totale e riepilogo su file.
+}</code></pre>
+</figure>
+      <p><strong>Prima di eseguire:</strong> scrivi l’output che ti aspetti. Spiega perché questa prova non stampa anche laboratorio, biblioteca e le altre destinazioni.</p>
+      <details class="answer-reveal">
+  <summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary>
+  <div class="solution-content"><p>L’output è <code>ingresso: 3 pacchi</code>. La lettura <code>in &gt;&gt; destinazione &gt;&gt; pacchi</code> è eseguita una sola volta. Il resto del file non viene elaborato: serve un ciclo.</p></div>
+</details>
+      <div class="callout"><strong>Confronto con la tastiera:</strong> <code>cin &gt;&gt; pacchi</code> legge dalla tastiera; <code>in &gt;&gt; pacchi</code> legge dal file aperto. Non devi digitare le consegne durante la lettura. Lo stream di input si chiude automaticamente alla fine del programma.</div>
+    </section>
+
+    <section class="exercise-card" id="ciclo">
+      <span class="exercise-label">Fase 3 · Ripetere la lettura · 25 minuti</span>
+      <h2>Una coppia alla volta, fino alla fine</h2>
+      <p>Nel lettore sostituisci il blocco di lettura singola, dalla dichiarazione di <code>destinazione</code> fino alla stampa, con lo schema seguente. Completa il TODO: per ogni coppia letta correttamente, stampa destinazione e pacchi.</p>
+      <ol class="steps">
+        <li>La condizione del <code>while</code> prova a leggere una destinazione. Se il file è finito regolarmente, il ciclo termina.</li>
+        <li>Se una destinazione è stata letta, deve seguirla il numero di pacchi: se manca o non è leggibile, segnaliamo un errore.</li>
+        <li>Solo dopo il successo di entrambe le letture possiamo stampare o elaborare la coppia. Non usare <code>while (!in.eof())</code>.</li>
+      </ol>
+      <figure class="code-example" data-example="ciclo-base">
+  <figcaption>C++17 · blocco da inserire dentro main, dopo il controllo di apertura</figcaption>
+<pre><code class="language-cpp">string destinazione;
+int pacchi = 0;
+
+while (in &gt;&gt; destinazione) {
+    if (!(in &gt;&gt; pacchi)) {
+        cerr &lt;&lt; "Numero di pacchi mancante o non leggibile\n";
+        return 2;
+    }
+    if (pacchi &lt; 0 || pacchi &gt; 20) {
+        cerr &lt;&lt; "Numero di pacchi fuori intervallo\n";
+        return 3;
+    }
+
+    // TODO: stampa destinazione e pacchi appena letti.
+}
+
+if (in.bad() || !in.eof()) {
+    cerr &lt;&lt; "Errore durante la lettura\n";
+    return 4;
+}</code></pre>
+</figure>
+      <details class="answer-reveal">
+  <summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary>
+  <div class="solution-content"><p>Al posto del TODO inserisci:</p><figure class="code-example" data-example="stampa-coppia">
+  <figcaption>C++17 · stampa della coppia corrente</figcaption>
+<pre><code class="language-cpp">cout &lt;&lt; destinazione &lt;&lt; ": " &lt;&lt; pacchi &lt;&lt; " pacchi\n";</code></pre>
+</figure><p>Al termine devi vedere cinque righe a schermo, anche se il file di input occupa una sola riga.</p></div>
+</details>
+    </section>
+
+    <section class="checkpoint">
+  <div class="checkpoint-prompt"><span class="checkpoint-label">Fermati e ragiona</span><h2>Per leggere cinque consegne servono cinque righe nel file?</h2><p>Prevedi che cosa cambia se sostituisci alcuni spazi con ritorni a capo oppure aggiungi più spazi tra i token.</p></div>
+  <details class="answer-reveal">
+  <summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary>
+  <div class="solution-content"><p>Con <code>&gt;&gt;</code> non cambia il risultato: spazi, tabulazioni e ritorni a capo separano i token. Il record è una <strong>coppia di valori</strong>, non necessariamente una riga. Nel file base scriviamo un singolo spazio per avere una convenzione semplice e uniforme.</p></div>
+</details>
+</section>
+
+    <section class="exercise-card" id="riepilogo">
+      <span class="exercise-label">Fase 4 · Elaborare e riscrivere · 30 minuti</span>
+      <h2>Quante tappe? Quanti pacchi? Quale media?</h2>
+      <p>Estendi il lettore con un conteggio e un accumulatore. Poi salva il risultato in un <strong>secondo file</strong>, <code>riepilogo.txt</code>. Non sovrascrivere <code>consegne.txt</code>, che rimane il nostro input.</p>
+      <ol class="steps">
+        <li>Prima del ciclo inizializza a zero <code>tappe</code> e <code>totale</code>.</li>
+        <li>Nel corpo, dopo i controlli, incrementa <code>tappe</code> e aggiungi <code>pacchi</code> al totale. Rifiuta una ventunesima consegna prima di contarla.</li>
+        <li>Dopo il ciclo verifica che la lettura sia finita senza errori. <strong>Solo allora</strong> apri il file di riepilogo con un nuovo <code>ofstream</code>.</li>
+        <li>Scrivi sei token separati da spazi: <code>tappe</code>, il conteggio, <code>pacchi</code>, il totale, <code>media</code>, la media.</li>
+        <li>Per la media usa <code>static_cast&lt;double&gt;(totale) / tappe</code>. Se il file era vuoto, non dividere per zero: scrivi il token <code>ND</code> al posto della media.</li>
+        <li>Chiudi il file di output e controlla l’esito, come nello scrittore.</li>
+      </ol>
+      <p><strong>Non aggiungere un menu.</strong> Il programma legge il file già esistente, stampa le coppie e produce il riepilogo. Nei token numerici usa soltanto interi separati correttamente: non valori attaccati a testo, come <code>3abc</code>.</p>
+      <p><strong>Prima di aprire la soluzione:</strong> calcola su carta conteggio, totale e media del dataset base. Prevedi anche i sei token del riepilogo per un file vuoto.</p>
+      <details class="answer-reveal">
+  <summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary>
+  <div class="solution-content"><p>Dataset base: <code>tappe 5 pacchi 15 media 3</code>. File vuoto: <code>tappe 0 pacchi 0 media ND</code>.</p><figure class="code-example" data-example="lettore-soluzione">
+  <figcaption>C++17 · lettore completo con riepilogo · sostituisce il lettore precedente</figcaption>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+using namespace std;
+
+int main() {
+    constexpr int MAX_TAPPE = 20;
+    ifstream in("consegne.txt");
+    if (!in) {
+        cerr &lt;&lt; "Impossibile aprire consegne.txt in lettura\n";
+        return 1;
+    }
+
+    string destinazione;
+    int pacchi = 0;
+    int tappe = 0;
+    int totale = 0;
+
+    while (in &gt;&gt; destinazione) {
+        if (!(in &gt;&gt; pacchi)) {
+            cerr &lt;&lt; "Numero di pacchi mancante o non leggibile\n";
+            return 2;
+        }
+        if (pacchi &lt; 0 || pacchi &gt; 20 || tappe == MAX_TAPPE) {
+            cerr &lt;&lt; "Dati fuori dai limiti previsti\n";
+            return 3;
+        }
+
+        cout &lt;&lt; destinazione &lt;&lt; ": " &lt;&lt; pacchi &lt;&lt; " pacchi\n";
+        ++tappe;
+        totale += pacchi;
+    }
+    if (in.bad() || !in.eof()) {
+        cerr &lt;&lt; "Errore durante la lettura\n";
+        return 4;
+    }
+
+    // Il riepilogo si scrive solo dopo una lettura conclusa bene.
+    ofstream out("riepilogo.txt");
+    if (!out) {
+        cerr &lt;&lt; "Impossibile aprire riepilogo.txt\n";
+        return 5;
+    }
+
+    out &lt;&lt; "tappe " &lt;&lt; tappe &lt;&lt; " pacchi " &lt;&lt; totale &lt;&lt; " media ";
+    if (tappe == 0)
+        out &lt;&lt; "ND";
+    else
+        out &lt;&lt; static_cast&lt;double&gt;(totale) / tappe;
+
+    out.close();
+    if (!out) {
+        cerr &lt;&lt; "Errore durante la scrittura del riepilogo\n";
+        return 6;
+    }
+    cout &lt;&lt; "Riepilogo scritto in riepilogo.txt\n";
+}</code></pre>
+</figure><p><strong>Segui tre blocchi:</strong> apertura; ciclo con conteggio e somma; scrittura del risultato. Il riepilogo viene creato solo dopo la lettura corretta. Le eventuali righe già mostrate a schermo prima di un errore non sono un riepilogo finale.</p></div>
+</details>
+    </section>
+
+    <section class="exercise-card" id="collaudo">
+      <span class="exercise-label">Fase 5 · Collaudo e consegna · 20 minuti</span>
+      <h2>Un test alla volta, senza riscrivere l’input per errore</h2>
+      <p>Conserva una copia del file corretto. Prima di ogni test modifica <strong>solo</strong> <code>consegne.txt</code>, poi esegui il lettore completo. Non rilanciare lo scrittore, altrimenti cancelleresti la modifica da verificare.</p>
+      <ol class="steps">
+        <li>Usa il dataset base e controlla il riepilogo calcolato nella fase 4.</li>
+        <li>Lascia soltanto <code>ingresso 3</code>, senza ritorno a capo finale.</li>
+        <li>Svuota il contenuto del file, senza eliminarlo.</li>
+        <li>Ripristina i dati e sostituisci un numero con la parola <code>due</code>.</li>
+        <li>Ripristina i dati e lascia l’ultima destinazione <code>palestra</code> senza il numero di pacchi.</li>
+        <li>Prova <code>ingresso -1</code>, poi <code>ingresso 21</code>. Infine rinomina temporaneamente il file per simulare un input assente.</li>
+      </ol>
+      <details class="answer-reveal">
+  <summary><span class="when-closed">Mostra risultati attesi</span><span class="when-open">Nascondi risultati attesi</span></summary>
+  <div class="solution-content"><ul><li>Dataset base: cinque coppie; <code>tappe 5 pacchi 15 media 3</code>.</li><li>Una coppia senza fine riga: successo; <code>tappe 1 pacchi 3 media 3</code>.</li><li>File vuoto: successo; <code>tappe 0 pacchi 0 media ND</code>.</li><li>Numero sostituito con <code>due</code> o ultimo numero mancante: errore di lettura, senza un nuovo riepilogo.</li><li>−1 o 21 pacchi: dato fuori intervallo, senza un nuovo riepilogo.</li><li>File assente: errore di apertura, senza un nuovo riepilogo.</li></ul><p>Come prova aggiuntiva, un file di 20 coppie valide è ammesso; la ventunesima deve essere rifiutata.</p></div>
+</details>
+      <div class="callout warning"><strong>Non farti ingannare da un vecchio risultato:</strong> se l’input è errato, il programma non riscrive <code>riepilogo.txt</code>. Un riepilogo precedente potrebbe quindi essere ancora presente. Prima di un test negativo rinominalo, oppure controlla il messaggio e la data dell’ultima modifica.</div>
+      <p><strong>Da consegnare:</strong> i due sorgenti completati, il file dati base, il riepilogo corretto e una breve nota sui test eseguiti. Devi saper indicare nel codice dove apri, leggi, scrivi, controlli e concludi le operazioni.</p>
+    </section>
+
+    <section class="exercise-card" id="aggiunta">
+      <span class="exercise-label">Sfida facoltativa A · 15–20 minuti</span>
+      <h2>Aggiungi una consegna senza cancellare le altre</h2>
+      <p>Riparti dal file base con cinque coppie. Crea un <strong>terzo programma separato</strong>, <code>aggiungi_consegna.cpp</code>, che apra il file con <code>ios::app</code> e aggiunga <code>aula4 6</code>. Metti uno spazio <strong>prima</strong> della nuova destinazione: l’ultimo token precedente potrebbe non essere seguito da uno spazio.</p>
+      <p>Esegui l’aggiunta una sola volta, poi rilancia soltanto il lettore. Prevedi il nuovo conteggio, il totale e la media. Che cosa accadrebbe rilanciando invece lo scrittore iniziale?</p>
+      <details class="answer-reveal">
+  <summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary>
+  <div class="solution-content"><figure class="code-example" data-example="aggiunta-soluzione">
+  <figcaption>C++17 · aggiungi_consegna.cpp · programma indipendente</figcaption>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+
+using namespace std;
+
+int main() {
+    ofstream out("consegne.txt", ios::app);
+    if (!out) {
+        cerr &lt;&lt; "Impossibile aprire consegne.txt\n";
+        return 1;
+    }
+
+    out &lt;&lt; ' ' &lt;&lt; "aula4" &lt;&lt; ' ' &lt;&lt; 6;
+    out.close();
+    if (!out) {
+        cerr &lt;&lt; "Errore durante l'aggiunta\n";
+        return 2;
+    }
+    cout &lt;&lt; "Consegna aggiunta\n";
+}</code></pre>
+</figure><p>Il lettore produce <code>tappe 6 pacchi 21 media 3.5</code>. Il cast evita la divisione intera <code>21 / 6 = 3</code>. Lo scrittore iniziale ripristinerebbe le sole cinque consegne base. Ogni esecuzione del programma di aggiunta inserisce un’altra coppia: non cancella e non evita duplicati.</p></div>
+</details>
+    </section>
+
+    <section class="exercise-card" id="massimo">
+      <span class="exercise-label">Sfida facoltativa B · 15–20 minuti</span>
+      <h2>Qual è la consegna più grande?</h2>
+      <p>Nel lettore trova la destinazione della <strong>singola consegna</strong> con il maggior numero di pacchi, senza memorizzare tutte le coppie in un array. Non devi sommare record con lo stesso nome. In caso di parità conserva la prima. Con file vuoto stampa <code>Nessuna destinazione</code>.</p>
+      <details class="answer-reveal">
+  <summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary>
+  <div class="solution-content"><p>Prima del ciclo aggiungi <code>int massimo = -1;</code> e <code>string destinazioneMassima;</code>. Dopo la lettura e i controlli della coppia usa:</p><figure class="code-example" data-example="massimo-frammento">
+  <figcaption>C++17 · aggiornamento nel corpo del ciclo</figcaption>
+<pre><code class="language-cpp">if (pacchi &gt; massimo) {
+    massimo = pacchi;
+    destinazioneMassima = destinazione;
+}</code></pre>
+</figure><p>Dopo i controlli finali della lettura, stampa la destinazione solo se <code>tappe &gt; 0</code>; altrimenti il messaggio per il file vuoto. Il confronto stretto <code>&gt;</code> conserva la prima a parità. Sul file base vince <code>laboratorio</code> con 5 pacchi; dopo l’aggiunta vince <code>aula4</code> con 6.</p></div>
+</details>
+    </section>
+
+    <aside class="next-step"><strong>Prima di chiudere.</strong> Mostra il risultato al docente e spiega la differenza tra <code>cout</code> e lo stream di output del file, tra una coppia e una riga, tra sovrascrittura e aggiunta.</aside>
+
+  </div>
+<nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_7.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_8.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

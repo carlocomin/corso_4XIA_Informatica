@@ -75,7 +75,7 @@
         <figcaption>C++17 · visita sopra la diagonale</figcaption>
 <pre><code class="language-cpp">constexpr int N = 3;
 
-bool simmetrica(const int (&amp;m)[N][N]) {
+bool simmetrica(const int m[][N]) {
     for (int r = 0; r &lt; N; ++r) {
         for (int c = r + 1; c &lt; N; ++c) {
             if (m[r][c] != m[c][r])

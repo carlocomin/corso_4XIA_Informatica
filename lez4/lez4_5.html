@@ -92,6 +92,7 @@ public:
     <div class="inner-box box">
       <h2><code>= delete</code></h2>
       <p>Con <code>= delete</code> dichiari che una certa operazione non deve esistere.</p>
+      <p>Nell’esempio compare anche <code>explicit</code>: sul costruttore impedisce conversioni implicite da <code>int</code> a <code>SoloConId</code>. Per creare l’oggetto chiamiamo esplicitamente il costruttore, per esempio con <code>SoloConId s(4);</code>.</p>
 <pre><code class="language-cpp">class SoloConId {
 public:
     SoloConId() = delete;

@@ -64,9 +64,13 @@
     <div class="inner-box box">
       <h2>Overload per parametri</h2>
       <p>Puoi usare lo stesso nome per operazioni concettualmente uguali ma con firme diverse.</p>
-<pre><code class="language-cpp">class Logger {
+<pre><code class="language-cpp">#include &lt;string&gt;
+
+using namespace std;
+
+class Logger {
 public:
-    void write(const std::string& s);
+    void write(const string& s);
     void write(int value);
 };</code></pre>
       <p>Qui il significato resta "scrivere qualcosa", ma il tipo dell'argomento cambia.</p>
@@ -77,7 +81,7 @@ public:
       <p>Una variante comune e offrire due versioni dello stesso accesso: una per sola lettura e una che permette modifica.</p>
 <pre><code class="language-cpp">class Buffer {
 private:
-    int data_[10];
+    int data_[10]{};
 public:
     int& at(int i) { return data_[i]; }
     const int& at(int i) const { return data_[i]; }

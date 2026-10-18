@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:77.78%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:78.95%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -28,6 +28,7 @@
     <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
     <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
     <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
@@ -45,7 +46,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 14/18</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 15/19</p>
     <h1>Scrivere un file binario in C++</h1>
     <p class="lead">Dallo schema ARRB alle chiamate write: header completo, quantità logica e controllo della scrittura.</p>
   </header>
@@ -88,7 +89,7 @@ int main() {
               sizeof versione);
     out.write(reinterpret_cast&lt;const char*&gt;(&amp;n), sizeof n);
     // 4. Scriviamo solo la parte valida dell'array.
-    const auto byteValori =
+    const streamsize byteValori =
         static_cast&lt;streamsize&gt;(n * sizeof valori[0]);
     out.write(reinterpret_cast&lt;const char*&gt;(valori), byteValori);
 

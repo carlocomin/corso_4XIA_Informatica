@@ -57,7 +57,7 @@
     <div class="inner-box box">
       <h2>Perché parlare di cast in una gerarchia</h2>
       <p>Una volta che hai una gerarchia con base e derivate, può capitarti di voler passare da un tipo all'altro. Non tutti questi passaggi hanno però lo stesso grado di sicurezza.</p>
-      <p>Il testo distingue bene due casi:</p>
+      <p>Distinguiamo due casi:</p>
       <ul>
         <li><b>upcast</b>: da derivata a base;</li>
         <li><b>downcast</b>: da base a derivata.</li>
@@ -68,7 +68,7 @@
     <div class="inner-box box">
       <h2>Upcast: passare da derivata a base è sicuro</h2>
       <p>L'upcast consiste nel trattare un oggetto derivato come un oggetto della sua base. Questo passaggio è sicuro, perché la derivata è davvero anche una base.</p>
-      <p>Il testo usa questo esempio:</p>
+      <p>In questo esempio passiamo dalla derivata alla base:</p>
 <pre><code class="language-cpp">Cane c;
 Animale& ra = c;
 Animale* pa = &amp;c;</code></pre>
@@ -85,28 +85,33 @@ Animale* pa = &amp;c;</code></pre>
     <div class="inner-box box">
       <h2>Quando entra in gioco <code>dynamic_cast</code></h2>
       <p>Quando serve controllare il tipo reale a runtime, si può usare <code>dynamic_cast</code>. Questa operazione non "indovina" a caso: verifica se l'oggetto reale appartiene davvero al tipo richiesto.</p>
-      <p>Il testo propone questo esempio:</p>
+      <p>In questo esempio tentiamo invece di passare dalla base alla derivata:</p>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+using namespace std;
 
 struct Base {
     virtual ~Base() = default;
 };
 
 struct Der1 : Base {
-    void x() const { std::cout &lt;&lt; "Der1\n"; }
+    void x() const { cout &lt;&lt; "Der1\n"; }
 };
 
 struct Der2 : Base {
-    void y() const { std::cout &lt;&lt; "Der2\n"; }
+    void y() const { cout &lt;&lt; "Der2\n"; }
 };
 
 void prova(Base* p) {
-    if (auto d1 = dynamic_cast&lt;Der1*&gt;(p)) {
+    Der1* d1 = dynamic_cast&lt;Der1*&gt;(p);
+    Der2* d2 = dynamic_cast&lt;Der2*&gt;(p);
+
+    if (d1 != nullptr) {
         d1-&gt;x();
-    } else if (auto d2 = dynamic_cast&lt;Der2*&gt;(p)) {
+    } else if (d2 != nullptr) {
         d2-&gt;y();
     } else {
-        std::cout &lt;&lt; "Tipo sconosciuto\n";
+        cout &lt;&lt; "Tipo sconosciuto\n";
     }
 }</code></pre>
     </div>
@@ -134,7 +139,7 @@ void prova(Base* p) {
 
     <div class="inner-box box">
       <h2>Perché non bisogna abusare del downcast</h2>
-      <p>Il testo chiude con una regola progettuale molto sana: se puoi ottenere lo stesso risultato con un metodo virtuale ben progettato, quello è di solito l'approccio migliore.</p>
+      <p>Prima di ricorrere a un cast, chiediti se puoi ottenere lo stesso risultato con un metodo virtuale. Se basta usare l'interfaccia della base, il codice chiamante non deve distinguere i tipi concreti.</p>
       <p>Questa osservazione va presa sul serio. Se un programma passa il tempo a fare cast dalla base alle varie derivate per capire "chi è" l'oggetto, probabilmente la base non sta esprimendo abbastanza bene il contratto comune.</p>
       <p class="warn"><b>Segnale d'allarme:</b> se devi fare <code>dynamic_cast</code> ovunque, forse il progetto sta chiedendo una interfaccia virtuale migliore, non più cast.</p>
     </div>
@@ -144,17 +149,19 @@ void prova(Base* p) {
       <p>Molte volte il bisogno di <code>dynamic_cast</code> scompare se la base espone già il comportamento giusto. In quel caso il codice chiamante non deve più chiedere "che tipo sei?", ma solo usare il contratto comune.</p>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 struct Base {
     virtual ~Base() = default;
     virtual void descrivi() const = 0;
 };
 
 struct Der1 : Base {
-    void descrivi() const override { std::cout &lt;&lt; "Sono Der1\n"; }
+    void descrivi() const override { cout &lt;&lt; "Sono Der1\n"; }
 };
 
 struct Der2 : Base {
-    void descrivi() const override { std::cout &lt;&lt; "Sono Der2\n"; }
+    void descrivi() const override { cout &lt;&lt; "Sono Der2\n"; }
 };
 
 void mostra(const Base& b) {
@@ -187,7 +194,7 @@ void mostra(const Base& b) {
     </div>
 
     <div class="inner-box note">
-      <b>Passo successivo.</b> A questo punto resta da chiudere la teoria con i temi finali del testo: ereditarietà multipla, diamond problem, buone pratiche, esempio completo ed errori tipici. Nella <strong>Lez5_8</strong> raccoglieremo proprio questi ultimi pezzi.
+      <b>Passo successivo.</b> Nella <strong>Lez5_8</strong> affronteremo ereditarietà multipla e diamond problem, poi raccoglieremo le buone pratiche e gli errori tipici attorno a un esempio completo.
     </div>
 
   </div>

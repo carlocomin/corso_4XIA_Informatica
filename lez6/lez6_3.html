@@ -85,7 +85,9 @@
       <p>Questo suggerisce una strategia molto pulita: risolvere il problema sul nodo corrente e poi ripetere lo stesso ragionamento sui due sottoalberi, che sono alberi più piccoli della stessa natura.</p>
       <p>Il caso base è semplice: se il puntatore è nullo, l'albero è vuoto e non c'è nulla da visitare.</p>
 <pre><code class="language-cpp">void visitaQualunque(const Node* p) {
-    if (p == nullptr) return;   // caso base
+    if (p == nullptr) {
+        return;   // caso base
+    }
     // azione sul nodo corrente
     // chiamata sul sottoalbero sinistro
     // chiamata sul sottoalbero destro
@@ -110,9 +112,15 @@
       <p>Nella visita in <b>preordine</b> elaboriamo subito il nodo corrente, poi visitiamo il sottoalbero sinistro e infine quello destro. In forma compatta:</p>
 <pre><code>nodo -> sinistra -> destra</code></pre>
       <p>Questa visita è utile quando vogliamo "vedere" il nodo prima di scendere nei suoi figli. Per esempio, è naturale per copiare la struttura di un albero o per produrre una rappresentazione prefissa di un'espressione.</p>
-<pre><code class="language-cpp">void preorder(const Node* p) {
-    if (p == nullptr) return;
-    std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+using namespace std;
+
+void preorder(const Node* p) {
+    if (p == nullptr) {
+        return;
+    }
+    cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
     preorder(p-&gt;left);
     preorder(p-&gt;right);
 }</code></pre>
@@ -126,10 +134,16 @@
       <p>Nella visita in <b>inordine</b> prima si visita il sottoalbero sinistro, poi si elabora il nodo corrente, poi si visita il sottoalbero destro. In forma compatta:</p>
 <pre><code>sinistra -> nodo -> destra</code></pre>
       <p>Questa visita è particolarmente importante negli <b>alberi binari</b>, perché usa in modo esplicito la distinzione tra figlio sinistro e figlio destro. In un albero generale l'idea di "inordine" non è più così naturale.</p>
-<pre><code class="language-cpp">void inorder(const Node* p) {
-    if (p == nullptr) return;
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+using namespace std;
+
+void inorder(const Node* p) {
+    if (p == nullptr) {
+        return;
+    }
     inorder(p-&gt;left);
-    std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+    cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
     inorder(p-&gt;right);
 }</code></pre>
       <p>Applicata all'albero campione, la sequenza è:</p>
@@ -142,11 +156,17 @@
       <p>Nella visita in <b>postordine</b> il nodo viene elaborato solo dopo aver visitato entrambi i sottoalberi. In forma compatta:</p>
 <pre><code>sinistra -> destra -> nodo</code></pre>
       <p>Questa visita è naturale quando il nodo dipende dai risultati dei figli. È il caso, per esempio, della valutazione di un albero di espressione o della distruzione corretta di un albero dinamico: prima tratto i figli, poi il nodo che li collega.</p>
-<pre><code class="language-cpp">void postorder(const Node* p) {
-    if (p == nullptr) return;
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+using namespace std;
+
+void postorder(const Node* p) {
+    if (p == nullptr) {
+        return;
+    }
     postorder(p-&gt;left);
     postorder(p-&gt;right);
-    std::cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
+    cout &lt;&lt; p-&gt;key &lt;&lt; ' ';
 }</code></pre>
       <p>Applicata all'albero campione, la sequenza è:</p>
 <pre><code class="language-text">D E B F C A</code></pre>
@@ -187,7 +207,7 @@
     <div class="inner-box box">
       <h2>Che cosa cambia davvero tra le tre visite?</h2>
       <p>A livello di codice, le tre funzioni sono quasi identiche. Hanno lo stesso caso base, visitano gli stessi sottoalberi e usano la stessa struttura ricorsiva. Cambia soltanto la posizione della riga che elabora il nodo corrente.</p>
-      <p>È proprio questo il punto didattico più importante della pagina: un cambiamento sintatticamente minimo produce comportamenti algoritmici molto diversi. Se elaboro il nodo prima dei figli, "vedo prima il contenitore". Se lo elaboro in mezzo, ottengo un ordine legato alla posizione sinistra/destra. Se lo elaboro alla fine, ottengo una logica di dipendenza dai figli.</p>
+      <p>Basta spostare l'elaborazione del nodo per cambiare l'ordine della visita. Se elaboro il nodo prima dei figli, "vedo prima il contenitore". Se lo elaboro in mezzo, ottengo un ordine legato alla posizione sinistra/destra. Se lo elaboro alla fine, posso usare i risultati già ottenuti dai figli.</p>
       <p class="ok"><b>Osservazione chiave:</b> capire le visite significa capire il significato dell'ordine, non solo il codice.</p>
     </div>
 

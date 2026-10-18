@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:44.44%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:47.37%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
@@ -28,6 +28,7 @@
     <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
     <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html" class="active" aria-current="page">L3.8 - La stessa idea in C</a></li>
     <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
     <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
@@ -45,12 +46,12 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 8/18</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 9/19</p>
     <h1>La stessa idea in C</h1>
     <p class="lead">Cambiano tipi e funzioni, non il metodo: aprire, controllare i valori restituiti, elaborare e chiudere.</p>
   </header>
-  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
-    <a class="nav-button" href="lez3_7.html">&#8592; Precedente</a>
+<nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_lab_testo.html">&#8592; Precedente</a>
     <a class="nav-button primary" href="lez3_9.html">Successiva &#8594;</a>
   </nav>
   <div class="content-box">
@@ -82,8 +83,11 @@ int main(void) {
     double voto;
     int letti;
 
-    while ((letti = fscanf(in, "%39s %lf", nome, &amp;voto)) == 2)
+    letti = fscanf(in, "%39s %lf", nome, &amp;voto);
+    while (letti == 2) {
         printf("%s: %.1f\n", nome, voto);
+        letti = fscanf(in, "%39s %lf", nome, &amp;voto);
+    }
 
     if (ferror(in)) {
         fclose(in);
@@ -94,7 +98,10 @@ int main(void) {
         return 6;  /* record malformato */
     }
 
-    return fclose(in) == EOF ? 7 : 0;
+    if (fclose(in) == EOF) {
+        return 7;
+    }
+    return 0;
 }</code></pre>
     </figure>
 
@@ -139,8 +146,8 @@ int main(void) {
 
     <aside class="next-step"><strong>Prossimo passo.</strong> Uniamo file e struct definendo una rappresentazione testuale semplice.</aside>
   </div>
-  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
-    <a class="nav-button" href="lez3_7.html">&#8592; Precedente</a>
+<nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_lab_testo.html">&#8592; Precedente</a>
     <a class="nav-button primary" href="lez3_9.html">Successiva &#8594;</a>
   </nav>
 </main>

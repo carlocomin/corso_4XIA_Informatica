@@ -85,15 +85,20 @@
         <li>se non c'è, lo inserisco;</li>
         <li>se c'è già, segnalo che è un duplicato oppure incremento un contatore esterno.</li>
       </ul>
-<pre><code class="language-cpp">Node* root = nullptr;
+      <p>Inserisci questo frammento nel <code>main</code>, usando le funzioni delle slide precedenti.</p>
+<pre><code class="language-cpp">constexpr int N = 6;
+int input[N] = {4, 7, 4, 2, 7, 9};
+Node* root = nullptr;
 
-for (int x : input) {
+for (int i = 0; i &lt; N; ++i) {
+    int x = input[i];
     if (search(root, x) == nullptr) {
         root = insert(root, x);
     } else {
-        std::cout &lt;&lt; x &lt;&lt; " già presente\n";
+        cout &lt;&lt; x &lt;&lt; " già presente\n";
     }
-}</code></pre>
+}
+destroyTree(root);</code></pre>
       <p>Qui il BST funziona come una struttura dati per la <b>membership</b>, cioè per rispondere alla domanda "questo valore appartiene già all'insieme?".</p>
     </div>
 
@@ -116,7 +121,7 @@ for (int x : input) {
 <pre><code class="language-text">7 4 9 4 2 9 1 7 3</code></pre>
       <p>Inserendo ogni chiave nel BST solo se non è già presente, alla fine l'inordine restituirà:</p>
 <pre><code class="language-text">1 2 3 4 7 9</code></pre>
-      <p>Questo è un esempio didatticamente molto forte, perché mostra che il BST non serve solo a "conservare" i dati: serve anche a trasformarli in una forma utile al problema.</p>
+      <p>Il risultato ha due proprietà: ogni valore compare una sola volta e i valori sono in ordine crescente. La politica di inserimento elimina i duplicati; la visita inorder produce l'ordinamento.</p>
     </div>
 
     <div class="inner-box box">
@@ -222,7 +227,7 @@ for (int x : input) {
 
     <div class="inner-box box">
       <h2>Quando il BST non è la scelta migliore</h2>
-      <p>Dal punto di vista didattico è importante anche saper dire <b>quando non usarlo</b>. Se il problema chiede solo test di appartenenza molto rapidi e non interessa affatto l'ordine, una hash table può essere più naturale. Se invece i dati sono tutti noti in anticipo e non cambiano, un array ordinato può bastare benissimo.</p>
+      <p>Devi anche saper riconoscere <b>quando non usarlo</b>. Se il problema chiede solo test di appartenenza molto rapidi e non interessa affatto l'ordine, una hash table può essere più naturale. Se invece i dati sono tutti noti in anticipo e non cambiano, un array ordinato può bastare.</p>
       <p>Questo punto conta molto nel problem solving: conoscere una struttura dati non significa doverla usare sempre. Significa sapere riconoscere quando il suo mix di vantaggi è davvero adatto al problema.</p>
     </div>
 

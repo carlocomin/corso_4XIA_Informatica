@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="720" viewBox="0 0 720 720" role="img" aria-labelledby="title description">
+  <title id="title">Programmazione e algoritmi</title>
+  <desc id="description">Un computer con un diagramma di flusso. Corso di informatica della classe 4BIA.</desc>
+  <rect width="720" height="720" rx="20" fill="#f7f0df"/>
+  <g fill="#005360">
+    <path d="M160 72h400a24 24 0 0 1 24 24v256H136V96a24 24 0 0 1 24-24Z"/>
+    <path d="M104 366h184l16 16h112l16-16h184v12a30 30 0 0 1-30 30H134a30 30 0 0 1-30-30Z"/>
+  </g>
+  <rect x="160" y="96" width="400" height="232" rx="8" fill="#f7f0df"/>
+  <g stroke="#cf4b00" stroke-width="11" stroke-linecap="square" stroke-linejoin="round" fill="none">
+    <path d="M360 168v34M310 240h-48v42M410 240h48v42"/>
+  </g>
+  <g fill="#cf4b00">
+    <rect x="330" y="126" width="60" height="42" rx="6"/>
+    <path d="m360 202 50 38-50 38-50-38Z"/>
+    <rect x="230" y="282" width="64" height="40" rx="5"/>
+    <rect x="426" y="282" width="64" height="40" rx="5"/>
+  </g>
+  <g fill="#005360" text-anchor="middle" font-family="'Franklin Gothic Medium', 'Trebuchet MS', sans-serif">
+    <text x="360" y="470" font-size="27" letter-spacing="3">INTRODUZIONE ALLA</text>
+    <text x="360" y="532" font-size="47" font-weight="700">PROGRAMMAZIONE</text>
+    <text x="360" y="593" font-size="51" font-weight="700">E ALGORITMI</text>
+    <text x="360" y="654" font-size="22" letter-spacing="2">INFORMATICA / 4BIA</text>
+  </g>
+</svg>

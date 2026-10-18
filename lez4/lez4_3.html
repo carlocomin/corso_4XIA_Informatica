@@ -65,8 +65,8 @@
       <h2>Struttura base</h2>
 <pre><code class="language-cpp">class Punto {
 private:
-    double x_;
-    double y_;
+    double x_ = 0.0;
+    double y_ = 0.0;
 public:
     double x() const { return x_; }
     double y() const { return y_; }

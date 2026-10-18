@@ -81,16 +81,18 @@
       <p>Il modo più semplice per fissare questa regola è osservare un programma che stampa i messaggi dei costruttori e dei distruttori.</p>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
 
+using namespace std;
+
 class Base {
 public:
-    Base()  { std::cout &lt;&lt; "Base()\n"; }
-    ~Base() { std::cout &lt;&lt; "~Base()\n"; }
+    Base()  { cout &lt;&lt; "Base()\n"; }
+    ~Base() { cout &lt;&lt; "~Base()\n"; }
 };
 
 class Derivata : public Base {
 public:
-    Derivata()  { std::cout &lt;&lt; "Derivata()\n"; }
-    ~Derivata() { std::cout &lt;&lt; "~Derivata()\n"; }
+    Derivata()  { cout &lt;&lt; "Derivata()\n"; }
+    ~Derivata() { cout &lt;&lt; "~Derivata()\n"; }
 };
 
 int main() {
@@ -122,13 +124,13 @@ Derivata()
 
     <div class="inner-box box">
       <h2>Base con costruttore parametrico</h2>
-      <p>Un altro punto essenziale del testo è questo: se la classe base richiede argomenti, la derivata deve inizializzarla nella lista di inizializzazione. Non può rimandare, non può "sistemare dopo". La base va costruita subito, e va costruita bene.</p>
+      <p>Se la classe base richiede argomenti, la derivata deve passarli nella lista di inizializzazione. Non può rimandare questa operazione al corpo del costruttore: la parte base deve essere già costruita quando il corpo inizia.</p>
       <p>Questo è il motivo per cui nella lista di inizializzazione del costruttore della derivata compare spesso una chiamata esplicita al costruttore della base.</p>
     </div>
 
     <div class="inner-box box">
       <h2>Esempio: <code>Rettangolo</code> e <code>Parallelepipedo</code></h2>
-      <p>Il testo propone questo esempio:</p>
+      <p>Osserva come il costruttore del parallelepipedo inizializza anche il rettangolo di base:</p>
 <pre><code class="language-cpp">class Rettangolo {
 public:
     Rettangolo(double w, double h) : w_(w), h_(h) {}
@@ -156,12 +158,12 @@ private:
         <li>il riuso del costruttore della base;</li>
         <li>il riuso dei metodi della base, come <code>area()</code>.</li>
       </ul>
-      <p>Dal punto di vista strettamente didattico funziona bene, perché permette di concentrarsi su inizializzazione e riuso senza introdurre troppi dettagli. Il testo, però, fa giustamente anche una nota metodologica importante: in un progetto reale, dal punto di vista concettuale, si potrebbe preferire la composizione.</p>
-      <p>Questo è un ottimo promemoria: non tutti gli esempi che sono utili a spiegare la meccanica del linguaggio sono automaticamente il miglior modello del dominio reale.</p>
+      <p>Qui ci concentriamo su inizializzazione e riuso. Per modellare invece il dominio geometrico, un parallelepipedo non è un rettangolo: ha una base rettangolare. In un progetto reale, la composizione rappresenterebbe meglio questa relazione.</p>
+      <p>Distingui quindi il meccanismo del linguaggio dalla scelta del modello: il fatto che una derivazione compili non basta a renderla una buona scelta progettuale.</p>
     </div>
 
     <div class="inner-box box">
-      <h2>Nota didattica importante</h2>
+      <h2>Meccanismo del linguaggio e scelte di progetto</h2>
       <p>Quando studi il linguaggio, a volte incontri esempi costruiti per isolare un meccanismo preciso. Qui il meccanismo è chiarissimo: la derivata richiama il costruttore della base e riusa i suoi metodi.</p>
       <p>Ma progettare bene non significa solo sapere che una cosa si può fare. Significa anche chiedersi se sia il modello più adatto. In questa lezione stiamo quindi lavorando su due piani insieme:</p>
       <ul>

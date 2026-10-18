@@ -89,28 +89,30 @@ Esempio:
     #include <iostream>
     #include <string>
 
+    using namespace std;
+
     class Persona {
     public:
-        Persona(std::string nome) : nome_(std::move(nome)) {}
+        Persona(const string& nome) : nome_(nome) {}
 
         void saluta() const {
-            std::cout << "Ciao, sono " << nome_ << "\n";
+            cout << "Ciao, sono " << nome_ << "\n";
         }
 
     protected:
-        const std::string& nome() const { return nome_; }
+        const string& nome() const { return nome_; }
 
     private:
-        std::string nome_;
+        string nome_;
     };
 
     class Studente : public Persona {
     public:
-        Studente(std::string nome, int classe)
-            : Persona(std::move(nome)), classe_(classe) {}
+        Studente(const string& nome, int classe)
+            : Persona(nome), classe_(classe) {}
 
         void presenta() const {
-            std::cout << "Sono " << nome() << " e sono in " << classe_ << "a.\n";
+            cout << "Sono " << nome() << " e sono in " << classe_ << "a.\n";
         }
 
     private:
@@ -172,16 +174,18 @@ Esempio:
 
     #include <iostream>
 
+    using namespace std;
+
     class Base {
     public:
-        Base()  { std::cout << "Base()\n"; }
-        ~Base() { std::cout << "~Base()\n"; }
+        Base()  { cout << "Base()\n"; }
+        ~Base() { cout << "~Base()\n"; }
     };
 
     class Derivata : public Base {
     public:
-        Derivata()  { std::cout << "Derivata()\n"; }
-        ~Derivata() { std::cout << "~Derivata()\n"; }
+        Derivata()  { cout << "Derivata()\n"; }
+        ~Derivata() { cout << "~Derivata()\n"; }
     };
 
     int main() {
@@ -236,14 +240,16 @@ Esempio:
 
     #include <iostream>
 
+    using namespace std;
+
     class Base {
     public:
-        void f() const { std::cout << "Base::f\n"; }
+        void f() const { cout << "Base::f\n"; }
     };
 
     class Derivata : public Base {
     public:
-        void g() const { std::cout << "Derivata::g\n"; }
+        void g() const { cout << "Derivata::g\n"; }
     };
 
     int main() {
@@ -284,12 +290,14 @@ Con `virtual`:
 
     #include <iostream>
 
+    using namespace std;
+
     struct Animale {
-        void verso() const { std::cout << "Verso generico\n"; }
+        void verso() const { cout << "Verso generico\n"; }
     };
 
     struct Cane : public Animale {
-        void verso() const { std::cout << "Bau!\n"; }
+        void verso() const { cout << "Bau!\n"; }
     };
 
     int main() {
@@ -313,17 +321,19 @@ Il compilatore decide la chiamata guardando il tipo statico del puntatore.
 
     #include <iostream>
 
+    using namespace std;
+
     struct Animale {
-        virtual void verso() const { std::cout << "Verso generico\n"; }
+        virtual void verso() const { cout << "Verso generico\n"; }
         virtual ~Animale() = default;
     };
 
     struct Cane : public Animale {
-        void verso() const override { std::cout << "Bau!\n"; }
+        void verso() const override { cout << "Bau!\n"; }
     };
 
     struct Gatto : public Animale {
-        void verso() const override { std::cout << "Miao!\n"; }
+        void verso() const override { cout << "Miao!\n"; }
     };
 
     void faiVerso(const Animale& a) {
@@ -387,12 +397,14 @@ Esempio problematico:
 
     #include <iostream>
 
+    using namespace std;
+
     struct Base {
-        ~Base() { std::cout << "~Base\n"; }
+        ~Base() { cout << "~Base\n"; }
     };
 
     struct Der : Base {
-        ~Der() { std::cout << "~Der\n"; }
+        ~Der() { cout << "~Der\n"; }
     };
 
     int main() {
@@ -418,10 +430,9 @@ Non può essere istanziata direttamente.
 
 Esempio:
 
-    #include <cmath>
     #include <iostream>
-    #include <memory>
-    #include <vector>
+
+    using namespace std;
 
     class Forma {
     public:
@@ -429,7 +440,7 @@ Esempio:
         virtual double area() const = 0;
 
         virtual void stampa() const {
-            std::cout << "Area=" << area() << "\n";
+            cout << "Area=" << area() << "\n";
         }
     };
 
@@ -437,7 +448,10 @@ Esempio:
     public:
         explicit Cerchio(double r) : r_(r) {}
 
-        double area() const override { return M_PI * r_ * r_; }
+        double area() const override {
+            constexpr double pi = 3.141592653589793;
+            return pi * r_ * r_;
+        }
     private:
         double r_;
     };
@@ -452,12 +466,12 @@ Esempio:
     };
 
     int main() {
-        std::vector<std::unique_ptr<Forma>> v;
-        v.push_back(std::make_unique<Cerchio>(2.0));
-        v.push_back(std::make_unique<Rettangolo>(3.0, 4.0));
+        Cerchio cerchio(2.0);
+        Rettangolo rettangolo(3.0, 4.0);
+        Forma* forme[2] = {&cerchio, &rettangolo};
 
-        for (const auto& f : v) {
-            f->stampa();
+        for (int i = 0; i < 2; ++i) {
+            forme[i]->stampa();
         }
     }
 
@@ -465,7 +479,10 @@ Perché qui si usano puntatori?
 -------------------------------
 - `Forma` è astratta, quindi non si possono creare oggetti `Forma`
 - i puntatori a base permettono il polimorfismo
-- `unique_ptr` evita `new` e `delete` manuali e gestisce la memoria in modo sicuro
+- gli oggetti sono locali e vengono distrutti automaticamente: non usare `delete` sui loro indirizzi
+
+L'array non possiede gli oggetti; i suoi puntatori sono validi finché gli oggetti restano vivi.
+Per l'allocazione dinamica, gli smart pointer sono un approfondimento separato.
 
 
 4.6 `override` non è `overload`
@@ -522,25 +539,29 @@ Esempio:
 
     #include <iostream>
 
+    using namespace std;
+
     struct Base {
         virtual ~Base() = default;
     };
 
     struct Der1 : Base {
-        void x() const { std::cout << "Der1\n"; }
+        void x() const { cout << "Der1\n"; }
     };
 
     struct Der2 : Base {
-        void y() const { std::cout << "Der2\n"; }
+        void y() const { cout << "Der2\n"; }
     };
 
     void prova(Base* p) {
-        if (auto d1 = dynamic_cast<Der1*>(p)) {
+        Der1* d1 = dynamic_cast<Der1*>(p);
+        Der2* d2 = dynamic_cast<Der2*>(p);
+        if (d1 != nullptr) {
             d1->x();
-        } else if (auto d2 = dynamic_cast<Der2*>(p)) {
+        } else if (d2 != nullptr) {
             d2->y();
         } else {
-            std::cout << "Tipo sconosciuto\n";
+            cout << "Tipo sconosciuto\n";
         }
     }
 
@@ -619,57 +640,57 @@ Obiettivo:
 inviare notifiche su canali diversi senza che il codice chiamante conosca i dettagli concreti.
 
     #include <iostream>
-    #include <memory>
     #include <string>
-    #include <vector>
+
+    using namespace std;
 
     class Notifica {
     public:
         virtual ~Notifica() = default;
-        virtual void invia(const std::string& messaggio) const = 0;
+        virtual void invia(const string& messaggio) const = 0;
     };
 
     class Email : public Notifica {
     public:
-        explicit Email(std::string destinatario) : destinatario_(std::move(destinatario)) {}
+        explicit Email(const string& destinatario) : destinatario_(destinatario) {}
 
-        void invia(const std::string& messaggio) const override {
-            std::cout << "[EMAIL a " << destinatario_ << "] " << messaggio << "\n";
+        void invia(const string& messaggio) const override {
+            cout << "[EMAIL a " << destinatario_ << "] " << messaggio << "\n";
         }
     private:
-        std::string destinatario_;
+        string destinatario_;
     };
 
     class SMS : public Notifica {
     public:
-        explicit SMS(std::string numero) : numero_(std::move(numero)) {}
+        explicit SMS(const string& numero) : numero_(numero) {}
 
-        void invia(const std::string& messaggio) const override {
-            std::cout << "[SMS a " << numero_ << "] " << messaggio << "\n";
+        void invia(const string& messaggio) const override {
+            cout << "[SMS a " << numero_ << "] " << messaggio << "\n";
         }
     private:
-        std::string numero_;
+        string numero_;
     };
 
     class Push : public Notifica {
     public:
-        explicit Push(std::string deviceId) : deviceId_(std::move(deviceId)) {}
+        explicit Push(const string& deviceId) : deviceId_(deviceId) {}
 
-        void invia(const std::string& messaggio) const override {
-            std::cout << "[PUSH a " << deviceId_ << "] " << messaggio << "\n";
+        void invia(const string& messaggio) const override {
+            cout << "[PUSH a " << deviceId_ << "] " << messaggio << "\n";
         }
     private:
-        std::string deviceId_;
+        string deviceId_;
     };
 
     int main() {
-        std::vector<std::unique_ptr<Notifica>> canali;
-        canali.push_back(std::make_unique<Email>("alice@example.com"));
-        canali.push_back(std::make_unique<SMS>("+39 333 1234567"));
-        canali.push_back(std::make_unique<Push>("DEVICE-XYZ"));
+        Email email("alice@example.com");
+        SMS sms("+39 333 1234567");
+        Push push("DEVICE-XYZ");
+        Notifica* canali[3] = {&email, &sms, &push};
 
-        for (const auto& c : canali) {
-            c->invia("Compito assegnato: esercizi di C++");
+        for (int i = 0; i < 3; ++i) {
+            canali[i]->invia("Compito assegnato: esercizi di C++");
         }
     }
 
@@ -727,7 +748,7 @@ usare riferimenti, puntatori o smart pointer.
 1. Crea una gerarchia con classe base `Dipendente` e metodo virtuale
    `stipendioMensile() const`.
    Deriva `DipendenteFisso` e `DipendenteOrario`.
-   Poi somma gli stipendi in un `vector<unique_ptr<Dipendente>>`.
+   Crea alcuni oggetti locali e somma gli stipendi tramite un array di `Dipendente*`.
 
 2. Definisci una classe astratta `Figura` con `area()` e `perimetro()`.
    Implementa `Quadrato`, `Rettangolo` e `Cerchio`.

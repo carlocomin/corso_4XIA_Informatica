@@ -62,24 +62,26 @@
     </div>
 
     <div class="inner-box box">
-      <h2>Perché è un problema didatticamente importante</h2>
+      <h2>Perché lo slicing è un problema</h2>
       <p>Questa è una delle prime situazioni in cui gli studenti vedono chiaramente che "ereditarietà" non significa che tutti i tipi della gerarchia siano intercambiabili in qualunque modo. Trattare una derivata come una base è sicuro solo in certi contesti. Se lo fai <b>per valore</b>, cambi la natura dell'oggetto.</p>
       <p>Lo slicing è quindi un punto di svolta concettuale: spinge a capire perché il polimorfismo reale in C++ si appoggia a <b>riferimenti</b>, <b>puntatori</b> e, nel C++ moderno, spesso a <b>smart pointer</b>.</p>
     </div>
 
     <div class="inner-box box">
       <h2>Esempio minimo</h2>
-      <p>Il testo propone questo esempio, volutamente piccolo:</p>
+      <p>Considera questa copia da una derivata a una base:</p>
 <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+using namespace std;
 
 class Base {
 public:
-    void f() const { std::cout &lt;&lt; "Base::f\n"; }
+    void f() const { cout &lt;&lt; "Base::f\n"; }
 };
 
 class Derivata : public Base {
 public:
-    void g() const { std::cout &lt;&lt; "Derivata::g\n"; }
+    void g() const { cout &lt;&lt; "Derivata::g\n"; }
 };
 
 int main() {
@@ -95,7 +97,7 @@ int main() {
 
     <div class="inner-box box">
       <h2>Che cosa succede davvero?</h2>
-      <p>Il punto più importante del testo è questo: <code>b</code> non è un alias di <code>d</code>. <code>b</code> è un nuovo oggetto di tipo <code>Base</code>, ottenuto copiando soltanto la parte <code>Base</code> di <code>d</code>.</p>
+      <p>Osserva che <code>b</code> non è un alias di <code>d</code>. <code>b</code> è un nuovo oggetto di tipo <code>Base</code>, ottenuto copiando soltanto la parte <code>Base</code> di <code>d</code>.</p>
       <p>Questo significa che tutto ciò che appartiene solo alla derivata non entra nel nuovo oggetto. Nel nostro esempio, il metodo <code>g()</code> non può essere chiamato su <code>b</code> per una ragione molto semplice: <code>b</code> non è una <code>Derivata</code>. È davvero e soltanto un oggetto <code>Base</code>.</p>
       <p class="note"><b>Formula mentale corretta:</b> non pensare "ho una derivata vista come base". Qui devi pensare: "ho costruito una nuova base copiando solo la parte di base della derivata".</p>
     </div>
@@ -108,7 +110,7 @@ int main() {
 
     <div class="inner-box box">
       <h2>Come si evita lo slicing</h2>
-      <p>Il testo indica tre strade fondamentali:</p>
+      <p>Per evitare la copia per valore in una base, possiamo usare:</p>
       <ul>
         <li>usare riferimenti a base (<code>Base&amp;</code>);</li>
         <li>usare puntatori a base (<code>Base*</code>);</li>
@@ -135,14 +137,15 @@ Base* p = &amp;d;</code></pre>
     </div>
 
     <div class="inner-box box">
-      <h2>Smart pointer e C++ moderno</h2>
-      <p>Quando la gestione degli oggetti richiede allocazione dinamica, nel C++ moderno non conviene pensare subito a <code>new</code> e <code>delete</code>. Conviene pensare a smart pointer come <code>std::unique_ptr</code> e, più raramente, <code>std::shared_ptr</code>.</p>
+      <h2>Approfondimento: smart pointer</h2>
+      <p>Quando la gestione degli oggetti richiede allocazione dinamica, nel C++ moderno non conviene pensare subito a <code>new</code> e <code>delete</code>. Conviene pensare a smart pointer come <code>unique_ptr</code> e, più raramente, <code>shared_ptr</code>.</p>
+      <p>Per gli esercizi di base possiamo creare oggetti locali e conservarne gli indirizzi: non occorre allocare ogni oggetto dinamicamente. Gli smart pointer riguardano il caso aggiuntivo in cui dobbiamo gestire quella durata di vita.</p>
       <p>In questo contesto, gli smart pointer sono utili per due motivi:</p>
       <ul>
         <li>evitano lo slicing, perché non copiano l'oggetto derivato in una base per valore;</li>
         <li>gestiscono in modo più sicuro la memoria e il ciclo di vita degli oggetti.</li>
       </ul>
-      <p class="ok"><b>Regola pratica:</b> se vuoi polimorfismo e gestione sicura della memoria, <code>std::unique_ptr&lt;Base&gt;</code> è spesso il punto di partenza migliore.</p>
+      <p class="ok"><b>Regola pratica:</b> se vuoi polimorfismo e gestione sicura della memoria, <code>unique_ptr&lt;Base&gt;</code> è spesso il punto di partenza migliore.</p>
     </div>
 
     <div class="inner-box box">

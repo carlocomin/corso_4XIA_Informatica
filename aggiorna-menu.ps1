@@ -198,6 +198,7 @@ $lez3Items = @(
     @{ Path = "lez3_5.html"; Label = "L3.5 - Leggere valori in C++" },
     @{ Path = "lez3_6.html"; Label = "L3.6 - Leggere righe in C++" },
     @{ Path = "lez3_7.html"; Label = "L3.7 - Il ciclo di lettura corretto" },
+    @{ Path = "lez3_lab_testo.html"; Label = "L3.7bis - Primo laboratorio sui file di testo" },
     @{ Path = "lez3_8.html"; Label = "L3.8 - La stessa idea in C" },
     @{ Path = "lez3_9.html"; Label = "L3.9 - Salvare una struct in testo" },
     @{ Path = "lez3_10.html"; Label = "L3.10 - Ricostruire una struct" },

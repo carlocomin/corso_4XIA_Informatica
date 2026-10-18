@@ -60,20 +60,19 @@
       <h2>C++: un <code>vector</code> contiguo</h2>
       <figure class="code-example">
         <figcaption>C++17 · dimensioni a runtime</figcaption>
-<pre><code class="language-cpp">#include &lt;cstddef&gt;
-#include &lt;iostream&gt;
+<pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;vector&gt;
 
 using namespace std;
 
 int main() {
-    size_t R = 3;
-    size_t C = 4;
+    int R = 3;
+    int C = 4;
     vector&lt;int&gt; m(R * C, 0);
 
-    for (size_t r = 0; r &lt; R; ++r) {
-        for (size_t c = 0; c &lt; C; ++c) {
-            m[r * C + c] = static_cast&lt;int&gt;(r + c);
+    for (int r = 0; r &lt; R; ++r) {
+        for (int c = 0; c &lt; C; ++c) {
+            m[r * C + c] = r + c;
         }
     }
 
