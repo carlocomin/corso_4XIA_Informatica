@@ -15,10 +15,10 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:31.58%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:25.00%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
-<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Lezione 3 - File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
@@ -30,15 +30,20 @@
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
-    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
-    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
-    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
-    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
-    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
@@ -46,7 +51,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 6/19</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 6/24</p>
     <h1>Leggere righe in C++</h1>
     <p class="lead"><code>getline</code> conserva gli spazi interni e usa il fine riga come confine logico.</p>
   </header>
@@ -58,7 +63,7 @@
 
     <section class="concept-card">
       <h2>La riga come unità di lavoro</h2>
-      <p>La lettura per token è ideale per valori separati da spazi; la lettura per riga è adatta a frasi, descrizioni e record che richiedono parsing successivo.</p>
+      <p>Con <code>&gt;&gt;</code> una stringa si ferma al primo spazio. Con <code>getline(in, riga)</code> leggiamo invece una riga intera, compresi gli spazi interni. Il fine riga viene consumato, ma non viene inserito in <code>riga</code>.</p>
       <p><strong>Idea chiave:</strong> prima acquisisci la riga completa, poi decidi come interpretarla.</p>
     </section>
 
@@ -78,7 +83,7 @@ int main() {
     int numero = 0;
 
     while (getline(in, riga)) {
-        ++numero;
+        numero++;
         if (!riga.empty())
             cout &lt;&lt; numero &lt;&lt; ": " &lt;&lt; riga &lt;&lt; '\n';
     }
@@ -96,24 +101,17 @@ int main() {
         <ul class="compact-list">
           <li><code>&gt;&gt;</code>: numeri e parole separate;</li>
           <li><code>getline</code>: riga completa;</li>
-          <li>dopo <code>getline</code>: eventuale parsing dei campi.</li>
+          <li>dopo <code>getline</code>: se necessario separiamo i campi.</li>
         </ul>
       </article>
       <article class="topic-card">
-        <h2>Quando li mescoli</h2>
-        <p>Dopo un’estrazione con <code>&gt;&gt;</code> può restare il fine riga. Se la descrizione deve iniziare sulla <strong>riga successiva</strong>, scarta il resto della riga corrente:</p>
-        <figure class="code-example">
-          <figcaption>C++17 · frammento contestuale</figcaption>
-<pre><code class="language-cpp">in.ignore(
-    numeric_limits&lt;streamsize&gt;::max(),
-    '\n'
-);
-getline(in, descrizione);</code></pre>
-        </figure>
+        <h2>Un esempio da prevedere</h2>
+        <p>Il file contiene la riga <code>Ada Lovelace</code>. Con <code>in &gt;&gt; nome</code> otteniamo soltanto <code>Ada</code>; con <code>getline(in, nome)</code> otteniamo <code>Ada Lovelace</code>.</p>
+        <p>Anche una riga vuota è una riga letta correttamente. Nel programma la contiamo, ma non la stampiamo: <code>riga.empty()</code> significa “la stringa è vuota”.</p>
       </article>
     </section>
 
-    <div class="callout warning"><strong>Nota:</strong> il frammento richiede <code>&lt;limits&gt;</code> e va eseguito solo dopo che la precedente estrazione con <code>&gt;&gt;</code> è riuscita. <code>ignore</code> scarta tutto fino a <code>\n</code>, compreso il delimitatore: non usarlo se vuoi conservare il testo che segue il numero sulla stessa riga.</div>
+    <div class="callout"><strong>Per iniziare:</strong> scegli una lettura coerente con i dati. Non alternare <code>&gt;&gt;</code> e <code>getline</code> senza ragionare su ciò che resta da leggere: dopo un numero può restare il fine riga e la successiva <code>getline</code> può trovare una stringa vuota. Nel CSV useremo sempre <code>getline</code> per acquisire le righe.</div>
 
     <section class="checkpoint">
       <div class="checkpoint-prompt">
@@ -135,6 +133,7 @@ getline(in, descrizione);</code></pre>
       <span class="exercise-label">Esercizio 6</span>
       <h2>La riga più lunga</h2>
       <p>Leggi <code>note.txt</code> e stampa numero e contenuto della riga più lunga. Decidi esplicitamente come trattare le righe vuote.</p>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Conta tutte le righe, comprese quelle vuote. Conserva la riga più lunga e il suo numero: la prima riga letta inizializza il risultato; ogni riga successiva lo sostituisce solo se la sua <code>length()</code> è maggiore. A parità conserva la prima. Se non hai letto nessuna riga, stampa “File vuoto”; altrimenti stampa numero e contenuto della riga scelta. Il controllo finale della lettura rimane quello del programma.</p></div></details>
     </section>
 
     <aside class="next-step"><strong>Prossimo passo.</strong> Rendiamo esplicita la regola più importante dei cicli di lettura.</aside>

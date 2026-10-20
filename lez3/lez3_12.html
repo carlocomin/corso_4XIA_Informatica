@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4BIA - L3.12 · Progettare un formato binario</title>
+  <title>4BIA - L3.12 · Binario: un formato elementare</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -15,10 +15,10 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:68.42%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:75.00%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
-<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Lezione 3 - File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
@@ -30,15 +30,20 @@
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
-    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
-    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
-    <li><a href="lez3_12.html" class="active" aria-current="page">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
-    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
-    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html" class="active" aria-current="page">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
@@ -46,27 +51,26 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 13/19</p>
-    <h1>Progettare un formato binario</h1>
-    <p class="lead">Definiamo un contratto semplice e lo manteniamo identico negli esempi C++, C e di accesso diretto.</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 18/24</p>
+    <h1>Binario: tre interi in un file</h1>
+    <p class="lead">Un solo esempio per tutte le prossime slide: i valori 10, 20 e 30, scritti uno dopo l’altro.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
-    <a class="nav-button" href="lez3_11.html">&#8592; Precedente</a>
+    <a class="nav-button" href="lez3_archivio_programma.html">&#8592; Precedente</a>
     <a class="nav-button primary" href="lez3_blocchi.html">Successiva &#8594;</a>
   </nav>
   <div class="content-box">
-<section class="concept-card"><h2>Prima il formato, poi il codice</h2><p><strong>Idea chiave:</strong> un file è una sequenza di byte. Chi legge deve sapere quanti byte prelevare, in quale ordine e come interpretarli. Il file non conserva automaticamente i nomi o i tipi delle variabili.</p></section>
-<div class="callout"><strong>Obiettivo di questa slide:</strong> disegnare su carta che cosa salviamo e in quale ordine. Non dobbiamo ancora scrivere il programma. Prima riconosciamo l’archivio dalla sua etichetta, poi leggiamo le misure.</div>
-<section class="topic-card"><h2>Un solo esempio per le prossime slide: ARRB</h2><p>Archiviamo fino a 10 misure intere di un sensore. Il formato didattico si chiama <strong>ARRB</strong>; la prima parte è l’<strong>header</strong> (intestazione), poi vengono i valori dell’array.</p><p><strong>Due tipi da conoscere:</strong> <code>uint32_t</code> è un intero di 32 bit senza segno, quindi non negativo: lo usiamo per contare. <code>int32_t</code> ha il segno: lo usiamo per misure anche negative. Nei nostri esempi entrambi occupano 4 byte. Si dichiarano includendo <code>&lt;cstdint&gt;</code>.</p><div class="binary-layout" aria-label="Header di 12 byte seguito da n valori"><span class="binary-field magic"><strong>ARRB</strong><small>4 byte · identificatore</small></span><span class="binary-field"><strong>versione = 1</strong><small>4 byte · uint32_t</small></span><span class="binary-field"><strong>n</strong><small>4 byte · uint32_t</small></span><span class="binary-field data"><strong>n valori</strong><small>4 byte ciascuno · int32_t</small></span></div><div class="table-wrap"><table><thead><tr><th>Offset iniziale</th><th>Campo</th><th>Significato</th></tr></thead><tbody><tr><td>0</td><td>4 caratteri ASCII: A R R B</td><td>Riconoscere questo formato</td></tr><tr><td>4</td><td>Versione, intero senza segno a 32 bit</td><td>Conoscere le regole dei record</td></tr><tr><td>8</td><td>n, intero senza segno a 32 bit</td><td>Numero di valori: da 0 a 10</td></tr><tr><td>12</td><td>n interi con segno a 32 bit</td><td>Le misure, anche negative</td></tr></tbody></table></div><p>Un <strong>offset</strong> è una posizione nel file contata da zero, non un indirizzo di memoria. Con i valori <code>10, 20, 30</code> la dimensione è <code>12 + 3 × 4 = 24 byte</code>. Con n = 0 resta soltanto l’header di 12 byte.</p></section>
-<section class="topic-card"><h2>Una regola semplice sulla portabilità</h2><p>Per ora salviamo e rileggiamo nello stesso ambiente del laboratorio. La rappresentazione è <strong>nativa</strong>: copiamo i byte così come sono nella memoria del nostro PC.</p><div class="callout warning"><strong>Da ricordare:</strong> avere interi di 4 byte non basta per scambiare il file fra qualsiasi computer. Un formato portabile deve stabilire anche l’ordine dei byte. <code>binary</code> non lo decide automaticamente.</div><details class="answer-reveal"><summary><span class="when-closed">Mostra approfondimento sull’ordine dei byte</span><span class="when-open">Nascondi approfondimento</span></summary><div class="answer"><p>Il numero 42 può avere i byte esadecimali <code>2A 00 00 00</code> in ordine little-endian oppure <code>00 00 00 2A</code> in ordine big-endian. Cambia l’ordine, non il valore. Per lo scambio tra piattaforme occorre scegliere un ordine e codificare/decodificare esplicitamente gli interi. Non è richiesto negli esercizi di base.</p></div></details></section>
-<section class="topic-card"><h2>Non copiare alla cieca un’intera struct</h2><p>Il layout in memoria può contenere <strong>padding</strong> (spazi aggiunti dal compilatore). Una <code>string</code> ha stato interno; un puntatore è un indirizzo, non il dato a cui punta. Copiarli su disco non costruisce un archivio riutilizzabile.</p><p><strong>Regola:</strong> progetta e salva i campi uno per volta. Per una stringa decidi, per esempio, di scrivere prima la sua lunghezza e poi i byte del testo; non <code>sizeof(string)</code>.</p></section>
-<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Un file di 24 byte è certamente un file ARRB valido?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>No. La dimensione è solo un controllo: servono anche magic corretta, versione supportata, conteggio coerente e letture complete. Un file qualsiasi può avere la stessa lunghezza.</p></div></details></section>
-<section class="exercise-card"><span class="exercise-label">Esercizio 12</span><h2>Calcola e interpreta</h2><p>Per n = 5, calcola la dimensione del file ARRB e l’offset del primo e dell’ultimo valore. Spiega che cosa deve accadere se l’header dichiara n = 12.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Dimensione: <code>12 + 5 × 4 = 32 byte</code>. Primo valore all’offset 12; ultimo, di indice 4, all’offset <code>12 + 4 × 4 = 28</code>. n = 12 supera la capacità 10: si rifiuta il file <strong>prima</strong> di leggere il blocco nell’array.</p></div></details></section>
-<aside class="next-step"><strong>Prossimo passo.</strong> Distinguiamo modalità di apertura, trasferimento di byte e conversione in testo.</aside>
-
+<section class="concept-card"><h2>Un formato davvero piccolo</h2><p><strong>Idea chiave:</strong> il file <code>dati.bin</code> contiene esattamente <strong>tre int consecutivi</strong>, nell’ordine 10, 20, 30. Nessuna intestazione e nessun separatore.</p></section>
+<section class="topic-card"><h2>Come lo immaginiamo</h2><div class="stream-map" aria-label="Tre blocchi di byte: primo int 10, secondo int 20, terzo int 30"><span class="io-node">int: 10</span><span class="io-arrow" aria-hidden="true">→</span><span class="io-node">int: 20</span><span class="io-arrow" aria-hidden="true">→</span><span class="io-node">int: 30</span></div><p>Ogni blocco occupa <code>sizeof(int)</code> byte. <strong>Non sono le cifre in un file di testo:</strong> sono i byte che rappresentano quei numeri nella memoria del nostro programma.</p>
+<div class="table-wrap"><table><thead><tr><th>Indice</th><th>Valore</th><th>Posizione iniziale nel file</th></tr></thead><tbody><tr><td>0</td><td>10</td><td><code>0</code></td></tr><tr><td>1</td><td>20</td><td><code>sizeof(int)</code></td></tr><tr><td>2</td><td>30</td><td><code>2 * sizeof(int)</code></td></tr></tbody></table></div>
+<p>Se un <code>int</code> occupa 4 byte, le posizioni iniziali sono 0, 4, 8 e il file occupa <strong>12 byte</strong>. Nel codice usiamo sempre <code>sizeof(int)</code>, non il numero 4 scritto a mano.</p></section>
+<section class="topic-card"><h2>Che cosa deve sapere il lettore?</h2><p>Deve sapere che ci sono <strong>tre valori di tipo int</strong>. Il file non contiene automaticamente né il tipo né il numero degli elementi.</p><p>Per questi esempi salviamo e rileggiamo nello <strong>stesso ambiente del laboratorio</strong>. Non supponiamo che il file funzioni su qualsiasi computer.</p></section>
+<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Quanto vale la posizione iniziale del primo numero?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>Zero. Le posizioni nel file si contano da 0, come gli indici di un array, ma si misurano in byte.</p></div></details></section>
+<section class="exercise-card"><span class="exercise-label">Prova tu</span><h2>Calcola lo spazio</h2><p>Con int da 4 byte, quanto occuperebbero cinque interi consecutivi? Dove comincerebbe il valore di indice 3?</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Il file occuperebbe <code>5 * 4 = 20</code> byte. Il valore di indice 3 comincerebbe alla posizione <code>3 * 4 = 12</code>. In generale usiamo <code>numeroElementi * sizeof(int)</code> e <code>indice * sizeof(int)</code>.</p></div></details></section>
+<aside class="next-step"><strong>Prossimo passo.</strong> Per trasferire questi byte ci servono soltanto un indirizzo e una quantità.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
-    <a class="nav-button" href="lez3_11.html">&#8592; Precedente</a>
+    <a class="nav-button" href="lez3_archivio_programma.html">&#8592; Precedente</a>
     <a class="nav-button primary" href="lez3_blocchi.html">Successiva &#8594;</a>
   </nav>
 </main>

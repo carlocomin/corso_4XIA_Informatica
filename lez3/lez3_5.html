@@ -15,10 +15,10 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:26.32%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:20.83%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
-<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Lezione 3 - File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
@@ -30,15 +30,20 @@
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
-    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
-    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
-    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
-    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
-    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
@@ -46,7 +51,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 5/19</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 5/24</p>
     <h1>Leggere valori in C++</h1>
     <p class="lead">L’operatore <code>&gt;&gt;</code> separa gli elementi usando gli spazi e prova a convertirli nel tipo della variabile.</p>
   </header>
@@ -58,8 +63,8 @@
 
     <section class="concept-card">
       <h2>Lettura formattata</h2>
-      <p>Come con <code>cin</code>, lo stream salta gli spazi iniziali, legge un token e lo converte.</p>
-      <p><strong>Idea chiave:</strong> l’operazione di lettura stessa dice se un record completo è stato acquisito.</p>
+      <p>Come con <code>cin</code>, leggiamo un dato alla volta. Un <strong>token</strong> è una parola o un valore separato dagli altri da spazi, tabulazioni o fine riga. Per una variabile numerica, <code>&gt;&gt;</code> prova a ricavare un numero dal testo.</p>
+      <p><strong>Idea chiave:</strong> prima leggiamo e controlliamo entrambi i campi; soltanto dopo usiamo il voto.</p>
     </section>
 
     <section class="two-col">
@@ -97,7 +102,7 @@ int main() {
     if (!in) return 1;
 
     string nome;
-    double voto;
+    double voto = 0.0;
     double somma = 0.0;
     int quanti = 0;
 
@@ -107,23 +112,23 @@ int main() {
             return 3;
         }
         somma += voto;
-        ++quanti;
+        quanti++;
     }
 
-    if (in.bad()) {
+    if (in.bad() || !in.eof()) {
         cerr &lt;&lt; "Errore durante la lettura\n";
         return 2;
     }
 
-    if (!in.eof()) {
-        cerr &lt;&lt; "Record non valido\n";
-        return 3;
-    }
-
-    if (quanti &gt; 0)
+    if (quanti &gt; 0) {
         cout &lt;&lt; somma / quanti &lt;&lt; '\n';
+    } else {
+        cout &lt;&lt; "File vuoto\n";
+    }
 }</code></pre>
     </figure>
+
+    <section class="topic-card"><h2>Segui un giro del ciclo</h2><ol class="steps"><li><code>in &gt;&gt; nome</code> legge <code>Ada</code>. Se non c’è un nuovo nome, il ciclo termina.</li><li><code>in &gt;&gt; voto</code> deve leggere il voto di Ada. Se manca, ci fermiamo con un errore.</li><li>Solo adesso aggiungiamo 9 alla somma e 1 al conteggio. Poi ripartiamo dal nome successivo.</li></ol><p>Il controllo finale distingue la normale fine del file da un errore di lettura. Prima di dividere, verifichiamo che sia stato letto almeno un voto.</p></section>
 
     <section class="checkpoint">
       <div class="checkpoint-prompt">
@@ -141,12 +146,13 @@ int main() {
       </details>
     </section>
 
-    <div class="callout"><strong>Due controlli, due ruoli:</strong> la condizione legge il primo campo; il controllo interno completa il record. Solo dopo entrambi i successi sommiamo il voto. Per imporre anche “un record per riga”, useremo <code>getline</code> e un parser.</div>
+    <div class="callout"><strong>Due controlli, due ruoli:</strong> la condizione legge il primo campo; il controllo interno completa il record. Solo dopo entrambi i successi sommiamo il voto. Con <code>&gt;&gt;</code> anche un fine riga separa i dati: non imponiamo una coppia per riga. Qui usiamo voti scritti correttamente, separati dagli altri token; il controllo completo dei campi arriverà nel caso di studio.</div>
 
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 5</span>
       <h2>Minimo e massimo</h2>
       <p>Modifica il programma per stampare nome e voto dello studente con risultato minimo e massimo. Gestisci anche il file vuoto.</p>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Prima del ciclo prepara voto minimo, voto massimo e i due nomi corrispondenti. Dopo avere letto e controllato il voto, se <code>quanti == 0</code> inizializza entrambi gli estremi con quel primo studente. Per i successivi aggiorna minimo e nome solo con un voto minore, massimo e nome solo con un voto maggiore. A parità conserva il primo. Alla fine stampa gli estremi solo se <code>quanti &gt; 0</code>; altrimenti segnala il file vuoto. Sul dataset: Alan con 7.5 e Grace con 10.0.</p></div></details>
     </section>
 
     <aside class="next-step"><strong>Prossimo passo.</strong> Quando gli spazi fanno parte dei dati, il token non basta: serve leggere un’intera riga.</aside>

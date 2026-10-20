@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - Archivio 1 · Un array di studenti</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script>
+  <script src="../menu.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', function () { hljs.highlightAll(); });</script>
+</head>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:54.17%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 3 - File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html" class="active" aria-current="page">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Caso di studio · File I/O · 13/24</p>
+    <h1>Un array di studenti</h1>
+    <p class="lead">Una piccola segreteria scolastica: gli stessi record in memoria, due modi diversi per conservarli su file.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_11.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_operazioni.html">Successiva &#8594;</a>
+  </nav>
+  <div class="content-box">
+    <section class="concept-card">
+      <h2>Prima il modello, poi il formato</h2>
+      <p><strong>Idea chiave:</strong> aggiunta, modifica e rimozione lavorano su un <strong>array di struct</strong>. Solo le funzioni di caricamento e salvataggio conoscono il formato del file.</p>
+      <p>Ogni studente ha una matricola positiva e univoca, un nome non vuoto e un anno di corso da 1 a 5. Usiamo un campo intero per l’anno, così possiamo concentrarci sull’archivio senza introdurre la precisione dei numeri decimali.</p>
+    </section>
+    <ol class="io-flow archive-flow" aria-label="Dal file all'array e ritorno">
+      <li><span class="step-number">1</span><strong>Carica</strong><small>Dal file ricostruiamo i record nell’array.</small></li>
+      <li><span class="step-number">2</span><strong>Lavora in memoria</strong><small>Aggiungiamo, modifichiamo o rimuoviamo.</small></li>
+      <li><span class="step-number">3</span><strong>Salva</strong><small>Riscriviamo il file con i record attualmente validi.</small></li>
+    </ol>
+    <figure class="code-example" data-archivio="modello">
+      <figcaption>C++17 · tipi e librerie del programma completo</figcaption>
+<pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;sstream&gt;
+#include &lt;string&gt;
+
+using namespace std;
+
+const int MAX = 30;
+
+struct Studente {
+    int matricola;
+    string nome;
+    int anno;
+};</code></pre>
+    </figure>
+    <section class="two-col">
+      <article class="topic-card">
+        <h2>Capacità e quantità non coincidono</h2>
+        <figure class="code-example"><figcaption>Frammento · due variabili del main</figcaption><pre><code class="language-cpp">Studente archivio[MAX];
+int n = 0;</code></pre></figure>
+        <p><code>MAX</code> è la capacità: 30 record. <code>n</code> è il numero di studenti presenti: inizialmente zero. Usiamo soltanto gli elementi da <code>0</code> a <code>n - 1</code>.</p>
+        <p>Le operazioni rispettano sempre la regola <code>0 &lt;= n &lt;= MAX</code>. Le celle da <code>n</code> in poi non fanno parte dell’archivio logico.</p>
+      </article>
+      <article class="topic-card">
+        <h2>Matricola e posizione sono cose diverse</h2>
+        <p>La matricola <code>1002</code> identifica uno studente; non è l’indice dell’array. Cerchiamo quale cella contiene quel valore e restituiamo la posizione, oppure <code>-1</code> se manca.</p>
+        <p>Dopo una rimozione gli indici possono cambiare, ma le matricole degli studenti rimasti restano uguali.</p>
+      </article>
+    </section>
+    <figure class="code-example" data-archivio="cercaStudente">
+      <figcaption>Frammento · ricerca lineare per matricola</figcaption>
+<pre><code class="language-cpp">int cercaStudente(const Studente archivio[], int n, int matricola) {
+    for (int i = 0; i &lt; n; i++) {
+        if (archivio[i].matricola == matricola) {
+            return i;
+        }
+    }
+    return -1;
+}</code></pre>
+    </figure>
+    <section class="topic-card">
+      <h2>Due formati, gli stessi record</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Formato</th><th>Un record</th><th>Regole</th></tr></thead>
+        <tbody>
+          <tr><td>Testo a spazi</td><td><code>1001 Ada 4</code></td><td>Tre token; nessuna intestazione. Il nome è una sola parola.</td></tr>
+          <tr><td>CSV con <code>;</code></td><td><code>1001;Ada Lovelace;4</code></td><td>Una riga per record, dopo l’intestazione <code>matricola;nome;anno</code>. Il nome può contenere spazi.</td></tr>
+        </tbody>
+      </table></div>
+      <p>Per questi esempi scrivi nomi senza <code>;</code>, virgolette o caratteri di controllo e senza spazi iniziali o finali. Gli spazi interni, come in “Ada Lovelace”, sono ammessi solo nel CSV.</p>
+      <p>Salva i file di prova in UTF-8, senza un marcatore iniziale (BOM), e non cambiare le regole del formato nell’editor.</p>
+      <div class="callout"><strong>Riconosci il modello:</strong> sono gli stessi tre campi dell’esempio sulla scrittura di una struct. Ora gestiamo più studenti, non uno solo. Nel CSV aggiungiamo anche la riga con i nomi delle colonne.</div>
+    </section>
+    <section class="checkpoint">
+      <div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Dopo una modifica nell’array, il file è già aggiornato?</h2></div>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>No. Abbiamo cambiato soltanto la memoria. Il file cambia quando chiamiamo una funzione di salvataggio. Uscire senza salvare perde le modifiche non ancora scritte.</p></div></details>
+    </section>
+    <section class="exercise-card">
+      <span class="exercise-label">Prima di programmare</span><h2>Trova il record, non il numero della cella</h2>
+      <p>L’array contiene, nell’ordine, le matricole 1001, 1002, 1003 e <code>n = 3</code>. Quale valore restituiscono le ricerche di 1002 e di 9999? Perché non si usa <code>archivio[1002]</code>?</p>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>I risultati sono <code>1</code> e <code>-1</code>. Gli indici validi sono 0, 1, 2, non le matricole. <code>archivio[1002]</code> supera anche la capacità fisica dell’array.</p></div></details>
+    </section>
+    <aside class="next-step"><strong>Percorso del caso:</strong> modello → operazioni in memoria → file a spazi → CSV → programma completo e collaudo. Il <a href="lez3_archivio_programma.html">programma e i dati scaricabili</a> sono nell’ultima slide del percorso.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
+    <a class="nav-button" href="lez3_11.html">&#8592; Precedente</a>
+    <a class="nav-button primary" href="lez3_operazioni.html">Successiva &#8594;</a>
+  </nav>
+</main>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4BIA - L3.12bis · Byte, modalità e operazioni</title>
+  <title>4BIA - L3.12bis · read e write: indirizzo e byte</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -15,10 +15,10 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:73.68%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:79.17%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
-<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Lezione 3 - File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
@@ -30,15 +30,20 @@
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
-    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
-    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
-    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_blocchi.html" class="active" aria-current="page">L3.12bis - Byte, modalità e operazioni</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
-    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
-    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html" class="active" aria-current="page">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
@@ -46,55 +51,33 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 14/19</p>
-    <h1>Byte, modalità e operazioni</h1>
-    <p class="lead">Prima di un archivio completo, capiamo che cosa fanno binary, read, write, sizeof e il cast.</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 19/24</p>
+    <h1>read e write: due argomenti</h1>
+    <p class="lead">Dove si trovano i byte? Quanti byte dobbiamo trasferire? Sono le due informazioni richieste.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_12.html">&#8592; Precedente</a>
     <a class="nav-button primary" href="lez3_13.html">Successiva &#8594;</a>
   </nav>
   <div class="content-box">
-<section class="concept-card"><h2>Tre scelte diverse, da non confondere</h2><ol class="steps"><li><strong>Formato:</strong> stabilisce il significato e l’ordine dei byte.</li><li><strong>Modalità:</strong> <code>ios::binary</code> evita le traduzioni proprie della modalità testo, per esempio dei fine riga su Windows.</li><li><strong>Operazione:</strong> <code>&lt;&lt;</code> formatta un numero in testo; <code>write</code> trasferisce un blocco di byte dalla memoria.</li></ol></section>
-<section class="topic-card"><h2>Lo stesso numero, due rappresentazioni</h2><div class="two-col"><article><h3>Testo</h3><p><code>out &lt;&lt; 42;</code> scrive i caratteri <code>4</code> e <code>2</code>: in ASCII/UTF-8, i byte esadecimali <code>34 32</code>.</p></article><article><h3>Binario nativo</h3><p>Scrivere i byte di un <code>uint32_t</code> con valore 42 trasferisce i suoi <strong>4 byte di memoria</strong>. Non scriviamo le cifre “4” e “2” come caratteri.</p></article></div><p>Aprire con <code>binary</code> e poi usare <code>&lt;&lt; 42</code> produce comunque <strong>testo</strong>. L’estensione <code>.bin</code> non cambia questo comportamento.</p></section>
-<section class="topic-card"><h2>Leggi le due chiamate parola per parola</h2><div class="two-col"><article><h3>write: dalla memoria al file</h3><p>Primo argomento: indirizzo dei byte sorgente, con vista <code>const char*</code>. Secondo: quanti byte scrivere. <code>&amp;valore</code> è l’indirizzo dell’intero, <code>sizeof valore</code> la sua dimensione.</p></article><article><h3>read: dal file alla memoria</h3><p>Primo argomento: indirizzo di memoria in cui ricevere i byte, con vista <code>char*</code>. Secondo: quanti byte richiedere. Se arrivano meno byte, la lettura fallisce: non usare il risultato parziale.</p></article></div><p><code>reinterpret_cast</code> rende l’indirizzo utilizzabile dall’API come sequenza di byte: <strong>non converte il valore</strong>, non cambia l’ordine dei byte e non serializza una struct. La copia è effettuata da <code>read</code>/<code>write</code>.</p><p><strong>Che cosa devi capire:</strong> ogni chiamata indica <em>da dove o dove</em> e <em>quanti byte</em>. La sintassi del cast è fornita nell’esempio: prima di riscriverla, spiegane questi due ruoli. <code>static_assert</code> è un controllo durante la compilazione; qui conferma che un byte contiene 8 bit.</p></section>
-<div class="callout"><strong>Prima di eseguire:</strong> il programma salva soltanto il numero 42 in 4 byte, senza header ARRB. Poi chiude il file e lo riapre per ricostruire il numero. Segui i due blocchi separatamente: prima scrittura, poi lettura.</div>
-<figure class="code-example"><figcaption>C++17 · un solo valore, senza header: prova del trasferimento di byte</figcaption><pre><code class="language-cpp">#include &lt;climits&gt;
-#include &lt;cstdint&gt;
-#include &lt;fstream&gt;
-#include &lt;iostream&gt;
-
-using namespace std;
-
-static_assert(CHAR_BIT == 8, "Servono byte da 8 bit");
-
-int main() {
-    uint32_t valore = 42;
-    // Primo blocco: dalla variabile al file.
-    ofstream out("singolo.bin", ios::binary);
-    if (!out) return 1;
-
-    out.write(reinterpret_cast&lt;const char*&gt;(&amp;valore),
-              sizeof valore);
-    out.close();
-    if (!out) return 2;
-
-    // Secondo blocco: dal file a una nuova variabile.
-    uint32_t copia = 0;
-    ifstream in("singolo.bin", ios::binary);
-    if (!in.read(reinterpret_cast&lt;char*&gt;(&amp;copia),
-                 sizeof copia))
-        return 3;
-
-    cout &lt;&lt; copia &lt;&lt; '\n';
+<section class="concept-card"><h2>La direzione cambia, i dati restano gli stessi</h2><p><code>write</code>: memoria → file. <code>read</code>: file → memoria. In entrambi i casi indichiamo un indirizzo e il numero di byte.</p></section>
+<section class="topic-card"><h2>write: dalla variabile al file</h2><p>Frammento: <code>out</code> è un file già aperto per scrivere in modalità binaria.</p>
+<figure class="code-example"><figcaption>Frammento C++ · scrivere un int</figcaption><pre><code class="language-cpp">int numero = 42;
+out.write((const char*)&amp;numero, sizeof(numero));</code></pre></figure>
+<p><code>&amp;numero</code> è l’indirizzo della variabile; <code>sizeof(numero)</code> è la sua dimensione in byte. La parte <code>(const char*)</code> permette a <code>write</code> di vedere quei byte senza cambiarli.</p></section>
+<section class="topic-card"><h2>read: dal file a una variabile</h2><p>Frammento: <code>in</code> è un file già aperto per leggere in modalità binaria, contenente l’intero scritto sopra.</p>
+<figure class="code-example"><figcaption>Frammento C++ · leggere un int</figcaption><pre><code class="language-cpp">int copia = 0;
+in.read((char*)&amp;copia, sizeof(copia));
+if (!in) {
+    return 1;
 }</code></pre></figure>
-<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Prima previsione</span><h2>La variabile copia parte da 0: quale valore stamperà il programma se la lettura riesce?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>42: <code>read</code> sostituisce i byte di <code>copia</code> con quelli salvati da <code>valore</code>. Sono due variabili distinte, con lo stesso valore.</p></div></details></section>
-<section class="topic-card"><h2>Array: capacità, quantità logica e puntatore</h2><p>Per un array con capacità 10 e soltanto n valori validi, i byte da salvare sono <code>n * sizeof valori[0]</code>. <code>sizeof valori</code>, dove <code>valori</code> è ancora un array, misura invece <strong>tutta la capacità</strong>.</p><p>Nell’argomento di <code>write</code> il nome dell’array fornisce già l’indirizzo del primo elemento.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra approfondimento sui parametri array</span><span class="when-open">Nascondi approfondimento</span></summary><div class="answer"><p>In una funzione con parametro <code>int32_t valori[]</code>, il parametro è un puntatore: <code>sizeof valori</code> misura il puntatore, non l’array del chiamante. Per salvare l’array, passa anche n e calcola <code>n * sizeof valori[0]</code>.</p></div></details></section>
-<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Per salvare un numero in formato binario basta usare binary e l’operatore &lt;&lt;?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>No: la modalità evita traduzioni dei byte; l’operatore <code>&lt;&lt;</code> continua a formattare il numero in testo. Per l’esempio nativo usiamo <code>write</code> con indirizzo e quantità.</p></div></details></section>
-<section class="exercise-card"><span class="exercise-label">Esercizio 12bis</span><h2>Salva solo gli elementi validi</h2><p>Un array int32_t ha capacità 10, ma n = 3. Quanti byte richiede il solo blocco dei valori? Che cosa cambia se scrivi sizeof dell’intero array?</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Il blocco valido richiede <code>3 × 4 = 12 byte</code>. L’intero array occupa 40 byte: salveresti anche 7 elementi fuori dalla porzione logica. Né 12 né 40 includono l’header ARRB di 12 byte.</p></div></details></section>
-<section class="topic-card"><h2>Per approfondire</h2><p>Riferimenti: <a href="https://eel.is/c++draft/istream.unformatted">read e gcount nello standard C++</a>, <a href="https://eel.is/c++draft/ostream.unformatted">write nello standard C++</a>, <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/text-and-binary-streams?view=msvc-170">modalità testo e binaria nel runtime Microsoft</a>.</p></section>
-<aside class="next-step"><strong>Prossimo passo.</strong> Usiamo queste operazioni per scrivere il formato ARRB completo.</aside>
-
+<p>Qui <code>(char*)</code> permette a <code>read</code> di scrivere nei byte di <code>copia</code>. Se la lettura non riesce, non usiamo la variabile come se contenesse un dato valido.</p></section>
+<div class="callout"><strong>Il cast non trasforma il numero in testo:</strong> cambia il modo in cui passiamo l’indirizzo alla funzione. Usiamo la forma breve del cast C, già vista nella Lezione 0. Il trasferimento effettivo è eseguito da <code>read</code> o <code>write</code>.</div>
+<section class="topic-card"><h2>Come aprire il file</h2><figure class="code-example"><figcaption>Frammenti · due aperture alternative</figcaption><pre><code class="language-cpp">ofstream out("dati.bin", ios::binary);  // scrittura
+ifstream in("dati.bin", ios::binary);   // lettura</code></pre></figure><p>Le aperture si usano nei rispettivi programmi, non contemporaneamente per questo esempio. <code>ios::binary</code> apre in modalità binaria; da solo <strong>non trasforma</strong> <code>&lt;&lt;</code> o <code>&gt;&gt;</code> in operazioni binarie.</p></section>
+<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>La chiamata write salva anche il nome della variabile numero?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>No. Salva solo <code>sizeof(numero)</code> byte a partire dal suo indirizzo. Nel file non compare il nome della variabile.</p></div></details></section>
+<section class="exercise-card"><span class="exercise-label">Prova tu</span><h2>Scegli l’operazione</h2><p>Quale chiamata useresti per salvare i byte di un int? E per scrivere le sue cifre in un file di testo?</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Per i byte uso <code>out.write((const char*)&amp;numero, sizeof(numero))</code>. Per le cifre uso <code>out &lt;&lt; numero</code>. Sono due rappresentazioni diverse.</p></div></details></section>
+<aside class="next-step"><strong>Prossimo passo.</strong> Scriviamo tre interi con un ciclo di tre iterazioni.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_12.html">&#8592; Precedente</a>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4BIA - L3.9 · Salvare una struct in testo</title>
+  <title>4BIA - L3.9 · Dalla struct al testo</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -15,10 +15,10 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:52.63%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:41.67%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
-<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Lezione 3 - File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
@@ -30,15 +30,20 @@
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
-    <li><a href="lez3_9.html" class="active" aria-current="page">L3.9 - Salvare una struct in testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
-    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
-    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
-    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
-    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_9.html" class="active" aria-current="page">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
@@ -46,37 +51,28 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 10/19</p>
-    <h1>Salvare una struct in testo</h1>
-    <p class="lead">Serializzare significa trasformare un record in una rappresentazione che può essere scritta e ricostruita.</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 10/24</p>
+    <h1>Dalla struct al testo</h1>
+    <p class="lead">Salvare un record significa scrivere i suoi campi in un ordine deciso da noi.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_8.html">&#8592; Precedente</a>
     <a class="nav-button primary" href="lez3_10.html">Successiva &#8594;</a>
   </nav>
   <div class="content-box">
-
-    <section class="concept-card">
-      <h2>Dal record alla riga</h2>
-      <p>Riprendiamo <code>Studente</code> e scegliamo il contratto <code>matricola;nome;media</code>.</p>
-      <p><strong>Idea chiave:</strong> non stiamo salvando “la struct”; stiamo scrivendo i suoi campi secondo un formato dichiarato.</p>
-    </section>
-
-    <div class="stream-map" aria-label="Trasformazione da struct a riga di testo">
-      <span class="io-node">struct</span>
-      <span class="io-arrow" aria-hidden="true">&#8594;</span>
-      <span class="io-node">serializzazione</span>
-      <span class="io-arrow" aria-hidden="true">&#8594;</span>
-      <span class="io-node">riga nel file</span>
-    </div>
-
-    <figure class="code-example">
-      <figcaption>C++17 · scrivere un record</figcaption>
-<pre><code class="language-cpp">#include &lt;fstream&gt;
-#include &lt;iomanip&gt;
-#include &lt;limits&gt;
-#include &lt;locale&gt;
-#include &lt;ostream&gt;
+<section class="concept-card">
+  <h2>Prima decidiamo che cosa salvare</h2>
+  <p>Per la nostra piccola segreteria ogni studente ha <strong>matricola, nome e anno di corso</strong>. Manteniamo questi tre campi anche nel successivo archivio completo.</p>
+  <p><strong>Idea chiave:</strong> la struct tiene insieme i dati in memoria; una riga di testo li conserva nel file. Scriviamo i campi, non automaticamente l’intero oggetto.</p>
+</section>
+<section class="topic-card">
+  <h2>Una regola semplice per scrivere e rileggere</h2>
+  <p>Scegliamo l’ordine <code>matricola;nome;anno</code>: il punto e virgola separa i campi, il fine riga conclude il record. Il nome può contenere spazi, ma non <code>;</code>, virgolette o fine riga.</p>
+  <p>Qui forniamo dati già corretti: matricola positiva, nome non vuoto e anno da 1 a 5. Nel programma completo controlleremo questi vincoli.</p>
+  <div class="stream-map" aria-label="Dalla struct a una riga nel file"><span class="io-node">1001 · Ada Lovelace · 4</span><span class="io-arrow" aria-hidden="true">→</span><span class="io-node">1001;Ada Lovelace;4</span></div>
+</section>
+<figure class="code-example"><figcaption>C++17 · programma completo · un solo record, senza intestazione</figcaption><pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
 #include &lt;string&gt;
 
 using namespace std;
@@ -84,76 +80,36 @@ using namespace std;
 struct Studente {
     int matricola;
     string nome;
-    double media;
+    int anno;
 };
 
-bool scriviStudente(ostream&amp; out,
-                     const Studente&amp; s) {
-    out.imbue(locale::classic());
-    out &lt;&lt; s.matricola &lt;&lt; ';'
-        &lt;&lt; s.nome &lt;&lt; ';'
-        &lt;&lt; setprecision(
-               numeric_limits&lt;double&gt;::max_digits10)
-        &lt;&lt; s.media &lt;&lt; '\n';
-    return static_cast&lt;bool&gt;(out);
-}
-
 int main() {
-    ofstream out("studenti.txt");
+    Studente s = {1001, "Ada Lovelace", 4};
+
+    ofstream out("studente.txt");
     if (!out) {
+        cerr &lt;&lt; "Apertura fallita\n";
         return 1;
     }
 
-    Studente ada{1001, "Ada Lovelace", 8.5};
-    if (!scriviStudente(out, ada)) {
-        return 2;
-    }
+    out &lt;&lt; s.matricola &lt;&lt; ';'
+        &lt;&lt; s.nome &lt;&lt; ';'
+        &lt;&lt; s.anno &lt;&lt; '\n';
 
     out.close();
     if (!out) {
-        return 3;
+        cerr &lt;&lt; "Scrittura fallita\n";
+        return 2;
     }
-    return 0;
-}</code></pre>
-    </figure>
-
-    <section class="two-col">
-      <article class="topic-card">
-        <h2>Risultato</h2>
-        <ol class="file-sheet compact" aria-label="Record serializzato">
-          <li><code>1001;Ada Lovelace;8.5</code></li>
-        </ol>
-      </article>
-      <article class="topic-card">
-        <h2>Contratto semplificato</h2>
-        <p><strong>Precondizione:</strong> il chiamante fornisce un record valido: matricola positiva, nome non vuoto senza <code>;</code> né fine riga, media da 0 a 10. Nel laboratorio controlleremo questi vincoli prima di aprire il file.</p>
-        <p><code>locale::classic()</code> fissa il punto decimale. <code>setprecision(max_digits10)</code> conserva abbastanza cifre significative da ricostruire lo stesso <code>double</code> dopo la lettura: non significa scrivere sempre un numero fisso di cifre dopo il punto.</p>
-      </article>
-    </section>
-
-    <section class="checkpoint">
-      <div class="checkpoint-prompt">
-        <span class="checkpoint-label">Checkpoint</span>
-        <h2>Perché passiamo <code>const Studente&amp;</code>?</h2>
-      </div>
-      <details class="answer-reveal">
-        <summary>
-          <span class="when-closed">Mostra risposta</span>
-          <span class="when-open">Nascondi risposta</span>
-        </summary>
-        <div class="answer">
-        <p>La funzione deve soltanto leggere il record: il riferimento evita la copia e <code>const</code> impedisce modifiche accidentali.</p>
-      </div>
-      </details>
-    </section>
-
-    <section class="exercise-card">
-      <span class="exercise-label">Esercizio 9</span>
-      <h2>Scrivere una classe</h2>
-      <p>Scrivi una funzione che riceva un array di studenti e il numero di elementi, salvi un record valido per riga e restituisca <code>false</code> al primo errore.</p>
-    </section>
-
-    <aside class="next-step"><strong>Prossimo passo.</strong> Percorriamo la trasformazione inversa senza modificare il risultato se il parsing fallisce.</aside>
+}</code></pre></figure>
+<section class="topic-card">
+  <h2>Segui le tre operazioni</h2>
+  <ol class="steps"><li><strong>Apri:</strong> <code>ofstream</code> prepara il file; <code>if (!out)</code> controlla l’apertura.</li><li><strong>Scrivi:</strong> <code>&lt;&lt;</code> invia un campo, poi il separatore, poi il campo successivo. <code>'\n'</code> conclude la riga.</li><li><strong>Concludi:</strong> chiudi e controlla l’esito della scrittura.</li></ol>
+  <p>Nel file <code>studente.txt</code> trovi <code>1001;Ada Lovelace;4</code>. I nomi dei membri, come <code>matricola</code>, non vengono scritti: li conosce il programma che legge.</p>
+</section>
+<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Perché qui “Ada Lovelace” può contenere uno spazio?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>Perché i campi sono separati da <code>;</code>, non dagli spazi. Il lettore deve rispettare la stessa scelta.</p></div></details></section>
+<section class="exercise-card"><span class="exercise-label">Prova su carta</span><h2>Prevedi la riga</h2><p>Il record è <code>{1002, "Alan Turing", 5}</code>. Quale riga produrrebbe lo stesso codice? Come scriveresti un intero array?</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>La riga è <code>1002;Alan Turing;5</code>. Per un array apriamo il file una sola volta, scriviamo i tre campi per gli indici da 0 a <code>n - 1</code>, poi chiudiamo e controlliamo. Non apriamo il file dentro il ciclo: ogni nuova apertura in scrittura cancellerebbe i record precedenti.</p></div></details></section>
+<aside class="next-step"><strong>Prossimo passo.</strong> Prendiamo una riga e separiamo i tre campi.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_8.html">&#8592; Precedente</a>

@@ -15,10 +15,10 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:36.84%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:29.17%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
-<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Lezione 3 - File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
@@ -30,15 +30,20 @@
     <li><a href="lez3_7.html" class="active" aria-current="page">L3.7 - Il ciclo di lettura corretto</a></li>
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
-    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
-    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
-    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
-    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
-    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
@@ -46,7 +51,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 7/19</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 7/24</p>
     <h1>Il ciclo di lettura corretto</h1>
     <p class="lead">La fine del file non si prevede: si tenta una lettura e si usa il dato soltanto se il tentativo riesce.</p>
   </header>
@@ -78,7 +83,7 @@
         <span class="badge extra">Corretto</span>
         <h2>La lettura governa il ciclo</h2>
         <figure class="code-example">
-          <figcaption>C++17 · pattern corretto</figcaption>
+          <figcaption>C++17 · schema corretto</figcaption>
 <pre><code class="language-cpp">while (getline(in, riga)) {
     elabora(riga);
 }</code></pre>
@@ -88,20 +93,15 @@
     </section>
 
     <section class="topic-card">
-      <h2>Stati essenziali dello stream</h2>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Controllo</th><th>Significato operativo</th></tr></thead>
-          <tbody>
-            <tr><td><code>in.good()</code></td><td>Nessun bit di stato è attivo: né EOF né fallimenti.</td></tr>
-            <tr><td><code>in.eof()</code></td><td>È stata incontrata la fine del file.</td></tr>
-            <tr><td><code>in.fail()</code></td><td>È attivo <code>failbit</code> oppure <code>badbit</code>: l’operazione non può essere considerata riuscita.</td></tr>
-            <tr><td><code>in.bad()</code></td><td>Errore grave del dispositivo o dello stream.</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p>Gli indicatori possono essere attivi insieme. La conversione dello stream a <code>bool</code>, usata in <code>if (in)</code>, controlla che non ci siano <code>failbit</code> o <code>badbit</code>: non equivale a <code>good()</code>.</p>
-      <div class="callout warning"><strong>EOF non significa “file valido”.</strong> Un ultimo numero o un’ultima riga senza fine riga possono essere letti correttamente anche incontrando EOF. Viceversa, un record iniziato ma incompleto resta un errore, come in L3.5. Nel binario una richiesta di 4 byte che ne ottiene solo 2 è una lettura fallita, anche se termina a EOF.</div>
+      <h2>Perché è finito il ciclo?</h2>
+      <p><code>elabora(riga)</code> indica il lavoro da fare sulla riga letta, per esempio stamparla o contarla. Non è una funzione della libreria: la definiamo noi.</p>
+      <div class="table-wrap"><table><thead><tr><th>Situazione</th><th>Come ragioniamo</th></tr></thead><tbody>
+        <tr><td>Non ci sono altre righe</td><td>È la normale fine del file: non c’è un nuovo dato da elaborare.</td></tr>
+        <tr><td>Un record è iniziato ma manca un campo</td><td>È un errore: non basta essere arrivati alla fine per rendere completo il record.</td></tr>
+        <tr><td>Il file non si riesce più a leggere</td><td>Segnaliamo il problema, senza presentare un risultato finale come se tutto fosse riuscito.</td></tr>
+      </tbody></table></div>
+      <p><code>in.eof()</code> segnala che una lettura ha incontrato la fine; <code>in.bad()</code> segnala un errore di lettura dello stream. Negli esempi trovi un controllo finale con queste due funzioni: serve a distinguere la fine normale da un problema.</p>
+      <div class="callout"><strong>Ultima riga senza a capo:</strong> se contiene testo, <code>getline</code> può leggerla correttamente. Non serve aggiungere un <code>\n</code> per rendere valido il contenuto.</div>
     </section>
 
     <section class="checkpoint">
@@ -123,7 +123,8 @@
     <section class="exercise-card">
       <span class="exercise-label">Esercizio 7</span>
       <h2>Trova e correggi il bug</h2>
-      <p>Prendi un programma che usa <code>while (!in.eof())</code>, sostituisci il ciclo con il pattern corretto e prova file vuoto, una sola riga e ultima riga senza <code>\n</code>.</p>
+      <p>Prendi un programma che usa <code>while (!in.eof())</code>, sostituisci il ciclo con lo schema corretto e prova file vuoto, una sola riga e ultima riga senza <code>\n</code>.</p>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Usa <code>while (getline(in, riga))</code> e lascia l’elaborazione nel corpo, come nell’esempio corretto. Il file vuoto produce zero elaborazioni; un file con una riga ne produce una, anche senza <code>\n</code> finale. Il dato viene usato soltanto quando la lettura è riuscita.</p></div></details>
     </section>
 
     <aside class="next-step"><strong>Prossimo passo.</strong> Mettiamo in pratica lettura e scrittura in un primo laboratorio guidato, usando soltanto token separati da spazi.</aside>

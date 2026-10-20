@@ -15,10 +15,10 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:47.37%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:37.50%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
-<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Lezione 3 - File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
@@ -30,15 +30,20 @@
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html" class="active" aria-current="page">L3.8 - La stessa idea in C</a></li>
-    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
-    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
-    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
-    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
-    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
@@ -46,7 +51,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 9/19</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 9/24</p>
     <h1>La stessa idea in C</h1>
     <p class="lead">Cambiano tipi e funzioni, non il metodo: aprire, controllare i valori restituiti, elaborare e chiudere.</p>
   </header>
@@ -57,8 +62,8 @@
   <div class="content-box">
 
     <section class="concept-card">
-      <h2><code>FILE*</code> rappresenta lo stream</h2>
-      <p>In C usiamo <code>fopen</code>, <code>fprintf</code>, <code>fscanf</code>, <code>fgets</code> e <code>fclose</code>.</p>
+      <h2>Un confronto con la libreria C</h2>
+      <p>In C <code>FILE*</code> indica il file aperto. <code>fopen</code> apre, <code>fprintf</code> scrive, <code>fscanf</code> legge e <code>fclose</code> chiude. È un confronto: i programmi del caso di studio restano in C++.</p>
       <p><strong>Idea chiave:</strong> ogni funzione comunica l’esito tramite il valore restituito; ignorarlo significa perdere il controllo sugli errori.</p>
     </section>
 
@@ -120,7 +125,7 @@ int main(void) {
       </article>
     </section>
 
-    <div class="callout"><strong>Per leggere righe:</strong> <code>fgets(buffer, dimensione, file)</code> restituisce il buffer in caso di successo e <code>NULL</code> a fine file o in caso di errore. Legge al massimo <code>dimensione - 1</code> byte e conserva il <code>\n</code> se lo incontra: se una riga supera il buffer, occorrono altre letture per completarla.</div>
+    <section class="topic-card"><h2>Leggi le istruzioni, non impararle alla cieca</h2><ul class="compact-list"><li><code>"w"</code> apre per scrivere e cancella il contenuto precedente; <code>"r"</code> apre per leggere.</li><li>In <code>fscanf</code>, <code>%39s</code> legge il nome e <code>%lf</code> legge un <code>double</code>. <code>&amp;voto</code> indica dove depositare il numero letto.</li><li><code>letti == 2</code> significa che entrambi i campi sono stati acquisiti. Un solo campo non basta per elaborare il record.</li><li><code>EOF</code> può segnalare che non ci sono altri dati; <code>ferror</code> permette di controllare se invece si è verificato un errore di lettura.</li></ul></section>
 
     <section class="checkpoint">
       <div class="checkpoint-prompt">
@@ -142,6 +147,7 @@ int main(void) {
       <span class="exercise-label">Esercizio 8</span>
       <h2>Versione C dei quadrati</h2>
       <p>Riscrivi l’esercizio 4 usando <code>FILE*</code> e <code>fprintf</code>, poi rileggi le coppie con <code>fscanf</code> controllando il numero di conversioni.</p>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Apri <code>quadrati.txt</code> con <code>fopen</code> in modalità <code>"w"</code> e controlla <code>NULL</code>. Per i numeri da 1 a 10 scrivi con <code>fprintf(out, "%d %d\n", i, i * i)</code>, controllandone il risultato. Chiudi con <code>fclose</code>. Riapri in <code>"r"</code>: ogni <code>fscanf(in, "%d %d", &amp;numero, &amp;quadrato)</code> deve restituire 2 prima di stampare o usare la coppia. Dopo il ciclo distingui fine del file, coppia incompleta ed errore di lettura, poi chiudi anche l’input.</p></div></details>
     </section>
 
     <aside class="next-step"><strong>Prossimo passo.</strong> Uniamo file e struct definendo una rappresentazione testuale semplice.</aside>

@@ -1,3 +1,5 @@
+param([string]$Lezione = "")
+
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
 function Write-Utf8NoBom {
@@ -200,15 +202,20 @@ $lez3Items = @(
     @{ Path = "lez3_7.html"; Label = "L3.7 - Il ciclo di lettura corretto" },
     @{ Path = "lez3_lab_testo.html"; Label = "L3.7bis - Primo laboratorio sui file di testo" },
     @{ Path = "lez3_8.html"; Label = "L3.8 - La stessa idea in C" },
-    @{ Path = "lez3_9.html"; Label = "L3.9 - Salvare una struct in testo" },
-    @{ Path = "lez3_10.html"; Label = "L3.10 - Ricostruire una struct" },
-    @{ Path = "lez3_11.html"; Label = "L3.11 - Testo robusto e round-trip" },
-    @{ Path = "lez3_12.html"; Label = "L3.12 - Progettare un formato binario" },
-    @{ Path = "lez3_blocchi.html"; Label = "L3.12bis - Byte, modalità e operazioni" },
-    @{ Path = "lez3_13.html"; Label = "L3.13 - Scrivere un file binario in C++" },
-    @{ Path = "lez3_lettura_binaria.html"; Label = "L3.13bis - Leggere e controllare un file binario" },
-    @{ Path = "lez3_14.html"; Label = "L3.14 - Binario con la libreria C" },
-    @{ Path = "lez3_15.html"; Label = "L3.15 - Cursore, seek e record fissi" },
+    @{ Path = "lez3_9.html"; Label = "L3.9 - Dalla struct al testo" },
+    @{ Path = "lez3_10.html"; Label = "L3.10 - Dalla riga ai campi" },
+    @{ Path = "lez3_11.html"; Label = "L3.11 - Provare scrittura e lettura" },
+    @{ Path = "lez3_archivio.html"; Label = "L3.A1 - Un array di studenti" },
+    @{ Path = "lez3_operazioni.html"; Label = "L3.A2 - Aggiungere, modificare, rimuovere" },
+    @{ Path = "lez3_archivio_spazi.html"; Label = "L3.A3 - Archivio di testo a spazi" },
+    @{ Path = "lez3_archivio_csv.html"; Label = "L3.A4 - Archivio CSV: righe e campi" },
+    @{ Path = "lez3_archivio_programma.html"; Label = "L3.A5 - Programma completo e collaudo" },
+    @{ Path = "lez3_12.html"; Label = "L3.12 - Binario: un formato elementare" },
+    @{ Path = "lez3_blocchi.html"; Label = "L3.12bis - read e write: indirizzo e byte" },
+    @{ Path = "lez3_13.html"; Label = "L3.13 - Scrivere con write" },
+    @{ Path = "lez3_lettura_binaria.html"; Label = "L3.13bis - Leggere con read" },
+    @{ Path = "lez3_14.html"; Label = "L3.14 - In C: fseek e ftell" },
+    @{ Path = "lez3_15.html"; Label = "L3.15 - seekg, seekp, tellg e tellp" },
     @{ Path = "lez3_16.html"; Label = "L3.16 - Laboratorio e autoverifica" }
 )
 
@@ -296,6 +303,9 @@ $targets += @($lez6Items | ForEach-Object {
 })
 
 foreach ($target in $targets) {
+    if ($Lezione -and -not $target.Path.StartsWith("$Lezione/")) {
+        continue
+    }
     $fullPath = Join-Path $PSScriptRoot $target.Path
     $content = Get-Content -Path $fullPath -Raw -Encoding utf8
     $content = Ensure-MenuJs -Content $content -ScriptSrc $target.ScriptSrc

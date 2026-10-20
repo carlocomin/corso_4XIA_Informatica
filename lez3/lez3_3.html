@@ -15,10 +15,10 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:15.79%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:12.50%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
-<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Lezione 3 - File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
@@ -30,15 +30,20 @@
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
-    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
-    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
-    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
-    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
-    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
@@ -46,9 +51,9 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 3/19</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 3/24</p>
     <h1>Apri, usa, controlla</h1>
-    <p class="lead">L’I/O affidabile nasce da una sequenza stabile: scegliere la modalità, aprire, verificare, elaborare e controllare l’esito.</p>
+    <p class="lead">Prima apro e controllo; poi leggo o scrivo; alla fine verifico che il lavoro sia riuscito.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_2.html">&#8592; Precedente</a>
@@ -57,12 +62,13 @@
   <div class="content-box">
 
     <section class="concept-card">
-      <h2>Il ciclo di vita di un file</h2>
+      <h2>Uno stream è un canale per i dati</h2>
+      <p>Uno <strong>stream</strong> collega il programma a una sorgente o a una destinazione. Con <code>cin</code> leggiamo dalla tastiera; con <code>ifstream</code> leggiamo da un file; con <code>ofstream</code> scriviamo in un file.</p>
       <p><strong>Idea chiave:</strong> non si legge e non si scrive finché l’apertura non è stata controllata; anche le operazioni successive possono fallire.</p>
     </section>
 
     <ol class="io-flow" aria-label="Cinque passi del lavoro con un file">
-      <li><span class="step-number">1</span><strong>Scegli</strong><small>path, formato e modalità</small></li>
+      <li><span class="step-number">1</span><strong>Scegli</strong><small>quale file e che cosa farci</small></li>
       <li><span class="step-number">2</span><strong>Apri</strong><small>crea lo stream</small></li>
       <li><span class="step-number">3</span><strong>Controlla</strong><small>l’apertura è riuscita?</small></li>
       <li><span class="step-number">4</span><strong>Usa</strong><small>leggi o scrivi</small></li>
@@ -74,14 +80,14 @@
         <h2>Modalità essenziali</h2>
         <ul class="compact-list">
           <li><code>ifstream</code>: lettura;</li>
-          <li><code>ofstream</code>: scrittura, con troncamento predefinito;</li>
+          <li><code>ofstream</code>: scrittura, cancellando il contenuto precedente;</li>
           <li><code>ios::app</code>: aggiunta in fondo;</li>
           <li><code>ios::binary</code>: modalità binaria.</li>
         </ul>
       </article>
       <article class="topic-card">
         <h2>Il percorso conta</h2>
-        <p>Un path relativo parte dalla <em>working directory</em>, che non coincide necessariamente con la cartella del sorgente.</p>
+        <p>Con <code>"dati.txt"</code> il programma cerca il file nella propria <strong>cartella di lavoro</strong>. Non è necessariamente la cartella del sorgente: l’IDE può sceglierne un’altra.</p>
         <p>File assente, cartella sbagliata e permessi insufficienti sono errori normali da gestire.</p>
       </article>
     </section>
@@ -105,6 +111,8 @@ int main() {
 }</code></pre>
     </figure>
 
+    <div class="callout"><strong>Come leggere i controlli:</strong> <code>!</code> significa “non”. Dopo l’apertura, <code>if (!in)</code> significa “se il file non si è aperto”. <code>cerr</code> mostra un messaggio di errore; <code>return 1</code> termina il programma con un codice di errore. Nei prossimi esempi useremo sempre questa logica.</div>
+
     <section class="checkpoint">
       <div class="checkpoint-prompt">
         <span class="checkpoint-label">Checkpoint</span>
@@ -116,7 +124,7 @@ int main() {
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p>Lo stream viene chiuso automaticamente alla distruzione, normalmente all’uscita dall’ambito. Usiamo <code>close()</code> anche per controllare esplicitamente l’esito della conclusione della scrittura: eventuali errori nel trasferimento dei dati rimasti nel buffer non devono essere ignorati.</p>
+        <p>Il file viene chiuso automaticamente quando la variabile stream smette di esistere, per esempio alla fine di <code>main</code>. Negli scrittori chiamiamo anche <code>close()</code> e controlliamo l’esito: un errore può emergere proprio alla conclusione della scrittura.</p>
       </div>
       </details>
     </section>
@@ -125,6 +133,7 @@ int main() {
       <span class="exercise-label">Esercizio 3</span>
       <h2>Scegli apertura e percorso</h2>
       <p>Indica modalità e tipo di stream per: leggere <code>dati.txt</code>, sovrascrivere <code>report.txt</code>, aggiungere una riga a <code>log.txt</code> e leggere <code>foto.bin</code>.</p>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Lettura: <code>ifstream in("dati.txt");</code>. Riscrittura: <code>ofstream out("report.txt");</code>. Aggiunta: <code>ofstream out("log.txt", ios::app);</code>. Lettura binaria: <code>ifstream in("foto.bin", ios::binary);</code>. Sono aperture alternative, ciascuna con il proprio controllo dell’esito.</p></div></details>
     </section>
 
     <aside class="next-step"><strong>Prossimo passo.</strong> Applichiamo il ciclo completo alla scrittura di un file testuale.</aside>

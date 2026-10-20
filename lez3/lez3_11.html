@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4BIA - L3.11 · Testo robusto e round-trip</title>
+  <title>4BIA - L3.11 · Provare scrittura e lettura</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -15,10 +15,10 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:63.16%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:50.00%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
-<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Lezione 3 - File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
@@ -30,15 +30,20 @@
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
-    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
-    <li><a href="lez3_11.html" class="active" aria-current="page">L3.11 - Testo robusto e round-trip</a></li>
-    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
-    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
-    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html" class="active" aria-current="page">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
@@ -46,91 +51,28 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 12/19</p>
-    <h1>Testo robusto e round-trip</h1>
-    <p class="lead">Un formato è affidabile quando scrittura e lettura condividono le stesse regole e vengono provate anche con dati difficili.</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 12/24</p>
+    <h1>Provare scrittura e lettura</h1>
+    <p class="lead">Il controllo più utile: salvo dei dati, riavvio il programma, li rileggo e li confronto.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_10.html">&#8592; Precedente</a>
-    <a class="nav-button primary" href="lez3_12.html">Successiva &#8594;</a>
+    <a class="nav-button primary" href="lez3_archivio.html">Successiva &#8594;</a>
   </nav>
   <div class="content-box">
-
-    <section class="concept-card">
-      <h2>Definire il contratto prima dei casi speciali</h2>
-      <p><strong>Idea chiave:</strong> “file di testo” non basta come specifica. Servono codifica, separatore, formato numerico, gestione delle righe vuote e strategia per gli errori.</p>
-    </section>
-
-    <div class="stream-map" aria-label="Ciclo di round-trip">
-      <span class="io-node">record originale</span>
-      <span class="io-arrow" aria-hidden="true">&#8594;</span>
-      <span class="io-node">scrivi</span>
-      <span class="io-arrow" aria-hidden="true">&#8594;</span>
-      <span class="io-node">leggi</span>
-      <span class="io-arrow" aria-hidden="true">&#8594;</span>
-      <span class="io-node">record equivalente</span>
-    </div>
-
-    <section class="two-col">
-      <article class="topic-card">
-        <h2>Regole minime</h2>
-        <ul class="compact-list">
-          <li>codifica UTF-8 senza BOM (nessun marcatore iniziale); gli stream non convertono automaticamente la codifica;</li>
-          <li>un record per riga;</li>
-          <li><code>;</code> come separatore;</li>
-          <li>punto per i decimali;</li>
-          <li>prima riga <code>STUDENTI;1</code> come tipo e versione;</li>
-          <li>righe malformate segnalate e scartate.</li>
-          <li>se i record validi superano la capacità dell’array, caricamento fallito invece di perdita silenziosa di dati.</li>
-        </ul>
-      </article>
-      <article class="topic-card">
-        <h2>Fine riga tra sistemi</h2>
-        <p>Leggendo un file Windows su altri sistemi può restare un <code>'\r'</code> finale. Rimuovilo dopo <code>getline</code>, sia dall’header sia dai record:</p>
-        <figure class="code-example">
-          <figcaption>C++17 · frammento contestuale</figcaption>
-<pre><code class="language-cpp">if (!riga.empty()
-    &amp;&amp; riga.back() == '\r') {
-    riga.pop_back();
-}</code></pre>
-        </figure>
-      </article>
-    </section>
-
-    <section class="topic-card">
-      <h2>CSV reale: un livello in più</h2>
-      <p><strong>Codifica:</strong> salva sorgente e file di prova in UTF-8. Gli esempi controllano struttura e valori dei campi, ma assumono che il testo sia già UTF-8 valido: non implementano un validatore della codifica.</p>
-      <p>Se un campo può contenere separatore, virgolette o ritorni a capo, servono regole di escape: campi tra virgolette e virgolette interne raddoppiate. Il nostro formato didattico evita questi casi dichiarandoli non validi.</p>
-      <div class="callout warning"><strong>Non fingere generalità:</strong> uno <code>split</code> sul separatore non è un parser CSV completo.</div>
-    </section>
-
-    <section class="checkpoint">
-      <div class="checkpoint-prompt">
-        <span class="checkpoint-label">Checkpoint</span>
-        <h2>Che cos’è un round-trip riuscito?</h2>
-      </div>
-      <details class="answer-reveal">
-        <summary>
-          <span class="when-closed">Mostra risposta</span>
-          <span class="when-open">Nascondi risposta</span>
-        </summary>
-        <div class="answer">
-        <p>Scriviamo un record, lo rileggiamo e otteniamo gli stessi dati logici secondo le regole del formato. Non è necessario che la memoria abbia gli stessi byte.</p>
-      </div>
-      </details>
-    </section>
-
-    <section class="exercise-card">
-      <span class="exercise-label">Esercizio 11</span>
-      <h2>Progetta i test</h2>
-      <p>Prepara almeno otto righe: valida, nome con spazi, nome vuoto, separatore mancante, numero non valido, media fuori intervallo, campo extra e ultima riga senza fine riga.</p>
-    </section>
-
-    <aside class="next-step"><strong>Prossimo passo.</strong> Passiamo al binario distinguendo il formato su disco dal layout in memoria.</aside>
+<section class="concept-card"><h2>Il file serve a ritrovare gli stessi dati</h2><p><strong>Idea chiave:</strong> una stampa corretta non dimostra che il salvataggio funzioni. Dobbiamo rileggere il file, possibilmente in una nuova esecuzione.</p></section>
+<div class="stream-map" aria-label="Salvataggio e rilettura"><span class="io-node">dati in memoria</span><span class="io-arrow" aria-hidden="true">→</span><span class="io-node">salva nel file</span><span class="io-arrow" aria-hidden="true">→</span><span class="io-node">rileggi e confronta</span></div>
+<section class="topic-card"><h2>Scrittore e lettore devono essere d’accordo</h2><ul class="compact-list"><li>Quali campi ci sono e in quale ordine?</li><li>Come sono separati: spazi oppure <code>;</code>?</li><li>C’è una riga iniziale con i nomi delle colonne?</li><li>Quali dati sono ammessi e che cosa facciamo se sono errati?</li><li>Quanti record può contenere l’array?</li></ul><p>Nel piccolo esempio precedente non c’è intestazione. Nel successivo CSV scriveremo <code>matricola;nome;anno</code> sulla prima riga: il lettore dovrà riconoscerla e non trattarla come uno studente.</p></section>
+<section class="topic-card"><h2>Pochi test, scelti bene</h2><div class="table-wrap"><table><thead><tr><th>Prova</th><th>Che cosa controlliamo</th></tr></thead><tbody><tr><td>Dati corretti</td><td>Matricole, nomi e anni riletti coincidono con quelli salvati.</td></tr><tr><td>Nome con spazi</td><td>Il CSV conserva il nome intero; il formato a spazi non può rappresentarlo.</td></tr><tr><td>Campo mancante o numero errato</td><td>Non entra nell’array un record incompleto o non valido.</td></tr><tr><td>Nessuno studente</td><td>Il programma non usa elementi inesistenti.</td></tr><tr><td>Array pieno</td><td>Non scriviamo mai oltre la sua capacità.</td></tr><tr><td>File assente</td><td>Segnaliamo che l’apertura è fallita.</td></tr></tbody></table></div></section>
+<section class="topic-card"><h2>Prima prevedi, poi esegui</h2><ol class="steps"><li>Conserva una copia del file corretto.</li><li>Cambia una sola cosa, per esempio un anno in <code>quattro</code>.</li><li>Scrivi che cosa ti aspetti; poi esegui soltanto il lettore.</li><li>Confronta il risultato e ripristina il file per la prova successiva.</li></ol><div class="callout warning"><strong>Non rilanciare lo scrittore durante una prova di lettura:</strong> riscriverebbe il file e cancellerebbe l’errore che volevi controllare.</div></section>
+<section class="topic-card"><h2>Un limite da sapere</h2><p>Il nostro CSV usa <code>;</code> e nomi senza separatori, virgolette o fine riga. Per file con regole diverse occorre adattare il lettore: non basta che il nome finisca in <code>.csv</code>.</p><p>In laboratorio mantieni sorgenti e dati in UTF-8, così i nomi accentati restano leggibili. I dettagli di compatibilità tra editor e sistemi non sono l’obiettivo di questi esercizi.</p></section>
+<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Il programma mostra i dati dopo una modifica: basta per dire che sono stati salvati?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>No. La stampa può mostrare soltanto l’array in memoria. Salvo, termino, riavvio e ricarico: se ritrovo gli stessi dati, ho verificato anche il file.</p></div></details></section>
+<section class="exercise-card"><span class="exercise-label">Progetta una prova</span><h2>Tre errori, tre risultati attesi</h2><p>Per il formato <code>matricola;nome;anno</code>, scrivi una riga corretta e tre righe errate. Per ognuna indica prima dell’esecuzione che cosa dovrebbe fare il lettore.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Esempio corretto: <code>1001;Ada Lovelace;4</code>. Esempi errati: <code>1001;;4</code> (nome vuoto), <code>1001;Ada;quattro</code> (anno non numerico), <code>1001;Ada;9</code> (anno fuori intervallo). Il lettore del caso completo deve accettare il primo e rifiutare gli altri senza sostituire l’archivio precedente.</p></div></details></section>
+<aside class="next-step"><strong>Prossimo passo.</strong> Uniamo un array di studenti, le operazioni in memoria e i due formati di testo.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_10.html">&#8592; Precedente</a>
-    <a class="nav-button primary" href="lez3_12.html">Successiva &#8594;</a>
+    <a class="nav-button primary" href="lez3_archivio.html">Successiva &#8594;</a>
   </nav>
 </main>
 </body>

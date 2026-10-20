@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4BIA - L3.14 · Binario con la libreria C</title>
+  <title>4BIA - L3.14 · In C: fseek e ftell</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -15,10 +15,10 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:89.47%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:91.67%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
-<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Lezione 3 - File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
@@ -30,15 +30,20 @@
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
-    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
-    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
-    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
-    <li><a href="lez3_14.html" class="active" aria-current="page">L3.14 - Binario con la libreria C</a></li>
-    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html" class="active" aria-current="page">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
@@ -46,102 +51,46 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 17/19</p>
-    <h1>Binario con la libreria C</h1>
-    <p class="lead">Gli stessi byte di ARRB con fread e fwrite: distinguiamo la dimensione di un elemento dal numero di elementi.</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 22/24</p>
+    <h1>In C: fseek e ftell</h1>
+    <p class="lead">fseek sposta la posizione nel file. ftell dice dove ci troviamo. Non leggono e non scrivono il contenuto.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_lettura_binaria.html">&#8592; Precedente</a>
     <a class="nav-button primary" href="lez3_15.html">Successiva &#8594;</a>
   </nav>
   <div class="content-box">
-<div class="callout"><strong>Confronto in C:</strong> le idee sono le stesse del C++. Concentrati sul significato dei tre argomenti <em>indirizzo, dimensione, quantità</em> e sul numero di elementi restituito. Non serve imparare a memoria un secondo programma completo.</div>
-<section class="concept-card"><h2>Stesso file, un’altra API</h2><p><strong>Idea chiave:</strong> C e C++ possono leggere il medesimo ARRB se rispettano gli stessi tipi, ordine e rappresentazione nativa. Cambiano le funzioni, non il contratto del file.</p><p>Questo programma <strong>legge soltanto</strong> il file creato dallo scrittore C++: non lo ricrea, quindi puoi riutilizzare i test di troncamento.</p></section>
-<section class="topic-card"><h2>fread e fwrite contano elementi, non sempre byte</h2><p>La forma è <code>fread(indirizzo, dimensione_elemento, numero_elementi, file)</code>; <code>fwrite</code> ha gli stessi argomenti per la scrittura. Il ritorno è il numero di <strong>elementi completi</strong> trasferiti.</p><ul class="compact-list"><li><code>fread(magic, 1, 4, f)</code>: 4 elementi da 1 byte; successo = 4.</li><li><code>fread(&amp;n, sizeof n, 1, f)</code>: 1 elemento da 4 byte; successo = 1.</li><li><code>fread(valori, sizeof valori[0], n, f)</code>: n elementi da 4 byte; successo = n.</li></ul><p>Un elemento letto solo in parte <strong>non</strong> conta come completo e non deve essere usato.</p></section>
-<figure class="code-example"><figcaption>C11 · lettore del formato ARRB</figcaption><pre><code class="language-c">#include &lt;limits.h&gt;
-#include &lt;stdint.h&gt;
-#include &lt;inttypes.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-
-_Static_assert(CHAR_BIT == 8, "Servono byte da 8 bit");
-
-int main(void) {
-    enum { MAX = 10 };
-    FILE *f = fopen("dati.bin", "rb");
-    if (f == NULL) return 1;
-
-    char magic[4] = {0};
-    uint32_t versione = 0, n = 0;
-    int32_t valori[MAX] = {0};
-
-    if (fread(magic, 1, 4, f) != 4
-        || fread(&amp;versione, sizeof versione, 1, f) != 1
-        || fread(&amp;n, sizeof n, 1, f) != 1) {
-        if (ferror(f)) {
-            fprintf(stderr, "Errore di I/O\n");
-        } else {
-            fprintf(stderr, "Header incompleto\n");
-        }
-        fclose(f);
-        return 2;
-    }
-    if (memcmp(magic, "ARRB", 4) != 0
-        || versione != 1 || n &gt; MAX) {
-        fclose(f);
-        return 3;
-    }
-
-    if (fread(valori, sizeof valori[0], n, f) != n) {
-        if (ferror(f)) {
-            fprintf(stderr, "Errore di I/O\n");
-        } else {
-            fprintf(stderr, "Valori incompleti\n");
-        }
-        fclose(f);
-        return 4;
-    }
-    if (fgetc(f) != EOF || ferror(f) || !feof(f)) {
-        fclose(f);
-        return 5;
-    }
-    if (fclose(f) != 0) return 6;
-
-    for (uint32_t i = 0; i &lt; n; ++i)
-        printf("%" PRId32 " ", valori[i]);
-    putchar('\n');
-    return 0;
+<section class="concept-card"><h2>Non mescolare le due librerie</h2><p><strong>Idea chiave:</strong> <code>fseek</code> e <code>ftell</code> appartengono alla libreria C e usano un <code>FILE*</code>. Nel C++ con gli stream useremo <code>seekg</code>, <code>seekp</code>, <code>tellg</code> e <code>tellp</code>.</p></section>
+<section class="topic-card"><h2>Prima apri il file</h2><p>Servono <code>#include &lt;stdio.h&gt;</code> e una funzione <code>main</code>. Inserisci i frammenti in questo ordine: apertura, spostamento, richiesta della posizione, chiusura.</p><figure class="code-example"><figcaption>Frammento C · apertura in lettura</figcaption><pre><code class="language-c">FILE* f = fopen("dati.bin", "rb");
+if (f == NULL) {
+    return 1;
+}</code></pre></figure><p><code>"rb"</code> apre il file binario in lettura, senza modificarlo. Usiamo sempre il file con 10, 20, 30.</p></section>
+<section class="topic-card"><h2>fseek: vai alla posizione indicata</h2><p>Questo frammento si usa dopo un’apertura riuscita con <code>fopen</code>:</p>
+<figure class="code-example"><figcaption>Frammento C · inizio del secondo int</figcaption><pre><code class="language-c">if (fseek(f, sizeof(int), SEEK_SET) != 0) {
+    fclose(f);
+    return 2;
 }</code></pre></figure>
-<section class="topic-card"><h2>Controlli e chiusura espliciti</h2><p><code>rb</code> significa lettura binaria; <code>wb</code> scrittura binaria con creazione o cancellazione del vecchio contenuto. Dopo un ritorno insufficiente, <code>ferror</code> segnala un errore di I/O, mentre <code>feof</code> segnala EOF incontrato da una lettura.</p><p>La lettura di prova con <code>fgetc</code> deve incontrare EOF senza errore. <code>fclose</code> va chiamata su ogni percorso dopo un’apertura riuscita.</p><p><code>PRId32</code>, definita in <code>&lt;inttypes.h&gt;</code>, fornisce il formato di stampa corretto per <code>int32_t</code>; le stringhe adiacenti costruiscono il formato di <code>printf</code>.</p></section>
-<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>fread legge due valori completi e metà del terzo: che cosa restituisce?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>Con dimensione elemento 4 e conteggio richiesto 3 restituisce <code>2</code>, non 10 byte e non 3 elementi. Il controllo <code>!= n</code> fa rifiutare il file.</p></div></details></section>
-<section class="exercise-card"><span class="exercise-label">Esercizio 14</span><h2>Scrittore C compatibile</h2><p>Scrivi in C il file ARRB con 10, 20, 30. Verifica ogni fwrite e fclose, poi prova a leggerlo con il lettore C++. Deve avere gli stessi 24 byte del file creato dal C++ nello stesso ambiente.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><figure class="code-example"><figcaption>C11 · scrittore compatibile nello stesso ambiente</figcaption><pre><code class="language-c">#include &lt;limits.h&gt;
-#include &lt;stdint.h&gt;
-#include &lt;stdio.h&gt;
+<p>I tre argomenti sono: file, spostamento in byte, punto da cui contare. <code>SEEK_SET</code> significa “dall’inizio”. Saltando <code>sizeof(int)</code> byte arriviamo all’inizio del secondo int. Il ritorno 0 indica successo.</p></section>
+<section class="topic-card"><h2>ftell: chiedi la posizione corrente</h2>
+<figure class="code-example"><figcaption>Frammento C · posizione espressa come long</figcaption><pre><code class="language-c">long posizione = ftell(f);
+if (posizione == -1L) {
+    fclose(f);
+    return 3;
+}
+printf("%ld\n", posizione);</code></pre></figure>
+<p>Se <code>sizeof(int)</code> è 4 e il seek precedente riesce, stampiamo <code>4</code>. <strong>Non stampiamo 20:</strong> 20 è il contenuto del secondo intero, non la sua posizione. Il valore <code>-1L</code> segnala un errore.</p></section>
+<section class="topic-card"><h2>Alla fine chiudi il file</h2>
 
-_Static_assert(CHAR_BIT == 8, "Servono byte da 8 bit");
-
-int main(void) {
-    const char magic[4] = {'A', 'R', 'R', 'B'};
-    const uint32_t versione = 1, n = 3;
-    const int32_t valori[3] = {10, 20, 30};
-    FILE *f = fopen("dati.bin", "wb");
-    if (f == NULL) return 1;
-
-    int ok = fwrite(magic, 1, 4, f) == 4
-          &amp;&amp; fwrite(&amp;versione, sizeof versione, 1, f) == 1
-          &amp;&amp; fwrite(&amp;n, sizeof n, 1, f) == 1
-          &amp;&amp; fwrite(valori, sizeof valori[0], n, f) == n;
-    if (fclose(f) != 0) {
-        ok = 0;
-    }
-    if (!ok) {
-        return 2;
-    }
-    return 0;
-}</code></pre></figure><p>Il confronto è tra file di <strong>rappresentazione nativa compatibile</strong>, non una garanzia di portabilità fra architetture.</p></div></details></section>
-<p class="callout">Riferimenti: <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/fread?view=msvc-170">fread</a> e <a href="https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/fwrite?view=msvc-170">fwrite nel runtime Microsoft</a>.</p>
-<aside class="next-step"><strong>Prossimo passo.</strong> Usiamo le dimensioni fisse di ARRB per raggiungere un valore con seek.</aside>
-
+<p>Dopo <code>ftell</code> concludi il lavoro:</p>
+<figure class="code-example"><figcaption>Frammento C · chiusura finale</figcaption><pre><code class="language-c">if (fclose(f) != 0) {
+    return 4;
+}
+return 0;</code></pre></figure>
+</section>
+<section class="topic-card"><h2>I tre punti di partenza</h2><p><code>SEEK_SET</code>: inizio. <code>SEEK_CUR</code>: posizione corrente. <code>SEEK_END</code>: fine. Negli esempi di base usiamo soltanto <code>SEEK_SET</code>.</p></section>
+<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Dopo fseek il programma ha già letto il secondo intero?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>No. Ha solo cambiato la posizione. Per leggere in C servirebbe una successiva <code>fread</code>; qui ci concentriamo soltanto sullo spostamento e sulla posizione.</p></div></details></section>
+<section class="exercise-card"><span class="exercise-label">Prova tu</span><h2>Raggiungi il terzo int</h2><p>Quale spostamento useresti con SEEK_SET per arrivare al terzo intero? Che cosa dovrebbe restituire ftell?</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Userei <code>2 * sizeof(int)</code>. <code>ftell</code> restituirebbe quel numero di byte: 8 se un int occupa 4 byte.</p></div></details></section>
+<aside class="next-step"><strong>Prossimo passo.</strong> Le stesse idee con gli stream C++: seek per spostarsi, tell per conoscere la posizione.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_lettura_binaria.html">&#8592; Precedente</a>

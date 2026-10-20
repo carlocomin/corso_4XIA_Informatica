@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4BIA - L3.10 · Ricostruire una struct</title>
+  <title>4BIA - L3.10 · Dalla riga ai campi</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -15,10 +15,10 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:57.89%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:45.83%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
-<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Lezione 3 - File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
@@ -30,15 +30,20 @@
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
-    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
-    <li><a href="lez3_10.html" class="active" aria-current="page">L3.10 - Ricostruire una struct</a></li>
-    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
-    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
-    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
-    <li><a href="lez3_15.html">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html" class="active" aria-current="page">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
@@ -46,108 +51,43 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 11/19</p>
-    <h1>Ricostruire una struct</h1>
-    <p class="lead">Il parsing separa i campi, converte i tipi e valida il record prima di consegnarlo al resto del programma.</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 11/24</p>
+    <h1>Dalla riga ai campi</h1>
+    <p class="lead">Prima leggiamo la riga; poi separiamo i campi; infine controlliamo e ricostruiamo la struct.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_9.html">&#8592; Precedente</a>
     <a class="nav-button primary" href="lez3_11.html">Successiva &#8594;</a>
   </nav>
   <div class="content-box">
-
-    <section class="concept-card">
-      <h2>Dalla riga al record</h2>
-      <p><strong>Idea chiave:</strong> costruiamo prima un oggetto temporaneo; assegniamo il risultato soltanto quando tutti i campi sono presenti e validi.</p>
-    </section>
-
-    <figure class="code-example">
-      <figcaption>C++17 · parser del formato semplice</figcaption>
-<pre><code class="language-cpp">#include &lt;iostream&gt;
+<section class="concept-card"><h2>Tre passaggi da non confondere</h2><ol class="steps"><li><strong>Leggere:</strong> prendere una riga dal file con <code>getline(in, riga)</code>.</li><li><strong>Separare:</strong> dividere quella riga in matricola, nome e anno.</li><li><strong>Capire e controllare:</strong> ricavare i numeri dai campi testuali e verificare che i dati siano ammessi.</li></ol><p><strong>Idea chiave:</strong> avere letto del testo non significa avere già ottenuto uno studente valido.</p></section>
+<section class="topic-card"><h2>Leggere da una stringa</h2><p><code>istringstream campi(riga)</code> ci permette di leggere il contenuto di <code>riga</code> come leggeremmo da un file. Richiede <code>&lt;sstream&gt;</code>. Non apre un secondo file.</p><p><code>getline(campi, nome, ';')</code> prende i caratteri fino al prossimo punto e virgola: il separatore viene consumato, ma non entra nella stringa.</p></section>
+<figure class="code-example"><figcaption>C++17 · programma completo · isoliamo la separazione dei campi</figcaption><pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;sstream&gt;
-#include &lt;locale&gt;
 #include &lt;string&gt;
 
 using namespace std;
 
-struct Studente {
-    int matricola;
-    string nome;
-    double media;
-};
-
-bool valido(const Studente&amp; s) {
-    return s.matricola &gt; 0
-        &amp;&amp; !s.nome.empty()
-        &amp;&amp; s.media &gt;= 0.0
-        &amp;&amp; s.media &lt;= 10.0;
-}
-
-bool parseStudente(const string&amp; riga,
-                   Studente&amp; risultato) {
-    istringstream in(riga);
-    in.imbue(locale::classic());
-    Studente temp{};
-    char separatore;
-
-    if (!(in &gt;&gt; temp.matricola)) return false;
-    if (!in.get(separatore) || separatore != ';') return false;
-    if (!getline(in, temp.nome, ';')) return false;
-    if (!(in &gt;&gt; temp.media)) return false;
-
-    char extra;
-    if (in &gt;&gt; extra) return false;
-    if (!valido(temp)) return false;
-
-    risultato = temp;
-    return true;
-}
-
 int main() {
-    Studente s{};
-    if (!parseStudente("1001;Ada Lovelace;8.5", s))
-        return 1;
+    string riga = "1001;Ada Lovelace;4";
+    istringstream campi(riga);
+    string matricola;
+    string nome;
+    string anno;
 
-    cout &lt;&lt; s.nome &lt;&lt; ": " &lt;&lt; s.media &lt;&lt; '\n';
-}</code></pre>
-    </figure>
+    if (!getline(campi, matricola, ';')) return 1;
+    if (!getline(campi, nome, ';')) return 1;
+    if (!getline(campi, anno)) return 1;
 
-    <section class="topic-card">
-      <h2>Perché usare <code>temp</code>?</h2>
-      <p>Se la riga è <code>1001;Ada;errore</code>, il parametro <code>risultato</code> conserva il valore precedente. La funzione segue una regola chiara: successo completo oppure nessuna modifica.</p>
-      <div class="callout"><strong>Limite intenzionale:</strong> questo non è un parser CSV generale. Implementa soltanto il formato semplificato dichiarato nella slide precedente.</div>
-    </section>
-
-    <section class="checkpoint">
-      <div class="checkpoint-prompt">
-        <span class="checkpoint-label">Checkpoint</span>
-        <h2>Quali righe vengono rifiutate?</h2>
-        <ul>
-          <li><code>-1;Ada;8.5</code></li>
-          <li><code>1001;;8.5</code></li>
-          <li><code>1001;Ada;12</code></li>
-          <li><code>1001;Ada</code></li>
-          <li><code>1001;Ada;8.5abc</code></li>
-        </ul>
-      </div>
-      <details class="answer-reveal">
-        <summary>
-          <span class="when-closed">Mostra risposta</span>
-          <span class="when-open">Nascondi risposta</span>
-        </summary>
-        <div class="answer">
-        <p><strong>Tutte.</strong> Nell’ordine: matricola negativa, nome vuoto, media fuori intervallo, campo mancante e caratteri extra dopo la media.</p>
-      </div>
-      </details>
-    </section>
-
-    <section class="exercise-card">
-      <span class="exercise-label">Esercizio 10</span>
-      <h2>Caricamento con scarti</h2>
-      <p>Leggi un file riga per riga, usa <code>parseStudente</code>, memorizza i record validi in un array e conta separatamente le righe rifiutate.</p>
-    </section>
-
-    <aside class="next-step"><strong>Prossimo passo.</strong> Trasformiamo il formato semplificato in un contratto più robusto e verificabile.</aside>
+    cout &lt;&lt; matricola &lt;&lt; '\n';
+    cout &lt;&lt; nome &lt;&lt; '\n';
+    cout &lt;&lt; anno &lt;&lt; '\n';
+}</code></pre></figure>
+<section class="topic-card"><h2>Che cosa contiene ogni variabile?</h2><div class="table-wrap"><table><thead><tr><th>Campo dopo getline</th><th>Tipo in questa prova</th><th>Dato che servirà nella struct</th></tr></thead><tbody><tr><td><code>"1001"</code></td><td><code>string</code></td><td>Il numero intero 1001</td></tr><tr><td><code>"Ada Lovelace"</code></td><td><code>string</code></td><td>Lo stesso nome</td></tr><tr><td><code>"4"</code></td><td><code>string</code></td><td>Il numero intero 4</td></tr></tbody></table></div><p>Le prime due letture si fermano a <code>;</code>. L’ultima prende il resto della riga. Gli spazi interni al nome restano al loro posto.</p></section>
+<section class="topic-card"><h2>Separare non basta</h2><p>Questo programma <strong>mostra i campi, ma non costruisce ancora una struct</strong>. Una riga come <code>1001;Ada;quattro</code> si può separare, però “quattro” non è il numero richiesto.</p><p>Nel caso completo useremo <code>convertiIntero</code>, una piccola funzione che prova a ottenere un intero da una stringa. Poi controlleremo matricola positiva, nome non vuoto e anno da 1 a 5. Solo dopo i controlli il record potrà entrare nell’array.</p></section>
+<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>La riga <code>1001;;4</code> ha tre campi: rappresenta uno studente valido?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>No. I separatori individuano anche un campo vuoto, ma il nome non può essere vuoto. Separare i campi e controllare il loro significato sono due lavori diversi.</p></div></details></section>
+<section class="exercise-card"><span class="exercise-label">Prima di programmare</span><h2>Individua il problema</h2><p>Per ogni riga indica che cosa non va: <code>-1;Ada;4</code>, <code>1001;Ada;7</code>, <code>1001;Ada;4abc</code>, <code>1001;Ada;4;extra</code>.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Nell’ordine: matricola non positiva; anno fuori dall’intervallo 1–5; anno che non è un intero completo; campo in più. Nell’ultima riga, l’ultima <code>getline</code> prenderebbe <code>"4;extra"</code>: la conversione numerica dovrà rifiutarlo, non fermarsi al solo 4.</p></div></details></section>
+<aside class="next-step"><strong>Prossimo passo.</strong> Controlliamo che scrittura e lettura rispettino le stesse regole.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_9.html">&#8592; Precedente</a>

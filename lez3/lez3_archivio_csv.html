@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - Archivio 4 · CSV: righe e campi</title>
+  <link rel="stylesheet" href="../style.css"><link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script><script src="../menu.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', function () { hljs.highlightAll(); });</script>
+</head>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:66.67%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 3 - File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html" class="active" aria-current="page">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Caso di studio · File I/O · 16/24</p><h1>CSV: prima la riga, poi i campi</h1><p class="lead">La struttura in memoria non cambia. Cambia il modo in cui separiamo e ricostruiamo i dati del file.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez3_archivio_spazi.html">&#8592; Precedente</a><a class="nav-button primary" href="lez3_archivio_programma.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+    <section class="concept-card"><h2>Un CSV semplificato con separatore dichiarato</h2><p><strong>Idea chiave:</strong> <code>getline(in, riga)</code> prende una riga dal file. Poi <code>getline(campi, campo, ';')</code> estrae un campo dalla riga fino al separatore.</p><p>Il CSV è una tabella scritta come testo. Negli esempi scegliamo <strong>;</strong> come separatore. Il nome può contenere spazi, ma non <code>;</code>, virgolette o fine riga: gestiamo un formato semplificato, non tutte le varianti CSV.</p></section>
+    <figure class="code-example"><figcaption>studenti.csv · variante valida con nomi composti</figcaption><pre><code class="language-plaintext">matricola;nome;anno
+1001;Ada Lovelace;4
+1002;Alan Turing;4
+1003;Grace Hopper;3</code></pre></figure>
+    <section class="topic-card">
+      <h2>1. Separare, convertire, controllare</h2>
+      <p>Separare il testo nei suoi campi si chiama anche <em>tokenizzare</em>. In <code>1001;Ada Lovelace;4</code>, gli spazi non interrompono il nome perché il delimitatore scelto è <code>;</code>.</p>
+      <figure class="code-example" data-archivio="leggiRecordCSV"><figcaption>Frammento · dal testo a una struct temporanea</figcaption><pre><code class="language-cpp">bool leggiRecordCSV(const string&amp; riga, Studente&amp; risultato) {
+    istringstream campi(riga);
+    Studente s;
+    string matricola;
+    string anno;
+    if (!getline(campi, matricola, ';')) {
+        return false;
+    }
+    if (!getline(campi, s.nome, ';')) {
+        return false;
+    }
+    if (!getline(campi, anno)) {
+        return false;
+    }
+    if (!convertiIntero(matricola, s.matricola)
+        || !convertiIntero(anno, s.anno)) {
+        return false;
+    }
+    if (!studenteValido(s)) {
+        return false;
+    }
+    risultato = s;
+    return true;
+}</code></pre></figure>
+      <p>Le prime due chiamate consumano anche il <code>;</code>. L’ultima prende tutto ciò che resta della riga: <code>convertiIntero</code> lo deve riconoscere come un solo intero. Così anche <code>1001;Ada;4;extra</code> e <code>1001;Ada;4;</code> sono rifiutati.</p>
+      <p>Solo l’ultima istruzione <code>risultato = s</code> consegna lo studente al chiamante. Se manca un campo o un controllo fallisce, il risultato precedente rimane invariato.</p>
+    </section>
+    <section class="topic-card">
+      <h2>Nota di compatibilità, non un nuovo algoritmo</h2>
+      <p><strong>Facoltativo:</strong> <code>togliCR</code> elimina soltanto un eventuale carattere aggiuntivo di fine riga. La logica del caricamento resta la stessa.</p>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra il dettaglio di compatibilità</span><span class="when-open">Nascondi il dettaglio</span></summary><div class="solution-content">
+      <p><code>getline</code> elimina <code>'\n'</code>. Se leggiamo una fine riga Windows <code>\r\n</code> in un ambiente che non la converte, può restare <code>'\r'</code>. Lo togliamo solo se è l’ultimo carattere, sia dall’intestazione sia da ogni record.</p>
+      <figure class="code-example" data-archivio="togliCR"><figcaption>Funzione comune per l’intestazione e le righe CSV</figcaption><pre><code class="language-cpp">void togliCR(string&amp; riga) {
+    if (!riga.empty() &amp;&amp; riga.back() == '\r') {
+        riga.pop_back();
+    }
+}</code></pre></figure>
+      </div></details>
+    </section>
+    <section class="topic-card">
+      <h2>2. Caricare il CSV nell’array</h2>
+      <figure class="code-example" data-archivio="caricaCSV"><figcaption>Frammento · getline sul file, poi parsing di ogni riga</figcaption><pre><code class="language-cpp">bool caricaCSV(const string&amp; nomeFile, Studente archivio[], int&amp; n) {
+    ifstream in(nomeFile);
+    if (!in) {
+        return false;
+    }
+    string riga;
+    if (!getline(in, riga)) {
+        return false;
+    }
+    togliCR(riga);
+    if (riga != "matricola;nome;anno") {
+        return false;
+    }
+    Studente temporanei[MAX];
+    int quanti = 0;
+    while (getline(in, riga)) {
+        togliCR(riga);
+        Studente s;
+        if (!leggiRecordCSV(riga, s)) {
+            return false;
+        }
+        if (!aggiungiStudente(temporanei, quanti, s)) {
+            return false;
+        }
+    }
+    if (!in.eof() || in.bad()) {
+        return false;
+    }
+    for (int i = 0; i &lt; quanti; i++) {
+        archivio[i] = temporanei[i];
+    }
+    n = quanti;
+    return true;
+}</code></pre></figure>
+      <p>L’intestazione deve essere esattamente <code>matricola;nome;anno</code>. Un file con la sola intestazione rappresenta un archivio vuoto; un file completamente vuoto è invece errato. Una riga vuota fra i record è rifiutata, non ignorata.</p>
+      <p>Come nel lettore a spazi, un duplicato, un record non valido o un trentunesimo studente fanno fallire il caricamento. L’array del chiamante viene sostituito soltanto a lettura completata.</p>
+    </section>
+    <section class="topic-card">
+      <h2>3. Scrivere le stesse regole</h2>
+      <figure class="code-example" data-archivio="salvaCSV"><figcaption>Frammento · i separatori si scrivono con &lt;&lt;, non con getline</figcaption><pre><code class="language-cpp">bool salvaCSV(const string&amp; nomeFile, const Studente archivio[], int n) {
+    if (!archivioValido(archivio, n)) {
+        return false;
+    }
+    ofstream out(nomeFile);
+    if (!out) {
+        return false;
+    }
+    out &lt;&lt; "matricola;nome;anno\n";
+    for (int i = 0; i &lt; n; i++) {
+        out &lt;&lt; archivio[i].matricola &lt;&lt; ';'
+            &lt;&lt; archivio[i].nome &lt;&lt; ';'
+            &lt;&lt; archivio[i].anno &lt;&lt; '\n';
+    }
+    out.close();
+    return !out.fail();
+}</code></pre></figure>
+      <p><code>getline</code> è un’operazione di lettura. In scrittura usiamo ancora <code>&lt;&lt;</code>: prima l’intestazione, poi tre campi separati da <code>;</code> e un fine riga per studente. Il nome con spazi non ha bisogno di virgolette in questo contratto, perché non contiene il separatore.</p>
+      <div class="callout warning"><strong>Lavora con il formato dichiarato:</strong> un foglio di calcolo può cambiare separatori o aggiungere virgolette. Per queste prove controlla il file con un editor e usa gli esempi forniti.</div>
+    </section>
+    <section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2><code>1001;"Ada;Lovelace";4</code> è accettato da questo programma?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>No. Può appartenere a un CSV che gestisce campi tra virgolette, ma non al nostro sottoinsieme. Qui ogni <code>;</code> separa campi e le virgolette non hanno un significato speciale. Non bisogna attribuire al programma una gestione che non implementa.</p></div></details></section>
+    <section class="exercise-card"><span class="exercise-label">Segui il parsing</span><h2>Quali stringhe otteniamo?</h2><p>Parti da <code>1002;Alan Turing;5</code>. Scrivi i tre campi dopo la tokenizzazione e i tipi dei tre membri della struct. Spiega perché <code>1002;;5</code> non viene aggiunto.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>I campi testuali sono <code>"1002"</code>, <code>"Alan Turing"</code>, <code>"5"</code>. Dopo le conversioni la struct contiene un <code>int</code>, una <code>string</code> e un <code>int</code>. Il secondo esempio ha il nome vuoto: tokenizzare non basta, serve anche validare il record.</p></div></details></section>
+    <aside class="next-step"><strong>Prossimo passo.</strong> Mettiamo insieme modello, operazioni, lettori e scrittori in un solo programma con menu.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez3_archivio_spazi.html">&#8592; Precedente</a><a class="nav-button primary" href="lez3_archivio_programma.html">Successiva &#8594;</a></nav>
+</main>
+</body>
+</html>

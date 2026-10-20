@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - Archivio 2 · Aggiungere, modificare, rimuovere</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script><script src="../menu.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', function () { hljs.highlightAll(); });</script>
+</head>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:58.33%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 3 - File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html" class="active" aria-current="page">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<main class="slide">
+  <header class="lesson-hero">
+    <p class="eyebrow">Caso di studio · File I/O · 14/24</p>
+    <h1>Aggiungere, modificare, rimuovere</h1>
+    <p class="lead">Tre operazioni sull’array. Nessuna apre un file: prima rendiamo corretta la gestione dei record in memoria.</p>
+  </header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez3_archivio.html">&#8592; Precedente</a><a class="nav-button primary" href="lez3_archivio_spazi.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+    <section class="concept-card">
+      <h2>Controllare prima di cambiare</h2>
+      <p><strong>Idea chiave:</strong> ciascuna operazione restituisce <code>true</code> se riesce. Se restituisce <code>false</code>, array e quantità restano invariati. Partiamo da un archivio valido: <code>0 &lt;= n &lt;= MAX</code>, dati ammessi e matricole tutte diverse.</p>
+      <p><code>studenteValido</code> controlla matricola, nome e anno secondo le regole della slide precedente. La ricerca di una matricola duplicata riguarda invece l’intero archivio.</p>
+    </section>
+    <section class="topic-card">
+      <h2>1. Aggiungere in fondo</h2>
+      <p><code>int&amp; n</code> permette alla funzione di aggiornare la quantità nel programma chiamante. <code>const Studente&amp;</code> permette di leggere il record ricevuto senza modificarlo.</p>
+      <p>Se c’è posto e la matricola non esiste, scriviamo nella prima cella libera, <code>archivio[n]</code>. <strong>Solo dopo</strong> aumentiamo <code>n</code>.</p>
+      <figure class="code-example" data-archivio="aggiungiStudente"><figcaption>Frammento · n cambia, quindi si passa per riferimento</figcaption><pre><code class="language-cpp">bool aggiungiStudente(Studente archivio[], int&amp; n,
+                     const Studente&amp; nuovo) {
+    if (n &gt;= MAX || !studenteValido(nuovo)) {
+        return false;
+    }
+    if (cercaStudente(archivio, n, nuovo.matricola) != -1) {
+        return false;
+    }
+    archivio[n] = nuovo;
+    n++;
+    return true;
+}</code></pre></figure>
+    </section>
+    <section class="topic-card">
+      <h2>2. Modificare il record trovato</h2>
+      <p>La matricola di <code>aggiornato</code> identifica lo studente già presente. Cambiamo nome e anno, ma <strong>non rinumeriamo la matricola</strong> e non cambiamo la quantità.</p>
+      <figure class="code-example" data-archivio="modificaStudente"><figcaption>Frammento · sostituzione di una struct nella stessa cella</figcaption><pre><code class="language-cpp">bool modificaStudente(Studente archivio[], int n,
+                     const Studente&amp; aggiornato) {
+    if (!studenteValido(aggiornato)) {
+        return false;
+    }
+    int posizione = cercaStudente(archivio, n, aggiornato.matricola);
+    if (posizione == -1) {
+        return false;
+    }
+    archivio[posizione] = aggiornato;
+    return true;
+}</code></pre></figure>
+    </section>
+    <section class="topic-card">
+      <h2>3. Rimuovere e chiudere il buco</h2>
+      <p>Individuiamo la posizione, spostiamo di una cella verso sinistra i record successivi, poi diminuiamo <code>n</code>. L’ordine degli studenti rimasti è conservato.</p>
+      <figure class="code-example" data-archivio="rimuoviStudente"><figcaption>Frammento · shift dell’intera struct, non di un solo campo</figcaption><pre><code class="language-cpp">bool rimuoviStudente(Studente archivio[], int&amp; n, int matricola) {
+    int posizione = cercaStudente(archivio, n, matricola);
+    if (posizione == -1) {
+        return false;
+    }
+    for (int i = posizione; i &lt; n - 1; i++) {
+        archivio[i] = archivio[i + 1];
+    }
+    n--;
+    return true;
+}</code></pre></figure>
+      <div class="table-wrap"><table><thead><tr><th>Momento</th><th>Indice 0</th><th>Indice 1</th><th>Indice 2</th><th>n</th></tr></thead><tbody>
+        <tr><td>Prima</td><td>1001 · Ada</td><td>1002 · Alan</td><td>1003 · Grace</td><td>3</td></tr>
+        <tr><td>Dopo la rimozione di 1002</td><td>1001 · Ada</td><td>1003 · Grace</td><td>Fuori dall’archivio logico</td><td>2</td></tr>
+      </tbody></table></div>
+      <p>Non occorre azzerare l’ultima cella: i cicli usano soltanto gli indici minori di <code>n</code>. Quando salveremo, il record rimosso non verrà scritto.</p>
+    </section>
+    <section class="checkpoint">
+      <div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Perché nella rimozione il ciclo usa <code>i &lt; n - 1</code>?</h2></div>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>A ogni passo leggiamo <code>archivio[i + 1]</code>. L’ultima sorgente valida è <code>n - 1</code>, quindi l’ultima destinazione è <code>n - 2</code>. Se togliamo l’ultimo studente, non servono spostamenti: cambia solo <code>n</code>.</p></div></details>
+    </section>
+    <section class="exercise-card">
+      <span class="exercise-label">Prova su carta</span><h2>Segui quantità e matricole</h2>
+      <p>Parti da 1001, 1002, 1003. Aggiungi 1004, modifica il nome di 1002 e rimuovi 1001. Indica matricole e quantità finali. Che cosa succede aggiungendo di nuovo 1002?</p>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Restano 1002, 1003, 1004 con <code>n = 3</code>. La modifica non cambia né ordine né quantità. L’aggiunta di un altro 1002 restituisce <code>false</code>: matricola duplicata, nessuna modifica all’array.</p></div></details>
+    </section>
+    <aside class="next-step"><strong>Prossimo passo.</strong> Usiamo le stesse funzioni per costruire un archivio leggendo i token da un file.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez3_archivio.html">&#8592; Precedente</a><a class="nav-button primary" href="lez3_archivio_spazi.html">Successiva &#8594;</a></nav>
+</main>
+</body>
+</html>

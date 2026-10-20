@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4BIA - L3.15 · Cursore, seek e record fissi</title>
+  <title>4BIA - L3.15 · seekg, seekp, tellg e tellp</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -15,10 +15,10 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:94.74%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:95.83%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
-<nav class="sidebar" id="menu" aria-label="Indice della Lezione 3">
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
   <h2>Lezione 3 - File I/O</h2>
   <ul>
     <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
@@ -30,15 +30,20 @@
     <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
-    <li><a href="lez3_9.html">L3.9 - Salvare una struct in testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Ricostruire una struct</a></li>
-    <li><a href="lez3_11.html">L3.11 - Testo robusto e round-trip</a></li>
-    <li><a href="lez3_12.html">L3.12 - Progettare un formato binario</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - Byte, modalità e operazioni</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere un file binario in C++</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere e controllare un file binario</a></li>
-    <li><a href="lez3_14.html">L3.14 - Binario con la libreria C</a></li>
-    <li><a href="lez3_15.html" class="active" aria-current="page">L3.15 - Cursore, seek e record fissi</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html" class="active" aria-current="page">L3.15 - seekg, seekp, tellg e tellp</a></li>
     <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
@@ -46,97 +51,54 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 18/19</p>
-    <h1>Cursore, seek e record fissi</h1>
-    <p class="lead">Dall’indice dell’array all’offset di ARRB: prima valida il file, poi sposta il cursore e leggi.</p>
+    <p class="eyebrow">Ripasso guidato · File I/O · 23/24</p>
+    <h1>Spostarsi e conoscere la posizione</h1>
+    <p class="lead">g riguarda la lettura, p la scrittura. Un seek sposta; un tell interroga.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_14.html">&#8592; Precedente</a>
     <a class="nav-button primary" href="lez3_16.html">Successiva &#8594;</a>
   </nav>
   <div class="content-box">
-<div class="callout"><span class="badge extra">Approfondimento</span> <strong>Da affrontare dopo lettura e scrittura sequenziali.</strong> L’obiettivo è capire la differenza tra il valore di un dato e la sua posizione nel file. Prima calcola gli offset di 10, 20, 30; poi segui la funzione guidata. L’aggiornamento diretto non è richiesto nel percorso di base.</div>
-<section class="concept-card"><h2>Il cursore è una posizione nel file</h2><p><strong>Idea chiave:</strong> il prossimo byte letto o scritto dipende dalla posizione corrente. <code>seekg</code>/<code>tellg</code> spostano/interrogano la posizione di <strong>lettura</strong>; <code>seekp</code>/<code>tellp</code> quella di <strong>scrittura</strong>.</p><p>Il seek non legge un dato e non cambia il file. Sposta una posizione; la successiva <code>read</code> o <code>write</code> effettua il trasferimento.</p></section>
-<section class="topic-card"><h2>La formula dipende da questo formato</h2><div class="formula">ARRB: offset(i) = 12 + i × 4</div><p>12 è la lunghezza dell’header; 4 quella di un record, che qui è un singolo <code>int32_t</code>. Gli indici partono da zero: i valori 10, 20, 30 iniziano rispettivamente agli offset <strong>12, 16, 20</strong>; il file termina dopo il byte di offset 23.</p><p>Non è una formula universale: se cambi formato devi cambiare anche dimensioni e controlli.</p></section>
-<figure class="code-example"><figcaption>C++17 · accesso diretto al terzo valore del file ARRB</figcaption><pre><code class="language-cpp">#include &lt;climits&gt;
-#include &lt;cstdint&gt;
-#include &lt;cstring&gt;
-#include &lt;fstream&gt;
-#include &lt;iostream&gt;
-#include &lt;string&gt;
+<section class="concept-card"><h2>Quattro nomi, due idee</h2><div class="table-wrap"><table><thead><tr><th></th><th>Spostare</th><th>Conoscere la posizione</th></tr></thead><tbody><tr><td>Lettura</td><td><code>seekg</code></td><td><code>tellg</code></td></tr><tr><td>Scrittura</td><td><code>seekp</code></td><td><code>tellp</code></td></tr></tbody></table></div><p>Le posizioni sono espresse in byte per questi file binari. Non sono né valori dei dati né indirizzi di memoria.</p></section>
+<section class="topic-card"><h2>1. seekg: sposta la lettura</h2><p>I frammenti sono da mettere in un <code>main</code> C++ con <code>&lt;fstream&gt;</code>, <code>&lt;iostream&gt;</code> e <code>using namespace std;</code>. Il file è quello con 10, 20, 30.</p>
+<figure class="code-example"><figcaption>Frammento C++ · apertura e inizio del secondo int</figcaption><pre><code class="language-cpp">ifstream in("dati.bin", ios::binary);
+if (!in) return 1;
 
-using namespace std;
+in.seekg(sizeof(int), ios::beg);
+if (!in) return 2;</code></pre></figure>
+<p><code>ios::beg</code> significa “dall’inizio”. Saltiamo il primo int: la prossima lettura partirà dal secondo. <code>seekg</code> non legge il numero.</p></section>
+<section class="topic-card"><h2>2. tellg: dove leggerò?</h2><p>Continuiamo sullo stesso stream <code>in</code>, subito dopo il seek:</p>
+<figure class="code-example"><figcaption>Frammento C++ · posizione, valore letto, nuova posizione</figcaption><pre><code class="language-cpp">cout &lt;&lt; in.tellg() &lt;&lt; '\n';
 
-static_assert(CHAR_BIT == 8, "Servono byte da 8 bit");
-constexpr streamoff HEADER = 12;
-constexpr streamoff RECORD = 4;
+int valore = 0;
+in.read((char*)&amp;valore, sizeof(valore));
+if (!in) return 3;
 
-bool leggiValore(const string&amp; path,
-                 uint32_t indice,
-                 int32_t&amp; valore) {
-    ifstream in(path, ios::binary);
-    if (!in) return false;
+cout &lt;&lt; valore &lt;&lt; '\n';
+cout &lt;&lt; in.tellg() &lt;&lt; '\n';
+in.close();</code></pre></figure>
+<p>Con int da 4 byte otteniamo, nell’ordine: <strong>4, 20, 8</strong>. Prima siamo all’inizio del secondo int; poi leggiamo 20; infine siamo dopo quel blocco. <code>tellg()</code> si limita a chiedere la posizione: non la sposta.</p></section>
+<section class="topic-card"><h2>3. seekp: sposta la scrittura</h2><p>Ora apriamo il file per aggiornare il secondo int senza cancellare gli altri:</p>
+<figure class="code-example"><figcaption>Frammento C++ · sostituisci 20 con 99</figcaption><pre><code class="language-cpp">fstream io("dati.bin", ios::in | ios::out | ios::binary);
+if (!io) return 1;
 
-    char magic[4]{};
-    uint32_t versione = 0, n = 0;
-    in.read(magic, sizeof magic);
-    in.read(reinterpret_cast&lt;char*&gt;(&amp;versione), sizeof versione);
-    in.read(reinterpret_cast&lt;char*&gt;(&amp;n), sizeof n);
-    if (!in || memcmp(magic, "ARRB", 4) != 0
-        || versione != 1 || n &gt; 10 || indice &gt;= n)
-        return false;
+io.seekp(sizeof(int), ios::beg);
+if (!io) return 2;
 
-    // Prima verifica la lunghezza, poi raggiungi il valore.
-    in.seekg(0, ios::end);
-    const streamoff attesi =
-        HEADER + static_cast&lt;streamoff&gt;(n) * RECORD;
-    if (!in || in.tellg() != streampos(attesi))
-        return false;
-
-    const streamoff offset =
-        HEADER + static_cast&lt;streamoff&gt;(indice) * RECORD;
-    in.seekg(offset, ios::beg);
-    int32_t temporaneo = 0;
-    if (!in.read(reinterpret_cast&lt;char*&gt;(&amp;temporaneo),
-                 sizeof temporaneo))
-        return false;
-
-    valore = temporaneo;
-    return true;
-}
-
-int main() {
-    int32_t valore = 0;
-    if (!leggiValore("dati.bin", 2, valore)) return 1;
-    cout &lt;&lt; valore &lt;&lt; '\n';
-}</code></pre></figure>
-<section class="topic-card"><h2>Perché controlliamo prima e usiamo un temporaneo?</h2><p>Prima del seek verifichiamo header, capacità, indice e dimensione totale <code>12 + n × 4</code>. <code>tellg()</code> restituisce una posizione; qui, su un file binario di byte, la confrontiamo con la lunghezza attesa.</p><p>La lettura scrive in <code>temporaneo</code>: solo quando riesce assegniamo <code>valore</code>. Così la funzione restituisce <code>false</code> senza alterare il parametro del chiamante. Il file deve rimanere stabile durante l’operazione.</p></section>
-<section class="two-col"><article class="topic-card"><h2>In C</h2><p><code>fseek(f, offset, SEEK_SET)</code> sposta la posizione e restituisce 0 se riesce; <code>ftell(f)</code> restituisce la posizione o −1 in caso di errore. Controlla entrambi.</p></article><article class="topic-card"><h2>E con nomi di lunghezza variabile?</h2><p>Non puoi usare <code>12 + i × 4</code> né <code>sizeof(Studente)</code>. Devi scorrere i record oppure costruire un indice che associ ogni record al suo offset.</p></article></section>
-<div class="callout warning"><strong>Ambito:</strong> questi calcoli valgono per il formato binario a record fissi. Nei file in modalità testo non fare liberamente aritmetica sulle posizioni: i fine riga possono essere tradotti e un carattere UTF-8 può occupare più byte.</div>
-<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Il valore di indice 2 vale 30: tellg restituisce 30?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>No. L’indice 2 porta all’offset 20; dopo la lettura completa di 4 byte la posizione è 24. Il <strong>contenuto</strong> letto è 30: posizione e valore sono cose diverse.</p></div></details></section>
-<section class="exercise-card"><span class="exercise-label">Esercizio 15</span><h2>Aggiorna un valore senza troncare</h2><p>Nel file ARRB sostituisci il valore di indice 1 con 99. Apri con fstream in lettura/scrittura binaria, senza trunc. Riusa leggiValore per convalidare file e indice, poi usa seekp e controlla scrittura e chiusura.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><figure class="code-example"><figcaption>C++17 · funzione da aggiungere al programma precedente</figcaption><pre><code class="language-cpp">// Da aggiungere al programma precedente.
-// Il file non deve essere modificato da altri durante l'operazione.
-bool aggiornaValore(const string&amp; path,
-                    uint32_t indice,
-                    int32_t nuovo) {
-    int32_t precedente = 0;
-    if (!leggiValore(path, indice, precedente))
-        return false;
-
-    fstream io(path,
-        ios::in | ios::out | ios::binary);
-    if (!io) return false;
-
-    const streamoff offset =
-        HEADER + static_cast&lt;streamoff&gt;(indice) * RECORD;
-    io.seekp(offset, ios::beg);
-    if (!io) return false;
-    io.write(reinterpret_cast&lt;const char*&gt;(&amp;nuovo), sizeof nuovo);
-    io.close();
-    return static_cast&lt;bool&gt;(io);
-}</code></pre></figure><p>Chiamata di prova: <code>aggiornaValore("dati.bin", 1, 99)</code>. Si sostituiscono i byte agli offset 16–19; la lunghezza resta 24 byte. Un errore di scrittura non garantisce l’annullamento della modifica: per aggiornamenti atomici servirebbe un’altra strategia.</p></div></details></section>
-<aside class="next-step"><strong>Prossimo passo.</strong> Il laboratorio conserva il testo come nucleo; la sfida binaria estende l’header a record studente variabili.</aside>
-
+int nuovo = 99;
+io.write((const char*)&amp;nuovo, sizeof(nuovo));
+if (!io) return 3;</code></pre></figure>
+<p>La modalità <code>in | out</code> apre il file esistente in lettura e scrittura, <strong>senza trunc</strong>. <code>seekp</code> prepara la posizione; è <code>write</code> a sostituire i byte del secondo intero. Per ora scegliamo una posizione di cui conosciamo l’esistenza.</p></section>
+<section class="topic-card"><h2>4. tellp: dove scriverò?</h2><p>Continuiamo sullo stesso stream <code>io</code>, dopo la scrittura:</p>
+<figure class="code-example"><figcaption>Frammento C++ · posizione dopo write e chiusura</figcaption><pre><code class="language-cpp">cout &lt;&lt; io.tellp() &lt;&lt; '\n';
+io.close();
+if (!io) return 4;</code></pre></figure>
+<p>La posizione è <code>2 * sizeof(int)</code>: 8 se l’int occupa 4 byte. Rileggendo il file troviamo <strong>10, 99, 30</strong>; la dimensione non cambia. Anche <code>tellp()</code> non modifica la posizione.</p></section>
+<div class="callout"><strong>Da ricordare:</strong> <code>tellg</code> e <code>tellp</code> restituiscono una posizione, oppure <code>-1</code> in caso di errore. Qui la stampiamo dopo operazioni controllate. Se una lettura ha già fallito, riapri il file prima di riprovare questi esempi.</div>
+<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>seekp da solo cambia 20 in 99?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>No. Sposta soltanto la posizione. La modifica avviene quando la successiva <code>write</code> scrive i byte di 99.</p></div></details></section>
+<section class="exercise-card"><span class="exercise-label">Prova tu</span><h2>Aggiorna il terzo valore</h2><p>Quale sola parte del frammento seekp cambieresti per sostituire il terzo int con 99? Quanto varrebbe tellp dopo la scrittura?</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Userei <code>io.seekp(2 * sizeof(int), ios::beg)</code>. Dopo la scrittura <code>tellp()</code> sarebbe <code>3 * sizeof(int)</code>, cioè 12 con int da 4 byte. Il file conterrebbe 10, 20, 99, se si parte dai dati originali.</p></div></details></section>
+<aside class="next-step"><strong>Ora sai fare il minimo necessario:</strong> scrivere, leggere, spostarti e conoscere la posizione. L’esercizio binario finale riprende soltanto questi gesti.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_14.html">&#8592; Precedente</a>

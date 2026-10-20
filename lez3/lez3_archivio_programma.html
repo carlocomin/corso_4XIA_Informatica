@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - Archivio 5 · Programma completo e collaudo</title>
+  <link rel="stylesheet" href="../style.css"><link rel="stylesheet" href="../default.css">
+  <script src="../highlight.js"></script><script src="../menu.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', function () { hljs.highlightAll(); });</script>
+</head>
+<body class="lesson-review lesson-files">
+<div class="lesson-progress" aria-hidden="true"><span style="width:70.83%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 3 - File I/O</h2>
+  <ul>
+    <li><a href="lez3_1.html">L3.1 - Dal dato al file</a></li>
+    <li><a href="lez3_2.html">L3.2 - Testo o binario?</a></li>
+    <li><a href="lez3_3.html">L3.3 - Apri, usa, controlla</a></li>
+    <li><a href="lez3_4.html">L3.4 - Scrivere testo in C++</a></li>
+    <li><a href="lez3_5.html">L3.5 - Leggere valori in C++</a></li>
+    <li><a href="lez3_6.html">L3.6 - Leggere righe in C++</a></li>
+    <li><a href="lez3_7.html">L3.7 - Il ciclo di lettura corretto</a></li>
+    <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
+    <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
+    <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
+    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
+    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
+    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
+    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
+    <li><a href="lez3_archivio_programma.html" class="active" aria-current="page">L3.A5 - Programma completo e collaudo</a></li>
+    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
+    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
+    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
+    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
+    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
+    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
+    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Caso di studio · File I/O · 17/24</p><h1>Programma completo e collaudo</h1><p class="lead">Un solo eseguibile: carica, mostra, aggiungi, modifica, rimuovi e salva. La memoria e i due file rimangono distinti.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez3_archivio_csv.html">&#8592; Precedente</a><a class="nav-button primary" href="lez3_12.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+    <section class="concept-card"><h2>Il menu collega funzioni già studiate</h2><p><strong>Idea chiave:</strong> non esiste una seconda copia della logica per il CSV. Le operazioni sui record sono sempre le stesse; il menu sceglie soltanto quale lettore o scrittore chiamare.</p><p>L’archivio parte vuoto. I comandi 1 e 2 sostituiscono i dati in memoria; 4, 5 e 6 li cambiano; 7 e 8 li salvano. Il comando 0 esce <strong>senza salvare automaticamente</strong>.</p></section>
+    <section class="topic-card" id="materiali">
+      <h2>Materiali completi, non scheletri</h2>
+      <ul class="compact-list">
+        <li><a href="materiali_archivio/archivio_studenti.cpp" download>Scarica archivio_studenti.cpp</a>: programma C++17 completo, senza TODO.</li>
+        <li><a href="materiali_archivio/studenti_spazi.txt" download>Scarica studenti_spazi.txt</a>: tre studenti nel formato a token.</li>
+        <li><a href="materiali_archivio/studenti.csv" download>Scarica studenti.csv</a>: gli stessi tre studenti nel CSV semplificato.</li>
+      </ul>
+      <p>Lavora su <strong>copie</strong> dei file dati: il salvataggio li riscrive. I nomi dei file sono fissi e vengono cercati nella <strong>cartella di lavoro</strong> dell’eseguibile, non necessariamente nella cartella del sorgente.</p>
+      <figure class="code-example"><figcaption>Terminale · dalla cartella in cui si trova il sorgente</figcaption><pre><code class="language-plaintext">g++ -std=c++17 -Wall -Wextra -pedantic archivio_studenti.cpp -o archivio_studenti
+./archivio_studenti</code></pre></figure>
+      <p>In PowerShell su Windows usa <code>.\archivio_studenti.exe</code>. Sorgenti e dati sono UTF-8: mantieni questa codifica nell’editor e usa un terminale che la visualizzi correttamente.</p>
+    </section>
+    <section class="topic-card">
+      <h2>Le due funzioni di controllo comuni</h2>
+      <p><code>studenteValido</code> controlla un singolo record. <code>archivioValido</code> controlla anche quantità e duplicati prima di scrivere. <code>find_first_of</code> cerca uno qualsiasi dei caratteri vietati; <code>find</code> cerca un carattere; <code>string::npos</code> significa “non trovato”.</p>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra i controlli comuni</span><span class="when-open">Nascondi i controlli</span></summary><div class="solution-content">
+        <figure class="code-example" data-archivio="controlli"><figcaption>C++17 · funzioni già richiamate nelle slide precedenti</figcaption><pre><code class="language-cpp">bool studenteValido(const Studente&amp; s) {
+    if (s.matricola &lt;= 0 || s.anno &lt; 1 || s.anno &gt; 5) {
+        return false;
+    }
+    if (s.nome.empty()) {
+        return false;
+    }
+    if (s.nome[0] == ' ' || s.nome[s.nome.length() - 1] == ' ') {
+        return false;
+    }
+    if (s.nome.find_first_of(";\"\t\r\n\v\f") != string::npos) {
+        return false;
+    }
+    return s.nome.find('\0') == string::npos;
+}
+
+bool archivioValido(const Studente archivio[], int n) {
+    if (n &lt; 0 || n &gt; MAX) {
+        return false;
+    }
+    for (int i = 0; i &lt; n; i++) {
+        if (!studenteValido(archivio[i])) {
+            return false;
+        }
+        if (cercaStudente(archivio, i, archivio[i].matricola) != -1) {
+            return false;
+        }
+    }
+    return true;
+}</code></pre></figure>
+      </div></details>
+      <p>In <code>archivioValido</code> cerchiamo ogni matricola solo nei <code>i</code> record precedenti: un risultato diverso da <code>-1</code> indica un duplicato.</p>
+    </section>
+    <section class="topic-card">
+      <h2>L’input da tastiera segue sempre lo stesso metodo</h2>
+      <p>Il programma legge ogni risposta con <code>getline(cin, riga)</code>. Per menu, matricola e anno chiama poi <code>convertiIntero</code>. Così non mescoliamo <code>cin &gt;&gt;</code> e <code>getline</code> e non lasciamo un fine riga da consumare.</p>
+      <p>Una scelta del menu non numerica o la fine dell’input terminano il programma con un messaggio. Un record non valido fa fallire la singola operazione, senza cambiare l’archivio. Il messaggio generico invita a controllare dati, matricola, capacità e percorso.</p>
+    </section>
+    <section class="topic-card" id="programma-completo">
+      <h2>Tutto il sorgente, nello stesso ordine del file scaricabile</h2>
+      <p>Le funzioni sono definite prima del <code>main</code>. Leggile per blocchi: modello, operazioni, controlli e conversione, formato a spazi, CSV, input, menu. Non è un programma da imparare interamente a memoria.</p>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra il programma completo</span><span class="when-open">Nascondi il programma</span></summary><div class="solution-content">
+        <figure class="code-example" data-archivio="completo"><figcaption>archivio_studenti.cpp · C++17 · programma completo compilabile</figcaption><pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;sstream&gt;
+#include &lt;string&gt;
+
+using namespace std;
+
+const int MAX = 30;
+
+struct Studente {
+    int matricola;
+    string nome;
+    int anno;
+};
+
+bool studenteValido(const Studente&amp; s) {
+    if (s.matricola &lt;= 0 || s.anno &lt; 1 || s.anno &gt; 5) {
+        return false;
+    }
+    if (s.nome.empty()) {
+        return false;
+    }
+    if (s.nome[0] == ' ' || s.nome[s.nome.length() - 1] == ' ') {
+        return false;
+    }
+    if (s.nome.find_first_of(";\"\t\r\n\v\f") != string::npos) {
+        return false;
+    }
+    return s.nome.find('\0') == string::npos;
+}
+
+int cercaStudente(const Studente archivio[], int n, int matricola) {
+    for (int i = 0; i &lt; n; i++) {
+        if (archivio[i].matricola == matricola) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+bool aggiungiStudente(Studente archivio[], int&amp; n,
+                     const Studente&amp; nuovo) {
+    if (n &gt;= MAX || !studenteValido(nuovo)) {
+        return false;
+    }
+    if (cercaStudente(archivio, n, nuovo.matricola) != -1) {
+        return false;
+    }
+    archivio[n] = nuovo;
+    n++;
+    return true;
+}
+
+bool modificaStudente(Studente archivio[], int n,
+                     const Studente&amp; aggiornato) {
+    if (!studenteValido(aggiornato)) {
+        return false;
+    }
+    int posizione = cercaStudente(archivio, n, aggiornato.matricola);
+    if (posizione == -1) {
+        return false;
+    }
+    archivio[posizione] = aggiornato;
+    return true;
+}
+
+bool rimuoviStudente(Studente archivio[], int&amp; n, int matricola) {
+    int posizione = cercaStudente(archivio, n, matricola);
+    if (posizione == -1) {
+        return false;
+    }
+    for (int i = posizione; i &lt; n - 1; i++) {
+        archivio[i] = archivio[i + 1];
+    }
+    n--;
+    return true;
+}
+
+void stampaArchivio(const Studente archivio[], int n) {
+    if (n == 0) {
+        cout &lt;&lt; "Archivio vuoto\n";
+    }
+    for (int i = 0; i &lt; n; i++) {
+        cout &lt;&lt; archivio[i].matricola &lt;&lt; " | "
+             &lt;&lt; archivio[i].nome &lt;&lt; " | anno "
+             &lt;&lt; archivio[i].anno &lt;&lt; '\n';
+    }
+}
+
+bool convertiIntero(const string&amp; testo, int&amp; valore) {
+    istringstream in(testo);
+    int numero;
+    char extra;
+    if (!(in &gt;&gt; numero)) {
+        return false;
+    }
+    if (in &gt;&gt; extra) {
+        return false;
+    }
+    valore = numero;
+    return true;
+}
+
+bool archivioValido(const Studente archivio[], int n) {
+    if (n &lt; 0 || n &gt; MAX) {
+        return false;
+    }
+    for (int i = 0; i &lt; n; i++) {
+        if (!studenteValido(archivio[i])) {
+            return false;
+        }
+        if (cercaStudente(archivio, i, archivio[i].matricola) != -1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool caricaSpazi(const string&amp; nomeFile, Studente archivio[], int&amp; n) {
+    ifstream in(nomeFile);
+    if (!in) {
+        return false;
+    }
+    Studente temporanei[MAX];
+    int quanti = 0;
+    string matricola;
+    string anno;
+    while (in &gt;&gt; matricola) {
+        Studente s;
+        if (!(in &gt;&gt; s.nome &gt;&gt; anno)) {
+            return false;
+        }
+        if (!convertiIntero(matricola, s.matricola)
+            || !convertiIntero(anno, s.anno)) {
+            return false;
+        }
+        if (!aggiungiStudente(temporanei, quanti, s)) {
+            return false;
+        }
+    }
+    if (!in.eof() || in.bad()) {
+        return false;
+    }
+    // Solo un caricamento completo sostituisce l'archivio precedente.
+    for (int i = 0; i &lt; quanti; i++) {
+        archivio[i] = temporanei[i];
+    }
+    n = quanti;
+    return true;
+}
+
+bool salvaSpazi(const string&amp; nomeFile, const Studente archivio[], int n) {
+    if (!archivioValido(archivio, n)) {
+        return false;
+    }
+    for (int i = 0; i &lt; n; i++) {
+        if (archivio[i].nome.find(' ') != string::npos) {
+            return false;
+        }
+    }
+    // I controlli sui dati precedono l'apertura che cancella il vecchio file.
+    ofstream out(nomeFile);
+    if (!out) {
+        return false;
+    }
+    for (int i = 0; i &lt; n; i++) {
+        out &lt;&lt; archivio[i].matricola &lt;&lt; ' '
+            &lt;&lt; archivio[i].nome &lt;&lt; ' '
+            &lt;&lt; archivio[i].anno &lt;&lt; '\n';
+    }
+    out.close();
+    return !out.fail();
+}
+
+void togliCR(string&amp; riga) {
+    if (!riga.empty() &amp;&amp; riga.back() == '\r') {
+        riga.pop_back();
+    }
+}
+
+bool leggiRecordCSV(const string&amp; riga, Studente&amp; risultato) {
+    istringstream campi(riga);
+    Studente s;
+    string matricola;
+    string anno;
+    if (!getline(campi, matricola, ';')) {
+        return false;
+    }
+    if (!getline(campi, s.nome, ';')) {
+        return false;
+    }
+    if (!getline(campi, anno)) {
+        return false;
+    }
+    if (!convertiIntero(matricola, s.matricola)
+        || !convertiIntero(anno, s.anno)) {
+        return false;
+    }
+    if (!studenteValido(s)) {
+        return false;
+    }
+    risultato = s;
+    return true;
+}
+
+bool caricaCSV(const string&amp; nomeFile, Studente archivio[], int&amp; n) {
+    ifstream in(nomeFile);
+    if (!in) {
+        return false;
+    }
+    string riga;
+    if (!getline(in, riga)) {
+        return false;
+    }
+    togliCR(riga);
+    if (riga != "matricola;nome;anno") {
+        return false;
+    }
+    Studente temporanei[MAX];
+    int quanti = 0;
+    while (getline(in, riga)) {
+        togliCR(riga);
+        Studente s;
+        if (!leggiRecordCSV(riga, s)) {
+            return false;
+        }
+        if (!aggiungiStudente(temporanei, quanti, s)) {
+            return false;
+        }
+    }
+    if (!in.eof() || in.bad()) {
+        return false;
+    }
+    for (int i = 0; i &lt; quanti; i++) {
+        archivio[i] = temporanei[i];
+    }
+    n = quanti;
+    return true;
+}
+
+bool salvaCSV(const string&amp; nomeFile, const Studente archivio[], int n) {
+    if (!archivioValido(archivio, n)) {
+        return false;
+    }
+    ofstream out(nomeFile);
+    if (!out) {
+        return false;
+    }
+    out &lt;&lt; "matricola;nome;anno\n";
+    for (int i = 0; i &lt; n; i++) {
+        out &lt;&lt; archivio[i].matricola &lt;&lt; ';'
+            &lt;&lt; archivio[i].nome &lt;&lt; ';'
+            &lt;&lt; archivio[i].anno &lt;&lt; '\n';
+    }
+    out.close();
+    return !out.fail();
+}
+
+bool chiediIntero(const string&amp; messaggio, int&amp; valore) {
+    cout &lt;&lt; messaggio;
+    string riga;
+    if (!getline(cin, riga)) {
+        return false;
+    }
+    return convertiIntero(riga, valore);
+}
+
+bool chiediStudente(Studente&amp; risultato) {
+    Studente s;
+    if (!chiediIntero("Matricola: ", s.matricola)) {
+        return false;
+    }
+    cout &lt;&lt; "Nome (anche con spazi, solo per il CSV): ";
+    if (!getline(cin, s.nome)) {
+        return false;
+    }
+    if (!chiediIntero("Anno di corso (1-5): ", s.anno)) {
+        return false;
+    }
+    if (!studenteValido(s)) {
+        return false;
+    }
+    risultato = s;
+    return true;
+}
+
+int main() {
+    Studente archivio[MAX];
+    int n = 0;
+    int scelta;
+    while (true) {
+        cout &lt;&lt; "\n1 Carica studenti_spazi.txt\n"
+             &lt;&lt; "2 Carica studenti.csv\n"
+             &lt;&lt; "3 Mostra archivio\n"
+             &lt;&lt; "4 Aggiungi studente\n"
+             &lt;&lt; "5 Modifica nome e anno di uno studente\n"
+             &lt;&lt; "6 Rimuovi studente\n"
+             &lt;&lt; "7 Salva studenti_spazi.txt\n"
+             &lt;&lt; "8 Salva studenti.csv\n"
+             &lt;&lt; "0 Esci (senza salvataggio automatico)\n";
+        if (!chiediIntero("Scelta: ", scelta)) {
+            cerr &lt;&lt; "Scelta non numerica o input terminato\n";
+            return 1;
+        }
+        if (scelta == 0) {
+            return 0;
+        }
+        bool riuscita = false;
+        if (scelta == 1) {
+            riuscita = caricaSpazi("studenti_spazi.txt", archivio, n);
+        } else if (scelta == 2) {
+            riuscita = caricaCSV("studenti.csv", archivio, n);
+        } else if (scelta == 3) {
+            stampaArchivio(archivio, n);
+            continue;
+        } else if (scelta == 4 || scelta == 5) {
+            Studente s;
+            if (chiediStudente(s)) {
+                if (scelta == 4) {
+                    riuscita = aggiungiStudente(archivio, n, s);
+                } else {
+                    riuscita = modificaStudente(archivio, n, s);
+                }
+            }
+        } else if (scelta == 6) {
+            int matricola;
+            if (chiediIntero("Matricola da rimuovere: ", matricola)) {
+                riuscita = rimuoviStudente(archivio, n, matricola);
+            }
+        } else if (scelta == 7) {
+            riuscita = salvaSpazi("studenti_spazi.txt", archivio, n);
+        } else if (scelta == 8) {
+            riuscita = salvaCSV("studenti.csv", archivio, n);
+        } else {
+            cout &lt;&lt; "Scelta non prevista\n";
+            continue;
+        }
+        if (riuscita) {
+            cout &lt;&lt; "Operazione completata\n";
+        } else {
+            cout &lt;&lt; "Operazione non riuscita: controlla dati, matricola, "
+                 &lt;&lt; "capacità e file. I nomi con spazi richiedono il CSV.\n";
+        }
+    }
+}</code></pre></figure>
+      </div></details>
+    </section>
+    <section class="topic-card">
+      <h2>Collaudo guidato: prima prevedi, poi esegui</h2>
+      <ol class="steps">
+        <li>Avvia il programma nella cartella delle copie dei dati. Scegli <strong>1</strong> per caricare il testo a spazi, poi <strong>3</strong>: compaiono 1001 Ada 4, 1002 Alan 4, 1003 Grace 3.</li>
+        <li>Scegli <strong>4</strong> e inserisci matricola 1004, nome Edsger, anno 5. L’archivio contiene quattro studenti.</li>
+        <li>Scegli <strong>5</strong> e inserisci matricola 1002, nome Turing, anno 5. La matricola esiste già: vengono cambiati soltanto nome e anno.</li>
+        <li>Scegli <strong>6</strong> e rimuovi 1001. Con <strong>3</strong> devono restare, nell’ordine: 1002 Turing 5, 1003 Grace 3, 1004 Edsger 5.</li>
+        <li>Scegli <strong>7</strong> e <strong>8</strong> per salvare entrambi i formati. Apri i file con un editor: stessi tre record, separatori diversi e intestazione solo nel CSV.</li>
+        <li>Esci con <strong>0</strong>, riavvia e carica con <strong>2</strong>. Ritrovi i tre record salvati: è il controllo di persistenza, non soltanto una stampa della memoria.</li>
+      </ol>
+    </section>
+    <section class="two-col">
+      <article class="topic-card"><h2>Che cosa succede in caso di errore?</h2><p>Un caricamento fallito conserva i dati precedenti. Un nome con spazi fa rifiutare <code>salvaSpazi</code> prima dell’apertura del file. Un salvataggio riuscito è segnalato solo dopo la chiusura senza errori.</p></article>
+      <article class="topic-card"><h2>Che cosa non garantiamo?</h2><p>Se la scrittura si interrompe, il file può rimanere incompleto. Per questo lavoriamo su copie dei dati originali. Un programma professionale richiederebbe altre precauzioni, che non sono l’obiettivo di questo laboratorio.</p></article>
+    </section>
+    <section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Salvi il CSV, poi modifichi l’array e carichi il vecchio file a spazi: quali dati restano in memoria?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>Se il caricamento riesce, restano i dati letti dal file a spazi: il caricamento sostituisce l’archivio, anche se il CSV contiene una versione più recente. I due file non si sincronizzano da soli; bisogna scegliere esplicitamente che cosa caricare e dove salvare.</p></div></details></section>
+    <section class="exercise-card"><span class="exercise-label">Esercizio base</span><h2>Duplicato e matricola assente</h2><p>Dopo avere caricato i dati iniziali, prova ad aggiungere 1002 e a rimuovere 9999. Prevedi il valore restituito dalle funzioni e controlla quantità e record dopo ogni tentativo.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Entrambe le funzioni restituiscono <code>false</code>. Il duplicato non viene aggiunto; la matricola assente non provoca spostamenti. <code>n</code> resta 3 e i tre record rimangono invariati.</p></div></details></section>
+    <section class="exercise-card"><span class="exercise-label">Esercizio intermedio</span><h2>Un nome che distingue i due formati</h2><p>Modifica 1001 in Ada Lovelace, anno 4. Salva prima il CSV e poi prova il testo a spazi. Controlla i due file e rileggi il CSV dopo avere riavviato il programma.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Il CSV salva e ricostruisce <code>Ada Lovelace</code> come un solo nome. Il salvataggio a spazi restituisce <code>false</code> prima di aprire il file: il vecchio testo a spazi rimane invariato. L’array può contenere il nome con spazi, ma non ogni formato è in grado di rappresentarlo.</p></div></details></section>
+    <section class="exercise-card"><span class="exercise-label">Esercizio avanzato</span><h2>Indica la riga che ha fatto fallire il CSV</h2><p>Progetta una modifica a <code>caricaCSV</code> che restituisca anche il numero della prima riga errata, contando l’intestazione come riga 1. Non cambiare la regola “archivio precedente invariato in caso di errore”.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione ragionata</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Aggiungi un parametro <code>int&amp; rigaErrata</code>, inizializzato a zero, e un contatore inizializzato a 1. Incrementa il contatore per ogni riga dati letta. Se intestazione, parsing, duplicati o capacità fanno fallire il caricamento, assegna il numero corrente prima di restituire <code>false</code>. Per un file vuoto manca la riga 1; per errori di apertura o I/O mantieni zero, distinguendoli dagli errori di contenuto. Conserva l’array temporaneo e copia i record nel risultato solo alla fine, come prima.</p></div></details></section>
+    <aside class="next-step"><strong>Prossimo passo.</strong> Passiamo al binario con un esempio più piccolo: salvare e rileggere soltanto tre interi, poi scegliere la posizione di uno di essi.</aside>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez3_archivio_csv.html">&#8592; Precedente</a><a class="nav-button primary" href="lez3_12.html">Successiva &#8594;</a></nav>
+</main>
+</body>
+</html>
