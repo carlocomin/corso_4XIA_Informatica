@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4BIA - L3.10 · Dalla riga ai campi</title>
+  <title>4BIA - L3.10 · Dalla riga alla struct</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../default.css">
   <script src="../highlight.js"></script>
@@ -31,7 +31,7 @@
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
     <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
-    <li><a href="lez3_10.html" class="active" aria-current="page">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_10.html" class="active" aria-current="page">L3.10 - Dalla riga alla struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
     <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
     <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
@@ -51,9 +51,9 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 11/24</p>
-    <h1>Dalla riga ai campi</h1>
-    <p class="lead">Prima leggiamo la riga; poi separiamo i campi; infine controlliamo e ricostruiamo la struct.</p>
+    <p class="eyebrow">Lezione 3 · File I/O · 11/24</p>
+    <h1>Dalla riga alla struct</h1>
+    <p class="lead">Prima leggiamo la riga; poi separiamo i campi; infine convertiamo i numeri e ricostruiamo la struct.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_9.html">&#8592; Precedente</a>
@@ -84,9 +84,98 @@ int main() {
     cout &lt;&lt; anno &lt;&lt; '\n';
 }</code></pre></figure>
 <section class="topic-card"><h2>Che cosa contiene ogni variabile?</h2><div class="table-wrap"><table><thead><tr><th>Campo dopo getline</th><th>Tipo in questa prova</th><th>Dato che servirà nella struct</th></tr></thead><tbody><tr><td><code>"1001"</code></td><td><code>string</code></td><td>Il numero intero 1001</td></tr><tr><td><code>"Ada Lovelace"</code></td><td><code>string</code></td><td>Lo stesso nome</td></tr><tr><td><code>"4"</code></td><td><code>string</code></td><td>Il numero intero 4</td></tr></tbody></table></div><p>Le prime due letture si fermano a <code>;</code>. L’ultima prende il resto della riga. Gli spazi interni al nome restano al loro posto.</p></section>
-<section class="topic-card"><h2>Separare non basta</h2><p>Questo programma <strong>mostra i campi, ma non costruisce ancora una struct</strong>. Una riga come <code>1001;Ada;quattro</code> si può separare, però “quattro” non è il numero richiesto.</p><p>Nel caso completo useremo <code>convertiIntero</code>, una piccola funzione che prova a ottenere un intero da una stringa. Poi controlleremo matricola positiva, nome non vuoto e anno da 1 a 5. Solo dopo i controlli il record potrà entrare nell’array.</p></section>
+<section class="topic-card">
+  <h2>Dalle stringhe ai numeri: quale funzione scelgo?</h2>
+  <p><code>getline</code> restituisce testo. Per un membro numerico scegliamo una funzione che produca il tipo richiesto. Sono funzioni di <code>&lt;string&gt;</code>; negli esempi usiamo <code>using namespace std;</code>.</p>
+  <div class="table-wrap"><table><thead><tr><th>Tipo del membro</th><th>Funzione</th><th>Esempio con testo corretto</th><th>Risultato</th></tr></thead><tbody>
+    <tr><td><code>int</code></td><td><code>stoi</code></td><td><code>stoi("4")</code></td><td>Il numero intero 4</td></tr>
+    <tr><td><code>long</code></td><td><code>stol</code></td><td><code>stol("123456")</code></td><td>Il numero intero 123456 di tipo long</td></tr>
+    <tr><td><code>float</code></td><td><code>stof</code></td><td><code>stof("23.5")</code></td><td>Un numero decimale di tipo float</td></tr>
+    <tr><td><code>double</code></td><td><code>stod</code></td><td><code>stod("123.75")</code></td><td>Un numero decimale di tipo double</td></tr>
+  </tbody></table></div>
+  <p>Negli esempi il separatore decimale è il <strong>punto</strong>, non la virgola. Il valore deve rientrare nel tipo di arrivo; la dimensione di <code>long</code> dipende dall’ambiente e non è necessariamente maggiore di quella di <code>int</code>.</p>
+</section>
+<section class="topic-card">
+  <h2>Ricostruire Studente, un membro alla volta</h2>
+  <p>Il modello resta quello della slide precedente. Metti questa definizione <strong>prima di main</strong>:</p>
+  <figure class="code-example" data-conversion-example="modello"><figcaption>C++17 · definizione del tipo, non un programma completo</figcaption><pre><code class="language-cpp">struct Studente {
+    int matricola;
+    string nome;
+    int anno;
+};</code></pre></figure>
+  <p>Dopo le tre <code>getline</code>, i campi dell’esempio corretto sono <code>"1001"</code>, <code>"Ada Lovelace"</code> e <code>"4"</code>. Il passaggio essenziale è:</p>
+  <figure class="code-example" data-conversion-example="assegnazioni"><figcaption>C++17 · frammento dentro main · soltanto per i campi già corretti dell’esempio</figcaption><pre><code class="language-cpp">Studente s;
+s.matricola = stoi(matricola);
+s.nome = nome;
+s.anno = stoi(anno);</code></pre></figure>
+  <p><code>matricola</code> e <code>anno</code> sono stringhe; <code>s.matricola</code> e <code>s.anno</code> sono interi. Il nome, invece, è già testo: basta assegnarlo, <strong>senza conversione</strong>.</p>
+  <div class="callout warning"><strong>Ipotesi degli esempi:</strong> i campi numerici sono già scritti correttamente e rientrano nei tipi di arrivo. Per il percorso di base bastano le assegnazioni appena viste. Nell’approfondimento facoltativo aggiungiamo il controllo dei valori ammessi, senza verificare la forma del testo numerico.</div>
+</section>
+<section class="topic-card" id="ricostruire-la-struct">
+  <span class="badge extra">Approfondimento facoltativo</span>
+  <h2>La procedura controllata: prima il candidato, poi il risultato</h2>
+  <p><strong>Non richiesta per la prima verifica.</strong> Questa variante aggiunge i controlli sui valori prima di aggiornare il risultato.</p>
+  <details class="answer-reveal">
+    <summary><span class="when-closed">Mostra l’approfondimento</span><span class="when-open">Nascondi l’approfondimento</span></summary>
+    <div class="solution-content">
+  <p><code>ricostruisciStudente</code> riceve i tre campi già separati. <code>convertiIntero</code> usa <code>stoi</code> e restituisce l’intero ottenuto; <code>studenteValido</code> controlla matricola positiva, nome non vuoto e anno da 1 a 5. Si presuppone che il testo dei numeri sia coerente.</p>
+  <p>Dopo le conversioni controlliamo i valori. Se, per esempio, l’anno è 9 oppure il nome è vuoto, la funzione restituisce <code>false</code> e lascia il risultato precedente invariato. Se i valori sono ammessi, assegniamo il candidato al risultato.</p>
+  <figure class="code-example" data-archivio="ricostruisciStudente"><figcaption>C++17 · funzione da mettere prima di main · usa i controlli forniti nel programma dell’archivio</figcaption><pre><code class="language-cpp">bool ricostruisciStudente(const string&amp; matricola, const string&amp; nome,
+                         const string&amp; anno, Studente&amp; risultato) {
+    Studente s;
+    s.matricola = convertiIntero(matricola);
+    s.nome = nome;
+    s.anno = convertiIntero(anno);
+    if (!studenteValido(s)) return false;
+    risultato = s;
+    return true;
+}</code></pre></figure>
+  <p>Nel <code>main</code>, dopo la separazione dei campi, la chiamata è questa. <code>Studente</code>, la funzione e le funzioni di supporto devono essere definiti prima: li trovi anche nel <a href="lez3_archivio_programma.html#programma-completo">programma completo scaricabile</a>.</p>
+  <figure class="code-example" data-conversion-example="chiamata"><figcaption>C++17 · frammento da inserire dopo le tre getline · ricostruisce il record e verifica i valori ammessi</figcaption><pre><code class="language-cpp">Studente s;
+if (!ricostruisciStudente(matricola, nome, anno, s)) {
+    return 2;
+}
+cout &lt;&lt; s.matricola &lt;&lt; ' ' &lt;&lt; s.nome &lt;&lt; ' ' &lt;&lt; s.anno &lt;&lt; '\n';</code></pre></figure>
+  <p>Per i dati dell’esempio otteniamo matricola <code>1001</code>, nome <code>Ada Lovelace</code>, anno <code>4</code>. È lo stesso procedimento quando <code>riga</code> arriva da <code>getline(in, riga)</code> invece che da una stringa scritta nel codice.</p>
+    </div>
+  </details>
+</section>
+<section class="topic-card">
+  <h2>Se cambiano i tipi: long, float e double</h2>
+  <p><strong>Esempio indipendente:</strong> una rilevazione di un robot. Non cambia la struct Studente né il formato dei file dell’archivio. Supponiamo di avere già separato quattro campi <strong>con valori corretti</strong>:</p>
+  <figure class="code-example" data-conversion-example="telemetria"><figcaption>C++17 · frammento dentro main · richiede string e using namespace std;</figcaption><pre><code class="language-cpp">struct Telemetria {
+    int id;
+    long secondi;
+    float temperatura;
+    double distanza;
+};
+
+string idTesto = "7";
+string secondiTesto = "120";
+string temperaturaTesto = "23.5";
+string distanzaTesto = "123.75";
+
+Telemetria t;
+t.id = stoi(idTesto);
+t.secondi = stol(secondiTesto);
+t.temperatura = stof(temperaturaTesto);
+t.distanza = stod(distanzaTesto);</code></pre></figure>
+  <p>La regola non cambia: un campo testuale, una conversione, un membro. Non usiamo <code>stoi</code> per un valore decimale: scegliamo <code>stof</code> per un membro <code>float</code> e <code>stod</code> per un membro <code>double</code>.</p>
+</section>
+<section class="topic-card">
+  <h2>Che cosa presupponiamo sui numeri?</h2>
+  <p>Per questi esempi i campi numerici devono contenere numeri completi, scritti correttamente e rappresentabili nel tipo di arrivo. Omettiamo i controlli sulla forma del testo e la gestione degli errori di conversione.</p>
+  <p>Per esempio <code>"quattro"</code> o un numero troppo grande possono interrompere il programma; <code>stoi("4abc")</code> può ricavare soltanto 4. Per gestire questi casi servono ulteriori controlli, che non affrontiamo qui.</p>
+  <p>Controllare il <strong>valore</strong> è un altro lavoro: l’anno <code>"9"</code> si converte correttamente, ma viene rifiutato perché non è compreso tra 1 e 5.</p>
+  <p>La stessa ipotesi sui campi coerenti vale per <code>stol</code>, <code>stof</code> e <code>stod</code>. Nel formato a spazi, invece, <code>&gt;&gt;</code> legge i numeri direttamente nei membri della struct.</p>
+</section>
+<section class="exercise-card"><span class="exercise-label">Prova tu · Scegli la conversione</span><h2>Ricostruisci una rilevazione</h2><p>Usa la struct <code>Telemetria</code> dell’esempio. I campi, già corretti e separati, sono <code>"9"</code> per id, <code>"300"</code> per secondi, <code>"19.75"</code> per temperatura e <code>"42.5"</code> per distanza. Scrivi le assegnazioni e indica il tipo di ciascun risultato.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><figure class="code-example" data-conversion-example="soluzione"><figcaption>C++17 · frammento dentro main, con Telemetria già definita</figcaption><pre><code class="language-cpp">Telemetria t;
+t.id = stoi("9");
+t.secondi = stol("300");
+t.temperatura = stof("19.75");
+t.distanza = stod("42.5");</code></pre></figure><p>I membri contengono, nell’ordine, un <code>int</code>, un <code>long</code>, un <code>float</code> e un <code>double</code>. Il testo non resta dentro i membri numerici: conserviamo i valori ottenuti dalle conversioni.</p></div></details></section>
 <section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>La riga <code>1001;;4</code> ha tre campi: rappresenta uno studente valido?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>No. I separatori individuano anche un campo vuoto, ma il nome non può essere vuoto. Separare i campi e controllare il loro significato sono due lavori diversi.</p></div></details></section>
-<section class="exercise-card"><span class="exercise-label">Prima di programmare</span><h2>Individua il problema</h2><p>Per ogni riga indica che cosa non va: <code>-1;Ada;4</code>, <code>1001;Ada;7</code>, <code>1001;Ada;4abc</code>, <code>1001;Ada;4;extra</code>.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Nell’ordine: matricola non positiva; anno fuori dall’intervallo 1–5; anno che non è un intero completo; campo in più. Nell’ultima riga, l’ultima <code>getline</code> prenderebbe <code>"4;extra"</code>: la conversione numerica dovrà rifiutarlo, non fermarsi al solo 4.</p></div></details></section>
+<section class="exercise-card"><span class="exercise-label">Prima di programmare</span><h2>Individua il problema</h2><p>Per ogni riga indica che cosa non va: <code>-1;Ada;4</code>, <code>1001;Ada;7</code>, <code>1001;Ada;4abc</code>, <code>1001;Ada;4;extra</code>.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Nell’ordine: matricola non positiva; anno fuori dall’intervallo 1–5; anno che non è un intero completo; campo in più. I primi due casi sono rifiutati dai controlli sui valori. Gli ultimi due sono fuori dall’ipotesi di campi numerici coerenti: la versione semplificata può ricavare soltanto 4 senza riconoscere il testo aggiuntivo.</p></div></details></section>
 <aside class="next-step"><strong>Prossimo passo.</strong> Controlliamo che scrittura e lettura rispettino le stesse regole.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">

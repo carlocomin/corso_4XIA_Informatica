@@ -25,7 +25,7 @@
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
     <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga alla struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
     <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
     <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
@@ -46,101 +46,37 @@
   <header class="lesson-hero"><p class="eyebrow">Caso di studio · File I/O · 15/24</p><h1>File di testo a spazi</h1><p class="lead">Leggiamo tre token con &gt;&gt;; scriviamo i tre campi con &lt;&lt;. Il nome, in questo formato, è una sola parola.</p></header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez3_operazioni.html">&#8592; Precedente</a><a class="nav-button primary" href="lez3_archivio_csv.html">Successiva &#8594;</a></nav>
   <div class="content-box">
-    <section class="concept-card"><h2>Una tripla di token è un record</h2><p><strong>Idea chiave:</strong> ogni record ha esattamente l’ordine <code>matricola nome anno</code>. Non c’è un conteggio iniziale e non c’è un’intestazione. Il file può essere vuoto: rappresenta zero studenti.</p></section>
-    <figure class="code-example"><figcaption>studenti_spazi.txt · un record per riga per comodità di lettura</figcaption><pre><code class="language-plaintext">1001 Ada 4
+<section class="concept-card"><h2>Tre campi letti direttamente con &gt;&gt;</h2><p>Ogni studente occupa tre token nell’ordine <code>matricola nome anno</code>. Non c’è intestazione e il nome è una sola parola. Spazi, tabulazioni e fine riga separano i token.</p></section>
+<figure class="code-example" data-archivio-file="studenti_spazi.txt"><figcaption>studenti_spazi.txt · file iniziale fornito</figcaption><pre><code class="language-plaintext">1001 Ada 4
 1002 Alan 4
 1003 Grace 3</code></pre></figure>
-    <p><code>&gt;&gt;</code> salta gli spazi bianchi: spazi, tabulazioni e fine riga separano i token. Le righe sono comode per noi, ma <strong>non sono confini di record per questo lettore</strong>. <code>1001 Ada Lovelace 4</code> non è valido: il nome occuperebbe due token.</p>
-    <section class="topic-card">
-      <h2>1. Dal testo al numero</h2>
-      <p>Leggiamo anche matricola e anno come stringhe, poi li convertiamo. Così <code>4abc</code> non viene accettato come se fosse soltanto <code>4</code>. <code>istringstream</code> è uno stream che legge da una stringa invece che da un file.</p>
-      <figure class="code-example" data-archivio="convertiIntero"><figcaption>Funzione comune ai due lettori e all’input da tastiera</figcaption><pre><code class="language-cpp">bool convertiIntero(const string&amp; testo, int&amp; valore) {
-    istringstream in(testo);
-    int numero;
-    char extra;
-    if (!(in &gt;&gt; numero)) {
-        return false;
-    }
-    if (in &gt;&gt; extra) {
-        return false;
-    }
-    valore = numero;
-    return true;
-}</code></pre></figure>
-      <p>La prima lettura prova a ottenere il numero. La seconda cerca un carattere rimasto dopo il numero: <code>"4"</code> va bene, <code>"4abc"</code> no. Solo se tutto riesce copiamo il numero nel parametro <code>valore</code>.</p>
-    </section>
-    <section class="topic-card">
-      <h2>2. Caricare senza perdere l’archivio precedente</h2>
-      <p>Pensa ai <code>temporanei</code> come a una bozza: prepariamo il nuovo archivio senza toccare quello attuale. Se tutti i record sono corretti, copiamo la bozza nel risultato. Se troviamo un errore, la scartiamo.</p>
-      <figure class="code-example" data-archivio="caricaSpazi"><figcaption>Frammento · lettura con &gt;&gt;, controllata dall’esito</figcaption><pre><code class="language-cpp">bool caricaSpazi(const string&amp; nomeFile, Studente archivio[], int&amp; n) {
+<section class="topic-card"><h2>Caricare: una struct alla volta</h2><ol class="steps"><li>Apriamo il file e poniamo <code>n = 0</code>.</li><li>Il ciclo legge la matricola; dentro leggiamo nome e anno.</li><li><code>aggiungiStudente</code> controlla i valori, i duplicati e lo spazio disponibile, poi inserisce il record.</li></ol><figure class="code-example" data-archivio="caricaSpazi"><figcaption>C++17 · lettura diretta nei tipi della struct</figcaption><pre><code class="language-cpp">bool caricaSpazi(const string&amp; nomeFile, Studente archivio[], int&amp; n) {
     ifstream in(nomeFile);
-    if (!in) {
-        return false;
+    if (!in) return false;
+    n = 0;
+    Studente s;
+    while (in &gt;&gt; s.matricola) {
+        if (!(in &gt;&gt; s.nome &gt;&gt; s.anno)) return false;
+        if (!aggiungiStudente(archivio, n, s)) return false;
     }
-    Studente temporanei[MAX];
-    int quanti = 0;
-    string matricola;
-    string anno;
-    while (in &gt;&gt; matricola) {
-        Studente s;
-        if (!(in &gt;&gt; s.nome &gt;&gt; anno)) {
-            return false;
-        }
-        if (!convertiIntero(matricola, s.matricola)
-            || !convertiIntero(anno, s.anno)) {
-            return false;
-        }
-        if (!aggiungiStudente(temporanei, quanti, s)) {
-            return false;
-        }
-    }
-    if (!in.eof() || in.bad()) {
-        return false;
-    }
-    // Solo un caricamento completo sostituisce l'archivio precedente.
-    for (int i = 0; i &lt; quanti; i++) {
-        archivio[i] = temporanei[i];
-    }
-    n = quanti;
-    return true;
-}</code></pre></figure>
-      <ol class="steps">
-        <li>Il <code>while</code> tenta di leggere il primo token del record. Non usa <code>while (!in.eof())</code>.</li>
-        <li>Dopo quel primo token, gli altri due sono obbligatori. Convertiamo i numeri e aggiungiamo solo record validi, con matricola non duplicata e spazio disponibile.</li>
-        <li>Alla fine distinguiamo EOF normale da errore di lettura. Solo allora copiamo i temporanei nell’array del chiamante e aggiorniamo <code>n</code>.</li>
-      </ol>
-      <div class="callout"><strong>Scelta di questo programma:</strong> un record errato, duplicato o oltre la capacità fa fallire l’intero caricamento. Non scartiamo righe in silenzio e non lasciamo un archivio caricato a metà. Un caricamento riuscito <strong>sostituisce</strong> i dati in memoria, non li accoda.</div>
-    </section>
-    <section class="topic-card">
-      <h2>3. Salvare i soli record presenti</h2>
-      <p><code>archivioValido</code> controlla quantità, campi e matricole univoche. La funzione qui sotto controlla anche che nessun nome contenga spazi, <strong>prima di aprire</strong> il file.</p>
-      <figure class="code-example" data-archivio="salvaSpazi"><figcaption>Frammento · scrittura con &lt;&lt; e controllo dopo close()</figcaption><pre><code class="language-cpp">bool salvaSpazi(const string&amp; nomeFile, const Studente archivio[], int n) {
-    if (!archivioValido(archivio, n)) {
-        return false;
-    }
-    for (int i = 0; i &lt; n; i++) {
-        if (archivio[i].nome.find(' ') != string::npos) {
-            return false;
-        }
-    }
-    // I controlli sui dati precedono l'apertura che cancella il vecchio file.
+    return in.eof() &amp;&amp; !in.bad();
+}</code></pre></figure><p>Un file vuoto carica zero studenti. La fine regolare del file non è un errore; un record iniziato ma incompleto lo è.</p></section>
+<div class="callout"><strong>Scelta semplice:</strong> carichiamo direttamente nell’array, senza copie temporanee. Se il caricamento restituisce <code>false</code>, l’array può essere parziale: il programma dimostrativo si ferma e non continua a elaborarlo.</div>
+<section class="topic-card"><h2>Salvare: un ciclo sull’array</h2><p>Scriviamo soltanto gli elementi da 0 a <code>n - 1</code>. <strong>Per usare questo formato i nomi devono essere singole parole:</strong> la funzione non controlla né corregge nomi con spazi.</p><figure class="code-example" data-archivio="salvaSpazi"><figcaption>C++17 · scrittura dei campi con &lt;&lt;</figcaption><pre><code class="language-cpp">bool salvaSpazi(const string&amp; nomeFile, const Studente archivio[], int n) {
+    // Per questo formato i nomi devono essere singole parole.
+    if (n &lt; 0 || n &gt; MAX) return false;
     ofstream out(nomeFile);
-    if (!out) {
-        return false;
-    }
+    if (!out) return false;
     for (int i = 0; i &lt; n; i++) {
         out &lt;&lt; archivio[i].matricola &lt;&lt; ' '
-            &lt;&lt; archivio[i].nome &lt;&lt; ' '
-            &lt;&lt; archivio[i].anno &lt;&lt; '\n';
+            &lt;&lt; archivio[i].nome &lt;&lt; ' ' &lt;&lt; archivio[i].anno &lt;&lt; '\n';
     }
     out.close();
     return !out.fail();
-}</code></pre></figure>
-      <p><code>ofstream</code> riscrive il file dall’inizio. È la scelta voluta: dobbiamo salvare anche modifiche e rimozioni, non accumulare vecchie versioni con <code>app</code>. Alla fine <code>!out.fail()</code> restituisce <code>true</code> se la scrittura si è conclusa senza errori: <code>fail()</code> significa “c’è stato un fallimento”, <code>!</code> nega il risultato.</p>
-    </section>
-    <section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Il file termina con <code>1004 Edsger</code>, senza anno. Basta avere raggiunto EOF per dire che la lettura è riuscita?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>No. Abbiamo iniziato un record ma non lo abbiamo completato. La lettura degli altri due token fallisce e la funzione restituisce <code>false</code> prima di copiare i temporanei. L’archivio precedente resta invariato.</p></div></details></section>
-    <section class="exercise-card"><span class="exercise-label">Controllo del formato</span><h2>Prevedi l’esito</h2><p>Quali file sono accettati: un file vuoto; <code>1001 Ada 4</code> senza fine riga finale; <code>1001 Ada 4abc</code>; due record con la stessa matricola?</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>I primi due sono accettati. Il token <code>4abc</code> non è un intero completo; il duplicato viola l’unicità. In entrambi i casi il caricamento fallisce senza modificare array e <code>n</code>.</p></div></details></section>
-    <aside class="next-step"><strong>Prossimo passo.</strong> Per conservare un nome come “Ada Lovelace” usiamo un separatore diverso dallo spazio e leggiamo una riga alla volta.</aside>
+}</code></pre></figure><p>Il file di uscita viene riscritto, non accodato: così conserva anche modifiche e rimozioni. Dopo <code>close()</code>, <code>!out.fail()</code> comunica se la scrittura è riuscita.</p></section>
+<section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Il file termina con 1004 Edsger, senza anno. Possiamo continuare a elaborare l’array?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>No. La lettura dell’anno fallisce e il caricamento restituisce <code>false</code>. Il chiamante deve fermarsi: non assumiamo che l’array contenga un archivio completo.</p></div></details></section>
+<section class="exercise-card"><span class="exercise-label">Prova tu</span><h2>Dall’array alla riga</h2><p>L’array contiene <code>{1002, "Turing", 5}</code> e <code>{1003, "Grace", 3}</code>, con <code>n = 2</code>. Quali righe scriviamo?</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Scriviamo <code>1002 Turing 5</code> e <code>1003 Grace 3</code>, una per riga. Le celle successive non vengono salvate.</p></div></details></section>
+<aside class="next-step"><strong>Prossimo passo.</strong> Con il CSV gli spazi possono restare dentro il nome: il separatore dei campi sarà <code>;</code>.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez3_operazioni.html">&#8592; Precedente</a><a class="nav-button primary" href="lez3_archivio_csv.html">Successiva &#8594;</a></nav>
 </main>

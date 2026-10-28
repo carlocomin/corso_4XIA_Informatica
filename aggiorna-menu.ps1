@@ -203,7 +203,7 @@ $lez3Items = @(
     @{ Path = "lez3_lab_testo.html"; Label = "L3.7bis - Primo laboratorio sui file di testo" },
     @{ Path = "lez3_8.html"; Label = "L3.8 - La stessa idea in C" },
     @{ Path = "lez3_9.html"; Label = "L3.9 - Dalla struct al testo" },
-    @{ Path = "lez3_10.html"; Label = "L3.10 - Dalla riga ai campi" },
+    @{ Path = "lez3_10.html"; Label = "L3.10 - Dalla riga alla struct" },
     @{ Path = "lez3_11.html"; Label = "L3.11 - Provare scrittura e lettura" },
     @{ Path = "lez3_archivio.html"; Label = "L3.A1 - Un array di studenti" },
     @{ Path = "lez3_operazioni.html"; Label = "L3.A2 - Aggiungere, modificare, rimuovere" },

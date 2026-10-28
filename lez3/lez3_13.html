@@ -31,7 +31,7 @@
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
     <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga alla struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
     <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
     <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
@@ -51,7 +51,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 20/24</p>
+    <p class="eyebrow">Lezione 3 · File I/O · 20/24</p>
     <h1>Scrivere con write</h1>
     <p class="lead">Un programma breve: apre il file, scrive tre interi, chiude e controlla.</p>
   </header>
@@ -60,7 +60,7 @@
     <a class="nav-button primary" href="lez3_lettura_binaria.html">Successiva &#8594;</a>
   </nav>
   <div class="content-box">
-<section class="concept-card"><h2>Un int alla volta</h2><p><strong>Idea chiave:</strong> ogni chiamata a <code>write</code> aggiunge il blocco successivo nella posizione corrente. Il ciclo salva 10, poi 20, poi 30.</p></section>
+<section class="concept-card"><h2>Un int alla volta</h2><p><strong>Idea chiave:</strong> ogni chiamata a <code>write</code> scrive nella posizione corrente. In questo ciclo la posizione avanza: salviamo 10, poi 20, poi 30.</p></section>
 <figure class="code-example"><figcaption>C++17 · programma completo · scrittore di dati.bin</figcaption><pre><code class="language-cpp">#include &lt;fstream&gt;
 #include &lt;iostream&gt;
 
@@ -85,7 +85,7 @@ int main() {
     }
     cout &lt;&lt; "Scritti 3 interi\n";
 }</code></pre></figure>
-<section class="topic-card"><h2>Tre cose da osservare</h2><ol class="steps"><li><code>&amp;valori[i]</code> è l’indirizzo dell’intero corrente.</li><li><code>sizeof(valori[i])</code> scrive solo i byte di quell’intero.</li><li>Dopo ogni scrittura la posizione avanza: la chiamata successiva continua dopo i byte appena scritti.</li></ol><p>Controlliamo anche dopo <code>close()</code>, perché l’errore può emergere durante l’invio finale dei dati al file.</p></section>
+<section class="topic-card"><h2>Tre cose da osservare</h2><ol class="steps"><li><code>&amp;valori[i]</code> è l’indirizzo dell’intero corrente.</li><li><code>sizeof(valori[i])</code> indica quanti byte deve trasferire <code>write</code>: quelli di un solo intero.</li><li>Dopo ogni scrittura la posizione avanza: la chiamata successiva continua dopo i byte appena scritti.</li></ol><p>Controlliamo anche dopo <code>close()</code>, perché l’errore può emergere durante l’invio finale dei dati al file.</p></section>
 <div class="callout warning"><strong>Attenzione:</strong> questa apertura crea il file o cancella il contenuto precedente. Lavora su una copia di prova. Un errore di scrittura non ripristina automaticamente il vecchio file.</div>
 <section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Fra 10 e 20 abbiamo scritto uno spazio?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>No. Nel file binario ci sono due blocchi di <code>sizeof(int)</code> byte consecutivi. Non aggiungiamo spazi o fine riga come nel testo.</p></div></details></section>
 <section class="exercise-card"><span class="exercise-label">Prova tu</span><h2>Cambia solo i valori</h2><p>Sostituisci l’array con 7, -2, 100 e salva. Cambiano la quantità di elementi o la dimensione del file?</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>No: rimangono tre int e quindi <code>3 * sizeof(int)</code> byte. Cambiano i valori rappresentati nei blocchi, non la loro dimensione.</p></div></details></section>

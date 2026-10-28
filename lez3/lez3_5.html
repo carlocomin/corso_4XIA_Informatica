@@ -31,7 +31,7 @@
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
     <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga alla struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
     <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
     <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
@@ -51,7 +51,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 5/24</p>
+    <p class="eyebrow">Lezione 3 · File I/O · 5/24</p>
     <h1>Leggere valori in C++</h1>
     <p class="lead">L’operatore <code>&gt;&gt;</code> separa gli elementi usando gli spazi e prova a convertirli nel tipo della variabile.</p>
   </header>
@@ -152,7 +152,7 @@ int main() {
       <span class="exercise-label">Esercizio 5</span>
       <h2>Minimo e massimo</h2>
       <p>Modifica il programma per stampare nome e voto dello studente con risultato minimo e massimo. Gestisci anche il file vuoto.</p>
-      <details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Prima del ciclo prepara voto minimo, voto massimo e i due nomi corrispondenti. Dopo avere letto e controllato il voto, se <code>quanti == 0</code> inizializza entrambi gli estremi con quel primo studente. Per i successivi aggiorna minimo e nome solo con un voto minore, massimo e nome solo con un voto maggiore. A parità conserva il primo. Alla fine stampa gli estremi solo se <code>quanti &gt; 0</code>; altrimenti segnala il file vuoto. Sul dataset: Alan con 7.5 e Grace con 10.0.</p></div></details>
+      <details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Prima del ciclo prepara voto minimo, voto massimo e i due nomi corrispondenti. Nel corpo del ciclo, dopo avere letto e controllato il voto ma <strong>prima di incrementare <code>quanti</code></strong>, se <code>quanti == 0</code> inizializza entrambi gli estremi con quel primo studente. Per i successivi aggiorna minimo e nome solo con un voto minore, massimo e nome solo con un voto maggiore. A parità conserva il primo. Alla fine stampa gli estremi solo se <code>quanti &gt; 0</code>; altrimenti segnala il file vuoto. Sul dataset: Alan con 7.5 e Grace con 10.0.</p></div></details>
     </section>
 
     <aside class="next-step"><strong>Prossimo passo.</strong> Quando gli spazi fanno parte dei dati, il token non basta: serve leggere un’intera riga.</aside>

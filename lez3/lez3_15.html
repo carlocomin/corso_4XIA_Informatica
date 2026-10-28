@@ -31,7 +31,7 @@
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
     <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga alla struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
     <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
     <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
@@ -51,7 +51,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 23/24</p>
+    <p class="eyebrow">Lezione 3 · File I/O · 23/24</p>
     <h1>Spostarsi e conoscere la posizione</h1>
     <p class="lead">g riguarda la lettura, p la scrittura. Un seek sposta; un tell interroga.</p>
   </header>
@@ -61,7 +61,7 @@
   </nav>
   <div class="content-box">
 <section class="concept-card"><h2>Quattro nomi, due idee</h2><div class="table-wrap"><table><thead><tr><th></th><th>Spostare</th><th>Conoscere la posizione</th></tr></thead><tbody><tr><td>Lettura</td><td><code>seekg</code></td><td><code>tellg</code></td></tr><tr><td>Scrittura</td><td><code>seekp</code></td><td><code>tellp</code></td></tr></tbody></table></div><p>Le posizioni sono espresse in byte per questi file binari. Non sono né valori dei dati né indirizzi di memoria.</p></section>
-<section class="topic-card"><h2>1. seekg: sposta la lettura</h2><p>I frammenti sono da mettere in un <code>main</code> C++ con <code>&lt;fstream&gt;</code>, <code>&lt;iostream&gt;</code> e <code>using namespace std;</code>. Il file è quello con 10, 20, 30.</p>
+<section class="topic-card"><h2>1. seekg: sposta la lettura</h2><p>I frammenti sono da mettere in un <code>main</code> C++ con <code>&lt;fstream&gt;</code>, <code>&lt;iostream&gt;</code> e <code>using namespace std;</code>. Prima di iniziare, ricrea <code>dati.bin</code> eseguendo una volta lo scrittore con <code>{10, 20, 30}</code>. Poi esegui i quattro passi nell’ordine indicato, senza rilanciare lo scrittore fra la modifica e la rilettura.</p>
 <figure class="code-example"><figcaption>Frammento C++ · apertura e inizio del secondo int</figcaption><pre><code class="language-cpp">ifstream in("dati.bin", ios::binary);
 if (!in) return 1;
 
@@ -97,7 +97,7 @@ if (!io) return 4;</code></pre></figure>
 <p>La posizione è <code>2 * sizeof(int)</code>: 8 se l’int occupa 4 byte. Rileggendo il file troviamo <strong>10, 99, 30</strong>; la dimensione non cambia. Anche <code>tellp()</code> non modifica la posizione.</p></section>
 <div class="callout"><strong>Da ricordare:</strong> <code>tellg</code> e <code>tellp</code> restituiscono una posizione, oppure <code>-1</code> in caso di errore. Qui la stampiamo dopo operazioni controllate. Se una lettura ha già fallito, riapri il file prima di riprovare questi esempi.</div>
 <section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>seekp da solo cambia 20 in 99?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="answer"><p>No. Sposta soltanto la posizione. La modifica avviene quando la successiva <code>write</code> scrive i byte di 99.</p></div></details></section>
-<section class="exercise-card"><span class="exercise-label">Prova tu</span><h2>Aggiorna il terzo valore</h2><p>Quale sola parte del frammento seekp cambieresti per sostituire il terzo int con 99? Quanto varrebbe tellp dopo la scrittura?</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Userei <code>io.seekp(2 * sizeof(int), ios::beg)</code>. Dopo la scrittura <code>tellp()</code> sarebbe <code>3 * sizeof(int)</code>, cioè 12 con int da 4 byte. Il file conterrebbe 10, 20, 99, se si parte dai dati originali.</p></div></details></section>
+<section class="exercise-card"><span class="exercise-label">Prova tu</span><h2>Aggiorna il terzo valore</h2><p>Per questa prova riparti dal file originale con 10, 20, 30. Quale sola parte del frammento seekp cambieresti per sostituire il terzo int con 99? Quanto varrebbe tellp dopo la scrittura?</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Userei <code>io.seekp(2 * sizeof(int), ios::beg)</code>. Dopo la scrittura <code>tellp()</code> sarebbe <code>3 * sizeof(int)</code>, cioè 12 con int da 4 byte. Il file conterrebbe 10, 20, 99, se si parte dai dati originali.</p></div></details></section>
 <aside class="next-step"><strong>Ora sai fare il minimo necessario:</strong> scrivere, leggere, spostarti e conoscere la posizione. L’esercizio binario finale riprende soltanto questi gesti.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">

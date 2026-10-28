@@ -31,7 +31,7 @@
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
     <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga alla struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
     <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
     <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
@@ -51,7 +51,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 7/24</p>
+    <p class="eyebrow">Lezione 3 · File I/O · 7/24</p>
     <h1>Il ciclo di lettura corretto</h1>
     <p class="lead">La fine del file non si prevede: si tenta una lettura e si usa il dato soltanto se il tentativo riesce.</p>
   </header>
@@ -63,7 +63,7 @@
 
     <section class="concept-card">
       <h2>Prima leggi, poi elabori</h2>
-      <p><strong>Idea chiave:</strong> la condizione del ciclo deve essere l’operazione che produce il dato. <code>eof()</code> segnala che una lettura ha incontrato la fine: non permette di prevedere se la prossima lettura produrrà un dato completo.</p>
+      <p><strong>Idea chiave:</strong> prima di elaborare un dato dobbiamo controllare la lettura che lo produce. Nel ciclo più semplice mettiamo la lettura direttamente nella condizione. <code>eof()</code> segnala che una lettura ha incontrato la fine: non permette di prevedere se la prossima lettura produrrà un dato completo.</p>
     </section>
 
     <section class="two-col">
@@ -77,7 +77,7 @@
     elabora(riga);
 }</code></pre>
         </figure>
-        <p>L’ultima lettura può fallire, ma <code>riga</code> viene elaborata comunque.</p>
+        <p>Dopo l’ultima riga valida, il ciclo può tentare un’altra lettura. Se non trova più dati, <code>getline</code> fallisce; ma il programma esegue ugualmente <code>elabora(riga)</code>, perché non ha controllato il risultato della lettura.</p>
       </article>
       <article class="topic-card">
         <span class="badge extra">Corretto</span>
@@ -93,15 +93,34 @@
     </section>
 
     <section class="topic-card">
-      <h2>Perché è finito il ciclo?</h2>
+      <h2>Un esempio: una riga, ma due elaborazioni</h2>
+      <p>Il file contiene soltanto <code>Ada\n</code>: il testo <code>Ada</code> seguito da un a capo. Supponiamo che il file sia stato aperto correttamente e seguiamo il <strong>ciclo sbagliato</strong>.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Passo</th><th>Che cosa succede</th></tr></thead>
+          <tbody>
+            <tr><td>Primo giro</td><td><code>eof()</code> è falso, quindi entriamo. <code>getline</code> legge <code>Ada</code> e consuma l’a capo. La riga viene elaborata correttamente.</td></tr>
+            <tr><td>Secondo giro</td><td>La lettura precedente si è fermata all’a capo: <strong>non ha ancora incontrato la fine del file</strong>. <code>eof()</code> è ancora falso, quindi entriamo di nuovo. Ora <code>getline</code> non trova alcun carattere, incontra la fine e fallisce. Ma la successiva <code>elabora(riga)</code> viene eseguita lo stesso.</td></tr>
+            <tr><td>Controllo successivo</td><td>Solo adesso <code>eof()</code> è vero e il ciclo termina. È troppo tardi: abbiamo già elaborato un tentativo che non ha prodotto una riga.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Se <code>elabora</code> incrementa un contatore, otteniamo <strong>2 invece di 1</strong>. Non significa che venga necessariamente ripetuta la parola <code>Ada</code>: l’errore è elaborare qualcosa senza avere letto una nuova riga.</p>
+      <div class="callout"><strong>Il punto logico:</strong> la condizione del <code>while</code> viene controllata prima di entrare nel corpo, non dopo ogni istruzione. Una lettura fallita non fa saltare automaticamente l’istruzione successiva. Con <code>while (getline(in, riga))</code>, invece, prima tentiamo la lettura e poi entriamo nel corpo <strong>solo se è riuscita</strong>.</div>
+      <p>Qui “lettura fallita” non significa che il file sia danneggiato: semplicemente abbiamo tentato di leggere quando non restavano dati. È normale arrivare alla fine; non è corretto elaborare quel tentativo come una riga letta.</p>
+    </section>
+
+    <section class="topic-card">
+      <h2>Tre situazioni da distinguere</h2>
       <p><code>elabora(riga)</code> indica il lavoro da fare sulla riga letta, per esempio stamparla o contarla. Non è una funzione della libreria: la definiamo noi.</p>
       <div class="table-wrap"><table><thead><tr><th>Situazione</th><th>Come ragioniamo</th></tr></thead><tbody>
         <tr><td>Non ci sono altre righe</td><td>È la normale fine del file: non c’è un nuovo dato da elaborare.</td></tr>
-        <tr><td>Un record è iniziato ma manca un campo</td><td>È un errore: non basta essere arrivati alla fine per rendere completo il record.</td></tr>
+        <tr><td>Una riga è stata letta, ma manca un campo del record</td><td>La lettura della riga può essere riuscita. È il controllo dei campi a riconoscere il dato incompleto, come nel caso di nome e voto.</td></tr>
         <tr><td>Il file non si riesce più a leggere</td><td>Segnaliamo il problema, senza presentare un risultato finale come se tutto fosse riuscito.</td></tr>
       </tbody></table></div>
-      <p><code>in.eof()</code> segnala che una lettura ha incontrato la fine; <code>in.bad()</code> segnala un errore di lettura dello stream. Negli esempi trovi un controllo finale con queste due funzioni: serve a distinguere la fine normale da un problema.</p>
-      <div class="callout"><strong>Ultima riga senza a capo:</strong> se contiene testo, <code>getline</code> può leggerla correttamente. Non serve aggiungere un <code>\n</code> per rendere valido il contenuto.</div>
+      <p><code>in.eof()</code> segnala che una lettura ha incontrato la fine; <code>in.bad()</code> segnala un errore di lettura dello stream. Il controllo finale distingue la fine normale da un problema di lettura, <strong>non convalida il contenuto dei record</strong>.</p>
+      <p>Una <code>getline</code> riuscita ci consegna una riga, anche vuota; non garantisce che contenga uno studente valido. Nel caso di studio controlleremo separatamente presenza, tipo e valore dei campi prima di inserirli nell’array.</p>
+      <div class="callout"><strong>Ultima riga senza a capo:</strong> se contiene testo, <code>getline</code> può leggerla correttamente e incontrare già la fine del file. In questo caso il ciclo sbagliato può sembrare corretto, perché non fa il tentativo aggiuntivo. Non basta provarlo con un solo file: lo schema corretto deve funzionare anche con a capo finale e file vuoto.</div>
     </section>
 
     <section class="checkpoint">
@@ -115,7 +134,7 @@
           <span class="when-open">Nascondi risposta</span>
         </summary>
         <div class="answer">
-        <p>Perché dopo il fallimento di <code>getline</code> la variabile non contiene una nuova riga valida, ma il corpo del ciclo viene comunque eseguito.</p>
+        <p>Perché il controllo <code>!in.eof()</code> è stato fatto <strong>prima</strong> della lettura. Una volta entrati nel corpo, <code>getline</code> può fallire, ma non c’è un controllo che impedisca la successiva <code>elabora(riga)</code>. Nel ciclo corretto è invece il successo di <code>getline</code> a decidere se eseguire il corpo.</p>
       </div>
       </details>
     </section>

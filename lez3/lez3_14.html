@@ -31,7 +31,7 @@
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
     <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga alla struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
     <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
     <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
@@ -51,7 +51,7 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 22/24</p>
+    <p class="eyebrow">Lezione 3 · File I/O · 22/24</p>
     <h1>In C: fseek e ftell</h1>
     <p class="lead">fseek sposta la posizione nel file. ftell dice dove ci troviamo. Non leggono e non scrivono il contenuto.</p>
   </header>
@@ -61,7 +61,7 @@
   </nav>
   <div class="content-box">
 <section class="concept-card"><h2>Non mescolare le due librerie</h2><p><strong>Idea chiave:</strong> <code>fseek</code> e <code>ftell</code> appartengono alla libreria C e usano un <code>FILE*</code>. Nel C++ con gli stream useremo <code>seekg</code>, <code>seekp</code>, <code>tellg</code> e <code>tellp</code>.</p></section>
-<section class="topic-card"><h2>Prima apri il file</h2><p>Servono <code>#include &lt;stdio.h&gt;</code> e una funzione <code>main</code>. Inserisci i frammenti in questo ordine: apertura, spostamento, richiesta della posizione, chiusura.</p><figure class="code-example"><figcaption>Frammento C · apertura in lettura</figcaption><pre><code class="language-c">FILE* f = fopen("dati.bin", "rb");
+<section class="topic-card"><h2>Prima prepara il file, poi aprilo</h2><p>Se hai svolto le prove precedenti, ripristina l’array <code>{10, 20, 30}</code> nello scrittore C++ e rieseguilo una volta per ricreare <code>dati.bin</code>. I frammenti C seguenti leggono la posizione nello stesso file, senza modificarne i valori.</p><p>Servono <code>#include &lt;stdio.h&gt;</code> e una funzione <code>main</code>. Inserisci i frammenti in questo ordine: apertura, spostamento, richiesta della posizione, chiusura.</p><figure class="code-example"><figcaption>Frammento C · apertura in lettura</figcaption><pre><code class="language-c">FILE* f = fopen("dati.bin", "rb");
 if (f == NULL) {
     return 1;
 }</code></pre></figure><p><code>"rb"</code> apre il file binario in lettura, senza modificarlo. Usiamo sempre il file con 10, 20, 30.</p></section>

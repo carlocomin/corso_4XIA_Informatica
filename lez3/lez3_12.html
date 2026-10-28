@@ -31,7 +31,7 @@
     <li><a href="lez3_lab_testo.html">L3.7bis - Primo laboratorio sui file di testo</a></li>
     <li><a href="lez3_8.html">L3.8 - La stessa idea in C</a></li>
     <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
-    <li><a href="lez3_10.html">L3.10 - Dalla riga ai campi</a></li>
+    <li><a href="lez3_10.html">L3.10 - Dalla riga alla struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
     <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
     <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
@@ -51,16 +51,16 @@
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Ripasso guidato · File I/O · 18/24</p>
+    <p class="eyebrow">Lezione 3 · File I/O · 18/24</p>
     <h1>Binario: tre interi in un file</h1>
-    <p class="lead">Un solo esempio per tutte le prossime slide: i valori 10, 20 e 30, scritti uno dopo l’altro.</p>
+    <p class="lead">Il nostro esempio di riferimento: tre interi, uno dopo l’altro. Partiamo dai valori 10, 20 e 30.</p>
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_archivio_programma.html">&#8592; Precedente</a>
     <a class="nav-button primary" href="lez3_blocchi.html">Successiva &#8594;</a>
   </nav>
   <div class="content-box">
-<section class="concept-card"><h2>Un formato davvero piccolo</h2><p><strong>Idea chiave:</strong> il file <code>dati.bin</code> contiene esattamente <strong>tre int consecutivi</strong>, nell’ordine 10, 20, 30. Nessuna intestazione e nessun separatore.</p></section>
+<section class="concept-card"><h2>Un formato davvero piccolo</h2><p><strong>Idea chiave:</strong> il formato di <code>dati.bin</code> prevede esattamente <strong>tre int consecutivi</strong>, senza intestazione e senza separatori. Nel primo esempio i valori sono 10, 20, 30: cambiare i valori non cambia il formato.</p></section>
 <section class="topic-card"><h2>Come lo immaginiamo</h2><div class="stream-map" aria-label="Tre blocchi di byte: primo int 10, secondo int 20, terzo int 30"><span class="io-node">int: 10</span><span class="io-arrow" aria-hidden="true">→</span><span class="io-node">int: 20</span><span class="io-arrow" aria-hidden="true">→</span><span class="io-node">int: 30</span></div><p>Ogni blocco occupa <code>sizeof(int)</code> byte. <strong>Non sono le cifre in un file di testo:</strong> sono i byte che rappresentano quei numeri nella memoria del nostro programma.</p>
 <div class="table-wrap"><table><thead><tr><th>Indice</th><th>Valore</th><th>Posizione iniziale nel file</th></tr></thead><tbody><tr><td>0</td><td>10</td><td><code>0</code></td></tr><tr><td>1</td><td>20</td><td><code>sizeof(int)</code></td></tr><tr><td>2</td><td>30</td><td><code>2 * sizeof(int)</code></td></tr></tbody></table></div>
 <p>Se un <code>int</code> occupa 4 byte, le posizioni iniziali sono 0, 4, 8 e il file occupa <strong>12 byte</strong>. Nel codice usiamo sempre <code>sizeof(int)</code>, non il numero 4 scritto a mano.</p></section>
