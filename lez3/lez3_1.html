@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:4.17%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:8.33%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della lezione">
@@ -33,25 +33,13 @@
     <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
     <li><a href="lez3_10.html">L3.10 - Dalla riga alla struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
-    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
-    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
-    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
-    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
-    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
-    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
-    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
-    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
-    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
 <!-- END MENU -->
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Lezione 3 · File I/O · 1/24</p>
+    <p class="eyebrow">Lezione 3 · File I/O · 1/12</p>
     <h1>Dal dato al file</h1>
     <p class="lead">Un programma termina, ma alcuni dati devono restare: li salviamo in un file per ritrovarli alla prossima esecuzione.</p>
   </header>
@@ -71,18 +59,18 @@
       <article class="topic-card">
         <span class="badge">Essenziale</span>
         <h2>Aprire, scrivere, rileggere</h2>
-        <p>Partiamo dal testo: un valore, una riga, poi un array di studenti. Controlliamo sempre se apertura e operazioni riescono.</p>
-        <p><a href="lez3_archivio.html">Caso di studio completo:</a> array di struct, file a spazi e CSV, aggiunta, modifica e rimozione.</p>
+        <p>Partiamo dai file di testo. Leggiamo e scriviamo valori separati da spazi, controllando sempre se apertura e operazioni riescono.</p>
+        <p><a href="lez3_lab_testo.html">Primo laboratorio:</a> un percorso guidato su lettura e scrittura di file di testo.</p>
       </article>
       <article class="topic-card">
         <span class="badge">Guidato</span>
-        <h2>Capire il binario</h2>
-        <p>Seguiamo il viaggio di un numero dalla memoria al file e ritorno. Poi salviamo più valori, mantenendo uguali ordine e quantità in scrittura e lettura.</p>
+        <h2>Leggere righe e campi</h2>
+        <p>Con getline leggiamo una riga intera. Poi separiamo i campi di un record e convertiamo i numeri per ricostruire una struct.</p>
       </article>
       <article class="topic-card">
         <span class="badge">Un passo in più</span>
-        <h2>Scegliere la posizione</h2>
-        <p>Spostiamoci su un intero del file e leggiamo la posizione corrente. Piccoli esempi distinguono fseek in C da seekg, seekp, tellg e tellp in C++.</p>
+        <h2>Verificare il risultato</h2>
+        <p>Salviamo, chiudiamo e rileggiamo in una nuova esecuzione. Confrontiamo i dati ottenuti con quelli iniziali.</p>
       </article>
     </section>
     <div class="callout"><strong>Come lavorare:</strong> leggi un blocco di codice alla volta, prevedi il risultato, eseguilo e cambia un solo dato. Non serve imparare programmi lunghi a memoria: devi saper spiegare da dove arriva il dato, dove va e come controlli l’operazione. Le slide in C servono a confrontare le stesse idee con un’altra libreria.</div>

@@ -125,10 +125,7 @@ $rootItems = @(
     @{ Path = "lez0/lez0_1.html"; Label = "Lezione 0: Array, funzioni e parametri" },
     @{ Path = "lez1/lez1_1.html"; Label = "Lezione 1: Matrici 2D in C/C++" },
     @{ Path = "lez2/lez2_1.html"; Label = "Lezione 2: Struct in C/C++" },
-    @{ Path = "lez3/lez3_1.html"; Label = "Lezione 3: File I/O in C/C++" },
-    @{ Path = "lez4/lez4_1.html"; Label = "Lezione 4: OOP in C++" },
-    @{ Path = "lez5/lez5_1.html"; Label = "Lezione 5: Ereditarietà e polimorfismo in C++" },
-    @{ Path = "lez6/lez6_1.html"; Label = "Lezione 6: Alberi e BST in C/C++" }
+    @{ Path = "lez3/lez3_1.html"; Label = "Lezione 3: File I/O in C/C++" }
 )
 
 $lez0Items = @(
@@ -204,67 +201,7 @@ $lez3Items = @(
     @{ Path = "lez3_8.html"; Label = "L3.8 - La stessa idea in C" },
     @{ Path = "lez3_9.html"; Label = "L3.9 - Dalla struct al testo" },
     @{ Path = "lez3_10.html"; Label = "L3.10 - Dalla riga alla struct" },
-    @{ Path = "lez3_11.html"; Label = "L3.11 - Provare scrittura e lettura" },
-    @{ Path = "lez3_archivio.html"; Label = "L3.A1 - Un array di studenti" },
-    @{ Path = "lez3_operazioni.html"; Label = "L3.A2 - Aggiungere, modificare, rimuovere" },
-    @{ Path = "lez3_archivio_spazi.html"; Label = "L3.A3 - Archivio di testo a spazi" },
-    @{ Path = "lez3_archivio_csv.html"; Label = "L3.A4 - Archivio CSV: righe e campi" },
-    @{ Path = "lez3_archivio_programma.html"; Label = "L3.A5 - Programma completo e collaudo" },
-    @{ Path = "lez3_12.html"; Label = "L3.12 - Binario: un formato elementare" },
-    @{ Path = "lez3_blocchi.html"; Label = "L3.12bis - read e write: indirizzo e byte" },
-    @{ Path = "lez3_13.html"; Label = "L3.13 - Scrivere con write" },
-    @{ Path = "lez3_lettura_binaria.html"; Label = "L3.13bis - Leggere con read" },
-    @{ Path = "lez3_14.html"; Label = "L3.14 - In C: fseek e ftell" },
-    @{ Path = "lez3_15.html"; Label = "L3.15 - seekg, seekp, tellg e tellp" },
-    @{ Path = "lez3_16.html"; Label = "L3.16 - Laboratorio e autoverifica" }
-)
-
-$lez4Items = @(
-    @{ Path = "lez4_1.html"; Label = "L4.1 - Perche OOP" },
-    @{ Path = "lez4_2.html"; Label = "L4.2 - Astrazione e incapsulamento" },
-    @{ Path = "lez4_3.html"; Label = "L4.3 - Anatomia minima di una classe" },
-    @{ Path = "lez4_4.html"; Label = "L4.4 - Costruttori e invarianti" },
-    @{ Path = "lez4_5.html"; Label = "L4.5 - Distruttore, ordine, default e delete" },
-    @{ Path = "lez4_6.html"; Label = "L4.6 - Incapsulamento forte e metodi const" },
-    @{ Path = "lez4_7.html"; Label = "L4.7 - Overload e overload const/non-const" },
-    @{ Path = "lez4_8.html"; Label = "L4.8 - Rendere leggibile un oggetto e contratti d'uso" },
-    @{ Path = "lez4_9.html"; Label = "L4.9 - Header, sorgenti e translation unit" },
-    @{ Path = "lez4_10.html"; Label = "L4.10 - Build, linking, ODR e dipendenze" },
-    @{ Path = "lez4_11.html"; Label = "L4.11 - Copy semantics e Rule of Three/Zero" },
-    @{ Path = "lez4_12.html"; Label = "L4.12 - Move semantics, Rule of Five e RVO" },
-    @{ Path = "lez4_13.html"; Label = "L4.13 - Esercizi base" },
-    @{ Path = "lez4_14.html"; Label = "L4.14 - Esercizi intermedi" },
-    @{ Path = "lez4_15.html"; Label = "L4.15 - Esercizi avanzati e ponte" }
-)
-
-$lez5Items = @(
-    @{ Path = "lez5_1.html"; Label = "Lez5_1: Ereditarietà: significato" },
-    @{ Path = "lez5_2.html"; Label = "Lez5_2: Sintassi della derivazione e accessi" },
-    @{ Path = "lez5_3.html"; Label = "Lez5_3: Costruttori, distruttori, ordine" },
-    @{ Path = "lez5_4.html"; Label = "Lez5_4: Object slicing" },
-    @{ Path = "lez5_5.html"; Label = "Lez5_5: Polimorfismo e virtual" },
-    @{ Path = "lez5_6.html"; Label = "Lez5_6: override, classi astratte, distruttore virtuale" },
-    @{ Path = "lez5_7.html"; Label = "Lez5_7: Casting tra base e derivata" },
-    @{ Path = "lez5_8.html"; Label = "Lez5_8: Multipla, diamond problem, buone pratiche" },
-    @{ Path = "lez5_9.html"; Label = "Lez5_9: Esercizi guidati - base" },
-    @{ Path = "lez5_10.html"; Label = "Lez5_10: Esercizi guidati - concetti e progettazione" },
-    @{ Path = "lez5_11.html"; Label = "Lez5_11: Esercizio pratico finale" }
-)
-
-$lez6Items = @(
-    @{ Path = "lez6_1.html"; Label = "Lez6_1: Alberi: significato, lessico, importanza" },
-    @{ Path = "lez6_2.html"; Label = "Lez6_2: Rappresentazione in C/C++" },
-    @{ Path = "lez6_3.html"; Label = "Lez6_3: Visite ordinate - pre, in, post" },
-    @{ Path = "lez6_4.html"; Label = "Lez6_4: DFS e BFS" },
-    @{ Path = "lez6_5.html"; Label = "Lez6_5: Le visite nel problem solving" },
-    @{ Path = "lez6_6.html"; Label = "Lez6_6: BST - proprietà e ricerca" },
-    @{ Path = "lez6_7.html"; Label = "Lez6_7: Inserimento in un BST" },
-    @{ Path = "lez6_8.html"; Label = "Lez6_8: Cancellazione in un BST" },
-    @{ Path = "lez6_9.html"; Label = "Lez6_9: Applicazioni algoritmiche dei BST" },
-    @{ Path = "lez6_10.html"; Label = "Lez6_10: Altezza, costo, degenerazione" },
-    @{ Path = "lez6_11.html"; Label = "Lez6_11: Alberi bilanciati e rotazioni" },
-    @{ Path = "lez6_12.html"; Label = "Lez6_12: Esercizi guidati" },
-    @{ Path = "lez6_13.html"; Label = "Lez6_13: Esercizio pratico finale" }
+    @{ Path = "lez3_11.html"; Label = "L3.11 - Provare scrittura e lettura" }
 )
 
 $targets = @(
@@ -288,18 +225,6 @@ $targets += @($lez2Items | ForEach-Object {
 
 $targets += @($lez3Items | ForEach-Object {
     @{ Path = "lez3/$($_.Path)"; Heading = "Lezione 3 - File I/O"; Items = $lez3Items; Active = $_.Path; ScriptSrc = "../menu.js" }
-})
-
-$targets += @($lez4Items | ForEach-Object {
-    @{ Path = "lez4/$($_.Path)"; Heading = "Lezione 4 - OOP in C++ (ripasso guidato)"; Items = $lez4Items; Active = $_.Path; ScriptSrc = "../menu.js" }
-})
-
-$targets += @($lez5Items | ForEach-Object {
-    @{ Path = "lez5/$($_.Path)"; Heading = "Lezione 5 - Ereditarietà e polimorfismo"; Items = $lez5Items; Active = $_.Path; ScriptSrc = "../menu.js" }
-})
-
-$targets += @($lez6Items | ForEach-Object {
-    @{ Path = "lez6/$($_.Path)"; Heading = "Lezione 6 - Alberi e BST"; Items = $lez6Items; Active = $_.Path; ScriptSrc = "../menu.js" }
 })
 
 foreach ($target in $targets) {

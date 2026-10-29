@@ -15,7 +15,7 @@
   </script>
 </head>
 <body class="lesson-review lesson-files">
-<div class="lesson-progress" aria-hidden="true"><span style="width:45.83%"></span></div>
+<div class="lesson-progress" aria-hidden="true"><span style="width:91.67%"></span></div>
 <!-- BEGIN MENU -->
 <button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
 <nav class="sidebar" id="menu" aria-label="Indice della lezione">
@@ -33,25 +33,13 @@
     <li><a href="lez3_9.html">L3.9 - Dalla struct al testo</a></li>
     <li><a href="lez3_10.html" class="active" aria-current="page">L3.10 - Dalla riga alla struct</a></li>
     <li><a href="lez3_11.html">L3.11 - Provare scrittura e lettura</a></li>
-    <li><a href="lez3_archivio.html">L3.A1 - Un array di studenti</a></li>
-    <li><a href="lez3_operazioni.html">L3.A2 - Aggiungere, modificare, rimuovere</a></li>
-    <li><a href="lez3_archivio_spazi.html">L3.A3 - Archivio di testo a spazi</a></li>
-    <li><a href="lez3_archivio_csv.html">L3.A4 - Archivio CSV: righe e campi</a></li>
-    <li><a href="lez3_archivio_programma.html">L3.A5 - Programma completo e collaudo</a></li>
-    <li><a href="lez3_12.html">L3.12 - Binario: un formato elementare</a></li>
-    <li><a href="lez3_blocchi.html">L3.12bis - read e write: indirizzo e byte</a></li>
-    <li><a href="lez3_13.html">L3.13 - Scrivere con write</a></li>
-    <li><a href="lez3_lettura_binaria.html">L3.13bis - Leggere con read</a></li>
-    <li><a href="lez3_14.html">L3.14 - In C: fseek e ftell</a></li>
-    <li><a href="lez3_15.html">L3.15 - seekg, seekp, tellg e tellp</a></li>
-    <li><a href="lez3_16.html">L3.16 - Laboratorio e autoverifica</a></li>
   </ul>
 </nav>
 <!-- END MENU -->
 
 <main class="slide">
   <header class="lesson-hero">
-    <p class="eyebrow">Lezione 3 · File I/O · 11/24</p>
+    <p class="eyebrow">Lezione 3 · File I/O · 11/12</p>
     <h1>Dalla riga alla struct</h1>
     <p class="lead">Prima leggiamo la riga; poi separiamo i campi; infine convertiamo i numeri e ricostruiamo la struct.</p>
   </header>
@@ -120,7 +108,16 @@ s.anno = stoi(anno);</code></pre></figure>
     <div class="solution-content">
   <p><code>ricostruisciStudente</code> riceve i tre campi già separati. <code>convertiIntero</code> usa <code>stoi</code> e restituisce l’intero ottenuto; <code>studenteValido</code> controlla matricola positiva, nome non vuoto e anno da 1 a 5. Si presuppone che il testo dei numeri sia coerente.</p>
   <p>Dopo le conversioni controlliamo i valori. Se, per esempio, l’anno è 9 oppure il nome è vuoto, la funzione restituisce <code>false</code> e lascia il risultato precedente invariato. Se i valori sono ammessi, assegniamo il candidato al risultato.</p>
-  <figure class="code-example" data-archivio="ricostruisciStudente"><figcaption>C++17 · funzione da mettere prima di main · usa i controlli forniti nel programma dell’archivio</figcaption><pre><code class="language-cpp">bool ricostruisciStudente(const string&amp; matricola, const string&amp; nome,
+  <figure class="code-example"><figcaption>C++17 · funzioni di supporto da mettere prima di ricostruisciStudente</figcaption><pre><code class="language-cpp">int convertiIntero(const string&amp; testo) {
+    // Presuppone un intero completo e rappresentabile come int.
+    return stoi(testo);
+}
+
+bool studenteValido(const Studente&amp; s) {
+    return s.matricola &gt; 0 &amp;&amp; !s.nome.empty()
+        &amp;&amp; s.anno &gt;= 1 &amp;&amp; s.anno &lt;= 5;
+}</code></pre></figure>
+  <figure class="code-example" data-archivio="ricostruisciStudente"><figcaption>C++17 · funzione da mettere prima di main · richiede le funzioni di supporto appena definite</figcaption><pre><code class="language-cpp">bool ricostruisciStudente(const string&amp; matricola, const string&amp; nome,
                          const string&amp; anno, Studente&amp; risultato) {
     Studente s;
     s.matricola = convertiIntero(matricola);
@@ -130,7 +127,7 @@ s.anno = stoi(anno);</code></pre></figure>
     risultato = s;
     return true;
 }</code></pre></figure>
-  <p>Nel <code>main</code>, dopo la separazione dei campi, la chiamata è questa. <code>Studente</code>, la funzione e le funzioni di supporto devono essere definiti prima: li trovi anche nel <a href="lez3_archivio_programma.html#programma-completo">programma completo scaricabile</a>.</p>
+  <p>Nel <code>main</code>, dopo la separazione dei campi, la chiamata è questa. Prima di main definiamo <code>Studente</code>, le due funzioni di supporto e <code>ricostruisciStudente</code>, nell’ordine mostrato in questa pagina.</p>
   <figure class="code-example" data-conversion-example="chiamata"><figcaption>C++17 · frammento da inserire dopo le tre getline · ricostruisce il record e verifica i valori ammessi</figcaption><pre><code class="language-cpp">Studente s;
 if (!ricostruisciStudente(matricola, nome, anno, s)) {
     return 2;
