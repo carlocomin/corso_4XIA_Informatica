@@ -1,0 +1,144 @@
+body.lesson-oop {
+    font-size: 19px;
+    line-height: 1.55;
+}
+
+.lesson-oop .content-box > * {
+    min-width: 0;
+}
+
+.lesson-oop .code-example pre code,
+.lesson-oop .code-example pre code.hljs {
+    display: block;
+    font-size: 18px;
+    line-height: 1.5;
+    background: #f8fbfa;
+    tab-size: 4;
+}
+
+.lesson-oop .code-example figcaption {
+    font-size: 14px;
+    letter-spacing: 0.025em;
+    text-transform: none;
+}
+
+.lesson-oop .download,
+.lesson-oop .plain-link {
+    color: #075a51;
+    font-weight: 700;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+}
+
+.lesson-oop .object-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin: 18px 0;
+}
+
+.lesson-oop .object-card {
+    min-width: 0;
+    padding: 22px;
+    border: 2px solid #76a99c;
+    border-radius: 14px;
+    background: #eef8f2;
+}
+
+.lesson-oop .object-card h3 {
+    margin: 0 0 8px;
+    color: #123f3c;
+}
+
+.lesson-oop .object-card p {
+    margin: 6px 0;
+}
+
+.lesson-oop .state-value {
+    display: block;
+    color: #075a51;
+    font-family: Georgia, Cambria, serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+}
+
+.lesson-oop .lifetime {
+    margin: 18px 0;
+    padding: 8px 20px;
+    border-left: 5px solid #087f73;
+    background: #eef8f2;
+}
+
+.lesson-oop .lifetime p {
+    padding: 6px 0;
+}
+
+.lesson-oop .sidebar {
+    width: min(320px, 85vw);
+    left: -340px;
+    background: #f8fdfa;
+    visibility: hidden;
+}
+
+.lesson-oop .sidebar.open {
+    left: 0;
+    visibility: visible;
+}
+
+.lesson-oop .sidebar a {
+    line-height: 1.35;
+}
+
+.lesson-oop .no-script-index {
+    position: static;
+    width: auto;
+    max-width: 1040px;
+    margin: 16px auto;
+    padding: 12px;
+    text-align: left;
+    color: #123f3c;
+    background: #fffdf7;
+    border: 1px solid var(--review-line);
+    border-radius: 14px;
+}
+
+.lesson-oop .no-script-index ul {
+    padding-left: 1.4rem;
+}
+
+.lesson-oop .table-wrap th,
+.lesson-oop .table-wrap td {
+    text-align: left;
+    vertical-align: top;
+}
+
+.lesson-oop .table-hint {
+    display: none;
+}
+
+.lesson-oop .table-wrap:focus-visible {
+    outline: 3px solid var(--review-sun);
+    outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+    body.lesson-oop {
+        font-size: 18px;
+    }
+
+    .lesson-oop .code-example pre code,
+    .lesson-oop .code-example pre code.hljs {
+        padding: 14px;
+        font-size: 16px;
+    }
+
+    .lesson-oop .object-pair {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .lesson-oop .table-hint {
+        display: block;
+        font-size: 0.9em;
+        color: #526968;
+    }
+}

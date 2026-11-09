@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L4.8 · Creare oggetti con dati iniziali diversi</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="lez4.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="lez4.js" defer></script>
+</head>
+<body class="lesson-review lesson-oop">
+<div class="lesson-progress" aria-hidden="true"><span style="width:53.33%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 4 - Classi e oggetti in C++</h2>
+  <ul>
+    <li><a href="lez4_1.html">L4.1 - Dai dati alle operazioni</a></li>
+    <li><a href="lez4_2.html">L4.2 - Una classe, più oggetti</a></li>
+    <li><a href="lez4_3.html">L4.3 - Il primo programma completo</a></li>
+    <li><a href="lez4_4.html">L4.4 - Interfaccia pubblica e dati privati</a></li>
+    <li><a href="lez4_5.html">L4.5 - Un metodo riceve dati e restituisce un risultato</a></li>
+    <li><a href="lez4_6.html">L4.6 - Rispettare le regole anche in caso di errore</a></li>
+    <li><a href="lez4_7.html">L4.7 - Il costruttore stabilisce lo stato iniziale</a></li>
+    <li><a href="lez4_8.html" class="active" aria-current="page">L4.8 - Creare oggetti con dati iniziali diversi</a></li>
+    <li><a href="lez4_9.html">L4.9 - Consultare senza modificare: i metodi const</a></li>
+    <li><a href="lez4_10.html">L4.10 - Copiare un oggetto</a></li>
+    <li><a href="lez4_11.html">L4.11 - Passare un oggetto a una funzione</a></li>
+    <li><a href="lez4_12.html">L4.12 - Quando un oggetto nasce e quando termina</a></li>
+    <li><a href="lez4_13.html">L4.13 - Un array contiene più oggetti</a></li>
+    <li><a href="lez4_14.html">L4.14 - Dalla consegna a una nuova classe</a></li>
+    <li><a href="lez4_15.html">L4.15 - Laboratorio e autoverifica</a></li>
+    <li><a href="lez4_inizializzazione.html">Approfondimento A1 - Inizializzare i membri con una lista</a></li>
+    <li><a href="lez4_metodi_esterni.html">Approfondimento A2 - Definire i metodi fuori dalla classe</a></li>
+    <li><a href="lez4_progetto.html">Approfondimento A3 - Un progetto in tre file</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 4: indice</strong><ul><li><a href="lez4_1.html">L4.1 - Dai dati alle operazioni</a></li><li><a href="lez4_2.html">L4.2 - Una classe, più oggetti</a></li><li><a href="lez4_3.html">L4.3 - Il primo programma completo</a></li><li><a href="lez4_4.html">L4.4 - Interfaccia pubblica e dati privati</a></li><li><a href="lez4_5.html">L4.5 - Un metodo riceve dati e restituisce un risultato</a></li><li><a href="lez4_6.html">L4.6 - Rispettare le regole anche in caso di errore</a></li><li><a href="lez4_7.html">L4.7 - Il costruttore stabilisce lo stato iniziale</a></li><li><a href="lez4_8.html">L4.8 - Creare oggetti con dati iniziali diversi</a></li><li><a href="lez4_9.html">L4.9 - Consultare senza modificare: i metodi const</a></li><li><a href="lez4_10.html">L4.10 - Copiare un oggetto</a></li><li><a href="lez4_11.html">L4.11 - Passare un oggetto a una funzione</a></li><li><a href="lez4_12.html">L4.12 - Quando un oggetto nasce e quando termina</a></li><li><a href="lez4_13.html">L4.13 - Un array contiene più oggetti</a></li><li><a href="lez4_14.html">L4.14 - Dalla consegna a una nuova classe</a></li><li><a href="lez4_15.html">L4.15 - Laboratorio e autoverifica</a></li><li><a href="lez4_inizializzazione.html">Approfondimento A1 - Inizializzare i membri con una lista</a></li><li><a href="lez4_metodi_esterni.html">Approfondimento A2 - Definire i metodi fuori dalla classe</a></li><li><a href="lez4_progetto.html">Approfondimento A3 - Un progetto in tre file</a></li></ul></nav><style>.lesson-oop .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 4 · Classi e oggetti · 8/15</p><h1>Creare oggetti con dati iniziali diversi</h1><p class="lead">Un parametro del costruttore permette di scegliere lo stato di partenza.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez4_7.html">&#8592; Precedente</a><a class="nav-button primary" href="lez4_9.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+<section class="topic-card"><h2>Due costruttori, parametri diversi</h2><p>Conserviamo il costruttore senza argomenti e ne aggiungiamo uno che riceve un intero. Il compilatore sceglie quale eseguire in base agli argomenti forniti. Definire più funzioni con lo stesso nome ma parametri diversi si chiama <strong>overload</strong>.</p>
+<figure class="code-example" ><figcaption>Frammento: i due costruttori nella parte public</figcaption><pre><code class="language-cpp">    Batteria() {
+        livello = 0;
+    }
+
+    Batteria(int iniziale) {
+        livello = 0;
+        if (iniziale &gt;= 0 &amp;&amp; iniziale &lt;= 100) {
+            livello = iniziale;
+        }
+    }</code></pre></figure>
+<p>Accettiamo livelli iniziali da 0 a 100; con un parametro fuori intervallo lasciamo il livello a 0. È una scelta del nostro modello, non una regola del C++. Il costruttore non può restituire <code>false</code> per segnalare il rifiuto.</p></section><section class="topic-card"><h2>Leggi la dichiarazione, poi scegli il costruttore</h2><figure class="code-example" ><figcaption>Main completo: quattro creazioni</figcaption><pre><code class="language-cpp">int main() {
+    Batteria a;
+    Batteria b(40);
+    Batteria c(100);
+    Batteria d(150);
+    cout &lt;&lt; a.leggiLivello() &lt;&lt; &quot;\n&quot;;
+    cout &lt;&lt; b.leggiLivello() &lt;&lt; &quot;\n&quot;;
+    cout &lt;&lt; c.leggiLivello() &lt;&lt; &quot;\n&quot;;
+    cout &lt;&lt; d.leggiLivello() &lt;&lt; &quot;\n&quot;;
+    return 0;
+}</code></pre></figure>
+<p>L'output è 0, 40, 100 e 0, su quattro righe. <code>a</code> usa il costruttore senza argomenti; le altre batterie quello con parametro.</p><p>Se scriviamo soltanto il costruttore con parametro, il compilatore non aggiunge automaticamente anche quello senza argomenti. Nella nostra classe li dichiariamo entrambi.</p><p><a class="download" href="esempi/05_costruttori.cpp" download>Scarica il programma completo (.cpp)</a></p></section><section class="exercise-card"><span class="exercise-label">Prova tu</span><h2>Prevedi prima di provare</h2><div class="exercise-prompt"><p>Quali livelli avranno <code>Batteria x(0);</code>, <code>Batteria y(-1);</code> e <code>Batteria z(75);</code>? Perché inizializziamo a 0 prima del controllo?</p></div><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>I livelli saranno 0, 0 e 75. Assegnando 0 prima del controllo, diamo al campo un valore valido anche quando il parametro è fuori intervallo.</p></div></details></section>
+
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez4_7.html">&#8592; Precedente</a><a class="nav-button primary" href="lez4_9.html">Successiva &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>

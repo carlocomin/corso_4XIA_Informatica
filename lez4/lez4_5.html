@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L4.5 · Un metodo riceve dati e restituisce un risultato</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="lez4.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="lez4.js" defer></script>
+</head>
+<body class="lesson-review lesson-oop">
+<div class="lesson-progress" aria-hidden="true"><span style="width:33.33%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 4 - Classi e oggetti in C++</h2>
+  <ul>
+    <li><a href="lez4_1.html">L4.1 - Dai dati alle operazioni</a></li>
+    <li><a href="lez4_2.html">L4.2 - Una classe, più oggetti</a></li>
+    <li><a href="lez4_3.html">L4.3 - Il primo programma completo</a></li>
+    <li><a href="lez4_4.html">L4.4 - Interfaccia pubblica e dati privati</a></li>
+    <li><a href="lez4_5.html" class="active" aria-current="page">L4.5 - Un metodo riceve dati e restituisce un risultato</a></li>
+    <li><a href="lez4_6.html">L4.6 - Rispettare le regole anche in caso di errore</a></li>
+    <li><a href="lez4_7.html">L4.7 - Il costruttore stabilisce lo stato iniziale</a></li>
+    <li><a href="lez4_8.html">L4.8 - Creare oggetti con dati iniziali diversi</a></li>
+    <li><a href="lez4_9.html">L4.9 - Consultare senza modificare: i metodi const</a></li>
+    <li><a href="lez4_10.html">L4.10 - Copiare un oggetto</a></li>
+    <li><a href="lez4_11.html">L4.11 - Passare un oggetto a una funzione</a></li>
+    <li><a href="lez4_12.html">L4.12 - Quando un oggetto nasce e quando termina</a></li>
+    <li><a href="lez4_13.html">L4.13 - Un array contiene più oggetti</a></li>
+    <li><a href="lez4_14.html">L4.14 - Dalla consegna a una nuova classe</a></li>
+    <li><a href="lez4_15.html">L4.15 - Laboratorio e autoverifica</a></li>
+    <li><a href="lez4_inizializzazione.html">Approfondimento A1 - Inizializzare i membri con una lista</a></li>
+    <li><a href="lez4_metodi_esterni.html">Approfondimento A2 - Definire i metodi fuori dalla classe</a></li>
+    <li><a href="lez4_progetto.html">Approfondimento A3 - Un progetto in tre file</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 4: indice</strong><ul><li><a href="lez4_1.html">L4.1 - Dai dati alle operazioni</a></li><li><a href="lez4_2.html">L4.2 - Una classe, più oggetti</a></li><li><a href="lez4_3.html">L4.3 - Il primo programma completo</a></li><li><a href="lez4_4.html">L4.4 - Interfaccia pubblica e dati privati</a></li><li><a href="lez4_5.html">L4.5 - Un metodo riceve dati e restituisce un risultato</a></li><li><a href="lez4_6.html">L4.6 - Rispettare le regole anche in caso di errore</a></li><li><a href="lez4_7.html">L4.7 - Il costruttore stabilisce lo stato iniziale</a></li><li><a href="lez4_8.html">L4.8 - Creare oggetti con dati iniziali diversi</a></li><li><a href="lez4_9.html">L4.9 - Consultare senza modificare: i metodi const</a></li><li><a href="lez4_10.html">L4.10 - Copiare un oggetto</a></li><li><a href="lez4_11.html">L4.11 - Passare un oggetto a una funzione</a></li><li><a href="lez4_12.html">L4.12 - Quando un oggetto nasce e quando termina</a></li><li><a href="lez4_13.html">L4.13 - Un array contiene più oggetti</a></li><li><a href="lez4_14.html">L4.14 - Dalla consegna a una nuova classe</a></li><li><a href="lez4_15.html">L4.15 - Laboratorio e autoverifica</a></li><li><a href="lez4_inizializzazione.html">Approfondimento A1 - Inizializzare i membri con una lista</a></li><li><a href="lez4_metodi_esterni.html">Approfondimento A2 - Definire i metodi fuori dalla classe</a></li><li><a href="lez4_progetto.html">Approfondimento A3 - Un progetto in tre file</a></li></ul></nav><style>.lesson-oop .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 4 · Classi e oggetti · 5/15</p><h1>Un metodo riceve dati e restituisce un risultato</h1><p class="lead">La quantità è un parametro. L’esito dice se la richiesta è stata accettata.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez4_4.html">&#8592; Precedente</a><a class="nav-button primary" href="lez4_6.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+<section class="topic-card"><h2>Consumare solo l’energia disponibile</h2><p><code>consuma</code> riceve una quantità intera. Se è positiva e non supera il livello, la sottrae e restituisce <code>true</code>. Negli altri casi restituisce <code>false</code> senza modificare il livello.</p>
+<figure class="code-example" ><figcaption>Frammento da aggiungere nella parte public della classe</figcaption><pre><code class="language-cpp">    bool consuma(int quantita) {
+        if (quantita &lt;= 0 || quantita &gt; livello) {
+            return false;
+        }
+        livello = livello - quantita;
+        return true;
+    }</code></pre></figure>
+<p><code>return</code> termina la chiamata: quando il controllo rifiuta la richiesta, la sottrazione non viene eseguita. Il livello modificato è quello dell'oggetto su cui abbiamo chiamato il metodo.</p></section><section class="topic-card"><h2>Il risultato non è il nuovo livello</h2><figure class="code-example" ><figcaption>Main completo da usare con la classe aggiornata</figcaption><pre><code class="language-cpp">int main() {
+    Batteria b;
+    b.caricaCompleta();
+
+    bool esito = b.consuma(60);
+    cout &lt;&lt; esito &lt;&lt; &quot; &quot; &lt;&lt; b.leggiLivello() &lt;&lt; &quot;\n&quot;;
+    esito = b.consuma(70);
+    cout &lt;&lt; esito &lt;&lt; &quot; &quot; &lt;&lt; b.leggiLivello() &lt;&lt; &quot;\n&quot;;
+    return 0;
+}</code></pre></figure>
+<p>L'output è <code>1 40</code>, poi <code>0 40</code>. Il primo numero è l'esito, stampato come 1 per <code>true</code> e 0 per <code>false</code>; il secondo è il livello. Il consumo di 60 riesce e lascia 40. Quello di 70 viene rifiutato perché l'energia rimasta non basta.</p><p><a class="download" href="esempi/02_consuma.cpp" download>Scarica il programma completo (.cpp)</a></p></section><section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Quando consuma restituisce false, il livello diventa 0?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>No. <code>false</code> è un risultato booleano, non un’assegnazione al livello. La richiesta è rifiutata e il livello resta quello precedente: nell’esempio 40.</p></div></details></section><section class="exercise-card"><span class="exercise-label">Prova tu</span><h2>Un messaggio soltanto in caso di rifiuto</h2><div class="exercise-prompt"><p>Supponi che <code>b</code> abbia livello 40. Scrivi una chiamata che prova a consumare 50 e stampa «Consumo rifiutato» solo se non riesce. Quale livello resta?</p></div><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><figure class="code-example" ><figcaption>Frammento nel main: ! significa «non»</figcaption><pre><code class="language-cpp">if (!b.consuma(50)) {
+    cout &lt;&lt; &quot;Consumo rifiutato\n&quot;;
+}</code></pre></figure><p>La condizione è vera quando il metodo restituisce <code>false</code>. Il livello resta 40.</p></div></details></section>
+
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez4_4.html">&#8592; Precedente</a><a class="nav-button primary" href="lez4_6.html">Successiva &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>

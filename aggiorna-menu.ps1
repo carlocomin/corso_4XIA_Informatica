@@ -125,7 +125,8 @@ $rootItems = @(
     @{ Path = "lez0/lez0_1.html"; Label = "Lezione 0: Array, funzioni e parametri" },
     @{ Path = "lez1/lez1_1.html"; Label = "Lezione 1: Matrici 2D in C/C++" },
     @{ Path = "lez2/lez2_1.html"; Label = "Lezione 2: Struct in C/C++" },
-    @{ Path = "lez3/lez3_1.html"; Label = "Lezione 3: File I/O in C/C++" }
+    @{ Path = "lez3/lez3_1.html"; Label = "Lezione 3: File I/O in C/C++" },
+    @{ Path = "lez4/lez4_1.html"; Label = "Lezione 4: Classi e oggetti in C++" }
 )
 
 $lez0Items = @(
@@ -204,6 +205,27 @@ $lez3Items = @(
     @{ Path = "lez3_11.html"; Label = "L3.11 - Provare scrittura e lettura" }
 )
 
+$lez4Items = @(
+    @{ Path = "lez4_1.html"; Label = "L4.1 - Dai dati alle operazioni" },
+    @{ Path = "lez4_2.html"; Label = "L4.2 - Una classe, più oggetti" },
+    @{ Path = "lez4_3.html"; Label = "L4.3 - Il primo programma completo" },
+    @{ Path = "lez4_4.html"; Label = "L4.4 - Interfaccia pubblica e dati privati" },
+    @{ Path = "lez4_5.html"; Label = "L4.5 - Un metodo riceve dati e restituisce un risultato" },
+    @{ Path = "lez4_6.html"; Label = "L4.6 - Rispettare le regole anche in caso di errore" },
+    @{ Path = "lez4_7.html"; Label = "L4.7 - Il costruttore stabilisce lo stato iniziale" },
+    @{ Path = "lez4_8.html"; Label = "L4.8 - Creare oggetti con dati iniziali diversi" },
+    @{ Path = "lez4_9.html"; Label = "L4.9 - Consultare senza modificare: i metodi const" },
+    @{ Path = "lez4_10.html"; Label = "L4.10 - Copiare un oggetto" },
+    @{ Path = "lez4_11.html"; Label = "L4.11 - Passare un oggetto a una funzione" },
+    @{ Path = "lez4_12.html"; Label = "L4.12 - Quando un oggetto nasce e quando termina" },
+    @{ Path = "lez4_13.html"; Label = "L4.13 - Un array contiene più oggetti" },
+    @{ Path = "lez4_14.html"; Label = "L4.14 - Dalla consegna a una nuova classe" },
+    @{ Path = "lez4_15.html"; Label = "L4.15 - Laboratorio e autoverifica" },
+    @{ Path = "lez4_inizializzazione.html"; Label = "Approfondimento A1 - Inizializzare i membri con una lista" },
+    @{ Path = "lez4_metodi_esterni.html"; Label = "Approfondimento A2 - Definire i metodi fuori dalla classe" },
+    @{ Path = "lez4_progetto.html"; Label = "Approfondimento A3 - Un progetto in tre file" }
+)
+
 $targets = @(
     @{ Path = "index.html"; Heading = "Menu Lezioni"; Items = $rootItems; Active = ""; ScriptSrc = "menu.js" },
     @{ Path = "programma.html"; Heading = "Menu Lezioni"; Items = $rootItems; Active = ""; ScriptSrc = "menu.js" },
@@ -225,6 +247,10 @@ $targets += @($lez2Items | ForEach-Object {
 
 $targets += @($lez3Items | ForEach-Object {
     @{ Path = "lez3/$($_.Path)"; Heading = "Lezione 3 - File I/O"; Items = $lez3Items; Active = $_.Path; ScriptSrc = "../menu.js" }
+})
+
+$targets += @($lez4Items | ForEach-Object {
+    @{ Path = "lez4/$($_.Path)"; Heading = "Lezione 4 - Classi e oggetti in C++"; Items = $lez4Items; Active = $_.Path; ScriptSrc = "../menu.js" }
 })
 
 foreach ($target in $targets) {

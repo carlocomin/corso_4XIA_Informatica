@@ -45,7 +45,7 @@
   </header>
   <nav class="nav-buttons" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_10.html">&#8592; Precedente</a>
-    <a class="nav-button primary" href="../programma.html">Programma del corso &#8594;</a>
+    <a class="nav-button primary" href="../lez4/lez4_1.html">Lezione 4 &#8594;</a>
   </nav>
   <div class="content-box">
 <section class="concept-card"><h2>Il file serve a ritrovare gli stessi dati</h2><p><strong>Idea chiave:</strong> una stampa corretta non dimostra che il salvataggio funzioni. Dobbiamo rileggere il file, possibilmente in una nuova esecuzione.</p></section>
@@ -56,11 +56,11 @@
 <section class="topic-card"><h2>Un limite da sapere</h2><p>Nel CSV presupponiamo campi numerici scritti correttamente e rappresentabili in <code>int</code>. I controlli sulla forma del testo numerico sono omessi: per queste prove usiamo numeri coerenti, anche quando verifichiamo un valore fuori intervallo come anno 9.</p><p>Il nostro CSV usa <code>;</code> e nomi senza separatori, virgolette o fine riga. Per file con regole diverse occorre adattare il lettore: non basta che il nome finisca in <code>.csv</code>.</p><p>In laboratorio mantieni sorgenti e dati in UTF-8, così i nomi accentati restano leggibili. I dettagli di compatibilità tra editor e sistemi non sono l’obiettivo di questi esercizi.</p></section>
 <section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Il programma mostra i dati dopo una modifica: basta per dire che sono stati salvati?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>No. La stampa può mostrare soltanto l’array in memoria. Salvo, termino, riavvio e ricarico: se ritrovo gli stessi dati, ho verificato anche il file.</p></div></details></section>
 <section class="exercise-card"><span class="exercise-label">Progetta una prova</span><h2>Tre errori, tre risultati attesi</h2><p>Per il formato <code>matricola;nome;anno</code>, scrivi una riga corretta e tre righe errate. Per ognuna indica prima dell’esecuzione che cosa dovrebbe fare il lettore.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Esempio corretto: <code>1001;Ada Lovelace;4</code>. Esempi errati: <code>1001;;4</code> (nome vuoto), <code>0;Ada;4</code> (matricola non positiva), <code>1001;Ada;9</code> (anno fuori intervallo). Un lettore che applica le regole sui valori deve accettare il primo e rifiutare gli altri. La separazione dei campi e la conversione dei numeri, da sole, non bastano a riconoscere questi errori: servono anche i controlli sui valori.</p></div></details></section>
-<aside class="next-step"><strong>Fine del materiale attualmente disponibile.</strong> Riprendi gli esempi e il laboratorio sui file di testo. Troverai i nuovi materiali nel programma del corso quando saranno disponibili.</aside>
+<aside class="next-step"><strong>Prossima lezione.</strong> Le classi permettono di riunire dati e operazioni, controllando gli accessi allo stato degli oggetti.</aside>
   </div>
   <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide">
     <a class="nav-button" href="lez3_10.html">&#8592; Precedente</a>
-    <a class="nav-button primary" href="../programma.html">Programma del corso &#8594;</a>
+    <a class="nav-button primary" href="../lez4/lez4_1.html">Lezione 4 &#8594;</a>
   </nav>
 </main>
 </body>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L4.1 · Dai dati alle operazioni</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="lez4.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="lez4.js" defer></script>
+</head>
+<body class="lesson-review lesson-oop">
+<div class="lesson-progress" aria-hidden="true"><span style="width:6.67%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 4 - Classi e oggetti in C++</h2>
+  <ul>
+    <li><a href="lez4_1.html" class="active" aria-current="page">L4.1 - Dai dati alle operazioni</a></li>
+    <li><a href="lez4_2.html">L4.2 - Una classe, più oggetti</a></li>
+    <li><a href="lez4_3.html">L4.3 - Il primo programma completo</a></li>
+    <li><a href="lez4_4.html">L4.4 - Interfaccia pubblica e dati privati</a></li>
+    <li><a href="lez4_5.html">L4.5 - Un metodo riceve dati e restituisce un risultato</a></li>
+    <li><a href="lez4_6.html">L4.6 - Rispettare le regole anche in caso di errore</a></li>
+    <li><a href="lez4_7.html">L4.7 - Il costruttore stabilisce lo stato iniziale</a></li>
+    <li><a href="lez4_8.html">L4.8 - Creare oggetti con dati iniziali diversi</a></li>
+    <li><a href="lez4_9.html">L4.9 - Consultare senza modificare: i metodi const</a></li>
+    <li><a href="lez4_10.html">L4.10 - Copiare un oggetto</a></li>
+    <li><a href="lez4_11.html">L4.11 - Passare un oggetto a una funzione</a></li>
+    <li><a href="lez4_12.html">L4.12 - Quando un oggetto nasce e quando termina</a></li>
+    <li><a href="lez4_13.html">L4.13 - Un array contiene più oggetti</a></li>
+    <li><a href="lez4_14.html">L4.14 - Dalla consegna a una nuova classe</a></li>
+    <li><a href="lez4_15.html">L4.15 - Laboratorio e autoverifica</a></li>
+    <li><a href="lez4_inizializzazione.html">Approfondimento A1 - Inizializzare i membri con una lista</a></li>
+    <li><a href="lez4_metodi_esterni.html">Approfondimento A2 - Definire i metodi fuori dalla classe</a></li>
+    <li><a href="lez4_progetto.html">Approfondimento A3 - Un progetto in tre file</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 4: indice</strong><ul><li><a href="lez4_1.html">L4.1 - Dai dati alle operazioni</a></li><li><a href="lez4_2.html">L4.2 - Una classe, più oggetti</a></li><li><a href="lez4_3.html">L4.3 - Il primo programma completo</a></li><li><a href="lez4_4.html">L4.4 - Interfaccia pubblica e dati privati</a></li><li><a href="lez4_5.html">L4.5 - Un metodo riceve dati e restituisce un risultato</a></li><li><a href="lez4_6.html">L4.6 - Rispettare le regole anche in caso di errore</a></li><li><a href="lez4_7.html">L4.7 - Il costruttore stabilisce lo stato iniziale</a></li><li><a href="lez4_8.html">L4.8 - Creare oggetti con dati iniziali diversi</a></li><li><a href="lez4_9.html">L4.9 - Consultare senza modificare: i metodi const</a></li><li><a href="lez4_10.html">L4.10 - Copiare un oggetto</a></li><li><a href="lez4_11.html">L4.11 - Passare un oggetto a una funzione</a></li><li><a href="lez4_12.html">L4.12 - Quando un oggetto nasce e quando termina</a></li><li><a href="lez4_13.html">L4.13 - Un array contiene più oggetti</a></li><li><a href="lez4_14.html">L4.14 - Dalla consegna a una nuova classe</a></li><li><a href="lez4_15.html">L4.15 - Laboratorio e autoverifica</a></li><li><a href="lez4_inizializzazione.html">Approfondimento A1 - Inizializzare i membri con una lista</a></li><li><a href="lez4_metodi_esterni.html">Approfondimento A2 - Definire i metodi fuori dalla classe</a></li><li><a href="lez4_progetto.html">Approfondimento A3 - Un progetto in tre file</a></li></ul></nav><style>.lesson-oop .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 4 · Classi e oggetti · 1/15</p><h1>Dai dati alle operazioni</h1><p class="lead">Il compilatore controlla il tipo del dato, non le regole della batteria.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="../lez3/lez3_11.html">&#8592; Precedente</a><a class="nav-button primary" href="lez4_2.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+<section class="topic-card"><h2>Una batteria non può avere il 150% di carica</h2><p>Rappresentiamo la carica di un piccolo robot con un livello intero da 0 a 100. Possiamo memorizzarlo in una <code>struct</code>, ma dobbiamo controllare i valori che gli assegniamo.</p>
+<figure class="code-example" ><figcaption>Frammento: compila, ma l’ultima assegnazione viola il modello</figcaption><pre><code class="language-cpp">struct Batteria {
+    int livello;
+};
+
+// Dentro il main:
+Batteria b;
+b.livello = 40;
+b.livello = 150;</code></pre></figure>
+<p><code>150</code> è rappresentabile in un <code>int</code>: il compilatore non conosce le regole della nostra batteria. L'errore è nel significato del dato, non nella sintassi.</p></section><section class="topic-card"><h2>Le modifiche devono passare dai controlli</h2><p>Una funzione può controllare il livello prima di cambiarlo, ma finché il campo è pubblico altro codice può aggirarla con <code>b.livello = 150;</code>. Vogliamo che ogni modifica passi dalle operazioni previste: caricare e consumare.</p><p>Una <strong>classe</strong> riunisce dati e operazioni. Può impedire gli accessi diretti dall'esterno, così le modifiche passano soltanto dai controlli che scriviamo al suo interno.</p></section><section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>L’istruzione b.livello = 150 dà necessariamente un errore di compilazione?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>No. Nella struct mostrata il campo è pubblico e 150 è un valore valido per <code>int</code>. È però fuori dall'intervallo scelto per rappresentare la batteria.</p></div></details></section><section class="exercise-card"><span class="exercise-label">Prova tu</span><h2>Individua la regola</h2><div class="exercise-prompt"><p>Una temperatura è memorizzata in un <code>int</code>. Possiamo decidere se 150 è un valore corretto senza conoscere il problema? Spiega la differenza rispetto alla percentuale della batteria.</p></div><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>No: dipende da cosa misuriamo e dalle regole del problema. Per la batteria abbiamo fissato l’intervallo 0–100; per una temperatura dobbiamo prima specificare unità di misura e valori ammessi.</p></div></details></section>
+
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="../lez3/lez3_11.html">&#8592; Precedente</a><a class="nav-button primary" href="lez4_2.html">Successiva &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>
