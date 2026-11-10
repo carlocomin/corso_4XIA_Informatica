@@ -221,9 +221,9 @@ $lez4Items = @(
     @{ Path = "lez4_13.html"; Label = "L4.13 - Un array contiene più oggetti" },
     @{ Path = "lez4_14.html"; Label = "L4.14 - Dalla consegna a una nuova classe" },
     @{ Path = "lez4_15.html"; Label = "L4.15 - Laboratorio e autoverifica" },
-    @{ Path = "lez4_inizializzazione.html"; Label = "Approfondimento A1 - Inizializzare i membri con una lista" },
-    @{ Path = "lez4_metodi_esterni.html"; Label = "Approfondimento A2 - Definire i metodi fuori dalla classe" },
-    @{ Path = "lez4_progetto.html"; Label = "Approfondimento A3 - Un progetto in tre file" }
+    @{ Path = "lez4_inizializzazione.html"; Label = "L4.16 - Inizializzare i membri con una lista" },
+    @{ Path = "lez4_metodi_esterni.html"; Label = "L4.17 - Definire i metodi fuori dalla classe" },
+    @{ Path = "lez4_progetto.html"; Label = "L4.18 - Un progetto in tre file" }
 )
 
 $targets = @(
