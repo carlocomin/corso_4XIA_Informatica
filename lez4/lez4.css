@@ -62,6 +62,27 @@ body.lesson-oop {
     font-weight: 700;
 }
 
+.lesson-oop .oop-principles {
+    align-items: stretch;
+}
+
+.lesson-oop .oop-principles article {
+    padding: 18px;
+    border-top: 4px solid var(--review-teal);
+    border-radius: 10px;
+    background: #eef8f2;
+}
+
+.lesson-oop .oop-principles h3 {
+    margin: 0 0 8px;
+    font-size: 1.2em;
+}
+
+.lesson-oop .oop-principles .future-principle {
+    border-top-color: var(--review-sun);
+    background: #fff8e7;
+}
+
 .lesson-oop .lifetime {
     margin: 18px 0;
     padding: 8px 20px;

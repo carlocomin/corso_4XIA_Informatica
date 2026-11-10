@@ -209,7 +209,7 @@ $lez4Items = @(
     @{ Path = "lez4_1.html"; Label = "L4.1 - Dai dati alle operazioni" },
     @{ Path = "lez4_2.html"; Label = "L4.2 - Una classe, più oggetti" },
     @{ Path = "lez4_3.html"; Label = "L4.3 - Il primo programma completo" },
-    @{ Path = "lez4_4.html"; Label = "L4.4 - Interfaccia pubblica e dati privati" },
+    @{ Path = "lez4_4.html"; Label = "L4.4 - Astrazione e incapsulamento" },
     @{ Path = "lez4_5.html"; Label = "L4.5 - Un metodo riceve dati e restituisce un risultato" },
     @{ Path = "lez4_6.html"; Label = "L4.6 - Rispettare le regole anche in caso di errore" },
     @{ Path = "lez4_7.html"; Label = "L4.7 - Il costruttore stabilisce lo stato iniziale" },
