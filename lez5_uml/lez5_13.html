@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L5.13 · Laboratorio: i prestiti dei tablet</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="uml.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="uml.js" defer></script>
+</head>
+<body class="lesson-review lesson-uml">
+<div class="lesson-progress" aria-hidden="true"><span style="width:65.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 5 - UML e diagramma delle classi</h2>
+  <ul>
+    <li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+    <li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+    <li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+    <li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+    <li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+    <li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+    <li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+    <li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+    <li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+    <li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+    <li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+    <li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+    <li><a href="lez5_13.html" class="active" aria-current="page">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+    <li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+    <li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+    <li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+    <li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+    <li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+    <li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+    <li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 5: indice</strong><ul><li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+<li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+<li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+<li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+<li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+<li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+<li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+<li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+<li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+<li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+<li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+<li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+<li><a href="lez5_13.html" class="active" aria-current="page">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+<li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+<li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+<li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+<li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+<li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+<li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+<li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li></ul></nav><style>.lesson-uml .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 5 · UML e diagramma delle classi · 13/20</p><h1>Laboratorio: i prestiti dei tablet</h1><p class="lead">Quando un collegamento ha dati propri, può diventare un’entità del modello.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_12.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_14.html">Approfondimento &#8594;</a></nav>
+  <div class="content-box">
+<section class="topic-card" id="laboratorio"><h2>5. Dal testo al diagramma · Intermedio avanzato</h2><div class="exercise-prompt" id="consegna-laboratorio"><p>Il laboratorio presta tablet agli studenti. Si registrano matricola e nome dello studente, codice e modello del tablet e data di inizio di ciascun prestito. <strong>L’archivio contiene soltanto prestiti in corso</strong>: alla restituzione il prestito viene rimosso, senza conservare lo storico.</p><p>Uno studente può avere da zero a due prestiti in corso. Un tablet può essere libero oppure essere coinvolto in un prestito solo. Ogni prestito riguarda esattamente uno studente e un tablet.</p><p>Individua le classi e gli attributi; disegna le associazioni con le molteplicità a entrambi gli estremi. Decidi dove collocare la data e verifica il modello con due studenti e tre tablet. Non sono richiesti codice C++ o algoritmi di gestione dei prestiti.</p></div></section><section class="topic-card"><h2>Procedimento di lavoro</h2><ol><li>Elenca le informazioni che devono essere conservate, senza scegliere ancora i contenitori C++.</li><li>Separa le entità e assegna a ciascuna i dati che la descrivono.</li><li>Leggi ogni associazione in entrambi i sensi, fissando ogni volta un solo oggetto.</li><li>Costruisci un esempio valido e due esempi vietati. Spiega quale regola rifiuta ciascun caso.</li></ol><p>Indicazione di tempo: circa 45–60 minuti per analisi, disegno e confronto a coppie. Il confronto serve a discutere il modello, non a ottenere disegni graficamente identici.</p></section><section class="exercise-card" id="soluzione-laboratorio"><h2>Confronta il tuo modello</h2><p>Prima di aprire, controlla: hai distinto i dati dello studente da quelli del tablet? La data cambia da un prestito all’altro? Hai rappresentato anche tablet liberi e studenti senza prestiti?</p><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><div class="class-grid"><div class="uml-class" role="group" aria-label="Classe Studente"><h3>Studente</h3><div class="compartment"><div>matricola: String</div><div>nome: String</div></div></div><div class="uml-class" role="group" aria-label="Classe Tablet"><h3>Tablet</h3><div class="compartment"><div>codice: String</div><div>modello: String</div></div></div></div><div class="uml-class" role="group" aria-label="Classe Prestito"><h3>Prestito</h3><div class="compartment"><div>dataInizio: String</div></div></div><figure class="diagram"><div class="diagram-scroll" tabindex="0" role="region" aria-label="Diagramma: Ogni prestito riguarda uno studente; ogni studente ha da zero a due prestiti in corso."><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 210" role="img" aria-labelledby="uml-diagram-7-title uml-diagram-7-desc"><title id="uml-diagram-7-title">Studente e Prestito</title><desc id="uml-diagram-7-desc">Ogni prestito riguarda uno studente; ogni studente ha da zero a due prestiti in corso.</desc><rect x="30" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><rect x="630" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><text x="150" y="119" text-anchor="middle">Studente</text><text x="750" y="119" text-anchor="middle">Prestito</text><line x1="270" y1="110" x2="630" y2="110" stroke="#173e38" stroke-width="3"/><text class="relation-label" x="450" y="76" text-anchor="middle">effettua</text><text class="multiplicity" x="282" y="146">1</text><text class="multiplicity" x="618" y="146" text-anchor="end">0..2</text></svg></div><figcaption>Ogni prestito riguarda uno studente; ogni studente ha da zero a due prestiti in corso.</figcaption><p class="scroll-hint">Su uno schermo stretto puoi scorrere il diagramma orizzontalmente.</p></figure><figure class="diagram"><div class="diagram-scroll" tabindex="0" role="region" aria-label="Diagramma: Ogni prestito riguarda un tablet; ogni tablet ha zero o un prestito in corso."><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 210" role="img" aria-labelledby="uml-diagram-8-title uml-diagram-8-desc"><title id="uml-diagram-8-title">Tablet e Prestito</title><desc id="uml-diagram-8-desc">Ogni prestito riguarda un tablet; ogni tablet ha zero o un prestito in corso.</desc><rect x="30" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><rect x="630" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><text x="150" y="119" text-anchor="middle">Tablet</text><text x="750" y="119" text-anchor="middle">Prestito</text><line x1="270" y1="110" x2="630" y2="110" stroke="#173e38" stroke-width="3"/><text class="relation-label" x="450" y="76" text-anchor="middle">è coinvolto in</text><text class="multiplicity" x="282" y="146">1</text><text class="multiplicity" x="618" y="146" text-anchor="end">0..1</text></svg></div><figcaption>Ogni prestito riguarda un tablet; ogni tablet ha zero o un prestito in corso.</figcaption><p class="scroll-hint">Su uno schermo stretto puoi scorrere il diagramma orizzontalmente.</p></figure><p><code>Prestito</code> è una classe ordinaria che collega studente e tablet e conserva la data. Una sola data dentro <code>Studente</code> non basta, perché può avere due prestiti iniziati in giorni diversi. Una classe separata raccoglie il fatto del prestito senza confonderlo con le caratteristiche del tablet.</p><p>Per questo esercizio rappresentiamo la data come stringa nel formato AAAA-MM-GG; non stiamo studiando un tipo calendario. I due diagrammi di associazione mostrano la <strong>stessa</strong> classe <code>Prestito</code>, ripetuta solo per rendere leggibili i due legami.</p><p>Esempio valido: un prestito collega S1 a T1 dal 5 ottobre, un altro collega S1 a T2 dal 7 ottobre. S2 non ha prestiti e T3 è libero. Le due date descrivono i due prestiti, non lo studente. Un terzo prestito per S1 viola <code>0..2</code>; due prestiti distinti sullo stesso T1 violano <code>0..1</code>. Non trasformare le molteplicità in <code>0..*</code> per includere lo storico: lo storico è escluso dalla consegna.</p><p><strong>Alternativa ammessa:</strong> se interessa solo il presente, anche un legame diretto Studente–Tablet può bastare: <code>0..1</code> vicino a Studente, <code>0..2</code> vicino a Tablet. In tal caso il tablet conserva la data solo finché è in prestito.</p></div></details></section><section class="topic-card"><h2>Controllo prima di consegnare</h2><p>Ogni attributo deve avere un significato, ogni associazione una lettura in entrambi i sensi. I numeri devono derivare dal testo; le eventuali ipotesi aggiunte vanno dichiarate. Un modello piccolo ma coerente è preferibile a un diagramma ricco di simboli non giustificati.</p><p>Il percorso di base termina qui. Nelle pagine successive confrontiamo le relazioni UML: per ogni tipo vedremo un diagramma e una possibile traduzione in C++.</p></section>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_12.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_14.html">Approfondimento &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>

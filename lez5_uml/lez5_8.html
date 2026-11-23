@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L5.8 · Molteplicità: quanti oggetti?</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="uml.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="uml.js" defer></script>
+</head>
+<body class="lesson-review lesson-uml">
+<div class="lesson-progress" aria-hidden="true"><span style="width:40.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 5 - UML e diagramma delle classi</h2>
+  <ul>
+    <li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+    <li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+    <li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+    <li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+    <li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+    <li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+    <li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+    <li><a href="lez5_8.html" class="active" aria-current="page">L5.8 - Molteplicità: quanti oggetti?</a></li>
+    <li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+    <li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+    <li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+    <li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+    <li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+    <li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+    <li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+    <li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+    <li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+    <li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+    <li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+    <li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 5: indice</strong><ul><li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+<li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+<li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+<li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+<li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+<li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+<li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+<li><a href="lez5_8.html" class="active" aria-current="page">L5.8 - Molteplicità: quanti oggetti?</a></li>
+<li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+<li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+<li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+<li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+<li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+<li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+<li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+<li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+<li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+<li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+<li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+<li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li></ul></nav><style>.lesson-uml .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 5 · UML e diagramma delle classi · 8/20</p><h1>Molteplicità: quanti oggetti?</h1><p class="lead">Fissa un oggetto da un lato e leggi il numero scritto vicino all’altro lato.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_7.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_9.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+<section class="topic-card" id="molteplicita"><h2>Leggere separatamente i due estremi</h2><figure class="diagram"><div class="diagram-scroll" tabindex="0" role="region" aria-label="Diagramma: Ogni missione ha zero o un robot assegnato; ogni robot può essere collegato a zero o più missioni registrate."><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 210" role="img" aria-labelledby="uml-diagram-2-title uml-diagram-2-desc"><title id="uml-diagram-2-title">Robot e Missione</title><desc id="uml-diagram-2-desc">Ogni missione ha zero o un robot assegnato; ogni robot può essere collegato a zero o più missioni registrate.</desc><rect x="30" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><rect x="630" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><text x="150" y="119" text-anchor="middle">Robot</text><text x="750" y="119" text-anchor="middle">Missione</text><line x1="270" y1="110" x2="630" y2="110" stroke="#173e38" stroke-width="3"/><text class="relation-label" x="450" y="76" text-anchor="middle">è assegnato a</text><text class="multiplicity" x="282" y="146">0..1</text><text class="multiplicity" x="618" y="146" text-anchor="end">0..*</text></svg></div><figcaption>Ogni missione ha zero o un robot assegnato; ogni robot può essere collegato a zero o più missioni registrate.</figcaption><p class="scroll-hint">Su uno schermo stretto puoi scorrere il diagramma orizzontalmente.</p></figure><p><strong>Fissa una missione.</strong> Vicino a <code>Robot</code> c’è <code>0..1</code>: quella missione può non avere un robot oppure averne uno solo.</p><p><strong>Fissa un robot.</strong> Vicino a <code>Missione</code> c’è <code>0..*</code>: quel robot può essere collegato a zero, una o più missioni registrate. Il numero vicino a una classe riguarda gli oggetti di <em>quella</em> classe per un oggetto all’altro estremo.</p></section><section class="topic-card"><h2>Gli intervalli essenziali</h2><div class="table-wrap" tabindex="0" role="region" aria-label="Notazione, Significato"><table><thead><tr><th scope="col">Notazione</th><th scope="col">Significato</th></tr></thead><tbody><tr><td><code>1</code></td><td>Esattamente uno.</td></tr><tr><td><code>0..1</code></td><td>Zero oppure uno: collegamento facoltativo.</td></tr><tr><td><code>0..*</code> oppure <code>*</code></td><td>Zero o più; non è fissato un massimo.</td></tr><tr><td><code>1..*</code></td><td>Almeno uno.</td></tr><tr><td><code>2..4</code></td><td>Da due a quattro, estremi inclusi.</td></tr></tbody></table></div><p><code>*</code> non significa “tutti” e non richiede di creare infiniti oggetti. Un eventuale limite pratico, come un array di 20 elementi, è una scelta d’implementazione; non va confuso con il vincolo del problema.</p></section><section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Con questo diagramma, M7 può essere assegnata contemporaneamente a R1 e R2?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>No. Per una missione il massimo di robot associati è 1. R1 può invece comparire in più missioni del registro.</p></div></details></section><section class="exercise-card" id="lettura-molteplicita"><span class="exercise-label">Prova tu</span><h2>Prova di lettura</h2><div class="exercise-prompt"><p>Un robot R3 non ha mai ricevuto missioni. Una missione M9 è ancora da assegnare. Questi due casi rispettano il diagramma? Giustifica ciascuno citando la molteplicità corretta.</p></div><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><p>Sì. R3 può avere zero missioni perché vicino a <code>Missione</code> c’è <code>0..*</code>. M9 può avere zero robot perché vicino a <code>Robot</code> c’è <code>0..1</code>.</p></div></details></section>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_7.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_9.html">Successiva &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>

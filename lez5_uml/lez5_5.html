@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L5.5 · Operazioni e visibilità</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="uml.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="uml.js" defer></script>
+</head>
+<body class="lesson-review lesson-uml">
+<div class="lesson-progress" aria-hidden="true"><span style="width:25.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 5 - UML e diagramma delle classi</h2>
+  <ul>
+    <li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+    <li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+    <li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+    <li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+    <li><a href="lez5_5.html" class="active" aria-current="page">L5.5 - Operazioni e visibilità</a></li>
+    <li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+    <li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+    <li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+    <li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+    <li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+    <li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+    <li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+    <li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+    <li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+    <li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+    <li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+    <li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+    <li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+    <li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+    <li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 5: indice</strong><ul><li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+<li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+<li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+<li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+<li><a href="lez5_5.html" class="active" aria-current="page">L5.5 - Operazioni e visibilità</a></li>
+<li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+<li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+<li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+<li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+<li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+<li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+<li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+<li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+<li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+<li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+<li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+<li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+<li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+<li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+<li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li></ul></nav><style>.lesson-uml .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 5 · UML e diagramma delle classi · 5/20</p><h1>Operazioni e visibilità</h1><p class="lead">Il diagramma espone un servizio e la sua interfaccia, non il procedimento che lo realizza.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_4.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_6.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+<section class="topic-card"><h2>Leggere una firma</h2><pre class="output">+ consuma(quantita: Integer): Boolean</pre><p><code>consuma</code> è un’operazione pubblica. Riceve un parametro intero chiamato <code>quantita</code> e restituisce un valore booleano. La quantità è un dato della chiamata: non diventa per questo un attributo permanente dell’oggetto.</p><p>Il risultato booleano segnala se il consumo è stato eseguito. La firma non basta a definire questa regola: precisiamo che la quantità deve essere positiva e non superare la carica disponibile; in caso contrario lo stato resta invariato.</p><p><code>caricaCompleta()</code> non ha parametri. Nel diagramma didattico omettiamo il tipo di ritorno delle operazioni senza risultato; in C++ useremo <code>void</code>. È una convenzione dichiarata, non un nuovo tipo UML.</p></section><section class="topic-card"><h2>Gli stessi accessi studiati in L4</h2><div class="table-wrap" tabindex="0" role="region" aria-label="Simbolo, Visibilità, Significato nel progetto C++"><table><thead><tr><th scope="col">Simbolo</th><th scope="col">Visibilità</th><th scope="col">Significato nel progetto C++</th></tr></thead><tbody><tr><td><code>+</code></td><td>Pubblica</td><td>Il codice esterno può richiedere l’operazione o accedere al membro pubblico.</td></tr><tr><td><code>-</code></td><td>Privata</td><td>L’accesso è riservato alla classe.</td></tr></tbody></table></div><p>Nel progetto della batteria teniamo privato il livello ed esponiamo operazioni controllate. La visibilità non significa che il testo dell’attributo sia segreto: indica chi può accedervi nel programma.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra approfondimento</span><span class="when-open">Nascondi approfondimento</span></summary><div class="solution-content"><p><code>#</code> indica visibilità protetta, utile parlando di ereditarietà. <code>~</code> indica visibilità di package: C++ non possiede un corrispondente diretto identico. Per gli esercizi di base bastano <code>+</code> e <code>-</code>.</p></div></details></section><section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>In consuma(quantita: Integer): Boolean, quantita è il valore restituito?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>No: è il parametro ricevuto. Il valore restituito ha tipo <code>Boolean</code> ed è indicato dopo la parentesi chiusa.</p></div></details></section>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_4.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_6.html">Successiva &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>

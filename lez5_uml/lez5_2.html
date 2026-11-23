@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L5.2 · La classe e i suoi oggetti</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="uml.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="uml.js" defer></script>
+</head>
+<body class="lesson-review lesson-uml">
+<div class="lesson-progress" aria-hidden="true"><span style="width:10.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 5 - UML e diagramma delle classi</h2>
+  <ul>
+    <li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+    <li><a href="lez5_2.html" class="active" aria-current="page">L5.2 - La classe e i suoi oggetti</a></li>
+    <li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+    <li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+    <li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+    <li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+    <li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+    <li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+    <li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+    <li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+    <li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+    <li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+    <li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+    <li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+    <li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+    <li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+    <li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+    <li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+    <li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+    <li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 5: indice</strong><ul><li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+<li><a href="lez5_2.html" class="active" aria-current="page">L5.2 - La classe e i suoi oggetti</a></li>
+<li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+<li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+<li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+<li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+<li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+<li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+<li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+<li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+<li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+<li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+<li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+<li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+<li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+<li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+<li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+<li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+<li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+<li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li></ul></nav><style>.lesson-uml .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 5 · UML e diagramma delle classi · 2/20</p><h1>La classe e i suoi oggetti</h1><p class="lead">Il tipo descrive le caratteristiche comuni; ogni oggetto possiede i propri valori.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_1.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_3.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+<section class="topic-card"><h2>Una classe non è una singola batteria</h2><p><code>Batteria</code> descrive il tipo degli oggetti. Il nome della classe si scrive in un riquadro, senza i valori assunti da una particolare batteria durante l’esecuzione.</p><div class="uml-class" role="group" aria-label="Classe Batteria"><h3>Batteria</h3><div class="compartment"><div>- livello: Integer</div></div><div class="compartment"><div>+ leggiLivello(): Integer</div></div></div><p>Il diagramma può contenere una sola classe <code>Batteria</code> anche quando il programma crea cento batterie. Il riquadro descrive il tipo, non conta quanti oggetti sono stati creati.</p></section><section class="topic-card"><h2>Una fotografia di due istanze</h2><div class="class-grid"><div class="uml-class object" role="group" aria-label="Oggetto b1 : Batteria"><h3>b1 : Batteria</h3><div class="compartment"><div>livello = 40</div></div></div><div class="uml-class object" role="group" aria-label="Oggetto b2 : Batteria"><h3>b2 : Batteria</h3><div class="compartment"><div>livello = 70</div></div></div></div><p>Questa è invece una rappresentazione di <strong>oggetti</strong>: il nome sottolineato <code>b1 : Batteria</code> si legge «b1 è un’istanza di Batteria». Nei riquadri compaiono valori concreti. Due oggetti possono avere anche valori uguali senza diventare lo stesso oggetto.</p><p>La fotografia degli oggetti aiuta a provare il modello delle classi, ma non va confusa con esso. Non è una mappa degli indirizzi di memoria.</p></section><section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Per rappresentare tre robot dello stesso tipo, nel diagramma delle classi devo disegnare tre classi Robot?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>No: basta la classe <code>Robot</code>. Per mostrare tre robot particolari potrei invece usare tre oggetti, per esempio <code>r1 : Robot</code>, <code>r2 : Robot</code> e <code>r3 : Robot</code>.</p></div></details></section>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_1.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_3.html">Successiva &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>

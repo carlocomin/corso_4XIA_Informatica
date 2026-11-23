@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L5.6 · Dal testo alle classi</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="uml.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="uml.js" defer></script>
+</head>
+<body class="lesson-review lesson-uml">
+<div class="lesson-progress" aria-hidden="true"><span style="width:30.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 5 - UML e diagramma delle classi</h2>
+  <ul>
+    <li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+    <li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+    <li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+    <li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+    <li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+    <li><a href="lez5_6.html" class="active" aria-current="page">L5.6 - Dal testo alle classi</a></li>
+    <li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+    <li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+    <li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+    <li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+    <li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+    <li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+    <li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+    <li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+    <li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+    <li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+    <li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+    <li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+    <li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+    <li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 5: indice</strong><ul><li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+<li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+<li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+<li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+<li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+<li><a href="lez5_6.html" class="active" aria-current="page">L5.6 - Dal testo alle classi</a></li>
+<li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+<li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+<li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+<li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+<li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+<li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+<li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+<li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+<li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+<li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+<li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+<li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+<li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+<li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li></ul></nav><style>.lesson-uml .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 5 · UML e diagramma delle classi · 6/20</p><h1>Dal testo alle classi</h1><p class="lead">Scegliamo le entità in base alle informazioni da gestire e alle loro responsabilità.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_5.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_7.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+<section class="topic-card"><h2>Il registro delle missioni del laboratorio</h2><p>Il laboratorio conserva un registro dei robot e delle loro missioni. Di un robot interessano codice e modello; di una missione codice, descrizione e indicazione se è completata. Una missione appena registrata può non essere assegnata; quando viene assegnata, riguarda un solo robot. Un robot può essere collegato a più missioni del registro.</p><p><strong>Confine del problema:</strong> registriamo assegnazioni, non programmiamo movimenti o algoritmi di intelligenza artificiale. Conserviamo anche le missioni concluse: più missioni dello stesso robot non significano che siano eseguite contemporaneamente.</p></section><section class="topic-card"><h2>Due entità, non una classe per ogni sostantivo</h2><div class="class-grid"><div class="uml-class" role="group" aria-label="Classe Robot"><h3>Robot</h3><div class="compartment"><div>- codice: String</div><div>- modello: String</div></div></div><div class="uml-class" role="group" aria-label="Classe Missione"><h3>Missione</h3><div class="compartment"><div>- codice: String</div><div>- descrizione: String</div><div>- completata: Boolean = false</div></div></div></div><p>Un robot esiste nel registro anche senza una missione; una missione ha un proprio codice e può attendere l’assegnazione. Ha quindi senso trattarli come due classi. <code>codice</code> e <code>descrizione</code> sono attributi, non nuove classi. Il laboratorio è il contesto: non serve una classe <code>Laboratorio</code> se non dobbiamo gestire suoi dati o operazioni.</p><p>Sottolineare nomi e verbi è un aiuto iniziale. La scelta si verifica chiedendo quali informazioni devono restare insieme e quale oggetto deve rispondere di ogni regola.</p></section><section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Missione deve essere solo una stringa dentro Robot?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>Non in questo problema: ha più proprietà, un’identità nel registro e può esistere prima dell’assegnazione. Una classe <code>Missione</code> rappresenta questi requisiti meglio di una sola descrizione testuale.</p></div></details></section>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_5.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_7.html">Successiva &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>

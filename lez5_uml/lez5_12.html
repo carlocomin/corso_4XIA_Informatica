@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L5.12 · Esercizi: leggere i vincoli del testo</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="uml.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="uml.js" defer></script>
+</head>
+<body class="lesson-review lesson-uml">
+<div class="lesson-progress" aria-hidden="true"><span style="width:60.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 5 - UML e diagramma delle classi</h2>
+  <ul>
+    <li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+    <li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+    <li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+    <li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+    <li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+    <li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+    <li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+    <li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+    <li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+    <li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+    <li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+    <li><a href="lez5_12.html" class="active" aria-current="page">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+    <li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+    <li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+    <li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+    <li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+    <li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+    <li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+    <li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+    <li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 5: indice</strong><ul><li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+<li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+<li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+<li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+<li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+<li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+<li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+<li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+<li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+<li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+<li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+<li><a href="lez5_12.html" class="active" aria-current="page">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+<li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+<li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+<li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+<li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+<li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+<li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+<li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+<li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li></ul></nav><style>.lesson-uml .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 5 · UML e diagramma delle classi · 12/20</p><h1>Esercizi: leggere i vincoli del testo</h1><p class="lead">Le quantità minime e massime si ricavano dalle frasi, non dall’aspetto del disegno.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_11.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_13.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+<section class="exercise-card" id="esercizio-3"><span class="exercise-label">Prova tu</span><h2>3. Stazioni e binari · Intermedio</h2><div class="exercise-prompt"><p>Un archivio conserva le stazioni ferroviarie e i loro binari. Di una stazione interessa il nome; di un binario il numero, univoco all’interno della sua stazione. Ogni stazione registrata ha da 3 a 30 binari; ogni binario appartiene a una sola stazione. Disegna classi e molteplicità. Spiega se il solo numero 2 identifica un binario in tutto l’archivio.</p></div><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><div class="class-grid"><div class="uml-class" role="group" aria-label="Classe Stazione"><h3>Stazione</h3><div class="compartment"><div>nome: String</div></div></div><div class="uml-class" role="group" aria-label="Classe Binario"><h3>Binario</h3><div class="compartment"><div>numero: Integer</div></div></div></div><figure class="diagram"><div class="diagram-scroll" tabindex="0" role="region" aria-label="Diagramma: Ogni stazione ha da 3 a 30 binari; ogni binario appartiene a una sola stazione."><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 210" role="img" aria-labelledby="uml-diagram-5-title uml-diagram-5-desc"><title id="uml-diagram-5-title">Stazione e Binario</title><desc id="uml-diagram-5-desc">Ogni stazione ha da 3 a 30 binari; ogni binario appartiene a una sola stazione.</desc><rect x="30" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><rect x="630" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><text x="150" y="119" text-anchor="middle">Stazione</text><text x="750" y="119" text-anchor="middle">Binario</text><line x1="270" y1="110" x2="630" y2="110" stroke="#173e38" stroke-width="3"/><text class="relation-label" x="450" y="76" text-anchor="middle">ha</text><text class="multiplicity" x="282" y="146">1</text><text class="multiplicity" x="618" y="146" text-anchor="end">3..30</text></svg></div><figcaption>Ogni stazione ha da 3 a 30 binari; ogni binario appartiene a una sola stazione.</figcaption><p class="scroll-hint">Su uno schermo stretto puoi scorrere il diagramma orizzontalmente.</p></figure><p>Il 2 non identifica un binario in tutto l’archivio: può esserci il binario 2 in stazioni diverse. La consegna garantisce l’unicità del numero solo all’interno di ciascuna stazione. Non è necessario aggiungere una generalizzazione o un rombo per soddisfare questi requisiti.</p></div></details></section><section class="exercise-card" id="esercizio-4"><span class="exercise-label">Prova tu</span><h2>4. Iscrizioni ai corsi · Intermedio</h2><div class="exercise-prompt"><p>La scuola conserva studenti, descritti da matricola e nome, e corsi, descritti da codice e titolo. Ogni studente può iscriversi a zero o più corsi; un corso può avere zero, uno o più iscritti. Per ora interessa soltanto sapere chi è iscritto a che cosa, senza date, voti o quote. Disegna il modello e spiega perché una stringa con tutti i nomi dei corsi dentro Studente non è una buona rappresentazione del collegamento.</p></div><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><div class="class-grid"><div class="uml-class" role="group" aria-label="Classe Studente"><h3>Studente</h3><div class="compartment"><div>matricola: String</div><div>nome: String</div></div></div><div class="uml-class" role="group" aria-label="Classe Corso"><h3>Corso</h3><div class="compartment"><div>codice: String</div><div>titolo: String</div></div></div></div><figure class="diagram"><div class="diagram-scroll" tabindex="0" role="region" aria-label="Diagramma: Uno studente può seguire zero o più corsi; un corso può avere zero o più studenti."><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 210" role="img" aria-labelledby="uml-diagram-6-title uml-diagram-6-desc"><title id="uml-diagram-6-title">Studente e Corso</title><desc id="uml-diagram-6-desc">Uno studente può seguire zero o più corsi; un corso può avere zero o più studenti.</desc><rect x="30" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><rect x="630" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><text x="150" y="119" text-anchor="middle">Studente</text><text x="750" y="119" text-anchor="middle">Corso</text><line x1="270" y1="110" x2="630" y2="110" stroke="#173e38" stroke-width="3"/><text class="relation-label" x="450" y="76" text-anchor="middle">è iscritto a</text><text class="multiplicity" x="282" y="146">0..*</text><text class="multiplicity" x="618" y="146" text-anchor="end">0..*</text></svg></div><figcaption>Uno studente può seguire zero o più corsi; un corso può avere zero o più studenti.</figcaption><p class="scroll-hint">Su uno schermo stretto puoi scorrere il diagramma orizzontalmente.</p></figure><p>La relazione è molti-a-molti. Una stringa di nomi mescola più collegamenti e non identifica con chiarezza gli oggetti <code>Corso</code>, che hanno un proprio codice e titolo. Per ora basta la linea: la consegna non richiede di conservare informazioni sull’iscrizione stessa.</p></div></details></section><section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Un’associazione molti-a-molti significa che ogni studente segue tutti i corsi?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>No. Le molteplicità delimitano i collegamenti possibili per ogni oggetto. I collegamenti effettivi possono essere pochi, diversi per ogni studente, oppure assenti.</p></div></details></section>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_11.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_13.html">Successiva &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>

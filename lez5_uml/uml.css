@@ -1,0 +1,52 @@
+body.lesson-uml {
+    font-size: 19px;
+    line-height: 1.55;
+}
+
+.lesson-uml .content-box > * { min-width: 0; }
+.lesson-uml .sidebar { width: min(330px, 85vw); left: -350px; visibility: hidden; background: #f8fdfa; }
+.lesson-uml .sidebar.open { left: 0; visibility: visible; }
+.lesson-uml .sidebar a { line-height: 1.35; }
+.lesson-uml .plain-link, .lesson-uml .download { color: #075a51; font-weight: 700; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.lesson-uml .code-example pre code, .lesson-uml .code-example pre code.hljs { display: block; background: #f8fbfa; font-size: 18px; line-height: 1.5; tab-size: 4; }
+.lesson-uml .code-example figcaption { text-transform: none; font-size: 14px; }
+.lesson-uml .class-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; margin: 20px 0; }
+.lesson-uml .uml-class { width: 100%; max-width: 470px; margin: 18px auto; border: 2px solid #244c48; border-radius: 3px; background: white; color: #172f2d; overflow: hidden; }
+.lesson-uml .class-grid .uml-class { margin: 0; }
+.lesson-uml .uml-class h3 { margin: 0; padding: 12px 15px; background: #e8f3ef; color: #173e38; font: bold 1.2em Georgia, Cambria, serif; text-align: center !important; overflow-wrap: anywhere; }
+.lesson-uml .uml-class .compartment { padding: 12px 15px; border-top: 2px solid #244c48; }
+.lesson-uml .uml-class .compartment div { font-family: Consolas, monospace; font-size: 0.94em; line-height: 1.6; overflow-wrap: anywhere; }
+.lesson-uml .uml-class.object h3 { background: #fff2d7; text-decoration: underline; text-underline-offset: 4px; }
+.lesson-uml .diagram { margin: 20px 0; container-type: inline-size; }
+.lesson-uml .diagram-scroll { width: 100%; overflow-x: auto; border: 1px solid #b6cbc5; border-radius: 10px; background: white; }
+.lesson-uml .diagram-scroll:focus-visible { outline: 3px solid #cc8c16; outline-offset: 3px; }
+.lesson-uml .diagram svg { display: block; width: 100%; min-width: 660px; height: auto; color: #173e38; }
+.lesson-uml .diagram svg text { fill: #173e38; font-family: Georgia, Cambria, serif; font-size: 24px; }
+.lesson-uml .diagram svg .relation-label { font-family: Georgia, Cambria, serif; font-size: 22px; }
+.lesson-uml .diagram svg .multiplicity { font-family: Consolas, monospace; font-size: 25px; font-weight: bold; }
+.lesson-uml .diagram figcaption { margin-top: 9px; font-size: 0.94em; color: #3c5550; }
+.lesson-uml .scroll-hint { margin: 5px 0; color: #526968; font-size: 0.85em; }
+@container (min-width: 662px) {
+    .lesson-uml .scroll-hint { display: none; }
+}
+.lesson-uml .rule-note { padding: 14px 18px; border-left: 5px solid #b47a11; background: #fff5df; }
+.lesson-uml .model-step { border-top: 3px solid #087f73; padding-top: 12px; }
+.lesson-uml .table-wrap th, .lesson-uml .table-wrap td { text-align: left; vertical-align: top; }
+.lesson-uml .no-script-index { margin: 12px auto; padding: 14px; max-width: 1040px; text-align: left; background: #fffdf7; border: 1px solid #b6cbc5; border-radius: 10px; }
+.lesson-uml .source-note { font-size: 0.9em; color: #526968; }
+.lesson-uml .two-col > * { min-width: 0; }
+
+@media (max-width: 760px) {
+    body.lesson-uml { font-size: 18px; }
+    .lesson-uml .class-grid { grid-template-columns: minmax(0, 1fr); }
+    .lesson-uml .code-example pre code, .lesson-uml .code-example pre code.hljs { padding: 14px; font-size: 16px; }
+    .lesson-uml .uml-class .compartment { padding: 10px; }
+    .lesson-uml .uml-class .compartment div { font-size: 0.88em; }
+}
+
+@media print {
+    .lesson-uml .menu-toggle, .lesson-uml .sidebar, .lesson-uml .lesson-progress, .lesson-uml .nav-buttons { display: none; }
+    .lesson-uml .diagram svg { min-width: 0; }
+    .lesson-uml .diagram-scroll { overflow: visible; }
+    .lesson-uml .topic-card, .lesson-uml .exercise-card { break-inside: avoid; }
+}

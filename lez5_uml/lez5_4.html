@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L5.4 · Attributi: nome, tipo e significato</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="uml.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="uml.js" defer></script>
+</head>
+<body class="lesson-review lesson-uml">
+<div class="lesson-progress" aria-hidden="true"><span style="width:20.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 5 - UML e diagramma delle classi</h2>
+  <ul>
+    <li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+    <li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+    <li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+    <li><a href="lez5_4.html" class="active" aria-current="page">L5.4 - Attributi: nome, tipo e significato</a></li>
+    <li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+    <li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+    <li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+    <li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+    <li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+    <li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+    <li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+    <li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+    <li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+    <li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+    <li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+    <li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+    <li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+    <li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+    <li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+    <li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 5: indice</strong><ul><li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+<li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+<li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+<li><a href="lez5_4.html" class="active" aria-current="page">L5.4 - Attributi: nome, tipo e significato</a></li>
+<li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+<li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+<li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+<li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+<li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+<li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+<li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+<li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+<li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+<li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+<li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+<li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+<li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+<li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+<li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+<li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li></ul></nav><style>.lesson-uml .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 5 · UML e diagramma delle classi · 4/20</p><h1>Attributi: nome, tipo e significato</h1><p class="lead">Un attributo deve rappresentare una proprietà utile per il problema, non una parola incontrata nel testo.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_3.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_5.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+<section class="topic-card"><h2>La forma essenziale</h2><pre class="output">- livello: Integer = 0</pre><p>Leggiamo: attributo privato chiamato <code>livello</code>, di tipo intero, con valore iniziale 0. La forma che useremo è <code>visibilità nome: Tipo</code>; il valore iniziale si aggiunge soltanto quando serve.</p><p>Nei nostri esempi usiamo attributi per dati semplici, come un codice, una descrizione o una quantità. Non è un limite di UML. Se dobbiamo rappresentare un’entità con proprie proprietà e relazioni, valutiamo una classe separata.</p></section><section class="topic-card"><h2>I tipi UML non sono parole chiave C++</h2><div class="table-wrap" tabindex="0" role="region" aria-label="Nel modello, Significato, Esempio di traduzione C++"><table><thead><tr><th scope="col">Nel modello</th><th scope="col">Significato</th><th scope="col">Esempio di traduzione C++</th></tr></thead><tbody><tr><td><code>Integer</code></td><td>Numero intero</td><td><code>int</code></td></tr><tr><td><code>Real</code></td><td>Numero reale</td><td><code>double</code>, con precisione finita</td></tr><tr><td><code>Boolean</code></td><td>Vero o falso</td><td><code>bool</code></td></tr><tr><td><code>String</code></td><td>Testo</td><td><code>string</code></td></tr></tbody></table></div><p>È una corrispondenza didattica, non un’identità perfetta: <code>int</code> ha limiti di rappresentazione. Possiamo anche usare tipi definiti nel progetto, purché ne chiariamo il significato.</p></section><section class="topic-card"><h2>Le regole vanno espresse</h2><p>Il tipo <code>Integer</code> non basta a dire che il livello deve essere fra 0 e 100. Aggiungiamo il vincolo <code>{0 &lt;= livello e livello &lt;= 100}</code>, con una nota o una frase accanto al diagramma. Non serve introdurre un nuovo linguaggio formale per scrivere questa regola.</p></section><section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Per memorizzare il nome di uno studente serve necessariamente una classe Nome?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>No. Nel nostro modello il nome può essere un attributo <code>nome: String</code>. Una classe separata avrebbe senso soltanto se il problema richiedesse di trattarlo come un’entità con una propria struttura o responsabilità.</p></div></details></section>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_3.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_5.html">Successiva &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L5.16 · Aggregazione condivisa: raggruppare senza possedere</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="uml.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="uml.js" defer></script>
+</head>
+<body class="lesson-review lesson-uml">
+<div class="lesson-progress" aria-hidden="true"><span style="width:80.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 5 - UML e diagramma delle classi</h2>
+  <ul>
+    <li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+    <li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+    <li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+    <li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+    <li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+    <li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+    <li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+    <li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+    <li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+    <li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+    <li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+    <li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+    <li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+    <li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+    <li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+    <li><a href="lez5_16.html" class="active" aria-current="page">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+    <li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+    <li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+    <li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+    <li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 5: indice</strong><ul><li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+<li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+<li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+<li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+<li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+<li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+<li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+<li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+<li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+<li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+<li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+<li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+<li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+<li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+<li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+<li><a href="lez5_16.html" class="active" aria-current="page">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+<li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+<li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+<li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+<li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li></ul></nav><style>.lesson-uml .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 5 · UML e diagramma delle classi · 16/20 · Approfondimento</p><h1>Aggregazione condivisa: raggruppare senza possedere</h1><p class="lead">Lo stesso robot può appartenere a due gruppi e continuare a esistere quando un gruppo termina.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_15.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_17.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+<section class="topic-card"><h2>Due gruppi, un solo robot</h2><figure class="diagram"><div class="diagram-scroll" tabindex="0" role="region" aria-label="Diagramma: Il rombo vuoto è vicino a Gruppo. Un gruppo contiene da zero a due robot; ogni robot può stare in zero o più gruppi."><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 210" role="img" aria-labelledby="uml-diagram-10-title uml-diagram-10-desc"><title id="uml-diagram-10-title">Gruppo e Robot</title><desc id="uml-diagram-10-desc">Il rombo vuoto è vicino a Gruppo. Un gruppo contiene da zero a due robot; ogni robot può stare in zero o più gruppi.</desc><rect x="30" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><rect x="630" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><text x="150" y="119" text-anchor="middle">Gruppo</text><text x="750" y="119" text-anchor="middle">Robot</text><line x1="310" y1="110" x2="630" y2="110" stroke="#173e38" stroke-width="3"/><polygon points="270,110 290,98 310,110 290,122" fill="white" stroke="#173e38" stroke-width="3"/><text class="relation-label" x="450" y="76" text-anchor="middle">raggruppa</text><text class="multiplicity" x="322" y="146">0..*</text><text class="multiplicity" x="618" y="146" text-anchor="end">0..2</text></svg></div><figcaption>Il rombo vuoto è vicino a Gruppo. Un gruppo contiene da zero a due robot; ogni robot può stare in zero o più gruppi.</figcaption><p class="scroll-hint">Su uno schermo stretto puoi scorrere il diagramma orizzontalmente.</p></figure><p>Nel nostro laboratorio il gruppo di collaudo e quello delle consegne possono includere lo stesso robot. Se si scioglie un gruppo, il robot resta nel registro. Il rombo vuoto indica il raggruppamento; da solo non dice se un robot può stare in due gruppi. In questo modello lo permette la molteplicità <code>0..*</code> vicino a <code>Gruppo</code>. Se la nozione di raggruppamento non aggiunge chiarezza, va bene anche una semplice associazione con le stesse regole esplicite.</p></section><section class="topic-card"><h2>Una traduzione in C++</h2><figure class="code-example"><figcaption>Frammento da aggregazione.cpp · il programma completo è scaricabile</figcaption><pre><code class="language-cpp">class Gruppo {
+private:
+    static constexpr int CAPACITA = 2;
+    const Robot* membri[CAPACITA]{};
+    int quanti = 0;
+
+public:
+    bool aggiungi(Robot&amp; robot) {
+        if (quanti == CAPACITA) {
+            return false;
+        }
+        for (int i = 0; i &lt; quanti; i++) {
+            if (membri[i] == &amp;robot) {
+                return false;
+            }
+        }
+        membri[quanti] = &amp;robot;
+        quanti++;
+        return true;
+    }
+
+    int numeroMembri() const {
+        return quanti;
+    }
+};</code></pre></figure><p>Il gruppo memorizza gli indirizzi dei robot, ma non li crea né li distrugge. Nel <code>main</code>, dopo la parentesi che chiude il blocco dei due gruppi, si può ancora leggere il codice di <code>r1</code>. Per questo i puntatori nell’array <code>membri</code> si dicono <strong>non proprietari</strong>: permettono di ritrovare i robot, ma non li tengono in vita. Il programma deve quindi garantire che un robot esista ancora quando il gruppo ne usa l’indirizzo.</p><p>Le prime cinque righe mostrano: inserimento nei due gruppi, duplicato rifiutato nel primo gruppo, secondo robot accettato e terzo rifiutato. Seguono il numero di membri del primo gruppo e il codice del robot ancora esistente.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra main</span><span class="when-open">Nascondi main</span></summary><div class="solution-content"><figure class="code-example"><figcaption>Il main del programma scaricabile</figcaption><pre><code class="language-cpp">int main() {
+    Robot r1(101);
+    Robot r2(102);
+    Robot r3(103);
+    {
+        Gruppo collaudo;
+        Gruppo consegne;
+        cout &lt;&lt; collaudo.aggiungi(r1) &lt;&lt; '\n';
+        cout &lt;&lt; consegne.aggiungi(r1) &lt;&lt; '\n';
+        cout &lt;&lt; collaudo.aggiungi(r1) &lt;&lt; '\n';
+        cout &lt;&lt; collaudo.aggiungi(r2) &lt;&lt; '\n';
+        cout &lt;&lt; collaudo.aggiungi(r3) &lt;&lt; '\n';
+        cout &lt;&lt; collaudo.numeroMembri() &lt;&lt; '\n';
+    }
+
+    cout &lt;&lt; r1.leggiCodice() &lt;&lt; '\n';
+    return 0;
+}</code></pre></figure></div></details><p><strong>Risultato del programma:</strong></p><pre class="output">1
+1
+0
+1
+0
+2
+101</pre><p><a class="download" href="esempi/aggregazione.cpp" download>Scarica il programma completo (.cpp)</a></p></section><section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Il rombo vuoto significa che ogni robot deve appartenere a più gruppi?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>No. Il numero dei gruppi si legge nella molteplicità: <code>0..*</code> vicino a <code>Gruppo</code> permette anche zero o un solo gruppo. Il rombo descrive il raggruppamento, non il numero di legami.</p></div></details></section>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_15.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_17.html">Successiva &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>

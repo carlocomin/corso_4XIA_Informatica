@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L5.11 · Esercizi: classi e responsabilità</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="uml.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="uml.js" defer></script>
+</head>
+<body class="lesson-review lesson-uml">
+<div class="lesson-progress" aria-hidden="true"><span style="width:55.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 5 - UML e diagramma delle classi</h2>
+  <ul>
+    <li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+    <li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+    <li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+    <li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+    <li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+    <li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+    <li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+    <li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+    <li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+    <li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+    <li><a href="lez5_11.html" class="active" aria-current="page">L5.11 - Esercizi: classi e responsabilità</a></li>
+    <li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+    <li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+    <li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+    <li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+    <li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+    <li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+    <li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+    <li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+    <li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 5: indice</strong><ul><li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+<li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+<li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+<li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+<li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+<li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+<li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+<li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+<li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+<li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+<li><a href="lez5_11.html" class="active" aria-current="page">L5.11 - Esercizi: classi e responsabilità</a></li>
+<li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+<li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+<li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+<li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+<li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+<li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+<li><a href="lez5_18.html">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+<li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+<li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li></ul></nav><style>.lesson-uml .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 5 · UML e diagramma delle classi · 11/20</p><h1>Esercizi: classi e responsabilità</h1><p class="lead">Leggi la situazione, scegli ciò che serve e disegna prima di aprire la soluzione.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_10.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_12.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+<section class="topic-card"><h2>Che cosa consegnare</h2><p>Per ogni esercizio prepara un piccolo diagramma, il significato degli attributi e una breve giustificazione delle scelte. Nei modelli di progetto usa <code>+</code> e <code>-</code>. <strong>Non devi implementare i metodi o scrivere il main.</strong> Sono accettabili nomi diversi se rappresentano le stesse informazioni e regole.</p></section><section class="exercise-card" id="esercizio-1"><span class="exercise-label">Prova tu</span><h2>1. Un prodotto nel distributore · Base</h2><div class="exercise-prompt"><p>Il programma gestisce un solo tipo di prodotto di un distributore: codice, prezzo in centesimi e pezzi disponibili. Deve permettere di sapere se è disponibile e di erogare un pezzo soltanto quando la scorta è positiva. Disegna una classe con attributi, operazioni e regole sui valori. Non modellare pagamenti o resto.</p></div><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><div class="uml-class" role="group" aria-label="Classe Prodotto"><h3>Prodotto</h3><div class="compartment"><div>- codice: String</div><div>- prezzoCentesimi: Integer</div><div>- scorta: Integer</div></div><div class="compartment"><div>+ disponibile(): Boolean</div><div>+ eroga(): Boolean</div></div></div><p>Vincoli: prezzo positivo e scorta non negativa. <code>disponibile</code> consulta; <code>eroga</code> riduce di uno la scorta soltanto se può riuscire, altrimenti restituisce falso senza modificarla. Il singolo prodotto gestito non richiede una classe per ogni pezzo fisico.</p></div></details></section><section class="exercise-card" id="esercizio-2"><span class="exercise-label">Prova tu</span><h2>2. Gli armadietti della scuola · Base</h2><div class="exercise-prompt"><p>Di ogni studente si conservano matricola e nome; di ogni armadietto, il numero. Uno studente può non avere un armadietto oppure averne uno solo. Un armadietto può essere libero oppure assegnato a uno studente solo. Rappresenta soltanto le assegnazioni attuali: scegli classi, attributi e molteplicità.</p></div><details class="answer-reveal"><summary><span class="when-closed">Mostra soluzione</span><span class="when-open">Nascondi soluzione</span></summary><div class="solution-content"><div class="class-grid"><div class="uml-class" role="group" aria-label="Classe Studente"><h3>Studente</h3><div class="compartment"><div>matricola: String</div><div>nome: String</div></div></div><div class="uml-class" role="group" aria-label="Classe Armadietto"><h3>Armadietto</h3><div class="compartment"><div>numero: Integer</div></div></div></div><figure class="diagram"><div class="diagram-scroll" tabindex="0" role="region" aria-label="Diagramma: Uno studente ha zero o un armadietto; un armadietto è assegnato a zero o uno studente."><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 210" role="img" aria-labelledby="uml-diagram-4-title uml-diagram-4-desc"><title id="uml-diagram-4-title">Studente e Armadietto</title><desc id="uml-diagram-4-desc">Uno studente ha zero o un armadietto; un armadietto è assegnato a zero o uno studente.</desc><rect x="30" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><rect x="630" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><text x="150" y="119" text-anchor="middle">Studente</text><text x="750" y="119" text-anchor="middle">Armadietto</text><line x1="270" y1="110" x2="630" y2="110" stroke="#173e38" stroke-width="3"/><text class="relation-label" x="450" y="76" text-anchor="middle">ha in uso</text><text class="multiplicity" x="282" y="146">0..1</text><text class="multiplicity" x="618" y="146" text-anchor="end">0..1</text></svg></div><figcaption>Uno studente ha zero o un armadietto; un armadietto è assegnato a zero o uno studente.</figcaption><p class="scroll-hint">Su uno schermo stretto puoi scorrere il diagramma orizzontalmente.</p></figure><p>È sufficiente un’associazione ordinaria. Uno studente non è un armadietto e nessuna regola chiede che la sua esistenza dipenda da esso. Qui mostriamo il modello dei dati, senza dettagliare ancora metodi e visibilità.</p></div></details></section>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_10.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_12.html">Successiva &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>

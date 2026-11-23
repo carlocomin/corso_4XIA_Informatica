@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4BIA - L5.18 · Generalizzazione: un tipo più specifico</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../default.css">
+  <link rel="stylesheet" href="uml.css">
+  <script src="../highlight.js" defer></script>
+  <script src="../menu.js" defer></script>
+  <script src="uml.js" defer></script>
+</head>
+<body class="lesson-review lesson-uml">
+<div class="lesson-progress" aria-hidden="true"><span style="width:90.00%"></span></div>
+<!-- BEGIN MENU -->
+<button class="menu-toggle" type="button" aria-controls="menu" aria-expanded="false" onclick="toggleMenu()">&#9776; Menu</button>
+<nav class="sidebar" id="menu" aria-label="Indice della lezione">
+  <h2>Lezione 5 - UML e diagramma delle classi</h2>
+  <ul>
+    <li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+    <li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+    <li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+    <li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+    <li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+    <li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+    <li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+    <li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+    <li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+    <li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+    <li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+    <li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+    <li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+    <li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+    <li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+    <li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+    <li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+    <li><a href="lez5_18.html" class="active" aria-current="page">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+    <li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+    <li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li>
+  </ul>
+</nav>
+<!-- END MENU -->
+<noscript><nav class="no-script-index" aria-label="Indice senza JavaScript"><strong>Lezione 5: indice</strong><ul><li><a href="lez5_1.html">L5.1 - UML: un modello per ragionare</a></li>
+<li><a href="lez5_2.html">L5.2 - La classe e i suoi oggetti</a></li>
+<li><a href="lez5_3.html">L5.3 - Il riquadro di una classe</a></li>
+<li><a href="lez5_4.html">L5.4 - Attributi: nome, tipo e significato</a></li>
+<li><a href="lez5_5.html">L5.5 - Operazioni e visibilità</a></li>
+<li><a href="lez5_6.html">L5.6 - Dal testo alle classi</a></li>
+<li><a href="lez5_7.html">L5.7 - Associazioni fra classi</a></li>
+<li><a href="lez5_8.html">L5.8 - Molteplicità: quanti oggetti?</a></li>
+<li><a href="lez5_9.html">L5.9 - Completare e verificare il modello</a></li>
+<li><a href="lez5_10.html">L5.10 - Dal diagramma al codice C++</a></li>
+<li><a href="lez5_11.html">L5.11 - Esercizi: classi e responsabilità</a></li>
+<li><a href="lez5_12.html">L5.12 - Esercizi: leggere i vincoli del testo</a></li>
+<li><a href="lez5_13.html">L5.13 - Laboratorio: i prestiti dei tablet</a></li>
+<li><a href="lez5_14.html">L5.14 - Come scegliere una relazione UML</a></li>
+<li><a href="lez5_15.html">L5.15 - Associazione semplice: un legame conservato</a></li>
+<li><a href="lez5_16.html">L5.16 - Aggregazione condivisa: raggruppare senza possedere</a></li>
+<li><a href="lez5_17.html">L5.17 - Composizione: una parte del tutto</a></li>
+<li><a href="lez5_18.html" class="active" aria-current="page">L5.18 - Generalizzazione: un tipo più specifico</a></li>
+<li><a href="lez5_19.html">L5.19 - Dipendenza: usare senza conservare il legame</a></li>
+<li><a href="lez5_20.html">L5.20 - Confronto: dallo scenario al simbolo</a></li></ul></nav><style>.lesson-uml .menu-toggle { display: none; }</style></noscript>
+<main class="slide">
+  <header class="lesson-hero"><p class="eyebrow">Lezione 5 · UML e diagramma delle classi · 18/20 · Approfondimento</p><h1>Generalizzazione: un tipo più specifico</h1><p class="lead">Un robot per consegne è un robot; non è una parte del robot.</p></header>
+  <nav class="nav-buttons" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_17.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_19.html">Successiva &#8594;</a></nav>
+  <div class="content-box">
+<section class="topic-card"><h2>La prova: «è un tipo di…»</h2><figure class="diagram"><div class="diagram-scroll" tabindex="0" role="region" aria-label="Diagramma: La linea continua con triangolo vuoto punta da RobotConsegne verso Robot, il tipo più generale."><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 210" role="img" aria-labelledby="uml-diagram-12-title uml-diagram-12-desc"><title id="uml-diagram-12-title">RobotConsegne e Robot</title><desc id="uml-diagram-12-desc">La linea continua con triangolo vuoto punta da RobotConsegne verso Robot, il tipo più generale.</desc><rect x="30" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><rect x="630" y="70" width="240" height="80" rx="2" fill="#eef6f2" stroke="#173e38" stroke-width="3"/><text x="150" y="119" text-anchor="middle">RobotConsegne</text><text x="750" y="119" text-anchor="middle">Robot</text><line x1="270" y1="110" x2="604" y2="110" stroke="#173e38" stroke-width="3"/><polygon points="630,110 604,96 604,124" fill="white" stroke="#173e38" stroke-width="3"/><text class="relation-label" x="450" y="76" text-anchor="middle"></text><text class="multiplicity" x="282" y="146"></text><text class="multiplicity" x="618" y="146" text-anchor="end"></text></svg></div><figcaption>La linea continua con triangolo vuoto punta da RobotConsegne verso Robot, il tipo più generale.</figcaption><p class="scroll-hint">Su uno schermo stretto puoi scorrere il diagramma orizzontalmente.</p></figure><p>Ogni robot per consegne ha il codice che caratterizza un robot e aggiunge una portata. Non stiamo collegando due robot distinti: descriviamo lo stesso oggetto a due livelli di generalità. La relazione non porta molteplicità.</p></section><section class="topic-card"><h2>Una traduzione in C++</h2><figure class="code-example"><figcaption>Frammento da generalizzazione.cpp · il programma completo è scaricabile</figcaption><pre><code class="language-cpp">class RobotConsegne : public Robot {
+private:
+    int portataKg;
+
+public:
+    RobotConsegne(int codice, int portata)
+        : Robot(codice), portataKg(portata) {}
+
+    int leggiPortata() const {
+        return portataKg;
+    }
+};</code></pre></figure><p><code>: public Robot</code> dichiara l’ereditarietà pubblica. Nella lista di inizializzazione, <code>Robot(codice)</code> inizializza la parte base e <code>portataKg(portata)</code> il nuovo campo. Nel <code>main</code>, <code>const Robot&amp; robot = r1;</code> usa il robot per consegne come un robot, senza copiarlo: tramite quel riferimento si legge il codice. La portata si legge tramite <code>r1</code>, il cui tipo è più specifico. Non servono ancora metodi virtuali.</p><details class="answer-reveal"><summary><span class="when-closed">Mostra main</span><span class="when-open">Nascondi main</span></summary><div class="solution-content"><figure class="code-example"><figcaption>Il main del programma scaricabile</figcaption><pre><code class="language-cpp">int main() {
+    RobotConsegne r1(101, 5);
+    const Robot&amp; robot = r1;
+    cout &lt;&lt; robot.leggiCodice() &lt;&lt; '\n';
+    cout &lt;&lt; r1.leggiPortata() &lt;&lt; '\n';
+    return 0;
+}</code></pre></figure></div></details><p><strong>Risultato del programma:</strong></p><pre class="output">101
+5</pre><p><a class="download" href="esempi/generalizzazione.cpp" download>Scarica il programma completo (.cpp)</a></p></section><section class="checkpoint"><div class="checkpoint-prompt"><span class="checkpoint-label">Checkpoint</span><h2>Perché Batteria non dovrebbe ereditare da Robot?</h2></div><details class="answer-reveal"><summary><span class="when-closed">Mostra risposta</span><span class="when-open">Nascondi risposta</span></summary><div class="solution-content"><p>Una batteria non è un tipo di robot. Nel simulatore è una sua parte: è la composizione a esprimere quella regola.</p></div></details></section>
+  </div>
+  <nav class="nav-buttons bottom-nav" aria-label="Navigazione tra le slide"><a class="nav-button" href="lez5_17.html">&#8592; Precedente</a><a class="nav-button primary" href="lez5_19.html">Successiva &#8594;</a></nav>
+  <p><a class="plain-link" href="../programma.html">Programma del corso</a></p>
+</main>
+</body>
+</html>

@@ -126,7 +126,8 @@ $rootItems = @(
     @{ Path = "lez1/lez1_1.html"; Label = "Lezione 1: Matrici 2D in C/C++" },
     @{ Path = "lez2/lez2_1.html"; Label = "Lezione 2: Struct in C/C++" },
     @{ Path = "lez3/lez3_1.html"; Label = "Lezione 3: File I/O in C/C++" },
-    @{ Path = "lez4/lez4_1.html"; Label = "Lezione 4: Classi e oggetti in C++" }
+    @{ Path = "lez4/lez4_1.html"; Label = "Lezione 4: Classi e oggetti in C++" },
+    @{ Path = "lez5_uml/lez5_1.html"; Label = "Lezione 5: UML e diagramma delle classi" }
 )
 
 $lez0Items = @(
@@ -251,6 +252,33 @@ $targets += @($lez3Items | ForEach-Object {
 
 $targets += @($lez4Items | ForEach-Object {
     @{ Path = "lez4/$($_.Path)"; Heading = "Lezione 4 - Classi e oggetti in C++"; Items = $lez4Items; Active = $_.Path; ScriptSrc = "../menu.js" }
+})
+
+$umlItems = @(
+    @{ Path = "lez5_1.html"; Label = "L5.1 - UML: un modello per ragionare" },
+    @{ Path = "lez5_2.html"; Label = "L5.2 - La classe e i suoi oggetti" },
+    @{ Path = "lez5_3.html"; Label = "L5.3 - Il riquadro di una classe" },
+    @{ Path = "lez5_4.html"; Label = "L5.4 - Attributi: nome, tipo e significato" },
+    @{ Path = "lez5_5.html"; Label = "L5.5 - Operazioni e visibilità" },
+    @{ Path = "lez5_6.html"; Label = "L5.6 - Dal testo alle classi" },
+    @{ Path = "lez5_7.html"; Label = "L5.7 - Associazioni fra classi" },
+    @{ Path = "lez5_8.html"; Label = "L5.8 - Molteplicità: quanti oggetti?" },
+    @{ Path = "lez5_9.html"; Label = "L5.9 - Completare e verificare il modello" },
+    @{ Path = "lez5_10.html"; Label = "L5.10 - Dal diagramma al codice C++" },
+    @{ Path = "lez5_11.html"; Label = "L5.11 - Esercizi: classi e responsabilità" },
+    @{ Path = "lez5_12.html"; Label = "L5.12 - Esercizi: leggere i vincoli del testo" },
+    @{ Path = "lez5_13.html"; Label = "L5.13 - Laboratorio: i prestiti dei tablet" },
+    @{ Path = "lez5_14.html"; Label = "L5.14 - Come scegliere una relazione UML" },
+    @{ Path = "lez5_15.html"; Label = "L5.15 - Associazione semplice: un legame conservato" },
+    @{ Path = "lez5_16.html"; Label = "L5.16 - Aggregazione condivisa: raggruppare senza possedere" },
+    @{ Path = "lez5_17.html"; Label = "L5.17 - Composizione: una parte del tutto" },
+    @{ Path = "lez5_18.html"; Label = "L5.18 - Generalizzazione: un tipo più specifico" },
+    @{ Path = "lez5_19.html"; Label = "L5.19 - Dipendenza: usare senza conservare il legame" },
+    @{ Path = "lez5_20.html"; Label = "L5.20 - Confronto: dallo scenario al simbolo" }
+)
+
+$targets += @($umlItems | ForEach-Object {
+    @{ Path = "lez5_uml/$($_.Path)"; Heading = "Lezione 5 - UML e diagramma delle classi"; Items = $umlItems; Active = $_.Path; ScriptSrc = "../menu.js" }
 })
 
 foreach ($target in $targets) {
